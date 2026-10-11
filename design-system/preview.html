@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PRIDE — дизайн-система</title>
+  <link rel="stylesheet" href="fonts/fonts.css">
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="components.css">
+  <style>
+    body { margin: 0; background: var(--pride-surface); }
+    main { max-width: 1100px; margin: auto; padding: 48px 24px 80px; }
+    header { display: flex; align-items: center; gap: 20px; padding-bottom: 32px; }
+    header img { width: 88px; height: 88px; }
+    h1 { margin: 0 0 8px; } h2 { margin: 0 0 20px; } p { margin: 0 0 16px; }
+    section { margin-top: 48px; } .muted { color: var(--pride-text-secondary); }
+    .palette { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+    .swatch { display: block; height: 72px; border-radius: 10px; margin-bottom: 8px; }
+    .palette figure { margin: 0; } figcaption { font-size: 14px; } figcaption span { display: block; color: var(--pride-text-muted); }
+    .examples { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+    .type-row { padding: 16px 0; border-bottom: 1px solid var(--pride-border-divider); }
+    .type-row small { display: block; color: var(--pride-text-muted); margin-bottom: 8px; }
+    .form-example { max-width: 480px; display: grid; gap: 20px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    footer { margin-top: 64px; color: var(--pride-text-muted); font-size: 14px; }
+    code { font-size: 13px; }
+    @media(max-width:650px) { main { padding: 24px 16px 48px; } header { align-items: flex-start; gap: 12px; } header img { width: 56px; height: 56px; } .palette { grid-template-columns: 1fr 1fr; } .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body class="pride-system">
+<main>
+  <header><img src="assets/logo-pride.png" alt="Эмблема клуба PRIDE" width="256" height="256"><div><h1>Дизайн-система PRIDE</h1><p class="muted">Основа будущего проекта · извлечено из judopride.by · 11.10.2026</p></div></header>
+  <div class="pride-panel"><p>Rubik, фирменный красный и спокойные светлые поверхности.</p><p class="muted">Значения подтверждены стилями сайта. Доступные состояния компонентов ниже — рекомендации для будущего проекта. Это витрина, кнопки не отправляют заявки.</p></div>
+  <section aria-labelledby="colors"><h2 id="colors">Палитра</h2><div class="palette">
+    <figure><span class="swatch" style="background:var(--pride-brand)"></span><figcaption>Акцент<span>#DB0C0C</span></figcaption></figure>
+    <figure><span class="swatch" style="background:var(--pride-text)"></span><figcaption>Основной текст<span>#212529</span></figcaption></figure>
+    <figure><span class="swatch" style="background:var(--pride-brand-hover)"></span><figcaption>Hover кнопки<span>#323232</span></figcaption></figure>
+    <figure><span class="swatch" style="background:var(--pride-text-muted)"></span><figcaption>Вторичный текст<span>#6B747A</span></figcaption></figure>
+    <figure><span class="swatch" style="background:var(--pride-surface-subtle)"></span><figcaption>Мягкая поверхность<span>#F5F7FA</span></figcaption></figure>
+    <figure><span class="swatch" style="background:var(--pride-surface-section)"></span><figcaption>Фон секции<span>#EFF3F9</span></figcaption></figure>
+    <figure><span class="swatch" style="background:var(--pride-surface-field)"></span><figcaption>Поле<span>#FAFAFA</span></figcaption></figure>
+    <figure><span class="swatch" style="background:var(--pride-border)"></span><figcaption>Граница<span>#DEDEDE</span></figcaption></figure>
+  </div></section>
+  <section aria-labelledby="type"><h2 id="type">Типографика</h2>
+    <div class="type-row"><small>Rubik 700 · H1 · 30–48 px</small><div style="font-size:var(--pride-size-h1);font-weight:700;line-height:1.2">Тренируемся, чтобы побеждать!</div></div>
+    <div class="type-row"><small>Rubik 600 · H3 · 25 px</small><h3 style="margin:0">Клуб дзюдо «Прайд»</h3></div>
+    <div class="type-row"><small>Rubik 400 · основной текст · 16 px / 1.6</small><p>Сильная команда, уважение к спорту и внимание к каждому участнику.</p><span class="muted">Кириллица: Аа Бб Вв Ёё Іі Ўў · Latin: Aa Bb Cc · 0123456789</span></div>
+  </section>
+  <section aria-labelledby="controls"><h2 id="controls">Кнопки и метки</h2><div class="examples">
+    <button type="button" class="pride-button">Записаться</button>
+    <button type="button" class="pride-button pride-button--secondary">Вход в кабинет</button>
+    <button type="button" class="pride-button" disabled>Недоступно</button>
+    <span class="pride-badge">6–7 лет</span><span class="pride-badge pride-badge--neutral">Метка стоимости</span>
+  </div></section>
+  <section aria-labelledby="forms"><h2 id="forms">Поля и поверхности</h2><div class="grid">
+    <div class="form-example"><label class="pride-field" for="name">Имя<input class="pride-input" id="name" placeholder="Введите имя" autocomplete="off"></label>
+    <div class="pride-field"><label for="phone">Телефон · пример ошибки</label><input class="pride-input" id="phone" type="tel" placeholder="+375…" aria-invalid="true" aria-describedby="phone-error" autocomplete="off"><span class="pride-field-error" id="phone-error">Укажите номер полностью.</span></div></div>
+    <div class="pride-card"><div class="pride-card-title">Карточка направления</div><p class="muted">Белая поверхность, скругление 20 px и мягкая тень.</p><span class="pride-badge">4–5 лет</span></div>
+  </div></section>
+  <section aria-labelledby="faq"><h2 id="faq">Раскрывающийся блок</h2><details class="pride-faq"><summary>Какие правила сохранены?</summary><p>Логотип, шрифт, палитра, типографическая шкала, размеры и визуальные паттерны. В комплекте есть исходные данные и рекомендации для реализации.</p></details></section>
+  <footer>Источник: <a class="pride-link" href="https://judopride.by/">judopride.by</a>. Полная спецификация — <a class="pride-link" href="README.md">design-system/README.md</a>. Rubik распространяется по SIL OFL; права на эмблему сохраняются у правообладателя.</footer>
+</main>
+</body>
+</html>

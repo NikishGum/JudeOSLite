@@ -1,0 +1,3 @@
+# Preserve whitespace in captured source CSS and the original font license.
+design-system/evidence/app*.css whitespace=-blank-at-eol
+design-system/fonts/OFL-Rubik.txt whitespace=-blank-at-eol

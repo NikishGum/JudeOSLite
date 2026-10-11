@@ -1,0 +1,32 @@
+/* Optional starter components. Appearance comes from the source; focus,
+   disabled states and reduced motion are recommendations for this project. */
+.pride-system { font-family: var(--pride-font); color: var(--pride-text); line-height: var(--pride-line-body); }
+.pride-system *, .pride-system *::before, .pride-system *::after { box-sizing: border-box; }
+.pride-system ::selection { background: var(--pride-brand); color: var(--pride-on-brand); }
+.pride-system :focus-visible { outline: var(--pride-focus-width) solid var(--pride-brand); outline-offset: var(--pride-focus-offset); }
+.pride-system h1 { font-size: var(--pride-size-h1); font-weight: 700; line-height: var(--pride-line-heading); }
+.pride-system h2 { font-size: var(--pride-size-h2); font-weight: 700; line-height: var(--pride-line-heading); }
+.pride-system h3 { font-size: var(--pride-size-h3); font-weight: 600; line-height: var(--pride-line-heading); }
+.pride-system p { font-size: var(--pride-size-body); line-height: var(--pride-line-body); }
+.pride-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: var(--pride-touch-target); padding: 15px 25px; border: 0; border-radius: var(--pride-radius-button); background: var(--pride-brand); color: var(--pride-on-brand); font: 500 14px/1.5 var(--pride-font); text-transform: uppercase; text-align: center; text-decoration: none; box-shadow: var(--pride-shadow-button); cursor: pointer; transition: background-color var(--pride-duration) var(--pride-easing), transform var(--pride-duration) var(--pride-easing), box-shadow var(--pride-duration) var(--pride-easing); }
+@media (hover: hover) { .pride-button:hover:not(:disabled) { background: var(--pride-brand-hover); transform: translateY(-5px); box-shadow: var(--pride-shadow-button-hover); } }
+.pride-button--secondary { background: var(--pride-surface-subtle); color: var(--pride-text-secondary); border: 1px solid var(--pride-border); padding: 10px 20px; text-transform: none; font-weight: 400; box-shadow: none; }
+.pride-button--secondary:hover:not(:disabled) { background: var(--pride-surface-section); color: var(--pride-text); transform: none; box-shadow: none; }
+.pride-button:disabled { opacity: .35; cursor: not-allowed; box-shadow: none; }
+.pride-field { display: grid; gap: 8px; font-size: 14px; font-weight: 500; }
+.pride-input { display: block; width: 100%; min-height: 50px; padding: 15px 20px; border: 1px solid var(--pride-surface-field); border-radius: var(--pride-radius-field); background: var(--pride-surface-field); color: var(--pride-text-field); caret-color: var(--pride-brand); font: 400 14px/20px var(--pride-font); }
+.pride-input::placeholder { color: var(--pride-text-secondary); opacity: 1; }
+.pride-input[aria-invalid="true"] { border-color: var(--pride-brand); }
+.pride-field-error { color: var(--pride-brand); font-size: 14px; font-weight: 400; }
+.pride-panel { padding: 40px; border-radius: var(--pride-radius-panel); background: var(--pride-surface-subtle); }
+.pride-card { padding: 30px 20px; border-radius: var(--pride-radius-panel); background: var(--pride-surface); box-shadow: var(--pride-shadow-card); text-align: center; }
+.pride-card-title { font: 600 20px/1.2 var(--pride-font); }
+.pride-badge { display: inline-block; padding: 3px 10px; border-radius: var(--pride-radius-badge); background: var(--pride-brand); color: var(--pride-on-brand); font: 500 13px/1.5 var(--pride-font); }
+.pride-badge--neutral { background: var(--pride-surface-subtle); color: var(--pride-text); font-size: 12px; font-weight: 400; }
+.pride-link { color: var(--pride-brand); text-decoration: underline; text-underline-offset: .2em; }
+.pride-faq { border-bottom: 1px solid var(--pride-border-divider); }
+.pride-faq summary { padding: 20px 0; cursor: pointer; font: 500 20px/1.5 var(--pride-font); }
+.pride-faq[open] summary { color: var(--pride-brand); }
+.pride-faq p { margin: 0 0 24px; }
+@media (max-width: 575px) { .pride-panel { padding: 24px; } .pride-system h2 { font-size: 24px; } .pride-faq summary { font-size: 16px; } }
+@media (prefers-reduced-motion: reduce) { .pride-button { transition: none; } .pride-button:hover:not(:disabled) { transform: none; } }

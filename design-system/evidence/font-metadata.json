@@ -1,0 +1,46 @@
+[
+  {
+    "file": "rubik-latin.woff2",
+    "axes": [
+      {
+        "tag": "wght",
+        "min": 300.0,
+        "max": 900.0
+      }
+    ],
+    "glyphs": 221
+  },
+  {
+    "file": "rubik-cyrillic.woff2",
+    "axes": [
+      {
+        "tag": "wght",
+        "min": 300.0,
+        "max": 900.0
+      }
+    ],
+    "glyphs": 107
+  },
+  {
+    "file": "rubik-cyrillic-ext.woff2",
+    "axes": [
+      {
+        "tag": "wght",
+        "min": 300.0,
+        "max": 900.0
+      }
+    ],
+    "glyphs": 88
+  },
+  {
+    "file": "rubik-latin-ext.woff2",
+    "axes": [
+      {
+        "tag": "wght",
+        "min": 300.0,
+        "max": 900.0
+      }
+    ],
+    "glyphs": 161
+  }
+]

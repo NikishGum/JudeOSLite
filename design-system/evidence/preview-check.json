@@ -1,0 +1,46 @@
+{
+  "desktop": {
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "overflow": false,
+    "fontLoaded": true,
+    "logoLoaded": true
+  },
+  "mobile": {
+    "controls": [
+      {
+        "height": 51,
+        "tag": "BUTTON",
+        "width": 145.28125
+      },
+      {
+        "height": 44,
+        "tag": "BUTTON",
+        "width": 145.46875
+      },
+      {
+        "height": 51,
+        "tag": "BUTTON",
+        "width": 145.9296875
+      },
+      {
+        "height": 52,
+        "tag": "INPUT",
+        "width": 343
+      },
+      {
+        "height": 52,
+        "tag": "INPUT",
+        "width": 343
+      }
+    ],
+    "fontLoaded": true,
+    "overflow": false,
+    "viewport": {
+      "h": 844,
+      "w": 390
+    }
+  }
+}

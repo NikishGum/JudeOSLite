@@ -1,0 +1,26 @@
+[
+  {
+    "path": "design-system/fonts/rubik-cyrillic-ext.woff2",
+    "source": "https://fonts.gstatic.com/s/rubik/v31/iJWKBXyIfDnIV7nMrXyw023e1Ik.woff2",
+    "sha256": "79891522e6f702d4f365da6048b12acb0b453dd7b0705a431f2b10f4400896a4",
+    "bytes": 12288
+  },
+  {
+    "path": "design-system/fonts/rubik-cyrillic.woff2",
+    "source": "https://fonts.gstatic.com/s/rubik/v31/iJWKBXyIfDnIV7nFrXyw023e1Ik.woff2",
+    "sha256": "963fc62d2cf3e59e6f338db71b85b5ea86dd009fff859116d51a31a9b98d1d30",
+    "bytes": 15108
+  },
+  {
+    "path": "design-system/fonts/rubik-latin-ext.woff2",
+    "source": "https://fonts.gstatic.com/s/rubik/v31/iJWKBXyIfDnIV7nPrXyw023e1Ik.woff2",
+    "sha256": "b11446f4d0b897435488492cdc6cd612f33748e2b010ac79eff74ea861cf8970",
+    "bytes": 19288
+  },
+  {
+    "path": "design-system/fonts/rubik-latin.woff2",
+    "source": "https://fonts.gstatic.com/s/rubik/v31/iJWKBXyIfDnIV7nBrXyw023e.woff2",
+    "sha256": "99ec7ccb40cf143f977c893649deece6cc2dcc7c0ff82ebf84b6584090f207ea",
+    "bytes": 35324
+  }
+]

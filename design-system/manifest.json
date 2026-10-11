@@ -1,0 +1,120 @@
+{
+  "source": "https://judopride.by/",
+  "capturedAt": "2026-10-11",
+  "timezone": "Europe/Minsk",
+  "scope": "Rendered homepage, site CSS and desktop/mobile layouts; not a full crawl or official brandbook",
+  "assets": [
+    {
+      "path": "design-system/assets/judo-calligraphy.png",
+      "bytes": 15953,
+      "sha256": "95c75f67134c7b418eeef3a90b2179b827348ddc5832a73ea367be0d0cbd2671",
+      "source": "https://judopride.by/img/1641091586_4-abrakadabra-fun-p-yaponskie-ieroglifi-vektor-12.png",
+      "license": "No explicit asset license observed",
+      "role": "Optional source decoration",
+      "dimensionsPx": [
+        1312,
+        3077
+      ],
+      "pngColorType": 3
+    },
+    {
+      "path": "design-system/assets/logo-pride.png",
+      "bytes": 16367,
+      "sha256": "349b48bb8312034f5b2ca9ef44995b8ae9a7a5d0f12dcabdb0d44b1c8aa9fef3",
+      "source": "https://judopride.by/img/logoalter.png",
+      "license": "No explicit asset license observed; original brand owner retains rights",
+      "role": "Original emblem, not redrawn",
+      "dimensionsPx": [
+        256,
+        256
+      ],
+      "pngColorType": 3
+    },
+    {
+      "path": "design-system/fonts/OFL-Rubik.txt",
+      "bytes": 4384,
+      "sha256": "472cbe7c25441df63e9c7864b43eb3c0f4b3df950c66a76224e6cfe1eae843fb",
+      "source": "https://raw.githubusercontent.com/google/fonts/main/ofl/rubik/OFL.txt",
+      "role": "Rubik license"
+    },
+    {
+      "path": "design-system/fonts/fonts.css",
+      "bytes": 1267,
+      "sha256": "8c7b7265e41e0936eabcead33a9f3910ac04f1199c2b6b4d0b14bce4504aed54",
+      "source": "Locally generated from captured Google Fonts declarations",
+      "role": "Self-hosted CSS"
+    },
+    {
+      "path": "design-system/fonts/rubik-cyrillic-ext.woff2",
+      "bytes": 12288,
+      "sha256": "79891522e6f702d4f365da6048b12acb0b453dd7b0705a431f2b10f4400896a4",
+      "source": "https://fonts.gstatic.com/s/rubik/v31/iJWKBXyIfDnIV7nMrXyw023e1Ik.woff2",
+      "license": "SIL Open Font License 1.1",
+      "role": "Rubik normal variable subset, wght 300–900"
+    },
+    {
+      "path": "design-system/fonts/rubik-cyrillic.woff2",
+      "bytes": 15108,
+      "sha256": "963fc62d2cf3e59e6f338db71b85b5ea86dd009fff859116d51a31a9b98d1d30",
+      "source": "https://fonts.gstatic.com/s/rubik/v31/iJWKBXyIfDnIV7nFrXyw023e1Ik.woff2",
+      "license": "SIL Open Font License 1.1",
+      "role": "Rubik normal variable subset, wght 300–900"
+    },
+    {
+      "path": "design-system/fonts/rubik-latin-ext.woff2",
+      "bytes": 19288,
+      "sha256": "b11446f4d0b897435488492cdc6cd612f33748e2b010ac79eff74ea861cf8970",
+      "source": "https://fonts.gstatic.com/s/rubik/v31/iJWKBXyIfDnIV7nPrXyw023e1Ik.woff2",
+      "license": "SIL Open Font License 1.1",
+      "role": "Rubik normal variable subset, wght 300–900"
+    },
+    {
+      "path": "design-system/fonts/rubik-latin.woff2",
+      "bytes": 35324,
+      "sha256": "99ec7ccb40cf143f977c893649deece6cc2dcc7c0ff82ebf84b6584090f207ea",
+      "source": "https://fonts.gstatic.com/s/rubik/v31/iJWKBXyIfDnIV7nBrXyw023e.woff2",
+      "license": "SIL Open Font License 1.1",
+      "role": "Rubik normal variable subset, wght 300–900"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "design-system/evidence/app.css",
+      "source": "https://judopride.by/css/app.css?ver=18",
+      "format": "Browser CSSOM serialization"
+    },
+    {
+      "path": "design-system/evidence/app2.css",
+      "source": "https://judopride.by/css/app2.css?ver=9",
+      "format": "Browser CSSOM serialization"
+    },
+    {
+      "path": "design-system/evidence/google-fonts-rubik.css",
+      "source": "https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap"
+    },
+    {
+      "path": "design-system/evidence/google-material-symbols.css",
+      "source": "https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,200,1,0"
+    },
+    {
+      "path": "design-system/evidence/home-desktop.png",
+      "viewportPx": [
+        1280,
+        720
+      ]
+    },
+    {
+      "path": "design-system/evidence/home-mobile.png",
+      "viewportPx": [
+        390,
+        844
+      ]
+    }
+  ],
+  "limitations": [
+    "Only raster emblem found on inspected homepage",
+    "Italic Rubik and Material Symbols binary files not bundled",
+    "Future product status colors and dark theme not established",
+    "Source CSS has invalid --color-text-dark and removes focus outlines; starter components do not reproduce these defects"
+  ]
+}

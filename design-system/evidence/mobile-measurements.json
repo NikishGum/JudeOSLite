@@ -1,0 +1,120 @@
+{
+  "samples": [
+    {
+      "cls": "select-box__input-text",
+      "lineHeight": "20.8px",
+      "padding": "10px 40px 10px 15px",
+      "size": "13px",
+      "tag": "P",
+      "weight": "500"
+    },
+    {
+      "cls": "button-order",
+      "lineHeight": "15px",
+      "padding": "9px 8px",
+      "size": "10px",
+      "tag": "DIV",
+      "weight": "500"
+    },
+    {
+      "cls": " ",
+      "lineHeight": "36.4154px",
+      "padding": "0px",
+      "size": "30.3462px",
+      "tag": "H1",
+      "weight": "700"
+    },
+    {
+      "cls": "",
+      "lineHeight": "22.4px",
+      "padding": "0px",
+      "size": "14px",
+      "tag": "P",
+      "weight": "400"
+    },
+    {
+      "cls": "",
+      "lineHeight": "22.4px",
+      "padding": "0px",
+      "size": "14px",
+      "tag": "P",
+      "weight": "400"
+    },
+    {
+      "cls": "",
+      "lineHeight": "22.4px",
+      "padding": "0px",
+      "size": "14px",
+      "tag": "P",
+      "weight": "400"
+    },
+    {
+      "cls": "",
+      "lineHeight": "22.4px",
+      "padding": "0px",
+      "size": "14px",
+      "tag": "P",
+      "weight": "400"
+    },
+    {
+      "cls": "button-order me-3",
+      "lineHeight": "16.5px",
+      "padding": "12px 13px",
+      "size": "11px",
+      "tag": "A",
+      "weight": "500"
+    },
+    {
+      "cls": "button-order",
+      "lineHeight": "16.5px",
+      "padding": "12px 13px",
+      "size": "11px",
+      "tag": "A",
+      "weight": "500"
+    },
+    {
+      "cls": "button-order me-3 air",
+      "lineHeight": "25.3px",
+      "padding": "12px 13px",
+      "size": "11px",
+      "tag": "A",
+      "weight": "500"
+    },
+    {
+      "cls": "button-order  air air-2",
+      "lineHeight": "25.3px",
+      "padding": "12px 13px",
+      "size": "11px",
+      "tag": "A",
+      "weight": "500"
+    },
+    {
+      "cls": "",
+      "lineHeight": "28.8px",
+      "padding": "0px",
+      "size": "24px",
+      "tag": "H2",
+      "weight": "700"
+    },
+    {
+      "cls": "",
+      "lineHeight": "22.4px",
+      "padding": "0px",
+      "size": "14px",
+      "tag": "P",
+      "weight": "400"
+    },
+    {
+      "cls": "",
+      "lineHeight": "28.8px",
+      "padding": "0px",
+      "size": "24px",
+      "tag": "H2",
+      "weight": "700"
+    }
+  ],
+  "viewport": {
+    "height": 844,
+    "width": 390
+  }
+}
