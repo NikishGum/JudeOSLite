@@ -7,3 +7,5 @@ Lite version of JudeOS — Sport CRM.
 - [Витрина](design-system/preview.html) — откройте в браузере для просмотра.
 
 Источник оформления: [judopride.by](https://judopride.by/). Приложение пока не реализовано.
+
+База знаний для будущей CRM: [docs/knowledge-base/README.md](docs/knowledge-base/README.md). Здесь собраны сведения о клубе, ЕРИП/iPay, требования заказчика, противоречия и источники. Агентам начинать с этого указателя и краткой памяти.
