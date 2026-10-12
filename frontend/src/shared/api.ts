@@ -32,3 +32,4 @@ async function request<T>(path: `/api/${string}`, method: string, body?: unknown
 }
 export function apiGet<T>(path: `/api/${string}`, signal?: AbortSignal): Promise<T> { return request<T>(path, 'GET', undefined, signal); }
 export function apiPost<T>(path: `/api/${string}`, body?: unknown): Promise<T> { return request<T>(path, 'POST', body); }
+export function apiPut<T>(path: `/api/${string}`, body: unknown): Promise<T> { return request<T>(path, 'PUT', body); }
