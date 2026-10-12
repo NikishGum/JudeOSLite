@@ -16,6 +16,7 @@ import (
 
 	"github.com/NikishGum/JudeOSLite/backend/internal/auth"
 	"github.com/NikishGum/JudeOSLite/backend/internal/clubs"
+	"github.com/NikishGum/JudeOSLite/backend/internal/participants"
 	"github.com/NikishGum/JudeOSLite/backend/internal/platform"
 	"github.com/NikishGum/JudeOSLite/backend/migrations"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -63,7 +64,7 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	handler = authService.Handler(clubs.New(pool, authService).Handler(handler))
+	handler = authService.Handler(participants.New(pool, authService).Handler(clubs.New(pool, authService).Handler(handler)))
 	srv := &http.Server{Addr: cfg.HTTPAddr, Handler: handler, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 15 * time.Second, WriteTimeout: 15 * time.Second, IdleTimeout: 60 * time.Second}
 	listener, err := net.Listen("tcp", cfg.HTTPAddr)
 	if err != nil {

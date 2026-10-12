@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import logo from '../../../design-system/assets/logo-pride.png';
 import { ApiError, apiGet, apiPost, setCsrfToken } from '../shared/api';
 import { OwnerManagement } from '../features/clubs/OwnerManagement';
+import { ParticipantRegistry } from '../features/participants/ParticipantRegistry';
 
 type Club = { id: string; name: string; timezone: string; archived: boolean; roles: string[] };
 type Session = { user: { id: string; displayName: string; isOwner: boolean }; clubs: Club[]; csrfToken: string };
@@ -127,6 +128,7 @@ export function App() {
             {club && <div className="club-summary"><h3>{club.name}</h3><p>{club.roles.map((role) => roleNames[role] ?? role).join(' · ')}</p></div>}
           </>}
         </section>
+        {club && (session.user.isOwner || club.roles.includes('administrator')) && <ParticipantRegistry key={`${session.user.id}:${club.id}:${roles}`} clubId={club.id} timezone={club.timezone} onSessionRefresh={() => loadSession()} />}
         {session.user.isOwner && <OwnerManagement key={session.user.id} onChanged={() => loadSession()} />}
       </> : <section className="connection login-panel" aria-labelledby="login-title"><h2 id="login-title">Ваш аккаунт PRIDE</h2>
         <form onSubmit={(event) => void signIn(event)} aria-busy={busy}>

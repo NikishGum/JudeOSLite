@@ -1,6 +1,6 @@
 # PostgreSQL: минимальная схема первой версии
 
-Версия 2.0, 12.10.2026. **Предложение для будущих таблиц; фактическая схема — миграции.** Только текущая посещаемость/реестр; прежние 26 таблиц, включая финансы/медицину/импорт, сохранены в [истории](../archive/README.md). Таблицы добавляются при реализации зависимой задачи. 0002 создаёт clubs, staff_users, staff_club_roles, staff_sessions; 0003 добавляет version в clubs/staff_users и audit_events. Контракты — [auth-v1.md](../auth-v1.md), [clubs-v1.md](../clubs-v1.md). Остальные предметные таблицы ещё не реализованы.
+Версия 2.0, 12.10.2026. **Предложение для будущих таблиц; фактическая схема — миграции.** Только текущая посещаемость/реестр; прежние 26 таблиц, включая финансы/медицину/импорт, сохранены в [истории](../archive/README.md). Таблицы добавляются при реализации зависимой задачи. 0002 создаёт clubs, staff_users, staff_club_roles, staff_sessions; 0003 добавляет version в clubs/staff_users и audit_events; 0004 — participants/club_memberships с отдельными версиями общей и локальной карточки. Контракты — [auth-v1.md](../auth-v1.md), [clubs-v1.md](../clubs-v1.md), [participants-v1.md](../participants-v1.md). Тренировочные таблицы ещё не реализованы.
 
 ## Соглашения
 
@@ -18,8 +18,8 @@
 | staff_users | login text, display_name text, password_hash text, is_owner bool, disabled_at timestamptz nullable | UNIQUE нормализованного login; хеш не возвращать клиенту |
 | staff_club_roles | staff_user_id FK, club_id FK, role text | UNIQUE(user, club, role), role administrator/trainer; общий owner в staff_users |
 | staff_sessions | staff_user_id FK, token_hash bytea, csrf_token_hash bytea, expires_at, revoked_at nullable | UNIQUE(token_hash), хранить хеши, проверять текущие роли/disabled; чистить истёкшие |
-| participants | full_name text, birth_date date | Общая идентичность. В ручном v1 полная дата; ФИО не UNIQUE. Поле birth_year понадобится позже при Excel, сейчас миграция не нужна |
-| club_memberships | participant_id FK, club_id FK, joined_on date, contact_kind text, contact_value text, contact_name nullable, archived_at nullable | UNIQUE(participant, club), локальный контакт; kind phone/email, семейный контакт не UNIQUE |
+| participants | full_name text, birth_date date, version integer, updated_at | Общая идентичность. В ручном v1 полная дата; ФИО не UNIQUE. Поле birth_year понадобится позже при Excel, сейчас миграция не нужна |
+| club_memberships | participant_id FK, club_id FK, joined_on date, contact_kind text, contact_value text, contact_name nullable, archived_at nullable, version integer, updated_at | UNIQUE(participant, club), UNIQUE(id,club_id) для будущих исторических FK; локальный контакт; kind phone/email, семейный контакт не UNIQUE. Новая связь блокирует participant для сериализации с правкой общей идентичности |
 | training_groups | club_id FK, name text, archived_at nullable | UNIQUE(id, club_id); простой справочник без вместимости/программ |
 | group_memberships | club_id FK, group_id FK, club_membership_id FK, valid_from date, valid_until date nullable | Состав на дату. Интервалы одной пары не пересекаются; until > from. Перевод атомарный |
 | schedule_rules | club_id FK, group_id FK, series_id uuid, trainer_id FK staff_users, mode text, weekdays smallint[] nullable, day_parity text nullable, selected_dates date[] nullable, starts_time time, duration_minutes integer, valid_from date, valid_until date nullable | mode weekly/day_parity/date_list; CHECK ровно соответствующего набору режима. Паритет even/odd по дню месяца, weekdays ISO 1–7. Версия правила новой строкой периода, общий series_id; UNIQUE(series_id, valid_from) |
