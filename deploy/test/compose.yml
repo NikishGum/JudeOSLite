@@ -1,0 +1,79 @@
+name: judeos-test
+services:
+  db:
+    image: postgres:18.6-bookworm
+    environment:
+      POSTGRES_DB: judeoslite
+      POSTGRES_USER: judeoslite
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets: [db_password]
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U judeoslite -d judeoslite']
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+    logging: &logging
+      driver: json-file
+      options: {max-size: 10m, max-file: '3'}
+  migrate:
+    image: ${APP_IMAGE:?APP_IMAGE digest is required}
+    command: [/app/migrate]
+    environment: &database
+      DATABASE_URL: host=db port=5432 sslmode=disable
+      PGDATABASE: judeoslite
+      PGUSER: judeoslite
+      PGPASSFILE: /run/secrets/pgpass
+    secrets: [pgpass]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    depends_on:
+      db: {condition: service_healthy}
+    restart: 'no'
+    logging: *logging
+  app:
+    image: ${APP_IMAGE:?APP_IMAGE digest is required}
+    environment:
+      <<: *database
+      UPLOAD_DIR: /app/uploads
+      APP_ORIGIN: https://test.judopride.tech
+      AUTH_INSECURE_LOCAL: 'false'
+    secrets: [pgpass]
+    volumes:
+      - /srv/judeos-test/uploads:/app/uploads
+    read_only: true
+    tmpfs: ['/tmp:size=64m,mode=1777']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    depends_on:
+      db: {condition: service_healthy}
+    restart: unless-stopped
+    stop_grace_period: 15s
+    logging: *logging
+  caddy:
+    image: caddy:2.10.2-alpine
+    environment:
+      TEST_DOMAIN: test.judopride.tech
+      NO_PROXY: app,localhost,127.0.0.1
+    ports: ['80:80', '443:443']
+    volumes:
+      - /srv/judeos-test/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+    logging: *logging
+secrets:
+  db_password:
+    file: /srv/judeos-test-config/db-password-v1-19
+  pgpass:
+    file: /srv/judeos-test-config/pgpass-v1-19
+volumes:
+  postgres_data:
+    name: judeos-test-postgres-v1-19
+  caddy_data:
+    name: judeos-test-caddy-data-v1-19
+  caddy_config:
+    name: judeos-test-caddy-config-v1-19

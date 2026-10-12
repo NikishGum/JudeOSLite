@@ -44,6 +44,8 @@ iPay только после доступа ЛК и уточнения взаи�
 
 По прямому поручению владельца добавлена V1-19 / #167: автоматический деплой успешного CI main на test.judopride.tech. Зависит от готовой V1-01; V1-17 переиспользует инфраструктуру после V1-13 и проверяет полную CRM/предметный restore. Работа агента только в Cloud; VPS, GitHub Secrets и реальные проверки выполняет владелец. DEPLOY_PATH=/srv/judeos-test, config=/srv/judeos-test-config. Доступ judeos-deploy только через root-owned ограниченный controller.py и forced SSH command, без Docker-группы и общего sudo. Реальный деплой ещё не подтверждён.
 
+Подготовленная реализация и ручные команды — [operations-test.md](../operations-test.md), Cloud-проверки — [test-deploy-validation.md](../test-deploy-validation.md). Bootstrap только staging: прежний контроллер/ключи/sudoers/firewall сохраняются; активация нового протокола по подтверждённому hash — явная root-операция владельца. Учитывается готовая V1-02: APP_ORIGIN HTTPS, первый владелец создаётся скрытым терминальным prompt после deploy. GitHub Environment test нужно создать владельцу: подключение Cloud не имеет API-прав управления environment (403); Secrets не заполнялись.
+
 ## Доступ сотрудников V1-02 — 12.10.2026
 
 По поручению #150: захват через очередь подтверждён для StarMadeGalaxy, [run 38233441350](https://github.com/NikishGum/JudeOSLite/actions/runs/38233441350). Добавлены auth API/UI, серверные 12-часовые сессии с хешами, Argon2id, Origin/CSRF, ограничение входа и интерактивный bootstrap первого владельца. Disable отзывает сессии DB-trigger; роли читаются заново. 0002 создаёт staff-таблицы и минимальный clubs: V1-03 развивает управление существующей таблицей. Контракт/запуск/границы — [auth-v1.md](../auth-v1.md).

@@ -1,0 +1,110 @@
+name: Deploy test
+on:
+  workflow_run:
+    workflows: [Build and checks]
+    branches: [main]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      ci_run_id:
+        description: Successful Build and checks push-run ID for current main
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: judeos-test-deployment
+  cancel-in-progress: false
+jobs:
+  select:
+    if: >-
+      github.repository == 'NikishGum/JudeOSLite' &&
+      ((github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') ||
+       (github.event_name == 'workflow_run' && github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.head_branch == 'main' &&
+        github.event.workflow_run.head_repository.full_name == github.repository &&
+        github.event.workflow_run.conclusion == 'success'))
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.select.outputs.sha }}
+      generation: ${{ steps.select.outputs.generation }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+      - id: select
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/select_deploy.py
+  publish:
+    needs: select
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ steps.publish.outputs.image }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.select.outputs.sha }}
+          persist-credentials: false
+      - id: publish
+        name: Build or reuse the SHA image, smoke it, and record its digest
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REGISTRY_ACTOR: ${{ github.actor }}
+          RELEASE_SHA: ${{ needs.select.outputs.sha }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$GH_TOKEN" | docker login ghcr.io -u "$REGISTRY_ACTOR" --password-stdin
+          trap 'docker logout ghcr.io >/dev/null' EXIT
+          image="ghcr.io/nikishgum/judeoslite-test:$RELEASE_SHA"
+          if docker manifest inspect "$image" >/dev/null 2>&1; then
+            # Retrying the same CI generation must retain the original digest.
+            docker pull "$image"
+            test "$(docker image inspect "$image" --format '{{ index .Config.Labels "org.opencontainers.image.revision" }}')" = "$RELEASE_SHA"
+            docker tag "$image" judeoslite:ci
+            bash deploy/check.sh judeoslite-ci-publish
+          else
+            docker build --build-arg APP_REVISION="$RELEASE_SHA" -f deploy/Dockerfile -t judeoslite:ci .
+            bash deploy/check.sh judeoslite-ci-publish
+            docker tag judeoslite:ci "$image"
+            docker push "$image"
+          fi
+          digest="$(docker image inspect "$image" --format '{{index .RepoDigests 0}}')"
+          [[ "$digest" =~ ^ghcr\.io/nikishgum/judeoslite-test@sha256:[0-9a-f]{64}$ ]]
+          printf 'image=%s\n' "$digest" >> "$GITHUB_OUTPUT"
+  deploy:
+    needs: [select, publish]
+    runs-on: ubuntu-latest
+    environment:
+      name: test
+      url: https://test.judopride.tech
+    # SSH disconnection does not stop the independently supervised VPS worker.
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Recheck that CI still represents current main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/select_deploy.py
+      - name: Send the restricted deployment request
+        env:
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ vars.DEPLOY_PORT }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+          TEST_DOMAIN: ${{ vars.TEST_DOMAIN }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          RELEASE_SHA: ${{ needs.select.outputs.sha }}
+          RELEASE_IMAGE: ${{ needs.publish.outputs.image }}
+          RELEASE_GENERATION: ${{ needs.select.outputs.generation }}
+        run: python3 .github/scripts/deploy_ssh.py

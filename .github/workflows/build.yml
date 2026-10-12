@@ -49,5 +49,9 @@ jobs:
           if env -u DATABASE_URL /tmp/judeos-server; then exit 1; fi
       - name: Build production image
         run: docker build -f deploy/Dockerfile -t judeoslite:ci .
+      - name: Deployment policy, controller and server operation tests
+        run: python3 -m unittest discover -s deploy/test -p 'test_*.py' -v
       - name: Compose clean startup, migration rerun and restart
         run: bash deploy/check.sh judeoslite-ci
+      - name: Disposable Caddy TLS, deploy persistence and backup restore
+        run: python3 deploy/test/integration_check.py
