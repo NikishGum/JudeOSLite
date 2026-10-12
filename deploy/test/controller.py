@@ -21,11 +21,12 @@ def main():
     request = validate_request(json.loads(raw))
     unit = f"judeos-test-deploy-{request['generation']}"
     # systemd owns the worker: losing SSH or cancelling Actions does not kill
-    # the migration. TimeoutStartSec=0 also disables the default start timeout.
+    # the migration. Use explicit infinity: systemd-run passes transient
+    # TimeoutStartSec=0 as a zero deadline, unlike the unit-file parser.
     command = [
         '/usr/bin/systemd-run', '--quiet', '--wait', '--collect',
         '--unit=' + unit, '--property=Type=oneshot',
-        '--property=TimeoutStartSec=0',
+        '--property=TimeoutStartSec=infinity',
         '/usr/bin/python3', '-I', str(LIB / 'admin.py'), 'deploy',
         request['sha'], request['image'], str(request['generation']),
     ]

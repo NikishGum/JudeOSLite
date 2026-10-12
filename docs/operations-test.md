@@ -343,9 +343,36 @@ Server flock охватывает backup/migrate/start/restore/rollback. Waterma
 предпочтителен новый revert-commit с успешным CI.
 
 SSH-запрос не переносит compose/scripts и не даёт shell. systemd worker работает
-независимо от SSH/Actions, `TimeoutStartSec=0` не обрывает миграцию. При timeout
+независимо от SSH/Actions, `TimeoutStartSec=infinity` отключает startup timeout.
+Нельзя заменять infinity на 0: transient D-Bus property в systemd-run передаёт
+нулевой deadline, хотя parser обычного unit-файла трактует 0 иначе. При timeout
 Actions сначала проверить status/unit; не отменять worker и не запускать restore.
 Миграции Go имеют собственный timeout и transaction/advisory lock.
+
+### Обновление прежнего V1-19 controller с нулевым timeout
+
+Владелец подтвердил пустой state и `code=killed/status=15/TERM` у worker.
+Контрольный `/usr/bin/true` с transient `TimeoutStartSec=0` вернул 1;
+та же команда с `infinity` завершилась success/exit 0. Ошибка в контроллере
+исправлена; GHCR/миграции в этих попытках ещё не проверялись.
+
+После получения и изучения исправленного checkout, остановив новые Actions
+и убедившись, что worker не выполняется, root обновляет только controller.
+Следующий hash соответствует прежнему V1-19 controller из merged PR #168;
+при отличии файла активация откажет — hash не подменять без изучения причины:
+
+```bash
+install -o root -g root -m 0755 deploy/test/controller.py /usr/local/lib/judeos-deploy/controller.v1-19.py.new
+mv -T /usr/local/lib/judeos-deploy/controller.v1-19.py.new /usr/local/lib/judeos-deploy/controller.v1-19.py
+python3 -I /usr/local/lib/judeos-deploy/admin.py activate-controller \
+  --expected-old-sha256 d0caef5ad48d2b9568c00481f10b0f8dc05b639ad407412e5590f8745bd5b7fe
+python3 -I /usr/local/lib/judeos-deploy/admin.py preflight
+```
+
+Активация сохраняет root-only архив старого controller. SSH reload, новые ключи,
+изменение Secrets/sudoers/Docker-группы не требуются. После обновления можно
+повторить Deploy test для текущего main; если main изменился, нужен его новый
+успешный CI. Реальный deploy/HTTPS проверяет владелец отдельно.
 
 ## Backup, проверка restore и recovery
 

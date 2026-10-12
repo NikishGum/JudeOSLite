@@ -164,7 +164,8 @@ class PolicyTests(unittest.TestCase):
             controller.main()
             command = run.call_args.args[0]
             self.assertEqual(command[0], '/usr/bin/systemd-run')
-            self.assertIn('--property=TimeoutStartSec=0', command)
+            self.assertIn('--property=TimeoutStartSec=infinity', command)
+            self.assertNotIn('--property=TimeoutStartSec=0', command)
             self.assertNotIn('--pipe', command)
             self.assertEqual(command[-4:], ['deploy', SHA, IMAGE, '12'])
             self.assertNotIn('shell', run.call_args.kwargs)

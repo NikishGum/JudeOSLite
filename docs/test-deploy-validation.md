@@ -70,3 +70,17 @@ GitHub API `/actions/runs/...` вернул HTTP 502 при повторной �
 отсутствие секретов в сообщениях retry, немедленный отказ permanent errors
 и запрет выдачи deploy outputs, если main изменился во время retry.
 Всего 29 Cloud tests прошли; реальный первый деплой по-прежнему не подтверждён.
+
+Следующие повторы владельца дошли до нового контроллера, но state оставался
+пустым. Журнал worker поколения 18 показал `code=killed, status=15/TERM`;
+контрольный `systemd-run ... --property=TimeoutStartSec=0 /usr/bin/true` тоже
+вернул 1. В systemd v255 unit-file parser преобразует zero timeout в infinity,
+но transient D-Bus property parser использует `parse_sec` без этого преобразования.
+Поэтому контроллер исправлен на явный `TimeoutStartSec=infinity`; существующий
+worker-launch test проверяет этот параметр и отсутствие нулевого timeout.
+Источник: `src/core/load-fragment.c` и `src/shared/bus-unit-util.c` systemd v255.
+29 Cloud tests прошли. Владелец подтвердил: та же контрольная transient unit с
+infinity завершилась `success`, `code=exited/status=0`, `systemd_check_exit=0`.
+Это подтверждает исправление причины раннего timeout, но ещё не проверяет
+реальный worker с GHCR/миграциями/HTTPS. Обновление controller на VPS и первый
+успешный деплой пока не подтверждены.
