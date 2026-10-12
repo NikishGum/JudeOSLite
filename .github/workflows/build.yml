@@ -41,7 +41,7 @@ jobs:
           test -z "$(gofmt -l .)"
           go vet ./...
           go test -race ./...
-          go build ./cmd/server ./cmd/migrate
+          go build ./cmd/server ./cmd/migrate ./cmd/create-owner
       - name: Missing mandatory configuration fails safely
         working-directory: backend
         run: |

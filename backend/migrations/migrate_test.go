@@ -79,7 +79,7 @@ func TestApplyIntegration(t *testing.T) {
 	if err = Check(ctx, pool); err != nil {
 		t.Fatal(err)
 	}
-	if err = pool.QueryRow(ctx, "SELECT count(*) FROM public.schema_migrations").Scan(&count); err != nil || count != 1 {
+	if err = pool.QueryRow(ctx, "SELECT count(*) FROM public.schema_migrations").Scan(&count); err != nil || count != 2 {
 		t.Fatalf("duplicate migration history: %d %v", count, err)
 	}
 	if _, err = pool.Exec(ctx, "UPDATE public.schema_migrations SET checksum='changed'"); err != nil {

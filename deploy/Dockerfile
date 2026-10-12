@@ -18,12 +18,13 @@ RUN --mount=type=secret,id=proxy_ca \
     go mod download
 COPY backend/ ./
 RUN CGO_ENABLED=0 go build -trimpath -o /out/server ./cmd/server && \
-    CGO_ENABLED=0 go build -trimpath -o /out/migrate ./cmd/migrate
+    CGO_ENABLED=0 go build -trimpath -o /out/migrate ./cmd/migrate && \
+    CGO_ENABLED=0 go build -trimpath -o /out/create-owner ./cmd/create-owner
 
 FROM debian:bookworm-slim
 COPY --from=backend /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=frontend /src/frontend/dist /app/static
-COPY --from=backend /out/server /out/migrate /app/
+COPY --from=backend /out/server /out/migrate /out/create-owner /app/
 WORKDIR /app
 ENV HTTP_ADDR=:8080 STATIC_DIR=/app/static
 USER 65532:65532

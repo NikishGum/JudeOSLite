@@ -1,6 +1,6 @@
 # JudeOSLite
 
-Внутренняя CRM PRIDE. Создана рабочая основа V1-01: Go API, React-оболочка, PostgreSQL, миграции и CI. Вход сотрудников и предметные функции реализуются следующими назначенными задачами.
+Внутренняя CRM PRIDE. Работают основа Go/React/PostgreSQL и вход сотрудников: сессии, роли, серверная проверка филиала и выбор доступного филиала. Управление филиалами и предметные функции — следующие задачи.
 
 ## Быстрый запуск из чистого checkout
 
@@ -12,7 +12,14 @@ cp deploy/.env.example deploy/.env
 docker compose --env-file deploy/.env -f deploy/compose.yml up --build -d --wait
 ```
 
-Откройте http://localhost:8080. Compose ждёт БД, единственная команда `migrate` применяет SQL, затем стартует Go со статикой React. Повторный запуск не удаляет данные и не применяет миграцию второй раз. БД хранится в именованном volume PostgreSQL 18; её порт в базовом Compose не опубликован.
+Создайте первого владельца командой с вводом пароля без отображения:
+
+```sh
+docker compose --env-file deploy/.env -f deploy/compose.yml exec app \
+  /app/create-owner --login owner --name 'Владелец сети'
+```
+
+Откройте http://localhost:8080 и войдите. Compose ждёт БД, единственная команда `migrate` применяет SQL, затем стартует Go со статикой React. Повторный запуск не удаляет данные и не применяет миграцию второй раз. БД хранится в именованном volume PostgreSQL 18; её порт в базовом Compose не опубликован.
 
 ```sh
 docker compose --env-file deploy/.env -f deploy/compose.yml logs app migrate
@@ -37,6 +44,8 @@ export DATABASE_URL='host=127.0.0.1 port=5432 dbname=judeoslite user=judeoslite 
 read -r -s -p 'Пароль БД: ' PGPASSWORD
 export PGPASSWORD
 go run ./cmd/migrate
+go run ./cmd/create-owner --login owner --name 'Владелец сети'
+export APP_ORIGIN=http://localhost:5173 AUTH_INSECURE_LOCAL=true
 go run ./cmd/server
 ```
 
@@ -51,10 +60,12 @@ cd frontend && npm ci && npm run build
 cd ../backend
 go vet ./...
 go test -race ./...
-go build ./cmd/server ./cmd/migrate
+go build ./cmd/server ./cmd/migrate ./cmd/create-owner
 ```
 
-Реальные интеграционные тесты миграций требуют `TEST_DATABASE_URL` к **тестовой** PostgreSQL и право CREATE DATABASE. Они создают отдельную временную БД и удаляют только её. Без этой переменной тест явно пропускается; CI задаёт её и выполняет тесты.
+Origin, защищённые cookie, bootstrap и API — [auth-v1.md](docs/auth-v1.md). Для Go-статики на :8080 задайте APP_ORIGIN=http://localhost:8080. На HTTPS используйте рабочий origin и AUTH_INSECURE_LOCAL=false.
+
+Реальные интеграционные тесты миграций и доступа требуют `TEST_DATABASE_URL` к **тестовой** PostgreSQL и право CREATE DATABASE. Они создают отдельную временную БД и удаляют только её. Без этой переменной тест явно пропускается; CI задаёт её и выполняет тесты.
 
 ```sh
 docker build -f deploy/Dockerfile -t judeoslite:ci .
@@ -65,7 +76,7 @@ bash deploy/check.sh
 
 ## Контекст проекта
 
-- [План: 18 полных задач](docs/development-plan-v1.md) и [GitHub issues](docs/github-issues-v1.md).
+- [План первой версии](docs/development-plan-v1.md) и [GitHub issues](docs/github-issues-v1.md).
 - [Совместная работа](docs/collaboration.md): агент автоматически занимает свободную задачу через общую очередь GitHub; исполнитель и In progress видны в issues, один issue — один автоматически названный чат. In review/ревью коллеги необязательны.
 - [Архитектура](docs/architecture-v1.md), [схема БД](docs/database/schema-v1.md), [диаграммы](docs/database/diagrams-v1.md).
 - [Промпт исполнителя с переименованием чата и назначением](docs/task-agent-prompt.md), [промпт планировщика](docs/planning-agent-prompt.md).

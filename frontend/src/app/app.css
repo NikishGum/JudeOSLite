@@ -33,3 +33,15 @@ footer { padding: 24px 16px calc(24px + env(safe-area-inset-bottom)); text-align
   .connection { padding: 24px 20px; }
   button { width: 100%; }
 }
+
+.connection + .connection { margin-top: 24px; }
+.login-panel { max-width: 480px; }
+.field { display: grid; gap: 8px; margin: 24px 0; font-weight: 500; }
+input, select { width: 100%; min-width: 0; min-height: var(--pride-touch-target); border: 1px solid var(--pride-border); border-radius: var(--pride-radius-field); padding: 12px; background: var(--pride-surface); color: var(--pride-text); font: 400 16px/1.4 var(--pride-font); }
+input:disabled { opacity: .7; }
+.error { border-left: 4px solid var(--pride-brand); padding: 12px 16px; background: var(--pride-surface); overflow-wrap: anywhere; }
+.account { display: flex; gap: 24px; align-items: center; justify-content: space-between; }
+.account p { margin-bottom: 0; }
+.account h2, .club-summary h3 { overflow-wrap: anywhere; }
+.help { color: var(--pride-text-secondary); font-size: 14px; }
+@media (max-width: 600px) { .account { align-items: stretch; flex-direction: column; } }

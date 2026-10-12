@@ -38,6 +38,8 @@ services:
       PGDATABASE: ${POSTGRES_DB:?POSTGRES_DB is required}
       PGUSER: ${POSTGRES_USER:?POSTGRES_USER is required}
       PGPASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      APP_ORIGIN: ${APP_ORIGIN:-https://localhost}
+      AUTH_INSECURE_LOCAL: ${AUTH_INSECURE_LOCAL:-false}
     ports:
       - "127.0.0.1:${APP_PORT:-8080}:8080"
     depends_on:

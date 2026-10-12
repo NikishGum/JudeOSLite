@@ -32,12 +32,12 @@ for _ in range(30):
 else: raise SystemExit('Readiness did not recover')
 PY
 "${compose[@]}" run --rm migrate
-"${compose[@]}" exec -T db psql -U check -d check -Atc 'SELECT count(*) FROM public.schema_migrations' | python3 -c 'import sys; assert sys.stdin.read().strip()=="1"'
+"${compose[@]}" exec -T db psql -U check -d check -Atc 'SELECT count(*) FROM public.schema_migrations' | python3 -c 'import sys; assert sys.stdin.read().strip()=="2"'
 # A full restart must preserve the checksum history and data volume.
 "${compose[@]}" down
 "${compose[@]}" up -d --no-build --wait --wait-timeout 120
 curl --fail --silent http://127.0.0.1:18080/api/readyz
-"${compose[@]}" exec -T db psql -U check -d check -Atc 'SELECT count(*) FROM public.schema_migrations' | python3 -c 'import sys; assert sys.stdin.read().strip()=="1"'
+"${compose[@]}" exec -T db psql -U check -d check -Atc 'SELECT count(*) FROM public.schema_migrations' | python3 -c 'import sys; assert sys.stdin.read().strip()=="2"'
 # Production template has no db ports; only app is bound to localhost.
 "${compose[@]}" config --format json | python3 -c 'import json,sys; c=json.load(sys.stdin); assert not c["services"]["db"].get("ports"); assert c["services"]["app"]["ports"][0]["host_ip"]=="127.0.0.1"'
 echo 'Compose clean startup, rerun, restart and port checks passed.'
