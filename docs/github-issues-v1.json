@@ -4,8 +4,8 @@
   "status": "verified",
   "repository": "NikishGum/JudeOSLite",
   "source_commit": "4b650dea4b0d6f811e9d92e775e004b3199d8bc1",
-  "task_count": 18,
-  "dependency_count": 27,
+  "task_count": 19,
+  "dependency_count": 29,
   "deleted_issue_numbers": [
     1,
     2,
@@ -351,9 +351,10 @@
       "github_id": 5811005827,
       "url": "https://github.com/NikishGum/JudeOSLite/issues/165",
       "dependencies": [
-        "V1-13"
+        "V1-13",
+        "V1-19"
       ],
-      "body_sha256": "394e49e10881009f1b335e65fdd516d257ed232fda1a60ddd366df09bfbae2a9",
+      "body_sha256": "d08bcf956ee82418b135a82e677c510405f9036250e763aab8f53cd96e81bc68",
       "title": "Развёртывание на VPS, HTTPS и восстановление резервной копии"
     },
     {
@@ -369,6 +370,17 @@
       ],
       "body_sha256": "755e0aad1c809f5095dc70ee3edc998b4b249487cecf4f0de577eb753c05a720",
       "title": "Приёмка первой версии и запуск с ручным вводом данных"
+    },
+    {
+      "id": "V1-19",
+      "number": 167,
+      "github_id": 5812051715,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/167",
+      "dependencies": [
+        "V1-01"
+      ],
+      "body_sha256": "c19211f4d054aa24a9f4d881c5ac6a5f90fa13cc045171c9f47abbbf34ed640f",
+      "title": "Автоматический деплой тестового стенда после успешного CI в main"
     }
   ],
   "status_automation": {
@@ -402,5 +414,11 @@
     "workflow_commit": "5f1b473dff699e88e18ce9b95baa3cd5ceca11b0",
     "issue_bodies_verified": 18,
     "scope_criteria_dependencies_changed": false
+  },
+  "early_test_deploy": {
+    "date": "2026-10-12",
+    "source": "User request: early test deployment; VPS and GitHub Secrets prepared manually by owner",
+    "issue": 167,
+    "acceptance": "pending real VPS deployment"
   }
 }

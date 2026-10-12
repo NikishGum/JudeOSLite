@@ -26,7 +26,7 @@
 | V1-14 | [#162 — Проверка изоляции филиалов и полной матрицы ролей](https://github.com/NikishGum/JudeOSLite/issues/162) | [#158](https://github.com/NikishGum/JudeOSLite/issues/158), [#159](https://github.com/NikishGum/JudeOSLite/issues/159), [#160](https://github.com/NikishGum/JudeOSLite/issues/160) |
 | V1-15 | [#163 — Проверка расписания, исторических данных и конкурентных отметок](https://github.com/NikishGum/JudeOSLite/issues/163) | [#159](https://github.com/NikishGum/JudeOSLite/issues/159), [#160](https://github.com/NikishGum/JudeOSLite/issues/160) |
 | V1-16 | [#164 — Сквозные проверки браузеров и мобильной PWA](https://github.com/NikishGum/JudeOSLite/issues/164) | [#161](https://github.com/NikishGum/JudeOSLite/issues/161), [#165](https://github.com/NikishGum/JudeOSLite/issues/165) |
-| V1-17 | [#165 — Развёртывание на VPS, HTTPS и восстановление резервной копии](https://github.com/NikishGum/JudeOSLite/issues/165) | [#161](https://github.com/NikishGum/JudeOSLite/issues/161) |
+| V1-17 | [#165 — Развёртывание на VPS, HTTPS и восстановление резервной копии](https://github.com/NikishGum/JudeOSLite/issues/165) | [#161](https://github.com/NikishGum/JudeOSLite/issues/161), [#167](https://github.com/NikishGum/JudeOSLite/issues/167) |
 | V1-18 | [#166 — Приёмка первой версии и запуск с ручным вводом данных](https://github.com/NikishGum/JudeOSLite/issues/166) | [#162](https://github.com/NikishGum/JudeOSLite/issues/162), [#163](https://github.com/NikishGum/JudeOSLite/issues/163), [#164](https://github.com/NikishGum/JudeOSLite/issues/164), [#165](https://github.com/NikishGum/JudeOSLite/issues/165) |
 
 Порядок определяется зависимостями, а не только номером: реальная PWA-проверка #164 требует HTTPS-развёртывания #165. Отдельных текущих issues для финансов/iPay, Excel или справок нет.
@@ -46,3 +46,5 @@ Workflow issue-status.yml опубликован и активен. Все 18 з
 Стартовые правила обновлены во всех 18 карточках и прочитаны обратно; состав работы, критерии и зависимости сохранены. Новые хеши тел и результаты проверки — github-issues-v1.json; исходный технический состав остаётся из 4b650de.
 
 Сведения о статусах здесь — срез проверки; актуальную работу всегда читать в GitHub.
+
+Ранняя инфраструктурная задача, добавлена 12.10.2026: **V1-19 / [#167 — Автоматический деплой тестового стенда после успешного CI в main](https://github.com/NikishGum/JudeOSLite/issues/167)**; зависит от #149. Дополняет 18 продуктовых задач; V1-17 переиспользует её результат и проверяет полную CRM/восстановление. VPS и секреты готовит владелец, реальная приёмка пока не выполнена.
