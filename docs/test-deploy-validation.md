@@ -1,7 +1,25 @@
 # Проверки V1-19 / #167
 
-12.10.2026. Проверки выполнены только в Cloud. VPS не подключался, серверные
-secret файлы/ключи владельца не читались, реальный деплой не выполнялся.
+12.10.2026. Агент работал только в Cloud: к VPS не подключался, серверные
+secret файлы/ключи владельца не читал. Результаты VPS ниже сообщил владелец.
+
+## Первый успешный реальный деплой
+
+[Deploy test 38250186366, attempt 2](https://github.com/NikishGum/JudeOSLite/actions/runs/38250186366)
+завершился success для main `90e09c322c13c854a51f816d11b1bb7e21084fa1`.
+Владелец отдельно проверил публичный HTTPS без отключения TLS verification:
+`/api/readyz` вернул `{"status":"ok"}`, `/release.json` — этот же полный SHA.
+Таким образом, первый Actions SSH → GHCR pull → предмиграционный backup →
+миграции → запуск → HTTPS-проверка завершён. Владелец ранее подтвердил
+активацию исправленного controller и local preflight; sudoers не расширялись.
+
+Повторный deploy с проверкой сохранения данных, реальный restore в отдельную
+БД и безопасный rollback ещё не подтверждены. PR #169 с исправлениями SSH,
+GitHub API retry и transient timeout пока открыт; issue #167 остаётся открытой
+до результата в main и остальных критериев. PWA/полная CRM/offsite recovery
+по-прежнему относятся к V1-17 после V1-13.
+
+## Проверки агента в Cloud
 
 - 29 Python tests: selection только успешного push-CI текущего main, отказ
   PR/fork/failed/old CI, ограниченный digest/SHA payload, root ownership/symlinks,
@@ -27,18 +45,23 @@ secret файлы/ключи владельца не читались, реал�
 
 У интеграционного теста заменены только VPS-specific paths/project/preflight
 и локальный image pull. Root ownership/sudo/systemd, Hostinger firewall, DNS/ACME,
-SSH из Actions, реальный GHCR publish/private pull, публичный TLS, сохранение
-производственных данных и PWA требуют проверки владельцем. Ошибку миграции
+SSH из Actions, реальный GHCR publish/private pull и публичный TLS были
+подтверждены первым deploy выше. Сохранение данных и PWA ещё требуют проверки
+владельцем. Ошибку миграции
 проверяет unit test; реальный серверный failure/recovery drill ещё не выполнен.
 
-Environment `test` не создан: GitHub API подключённого аккаунта вернул HTTP 403
+При первоначальной подготовке Environment `test` не удалось создать из Cloud:
+GitHub API подключённого аккаунта вернул HTTP 403
 `Resource not accessible by integration` на create/update environment. Настройка
-Environment, Variables и Secrets описана в operations-test.md и остаётся владельцу.
-Ни одно secret значение не отправлялось в GitHub из Cloud.
+Environment, Variables и Secrets описана в operations-test.md; затем владелец
+самостоятельно создал и настроил Environment. Ни одно secret значение не
+отправлялось в GitHub из Cloud.
 
 Issue остаётся open/In progress до результата в main и реальной приёмки.
 V1-17 сохраняет ответственность за полную CRM/PWA, регулярный offsite backup
 с согласованным retention и восстановление предметных данных после V1-13.
+
+## История диагностики до успешного деплоя
 
 Уточнение по выводу владельца: preflight остановился на старом restricted ключе
 с forced command через ssh-entry.py, тогда как новый Actions-ключ указывал
