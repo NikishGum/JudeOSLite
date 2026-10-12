@@ -1,21 +1,12 @@
 # JudeOSLite
 
-Lite version of JudeOS — Sport CRM.
+Внутренняя CRM PRIDE. Первая версия: ручной реестр, группы и расписание администратора, мобильная посещаемость тренера, статистика владельца по филиалам. React, Go, PostgreSQL, VPS/Docker Compose, PWA. Приложение пока не реализовано.
 
-- [Визуальные правила](DESIGN.md) — краткая основа оформления.
-- [Дизайн-система](design-system/README.md) — спецификация, токены, ресурсы и лицензии.
-- [Витрина](design-system/preview.html) — откройте в браузере для просмотра.
+- [План: 18 полных задач](docs/development-plan-v1.md) и [GitHub issues](docs/github-issues-v1.md).
+- [Совместная работа](docs/collaboration.md): человек назначает исполнителя, метки Todo / In progress / Done автоматические; In review и ревью коллеги необязательны.
+- [Архитектура](docs/architecture-v1.md), [схема БД](docs/database/schema-v1.md), [диаграммы](docs/database/diagrams-v1.md).
+- [Промпт исполнителя первой задачи](docs/task-agent-prompt.md), [промпт планировщика](docs/planning-agent-prompt.md).
+- [База знаний](docs/knowledge-base/README.md) и [память](docs/knowledge-base/memory.md); агентам начинать с них и [AGENTS.md](AGENTS.md).
+- [Оформление](DESIGN.md), [дизайн-система](design-system/README.md), [витрина](design-system/preview.html).
 
-Источник оформления: [judopride.by](https://judopride.by/). Приложение пока не реализовано.
-
-База знаний для будущей CRM: [docs/knowledge-base/README.md](docs/knowledge-base/README.md). Здесь собраны сведения о клубе, ЕРИП/iPay, требования заказчика, противоречия и источники. Агентам начинать с этого указателя и краткой памяти.
-
-Комплект для планирования первой версии:
-
-- [План реализации](docs/development-plan-v1.md) — небольшие задачи, зависимости, первый рабочий сценарий и обязательная проверка перехода к оплатам через CRM.
-- [Issues плана v1](docs/github-issues-v1.md) — реестр всех 148 задач в GitHub, 358 прямых зависимостей и результаты проверки переноса.
-- [Архитектура](docs/architecture-v1.md) — требования, модули, права, сценарии и открытые решения.
-- [Структура и описание БД](docs/database/schema-v1.md), [диаграммы](docs/database/diagrams-v1.md).
-- [Промпт агента-планировщика](docs/planning-agent-prompt.md) — подробный план небольших проверяемых задач с контекстными ссылками.
-
-Архитектура и схема — инженерные предложения на основе ответов заказчика. Приложение сейчас не реализуется.
+Финансы/iPay, Excel и отдельные справки отложены; прежние требования сохранены в [истории](docs/archive/README.md). Фундамент развиваемый, без инфраструктуры для предполагаемой большой нагрузки.
