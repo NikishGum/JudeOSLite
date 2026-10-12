@@ -33,6 +33,9 @@ tests, actionlint 1.7.12, Python compilation, bash syntax, git diff check;
 Compose clean/rerun/restart/readiness recovery/непубличная БД — passed.
 Календарь предлагаемого таймера разобран systemd-analyze с явной Europe/Minsk;
 сервис/таймер на VPS ещё не установлен/не проверен.
+В CI выявлена и исправлена гонка PWA setup: pg_isready теперь ждёт TCP,
+который использует migrate из соседнего контейнера, а не Unix socket временного
+init-сервера официального PostgreSQL image. Это изменение только теста.
 
 `deploy/test/integration_check.py` запускает только случайный disposable Compose:
 PostgreSQL 18.6, Caddy local CA с проверкой сертификата, hidden owner bootstrap,

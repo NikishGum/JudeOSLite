@@ -69,7 +69,10 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
         command('docker', 'run', '-d', '--name', DB, '--network', NETWORK,
                 '-e', 'POSTGRES_USER=test', '-e', 'POSTGRES_PASSWORD=test-only', '-e', 'POSTGRES_DB=browser161', 'postgres:18.6-bookworm')
         for _ in range(30):
-            if subprocess.run(['docker', 'exec', DB, 'pg_isready', '-U', 'test'], stdout=subprocess.DEVNULL).returncode == 0:
+            # The image's temporary init server accepts Unix sockets before the
+            # final server opens TCP. Migrate connects over TCP from another
+            # container, so socket readiness can race with initialization.
+            if subprocess.run(['docker', 'exec', DB, 'pg_isready', '-h', '127.0.0.1', '-U', 'test', '-d', 'browser161'], stdout=subprocess.DEVNULL).returncode == 0:
                 break
             time.sleep(1)
         else:
