@@ -1,10 +1,380 @@
 {
   "version": "2.0",
   "date": "2026-10-12",
-  "status": "pending_recreation",
+  "status": "verified",
   "repository": "NikishGum/JudeOSLite",
+  "source_commit": "4b650dea4b0d6f811e9d92e775e004b3199d8bc1",
   "task_count": 18,
   "dependency_count": 27,
-  "source": "docs/implementation-tasks-v1.json",
-  "issues": []
+  "deleted_issue_numbers": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127,
+    128,
+    129,
+    130,
+    131,
+    132,
+    133,
+    134,
+    135,
+    136,
+    137,
+    138,
+    139,
+    140,
+    141,
+    142,
+    143,
+    144,
+    145,
+    146,
+    147,
+    148
+  ],
+  "verification": {
+    "complete_bodies": true,
+    "blocked_by": true,
+    "blocking": true,
+    "no_duplicates": true,
+    "all_todo_unassigned": true
+  },
+  "issues": [
+    {
+      "id": "V1-01",
+      "number": 149,
+      "github_id": 5810997255,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/149",
+      "dependencies": [],
+      "body_sha256": "2933a84b02401e599b4585041ebac3dbe8e25920c3bc66705b680457e71420a8",
+      "title": "Рабочая основа Go + React + PostgreSQL и проверки сборки"
+    },
+    {
+      "id": "V1-02",
+      "number": 150,
+      "github_id": 5810997760,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/150",
+      "dependencies": [
+        "V1-01"
+      ],
+      "body_sha256": "2d00f2b72edc5a767b35bff923078c2c6a8e50ab0609b6cd39d0ac2355f38b5e",
+      "title": "Вход сотрудников, выход и серверная проверка доступа"
+    },
+    {
+      "id": "V1-03",
+      "number": 151,
+      "github_id": 5810998342,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/151",
+      "dependencies": [
+        "V1-02"
+      ],
+      "body_sha256": "79fba7af3b72504182b37343b83dd6def0ebdd1aec315c1e75f93ce434a5c2da",
+      "title": "Филиалы и назначения администраторов для владельца"
+    },
+    {
+      "id": "V1-04",
+      "number": 152,
+      "github_id": 5810998890,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/152",
+      "dependencies": [
+        "V1-03"
+      ],
+      "body_sha256": "1037e2176391b7e4759482da83507bb8af505694e44ca232e59703eae5a6f01d",
+      "title": "Создание и управление тренерами своего филиала"
+    },
+    {
+      "id": "V1-05",
+      "number": 153,
+      "github_id": 5810999417,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/153",
+      "dependencies": [
+        "V1-03"
+      ],
+      "body_sha256": "1e76c7d339768119b2b0bc9164e9ecbac537628532f9ff9b0ee682f1a2e6b358",
+      "title": "Ручной реестр участников и карточки филиала"
+    },
+    {
+      "id": "V1-06",
+      "number": 154,
+      "github_id": 5810999979,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/154",
+      "dependencies": [
+        "V1-04",
+        "V1-05"
+      ],
+      "body_sha256": "d3c1e5668bca7cf9707350e80a0be117516d16124d7fdc4edd0c786ac662df91",
+      "title": "Группы и датированная история состава"
+    },
+    {
+      "id": "V1-07",
+      "number": 155,
+      "github_id": 5811000488,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/155",
+      "dependencies": [
+        "V1-06"
+      ],
+      "body_sha256": "df0c7eb24641acf98c28ff01f475d34b1beff428f94ee79af84797051d930812",
+      "title": "Расписание: дни недели, чётность дат, календарные даты и разовое занятие"
+    },
+    {
+      "id": "V1-08",
+      "number": 156,
+      "github_id": 5811001002,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/156",
+      "dependencies": [
+        "V1-07"
+      ],
+      "body_sha256": "43f0e6f8019886c58ac9c3f43b6f8469b7918ff57c72cc822730c41f71453b1b",
+      "title": "Календарь занятий, отмена и замена тренера администратором"
+    },
+    {
+      "id": "V1-09",
+      "number": 157,
+      "github_id": 5811001524,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/157",
+      "dependencies": [
+        "V1-08"
+      ],
+      "body_sha256": "6d31648627c9caa869b5e657def97703cde441a3b4b2c547ffd030fcbc0088ac",
+      "title": "Журнал занятия: снимок состава, отметки и атомарное завершение"
+    },
+    {
+      "id": "V1-10",
+      "number": 158,
+      "github_id": 5811002064,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/158",
+      "dependencies": [
+        "V1-09"
+      ],
+      "body_sha256": "19818f14f6f1e2a630981997aa1382bac140a9a2df9f587222dff8d8cdbd7d8e",
+      "title": "Мобильные карточки посещаемости тренера с кнопками и выбором причины"
+    },
+    {
+      "id": "V1-11",
+      "number": 159,
+      "github_id": 5811002603,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/159",
+      "dependencies": [
+        "V1-09"
+      ],
+      "body_sha256": "eb03b220afb83bc42dc74d8c2f6e13056c7486803cf4a3e5cb792dd69ca6a5d1",
+      "title": "Журнал администратора и поштучное исправление закрытых отметок"
+    },
+    {
+      "id": "V1-12",
+      "number": 160,
+      "github_id": 5811003129,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/160",
+      "dependencies": [
+        "V1-11"
+      ],
+      "body_sha256": "c02a5ead8af1d65aace2a5ed9521b3ba64dec525ad42e9e8ee4063f460c9fd78",
+      "title": "Статистика владельца по филиалам, группам и периоду"
+    },
+    {
+      "id": "V1-13",
+      "number": 161,
+      "github_id": 5811003602,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/161",
+      "dependencies": [
+        "V1-10",
+        "V1-11",
+        "V1-12"
+      ],
+      "body_sha256": "1580261de1ae348a54fca3a1be7c2c0986aef9ea4afbdd416646b8159a4ccbe2",
+      "title": "Адаптация всех ролей и установка PWA"
+    },
+    {
+      "id": "V1-14",
+      "number": 162,
+      "github_id": 5811004112,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/162",
+      "dependencies": [
+        "V1-10",
+        "V1-11",
+        "V1-12"
+      ],
+      "body_sha256": "6023e4099c8689a54f90063aa605861fac9bfe1ead01eceb1ca60014dfd1c048",
+      "title": "Проверка изоляции филиалов и полной матрицы ролей"
+    },
+    {
+      "id": "V1-15",
+      "number": 163,
+      "github_id": 5811004649,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/163",
+      "dependencies": [
+        "V1-11",
+        "V1-12"
+      ],
+      "body_sha256": "bbaf1344022923729493205c7aa4e43291d655c177ff07622f60e2b7ed069510",
+      "title": "Проверка расписания, исторических данных и конкурентных отметок"
+    },
+    {
+      "id": "V1-16",
+      "number": 164,
+      "github_id": 5811005177,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/164",
+      "dependencies": [
+        "V1-13",
+        "V1-17"
+      ],
+      "body_sha256": "b3894233ca124bf2395cbc7fc9a3ea5967c02c91ebe0e54f3215f7ca5a7c48fd",
+      "title": "Сквозные проверки браузеров и мобильной PWA"
+    },
+    {
+      "id": "V1-17",
+      "number": 165,
+      "github_id": 5811005827,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/165",
+      "dependencies": [
+        "V1-13"
+      ],
+      "body_sha256": "31666994cab52fd66ffd1cf1600c8e080d3413211ecead023a2e993172acdbd6",
+      "title": "Развёртывание на VPS, HTTPS и восстановление резервной копии"
+    },
+    {
+      "id": "V1-18",
+      "number": 166,
+      "github_id": 5811006351,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/166",
+      "dependencies": [
+        "V1-14",
+        "V1-15",
+        "V1-16",
+        "V1-17"
+      ],
+      "body_sha256": "2662545e19a9ea01f62c8d4a4b428adf2154fab713c0d9d48f719d0079f4cc8c",
+      "title": "Приёмка первой версии и запуск с ручным вводом данных"
+    }
+  ],
+  "status_automation": {
+    "workflow": ".github/workflows/issue-status.yml",
+    "opened_runs_passed": 18,
+    "live_label_repair_run": "https://github.com/NikishGum/JudeOSLite/actions/runs/38226762759",
+    "local_cases": "5 transitions, unrelated label preservation, multiple/bot assignment refusal"
+  }
 }

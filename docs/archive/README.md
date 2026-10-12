@@ -10,7 +10,7 @@
 - [Тексты, ID, зависимости и хеши удаляемых issues](https://github.com/NikishGum/JudeOSLite/blob/6f1a75d677e85ed9694ac22fb29a179bbf7b99f5/docs/github-issues-v1.json), [реестр переноса](https://github.com/NikishGum/JudeOSLite/blob/6f1a75d677e85ed9694ac22fb29a179bbf7b99f5/docs/github-issues-v1.md).
 - [Предыдущая память](https://github.com/NikishGum/JudeOSLite/blob/6f1a75d677e85ed9694ac22fb29a179bbf7b99f5/docs/knowledge-base/memory.md).
 
-GitHub issues #1–#148 удаляются по прямому поручению заказчика, а не закрываются как выполненные. Их номера не переиспользуются; старые issue URL перестанут открываться, источником истории остаётся Git. Новые ID V1-01–V1-18 относятся к новому составу, не объявляют старые DEC/BE/FE/QA выполненными.
+GitHub issues #1–#148 удалены по прямому поручению заказчика, а не закрываются как выполненные. Их номера не переиспользуются; старые issue URL перестанут открываться, источником истории остаётся Git. Новые ID V1-01–V1-18 относятся к новому составу, не объявляют старые DEC/BE/FE/QA выполненными.
 
 ## Что именно отложено
 

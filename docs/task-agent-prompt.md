@@ -1,6 +1,6 @@
 # Промпт нового агента-исполнителя
 
-Это шаблон для человека, который предварительно назначил себе issue. Первая задача новой версии — V1-01; её фактический номер/URL смотри в docs/github-issues-v1.md. Не использовать удалённый #1 или старый DEC-01.
+Это шаблон для человека, который предварительно назначил себе issue. Первая задача новой версии — [V1-01 / #149](https://github.com/NikishGum/JudeOSLite/issues/149); полный реестр — docs/github-issues-v1.md. Не использовать удалённый #1 или старый DEC-01.
 
 Прочитай AGENTS.md, docs/knowledge-base/README.md и memory.md, docs/collaboration.md, architecture-v1.md, development-plan-v1.md и полное выбранное issue.
 
