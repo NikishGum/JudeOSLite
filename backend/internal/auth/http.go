@@ -319,6 +319,15 @@ func (s *Service) club(w http.ResponseWriter, r *http.Request) {
 }
 func (s *Service) Handler(fallback http.Handler) http.Handler {
 	mux := http.NewServeMux()
+	mux.Handle("GET /api/clubs/{clubID}/trainers", s.trainerScope(s.listTrainers, false))
+	mux.Handle("POST /api/clubs/{clubID}/trainers", s.trainerScope(s.createTrainer, false))
+	mux.Handle("PUT /api/clubs/{clubID}/trainers/{staffID}/account", s.trainerScope(s.changeTrainer, false))
+	mux.Handle("POST /api/clubs/{clubID}/trainers/{staffID}/password", s.trainerScope(s.trainerPassword, false))
+	mux.Handle("POST /api/clubs/{clubID}/trainers/{staffID}/revoke", s.trainerScope(s.revokeTrainer, false))
+	mux.Handle("GET /api/trainer-accounts", s.trainerScope(s.trainerRoster, true))
+	mux.Handle("PUT /api/staff/{staffID}/account", s.trainerScope(s.changeTrainer, true))
+	mux.Handle("POST /api/staff/{staffID}/password", s.trainerScope(s.trainerPassword, true))
+	mux.Handle("POST /api/staff/{staffID}/trainer-assignments", s.trainerScope(s.assignTrainer, true))
 	mux.HandleFunc("POST /api/auth/login", s.login)
 	mux.Handle("GET /api/auth/me", s.Require(http.HandlerFunc(s.me)))
 	mux.Handle("POST /api/auth/logout", s.Require(http.HandlerFunc(s.logout)))
@@ -331,7 +340,7 @@ func (s *Service) Handler(fallback http.Handler) http.Handler {
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("Referrer-Policy", "same-origin")
 		// Keep all auth responses (including method/path errors) out of caches.
-		if strings.HasPrefix(r.URL.Path, "/api/auth/") {
+		if strings.HasPrefix(r.URL.Path, "/api/auth/") || strings.HasPrefix(r.URL.Path, "/api/clubs/") || strings.HasPrefix(r.URL.Path, "/api/staff/") || r.URL.Path == "/api/trainer-accounts" {
 			w.Header().Set("Cache-Control", "no-store")
 		}
 		mux.ServeHTTP(w, r)
