@@ -20,9 +20,22 @@ spec.loader.exec_module(selection)
 SHA = 'a' * 40
 IMAGE = ops.IMAGE + '@sha256:' + 'b' * 64
 REQUEST = {'sha': SHA, 'image': IMAGE, 'generation': 12}
+SSH_CONFIG = ('pubkeyauthentication yes\nauthorizedkeyscommand none\n'
+              'authorizedkeysfile /var/lib/judeos-deploy/.ssh/authorized_keys\n')
 
 
 class PolicyTests(unittest.TestCase):
+    def test_effective_sshd_config_detects_override_and_wrong_keys_source(self):
+        for forced in ('none', ops.SSH_CONTROLLER_COMMAND):
+            ops.validate_sshd_config((SSH_CONFIG + 'forcecommand ' + forced + '\n').encode(), ops.KEY_HOME)
+        for raw in [SSH_CONFIG + 'forcecommand ' + str(ops.LEGACY_ENTRYPOINT) + '\n',
+                    (SSH_CONFIG + 'forcecommand none\n').replace('/var/lib/judeos-deploy/.ssh/authorized_keys', '/etc/ssh/other-keys'),
+                    (SSH_CONFIG + 'forcecommand none\n').replace('pubkeyauthentication yes', 'pubkeyauthentication no'),
+                    (SSH_CONFIG + 'forcecommand none\n').replace('authorizedkeyscommand none', 'authorizedkeyscommand /external')]:
+            with self.subTest(raw=raw), self.assertRaises(RuntimeError):
+                ops.validate_sshd_config(raw.encode(), ops.KEY_HOME)
+        ops.validate_sshd_config((SSH_CONFIG.replace('/var/lib/judeos-deploy/.ssh/authorized_keys', '%h/.ssh/authorized_keys .ssh/authorized_keys2') + 'forcecommand none\n').encode(), ops.KEY_HOME)
+
     def test_existing_pinned_wrapper_is_preserved_with_direct_actions_key(self):
         canonical = 'restrict,command="/usr/bin/sudo -n /usr/local/lib/judeos-deploy/controller.py" ssh-ed25519 AAAA\n'
         with tempfile.TemporaryDirectory() as temporary:
@@ -171,6 +184,67 @@ class DeploymentTests(unittest.TestCase):
 
 
 class FileTests(unittest.TestCase):
+    def test_manual_ssh_repair_is_scoped_and_rolls_back_before_reload_on_invalid_policy(self):
+        original = ('Match User judeos-deploy\n    AuthenticationMethods publickey\n'
+                    '    ForceCommand /usr/local/lib/judeos-deploy/ssh-entry.py\n'
+                    'Match User root\n    ForceCommand /root/admin-only\nMatch all\n')
+        for failure in (None, 'syntax', 'root-policy', 'reload'):
+            with self.subTest(failure=failure), tempfile.TemporaryDirectory() as temporary:
+                path = Path(temporary) / '60-judeos-deploy.conf'; path.write_text(original)
+                calls = []; root_calls = 0; reload_calls = 0
+                def run(command, **kwargs):
+                    nonlocal root_calls, reload_calls
+                    calls.append(command)
+                    if '-T' in command:
+                        if 'user=root,' in command[-1]:
+                            root_calls += 1
+                            return b'root-original' if root_calls == 1 or failure != 'root-policy' else b'changed'
+                        return (SSH_CONFIG + 'forcecommand ' + ops.SSH_CONTROLLER_COMMAND + '\n').encode()
+                    if command == ['/usr/sbin/sshd', '-t'] and failure == 'syntax':
+                        raise RuntimeError('Invalid config')
+                    if command == ['/usr/bin/systemctl', 'reload', 'ssh']:
+                        reload_calls += 1
+                        if failure == 'reload' and reload_calls == 1: raise RuntimeError('Reload failed')
+                    return b''
+                with patch.object(ops, 'SSH_MATCH_FILE', path), patch.object(ops, 'trusted'), patch.object(ops, 'run', side_effect=run):
+                    if failure:
+                        with self.assertRaises(RuntimeError): ops.repair_ssh()
+                        self.assertEqual(path.read_text(), original)
+                        self.assertEqual(reload_calls, 2 if failure == 'reload' else 0)
+                    else:
+                        ops.repair_ssh()
+                        self.assertIn('Match User root\n    ForceCommand /root/admin-only', path.read_text())
+                        self.assertIn('AuthenticationMethods publickey', path.read_text())
+                        self.assertIn('ForceCommand ' + ops.SSH_CONTROLLER_COMMAND, path.read_text())
+                        self.assertEqual(reload_calls, 1)
+                backups = list(path.parent.glob('*.before-json-*'))
+                self.assertEqual(len(backups), 1)
+                self.assertEqual(backups[0].read_text(), original)
+                self.assertEqual(backups[0].stat().st_mode & 0o777, 0o600)
+
+    def test_manual_ssh_repair_refuses_unexpected_match_scope_or_command(self):
+        for source in ('Match User root\n ForceCommand /usr/local/lib/judeos-deploy/ssh-entry.py\n',
+                       'Match User judeos-deploy\n ForceCommand /different\n'):
+            with tempfile.TemporaryDirectory() as temporary:
+                path = Path(temporary) / '60-judeos-deploy.conf'; path.write_text(source)
+                with patch.object(ops, 'SSH_MATCH_FILE', path), patch.object(ops, 'trusted'), patch.object(ops, 'run') as run:
+                    with self.assertRaises(RuntimeError): ops.repair_ssh()
+                    run.assert_not_called()
+                self.assertEqual(path.read_text(), source)
+                self.assertEqual(list(path.parent.glob('*.before-json-*')), [])
+
+    def test_already_correct_disk_rule_is_reloaded_without_rewriting(self):
+        source = 'Match User judeos-deploy\n ForceCommand ' + ops.SSH_CONTROLLER_COMMAND + '\nMatch all\n'
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / '60-judeos-deploy.conf'; path.write_text(source)
+            with patch.object(ops, 'SSH_MATCH_FILE', path), patch.object(ops, 'trusted'), patch.object(ops, 'run') as run:
+                run.return_value = (SSH_CONFIG + 'forcecommand ' + ops.SSH_CONTROLLER_COMMAND + '\n').encode()
+                ops.repair_ssh()
+                self.assertIn(unittest.mock.call(['/usr/sbin/sshd', '-t']), run.call_args_list)
+                self.assertIn(unittest.mock.call(['/usr/bin/systemctl', 'reload', 'ssh']), run.call_args_list)
+            self.assertEqual(path.read_text(), source)
+            self.assertEqual(list(path.parent.glob('*.before-json-*')), [])
+
     def test_installed_public_key_is_readable_by_sshd_and_not_user_writable(self):
         with tempfile.TemporaryDirectory() as temporary:
             base = Path(temporary); home = base / 'home'; key = base / 'public'

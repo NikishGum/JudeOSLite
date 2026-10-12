@@ -89,6 +89,41 @@ python3 -I /usr/local/lib/judeos-deploy/admin.py activate-controller \
 
 Активация откажет, если прежний файл изменился, и сохранит root-only архив.
 **Не менять sudoers на ALL, не добавлять пользователя в docker/sudo.**
+
+### Эффективные правила sshd и прежний ForceCommand
+
+Владелец подтвердил: `/etc/ssh/sshd_config.d/60-judeos-deploy.conf` содержит
+`Match User judeos-deploy` и `ForceCommand /usr/local/lib/judeos-deploy/ssh-entry.py`.
+Серверный ForceCommand имеет приоритет над command в authorized_keys: даже новый
+правильный ключ направлялся в старый обработчик, который возвращал
+`command_denied` на новый JSON-протокол. Утверждение о неправильном ключе не
+было доказано; обнаруженная причина — правило sshd.
+
+После установки проверенного admin.py/operations.py и активированного контроллера
+владелец выполняет **явную root-команду**, когда worker не работает:
+
+```bash
+python3 -I /usr/local/lib/judeos-deploy/admin.py repair-ssh
+python3 -I /usr/local/lib/judeos-deploy/admin.py preflight
+```
+
+repair-ssh меняет только известный ForceCommand внутри **точного**
+`Match User judeos-deploy` в указанном файле на
+`ForceCommand /usr/bin/sudo -n /usr/local/lib/judeos-deploy/controller.py`.
+Сохраняет root-only backup рядом с файлом (суффикс не включается в *.conf),
+проверяет `sshd -t`, равенство эффективной политики root до/после и эффективное
+правило deploy-user, затем делает `systemctl reload ssh`, сохраняя текущие SSH-сеансы.
+При ошибке исходный файл восстанавливается; при ошибке reload также предпринимается
+reload восстановленного файла. Иные scopes/неизвестные команды не изменяются.
+Bootstrap сам конфигурацию SSH не меняет. Keys/Secrets/sudoers/Docker-группа
+этой операцией не изменяются; интерактивный shell deploy-user не разрешается.
+
+Не закрывать существующую root-сессию до проверки второго административного
+SSH-сеанса. Проверка sshd -T читает файлы на диске и использует модельный адрес
+192.0.2.10; она не доказывает состояние работающего daemon и Match Address/Host
+для реального runner. Реальный SSH из Actions после reload остаётся обязательным.
+Перечитывание выполняется и при уже правильной строке на диске: daemon мог
+продолжать работать со старой конфигурацией.
 Старый forced command может использовать прежний протокол; Actions использует
 новый отдельный ключ и фиксированную команду ниже. Остальные старые ключи
 владелец отдельно проверяет/удаляет при ненадобности; bootstrap их не удаляет.
@@ -240,6 +275,7 @@ python3 -I /usr/local/lib/judeos-deploy/admin.py preflight
 
 Проверяет root-owned tree/config/secret consistency, активированный контроллер,
 restricted key, ровно одну sudo-гранту, отсутствие дополнительных групп,
+эффективные ForceCommand и источник authorized_keys через sshd -T,
 Docker/Compose/config, закрытые DB/app ports, uploads permissions, DNS, активный
 UFW, необходимость reboot и конфликт Traefik/портов. Успех — локальная подготовка;
 доступ GHCR, firewall Hostinger, реальный SSH из Actions, сертификат/HTTPS и PWA

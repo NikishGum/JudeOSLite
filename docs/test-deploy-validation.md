@@ -3,7 +3,7 @@
 12.10.2026. Проверки выполнены только в Cloud. VPS не подключался, серверные
 secret файлы/ключи владельца не читались, реальный деплой не выполнялся.
 
-- 19 Python tests: selection только успешного push-CI текущего main, отказ
+- 23 Python tests: selection только успешного push-CI текущего main, отказ
   PR/fork/failed/old CI, ограниченный digest/SHA payload, root ownership/symlinks,
   запуск worker через systemd без привязки к SSH, настоящий flock двух workers,
   порядок backup/migration/readiness, reservation при ошибке миграции,
@@ -49,3 +49,14 @@ V1-17 сохраняет ответственность за полную CRM/PW
 shell/аргументам, подделке restrict и повторному включению forwarding. Пять новых
 regression tests прошли в Cloud. Владельцу остаётся обновить operations.py и
 повторить реальный preflight; его успех пока не подтверждён.
+
+Следующая диагностика владельца подтвердила успешный прежний local preflight,
+но также действующий Match User ForceCommand через ssh-entry.py. Preflight
+не учитывал приоритет серверного правила, поэтому давал ложное заключение о
+готовности SSH-протокола. Новый preflight проверяет эффективный ForceCommand,
+pubkeyauthentication, AuthorizedKeysCommand и реальный источник authorized_keys.
+Root-only repair-ssh — отдельная ручная операция владельца. Четыре новых tests
+проверяют policy mismatch, scoped replacement, сохранение root-политики,
+отказ неизвестным scopes/командам, restore при syntax/root-policy/reload failures
+и reload уже правильного файла без rewrite. 23 Cloud tests прошли. Реальные
+repair/reload и первый успешный deploy ещё не подтверждены владельцем.
