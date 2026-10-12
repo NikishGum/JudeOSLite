@@ -1,0 +1,21 @@
+.audit-heading, .audit-event-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.audit-history { margin-top: 24px; min-width: 0; }
+.audit-history .help { margin-bottom: 16px; }
+.audit-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.audit-filters .field { margin: 0; }
+.audit-buttons { display: flex; flex-wrap: wrap; gap: 12px; grid-column: 1 / -1; }
+.audit-secondary { background: var(--pride-surface-subtle); color: var(--pride-text); border: 1px solid var(--pride-border); }
+.audit-secondary:hover:not(:disabled) { color: var(--pride-on-brand); }
+.audit-events { list-style: none; padding: 0; display: grid; gap: 16px; }
+.audit-event { border: 1px solid var(--pride-border); border-radius: var(--pride-radius-field); padding: 16px; min-width: 0; overflow-wrap: anywhere; }
+.audit-event time { font-size: 14px; color: var(--pride-text-secondary); }
+.audit-event dl { margin: 16px 0 0; display: grid; gap: 8px; }
+.audit-event dl > div { display: grid; grid-template-columns: 100px minmax(0, 1fr); gap: 12px; }
+.audit-event dt { color: var(--pride-text-secondary); }
+.audit-event dd { margin: 0; }
+.audit-record-id { display: block; font-size: 13px; color: var(--pride-text-secondary); }
+@media (max-width: 600px) {
+ .audit-heading, .audit-event-heading { flex-direction: column; align-items: stretch; }
+ .audit-filters { grid-template-columns: minmax(0, 1fr); }
+ .audit-event dl > div { grid-template-columns: minmax(0, 1fr); gap: 0; }
+}

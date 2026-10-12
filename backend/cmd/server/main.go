@@ -14,6 +14,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/NikishGum/JudeOSLite/backend/internal/audit"
 	"github.com/NikishGum/JudeOSLite/backend/internal/auth"
 	"github.com/NikishGum/JudeOSLite/backend/internal/clubs"
 	"github.com/NikishGum/JudeOSLite/backend/internal/participants"
@@ -68,6 +69,7 @@ func run() error {
 		return err
 	}
 	scheduleService := schedule.New(pool, authService)
+	handler = audit.New(pool, authService).Handler(handler)
 	handler = authService.Handler(sessions.New(pool, authService).Handler(scheduleService.Handler(groups.New(pool, authService).Handler(participants.New(pool, authService).Handler(clubs.New(pool, authService).Handler(handler))))))
 	srv := &http.Server{Addr: cfg.HTTPAddr, Handler: handler, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 15 * time.Second, WriteTimeout: 15 * time.Second, IdleTimeout: 60 * time.Second}
 	listener, err := net.Listen("tcp", cfg.HTTPAddr)
