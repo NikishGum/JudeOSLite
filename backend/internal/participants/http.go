@@ -16,6 +16,7 @@ import (
 	"github.com/NikishGum/JudeOSLite/backend/internal/auth"
 	"github.com/NikishGum/JudeOSLite/backend/internal/clubs"
 	"github.com/NikishGum/JudeOSLite/backend/internal/platform"
+	"github.com/NikishGum/JudeOSLite/backend/internal/training/groups"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -55,7 +56,10 @@ func respond(w http.ResponseWriter, status int, body any) {
 	_ = json.NewEncoder(w).Encode(body)
 }
 func fail(w http.ResponseWriter, err error) {
+	err = groups.NormalizeError(err)
 	switch {
+	case errors.Is(err, groups.ErrInput), errors.Is(err, groups.ErrArchived), errors.Is(err, groups.ErrOverlap):
+		groups.Fail(w, err)
 	case errors.Is(err, errInput):
 		platform.WriteError(w, 400, "invalid_input", "Проверьте ФИО, полные даты и контакт. Дата вступления — от рождения до сегодняшнего дня.")
 	case errors.Is(err, errConflict):
@@ -101,12 +105,13 @@ type IdentityInput struct {
 	Version   int    `json:"version"`
 }
 type cardInput struct {
-	Identity     *IdentityInput `json:"identity,omitempty"`
-	JoinedOn     string         `json:"joinedOn"`
-	ContactKind  string         `json:"contactKind"`
-	ContactValue string         `json:"contactValue"`
-	ContactName  string         `json:"contactName"`
-	Version      int            `json:"version"`
+	InitialGroup *groups.InitialGroup `json:"initialGroup,omitempty"`
+	Identity     *IdentityInput       `json:"identity,omitempty"`
+	JoinedOn     string               `json:"joinedOn"`
+	ContactKind  string               `json:"contactKind"`
+	ContactValue string               `json:"contactValue"`
+	ContactName  string               `json:"contactName"`
+	Version      int                  `json:"version"`
 }
 
 func (in *cardInput) validate() bool {
@@ -199,15 +204,9 @@ func (s *Service) transaction(r *http.Request, change func(pgx.Tx, string, bool,
 	defer tx.Rollback(context.Background())
 	actor := auth.CurrentUser(ctx).ID
 	clubID := r.PathValue("clubID")
-	var owner bool
-	if err = tx.QueryRow(ctx, `SELECT is_owner FROM pride.staff_users WHERE id=$1 AND disabled_at IS NULL FOR SHARE`, actor).Scan(&owner); err != nil {
+	owner, err := auth.LockClubAdministrator(ctx, tx, clubID)
+	if err != nil {
 		return err
-	}
-	if !owner {
-		var role string
-		if err = tx.QueryRow(ctx, `SELECT role FROM pride.staff_club_roles WHERE staff_user_id=$1 AND club_id::text=$2 AND role='administrator' FOR SHARE`, actor, clubID).Scan(&role); err != nil {
-			return err
-		}
 	}
 	if err = clubs.RequireActive(ctx, tx, clubID); err != nil {
 		return err
@@ -316,7 +315,7 @@ func (s *Service) save(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	creating := r.Method == http.MethodPost
-	if !in.validate() || (creating && (in.Identity == nil || in.Identity.Version != 0 || in.Version != 0)) || (!creating && in.Version < 1) {
+	if !in.validate() || (creating && (in.Identity == nil || in.Identity.Version != 0 || in.Version != 0)) || (!creating && (in.Version < 1 || in.InitialGroup != nil)) {
 		fail(w, errInput)
 		return
 	}
@@ -337,6 +336,11 @@ func (s *Service) save(w http.ResponseWriter, r *http.Request) {
 			}
 			if err := tx.QueryRow(ctx, `INSERT INTO pride.club_memberships(participant_id,club_id,joined_on,contact_kind,contact_value,contact_name) VALUES($1,$2,$3::date,$4,$5,nullif($6,'')) RETURNING id::text`, participant, clubID, in.JoinedOn, in.ContactKind, in.ContactValue, in.ContactName).Scan(&id); err != nil {
 				return err
+			}
+			if in.InitialGroup != nil {
+				if err := groups.AddInitial(ctx, tx, actor, clubID, id, *in.InitialGroup); err != nil {
+					return err
+				}
 			}
 		} else {
 			old, err := lockCard(ctx, tx, clubID, id, owner)

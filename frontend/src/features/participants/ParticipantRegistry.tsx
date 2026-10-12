@@ -2,6 +2,9 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ApiError, apiGet, apiPost, apiPut } from '../../shared/api';
 import { ParticipantEditor, type Card, type Draft } from './ParticipantEditor';
 import './participants.css';
+import { MembershipHistory } from '../groups/MembershipHistory';
+import type { Group } from '../groups/types';
+import '../groups/groups.css';
 
 type List = { items: Card[]; hasMore: boolean };
 const message = (cause: unknown) => cause instanceof ApiError ? cause.message : 'Нет соединения. Проверьте интернет и повторите действие.';
@@ -27,6 +30,9 @@ export function ParticipantRegistry({ clubId, timezone, onSessionRefresh }: { cl
   const [notice, setNotice] = useState('');
   const [conflict, setConflict] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [groupsLoading, setGroupsLoading] = useState(true);
+  const [groupsError, setGroupsError] = useState('');
   const pending = useRef(false);
   const epoch = useRef(0);
   const heading = useRef<HTMLHeadingElement>(null);
@@ -34,6 +40,15 @@ export function ParticipantRegistry({ clubId, timezone, onSessionRefresh }: { cl
   // Calendar date in this club, without converting birth dates through UTC.
   const parts = new Intl.DateTimeFormat('en', { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
   const today = ['year', 'month', 'day'].map((name) => parts.find((part) => part.type === name)?.value).join('-');
+
+  useEffect(() => {
+    const controller = new AbortController(); setGroupsLoading(true); setGroupsError('');
+    apiGet<Group[]>(`/api/clubs/${clubId}/groups?state=all`, controller.signal)
+      .then((data) => { if (!controller.signal.aborted) setGroups(data); })
+      .catch((cause: unknown) => { if (!controller.signal.aborted) setGroupsError(message(cause)); })
+      .finally(() => { if (!controller.signal.aborted) setGroupsLoading(false); });
+    return () => controller.abort();
+  }, [clubId, selected, attempt]);
 
   useEffect(() => {
     const controller = new AbortController(); setLoading(true); setLoadError(''); setList({ items: [], hasMore: false });
@@ -77,7 +92,7 @@ export function ParticipantRegistry({ clubId, timezone, onSessionRefresh }: { cl
   function save(draft: Draft) {
     const local = { joinedOn: draft.joinedOn, contactKind: draft.contactKind, contactValue: draft.contactValue, contactName: draft.contactName };
     if (selected === 'new') {
-      void mutate(() => apiPost<Card>(base, { ...local, identity: { fullName: draft.fullName, birthDate: draft.birthDate, version: 0 }, version: 0 }), 'Участник добавлен.');
+      void mutate(() => apiPost<Card>(base, { ...local, identity: { fullName: draft.fullName, birthDate: draft.birthDate, version: 0 }, version: 0, ...(draft.groupId ? { initialGroup: { groupId: draft.groupId, from: draft.groupFrom } } : {}) }), 'Участник добавлен.');
     } else if (card) {
       const identity = card.canEditIdentity && (draft.fullName !== card.fullName || draft.birthDate !== card.birthDate)
         ? { fullName: draft.fullName, birthDate: draft.birthDate, version: card.participantVersion } : undefined;
@@ -96,7 +111,7 @@ export function ParticipantRegistry({ clubId, timezone, onSessionRefresh }: { cl
       {conflict && <><p className="help">Ваши правки остались в форме. Загрузка актуальной карточки сбросит их.</p><button className="secondary" disabled={busy} onClick={refreshCard}>Загрузить актуальную карточку</button></>}
       {cardLoading && <p role="status">Загружаем карточку…</p>}
       {cardError && <div role="alert"><p>{cardError}</p><button className="secondary" onClick={refreshCard}>Попробовать снова</button></div>}
-      {editing && (selected === 'new' || card) && <ParticipantEditor key={selected} card={selected === 'new' ? null : card} busy={busy} today={today} onSave={save} onCancel={() => { if (selected === 'new') close(); else { setEditing(false); setError(''); setConflict(false); } }} />}
+      {editing && (selected === 'new' || card) && <ParticipantEditor key={selected} card={selected === 'new' ? null : card} busy={busy} today={today} groups={groups} groupsLoading={groupsLoading} groupsError={groupsError} onSave={save} onCancel={() => { if (selected === 'new') close(); else { setEditing(false); setError(''); setConflict(false); } }} />}
       {card && !editing && <>
         <h4>{card.fullName}</h4><dl><dt>Дата рождения</dt><dd>{displayDate(card.birthDate)}</dd><dt>Дата вступления</dt><dd>{displayDate(card.joinedOn)}</dd>
           <dt>{card.contactKind === 'phone' ? 'Телефон' : 'Электронная почта'}</dt><dd>{card.contactValue}</dd><dt>Контактное лицо</dt><dd>{card.contactName || 'Не указано'}</dd><dt>Состояние карточки</dt><dd>{card.archived ? 'В архиве' : 'Действующая'}</dd></dl>
@@ -106,6 +121,7 @@ export function ParticipantRegistry({ clubId, timezone, onSessionRefresh }: { cl
           <button disabled={busy} onClick={() => { setEditing(true); setError(''); setConflict(false); }}>Редактировать участника</button>
           {card.archived ? <button className="secondary" disabled={busy} onClick={() => void mutate(() => apiPost<Card>(`${base}/${card.id}/restore`, { version: card.version }), 'Карточка возвращена из архива.')}>Вернуть из архива</button> : <button className="secondary" disabled={busy} onClick={() => setConfirmArchive(true)}>В архив</button>}
         </div>}
+        <MembershipHistory key={`${card.id}:${card.version}`} clubId={clubId} membershipId={card.id} archived={card.archived} joinedOn={card.joinedOn} groups={groups} />
       </>}
     </div>}
     <form className="registry-search" onSubmit={search}><label className="field">Поиск по ФИО или контакту<input type="search" maxLength={200} value={queryDraft} onChange={(event) => setQueryDraft(event.target.value)} /></label><button type="submit" disabled={busy}>Найти</button></form>

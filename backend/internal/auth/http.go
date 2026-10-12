@@ -63,6 +63,25 @@ type contextKey struct{}
 // CurrentUser is populated only by Require; domain handlers do not trust client user IDs.
 func CurrentUser(ctx context.Context) User { return ctx.Value(contextKey{}).(principal).User }
 
+// LockClubAdministrator repeats the live session and role checks in domain writes.
+// The caller must already be inside Require and retain these locks until commit.
+func LockClubAdministrator(ctx context.Context, tx pgx.Tx, clubID string) (bool, error) {
+	p := ctx.Value(contextKey{}).(principal)
+	var owner, live bool
+	if err := tx.QueryRow(ctx, `SELECT is_owner FROM pride.staff_users WHERE id=$1 AND disabled_at IS NULL FOR SHARE`, p.User.ID).Scan(&owner); err != nil {
+		return false, err
+	}
+	if err := tx.QueryRow(ctx, `SELECT true FROM pride.staff_sessions WHERE token_hash=$1 AND revoked_at IS NULL AND expires_at>now() FOR SHARE`, p.tokenHash).Scan(&live); err != nil {
+		return false, err
+	}
+	if !owner {
+		if err := tx.QueryRow(ctx, `SELECT true FROM pride.staff_club_roles WHERE staff_user_id=$1 AND club_id::text=$2 AND role='administrator' FOR SHARE`, p.User.ID, clubID).Scan(&live); err != nil {
+			return false, err
+		}
+	}
+	return owner, nil
+}
+
 type Service struct {
 	pool      *pgxpool.Pool
 	cfg       Config

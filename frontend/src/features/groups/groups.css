@@ -1,0 +1,6 @@
+.groups, .membership-history { overflow-wrap: anywhere; }
+.membership-history { margin-top: 24px; }
+.groups fieldset, .membership-history fieldset { min-width: 0; border: 0; margin: 0; padding: 0; }
+.groups .registry-list li, .membership-history .registry-list li { flex-wrap: wrap; }
+.groups .actions { flex-wrap: wrap; }
+.groups h3, .groups h4 { line-height: 1.4; }
