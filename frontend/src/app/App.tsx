@@ -7,6 +7,7 @@ import { TrainerManagement } from '../features/staff/TrainerManagement';
 import { GroupManagement } from '../features/groups/GroupManagement';
 import { ScheduleManagement } from '../features/schedule/ScheduleManagement';
 import { AuditHistory } from '../features/audit/AuditHistory';
+import { TrainerSessions } from '../features/trainer-sessions/TrainerSessions';
 import { SessionCalendar } from '../features/sessions/SessionCalendar';
 
 type Club = { id: string; name: string; timezone: string; archived: boolean; roles: string[] };
@@ -136,6 +137,7 @@ export function App() {
         {club && (session.user.isOwner || club.roles.includes('administrator')) && <ParticipantRegistry key={`participants:${session.user.id}:${club.id}:${roles}`} clubId={club.id} timezone={club.timezone} onSessionRefresh={() => loadSession()} />}
         {club && (session.user.isOwner || club.roles.includes('administrator')) && <GroupManagement key={`groups:${session.user.id}:${club.id}:${roles}`} clubId={club.id} timezone={club.timezone} />}
         {club && (session.user.isOwner || club.roles.includes('administrator')) && <ScheduleManagement key={`schedule:${session.user.id}:${club.id}:${roles}`} clubId={club.id} timezone={club.timezone} />}
+        {club && club.roles.includes('trainer') && <TrainerSessions key={`journal:${session.user.id}:${club.id}:${roles}`} clubId={club.id} timezone={club.timezone} />}
         {club && <SessionCalendar key={`sessions:${session.user.id}:${club.id}:${roles}`} clubId={club.id} timezone={club.timezone} canManage={session.user.isOwner || club.roles.includes('administrator')} />}
         {club && (session.user.isOwner || club.roles.includes('administrator')) && <TrainerManagement key={`trainers:${session.user.id}:${club.id}:${roles}`} clubId={club.id} isOwner={session.user.isOwner} onSessionRefresh={() => loadSession()} />}
         {session.user.isOwner && <OwnerManagement key={session.user.id} onChanged={() => loadSession()} />}

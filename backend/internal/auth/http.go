@@ -66,6 +66,23 @@ func CurrentUser(ctx context.Context) User { return ctx.Value(contextKey{}).(pri
 // LockClubAdministrator repeats the live session and role checks in domain writes.
 // The caller must already be inside Require and retain these locks until commit.
 func LockClubAdministrator(ctx context.Context, tx pgx.Tx, clubID string) (bool, error) {
+	owner, err := LockSession(ctx, tx)
+	if err != nil {
+		return false, err
+	}
+	p := ctx.Value(contextKey{}).(principal)
+	var live bool
+	if !owner {
+		if err := tx.QueryRow(ctx, `SELECT true FROM pride.staff_club_roles WHERE staff_user_id=$1 AND club_id::text=$2 AND role='administrator' FOR SHARE`, p.User.ID, clubID).Scan(&live); err != nil {
+			return false, err
+		}
+	}
+	return owner, nil
+}
+
+// LockSession rechecks the authenticated actor and session inside a domain
+// transaction. Retain these locks while checking domain-specific assignments.
+func LockSession(ctx context.Context, tx pgx.Tx) (bool, error) {
 	p := ctx.Value(contextKey{}).(principal)
 	var owner, live bool
 	if err := tx.QueryRow(ctx, `SELECT is_owner FROM pride.staff_users WHERE id=$1 AND disabled_at IS NULL FOR SHARE`, p.User.ID).Scan(&owner); err != nil {
@@ -73,11 +90,6 @@ func LockClubAdministrator(ctx context.Context, tx pgx.Tx, clubID string) (bool,
 	}
 	if err := tx.QueryRow(ctx, `SELECT true FROM pride.staff_sessions WHERE token_hash=$1 AND revoked_at IS NULL AND expires_at>now() FOR SHARE`, p.tokenHash).Scan(&live); err != nil {
 		return false, err
-	}
-	if !owner {
-		if err := tx.QueryRow(ctx, `SELECT true FROM pride.staff_club_roles WHERE staff_user_id=$1 AND club_id::text=$2 AND role='administrator' FOR SHARE`, p.User.ID, clubID).Scan(&live); err != nil {
-			return false, err
-		}
 	}
 	return owner, nil
 }
