@@ -1,0 +1,5 @@
+# Local host Go/Vite development only; never add this overlay on a VPS.
+services:
+  db:
+    ports:
+      - "127.0.0.1:${DB_PORT:-5432}:5432"

@@ -1,0 +1,53 @@
+name: Build and checks
+on:
+  push:
+    branches: [main, 'codex/**']
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18.6-bookworm
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test-only
+          POSTGRES_DB: test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U test -d test"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Frontend checks and production build
+        working-directory: frontend
+        run: npm ci && npm run build
+      - name: Go formatting, vet, race and PostgreSQL migration tests
+        working-directory: backend
+        env:
+          TEST_DATABASE_URL: postgres://test:test-only@127.0.0.1:5432/test?sslmode=disable
+        run: |
+          test -z "$(gofmt -l .)"
+          go vet ./...
+          go test -race ./...
+          go build ./cmd/server ./cmd/migrate
+      - name: Missing mandatory configuration fails safely
+        working-directory: backend
+        run: |
+          go build -o /tmp/judeos-server ./cmd/server
+          if env -u DATABASE_URL /tmp/judeos-server; then exit 1; fi
+      - name: Build production image
+        run: docker build -f deploy/Dockerfile -t judeoslite:ci .
+      - name: Compose clean startup, migration rerun and restart
+        run: bash deploy/check.sh judeoslite-ci
