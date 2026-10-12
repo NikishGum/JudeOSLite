@@ -90,6 +90,9 @@ bash deploy/check.sh
 
 ## Контекст проекта
 
+Проверенная матрица ролей и изоляция филиалов на реальной PostgreSQL:
+[access-testing-v1.md](docs/access-testing-v1.md), тесты `backend/tests/integration/access` (V1-14).
+
 - [План первой версии](docs/development-plan-v1.md) и [GitHub issues](docs/github-issues-v1.md).
 - [Совместная работа](docs/collaboration.md): агент автоматически занимает свободную задачу через общую очередь GitHub; исполнитель и In progress видны в issues, один issue — один автоматически названный чат. In review/ревью коллеги необязательны.
 - [Архитектура](docs/architecture-v1.md), [схема БД](docs/database/schema-v1.md), [диаграммы](docs/database/diagrams-v1.md).
