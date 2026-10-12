@@ -25,6 +25,8 @@ LEGACY_ENTRYPOINT = LIB / 'ssh-entry.py'
 # Preserve the exact owner-managed restricted entrypoint reported by the owner.
 # This does not claim that it understands the new JSON deployment protocol.
 LEGACY_ENTRYPOINT_SHA256 = '85a9dd8c570d315e563b0b83e71caf698916388efa0320193e17e58946f21af3'
+SSH_MATCH_FILE = Path('/etc/ssh/sshd_config.d/60-judeos-deploy.conf')
+SSH_CONTROLLER_COMMAND = '/usr/bin/sudo -n /usr/local/lib/judeos-deploy/controller.py'
 DOMAIN = 'test.judopride.tech'
 IMAGE = 'ghcr.io/nikishgum/judeoslite-test'
 ENV = {'PATH': '/usr/sbin:/usr/bin:/sbin:/bin', 'HOME': '/root',
@@ -219,7 +221,7 @@ def authorized_options(line):
 
 
 def validate_authorized_keys(contents):
-    canonical = '/usr/bin/sudo -n /usr/local/lib/judeos-deploy/controller.py'
+    canonical = SSH_CONTROLLER_COMMAND
     actions_key = False
     for number, line in enumerate(contents.splitlines(), 1):
         if not line.strip() or line.lstrip().startswith('#'): continue
@@ -243,6 +245,77 @@ def validate_authorized_keys(contents):
                 raise RuntimeError(f'authorized_keys line {number}: legacy handler hash changed; review locally.')
         if key_type == 'ssh-ed25519' and command == canonical: actions_key = True
     if not actions_key: raise RuntimeError('Restricted Actions key missing.')
+
+
+def sshd_config(user):
+    # No connection is opened. Match evaluation uses a documentation-only IP;
+    # actual Address/Host-specific overrides still require an owner connection test.
+    context = f'user={user},host=github-actions,addr=192.0.2.10,laddr=187.7.69.230,lport=22'
+    return run(['/usr/sbin/sshd', '-T', '-C', context])
+
+
+def validate_sshd_config(raw, home):
+    fields = dict(line.split(None, 1) for line in raw.decode().splitlines() if ' ' in line)
+    if fields.get('forcecommand') not in ('none', SSH_CONTROLLER_COMMAND):
+        raise RuntimeError('sshd ForceCommand overrides the Actions key; root must repair the judeos-deploy Match rule.')
+    if fields.get('pubkeyauthentication') != 'yes':
+        raise RuntimeError('sshd public-key authentication is disabled.')
+    if fields.get('authorizedkeyscommand') != 'none':
+        raise RuntimeError('External AuthorizedKeysCommand requires separate owner review.')
+    paths = []
+    for value in fields.get('authorizedkeysfile', '').split():
+        expanded = Path(value.replace('%h', str(home)).replace('%u', 'judeos-deploy'))
+        paths.append(expanded if expanded.is_absolute() else home / expanded)
+    if home / '.ssh' / 'authorized_keys' not in paths:
+        raise RuntimeError('sshd reads a different authorized_keys file from the installed Actions key.')
+
+
+def repair_ssh():
+    # Explicit root-only admin action, never part of bootstrap or SSH payloads.
+    path = SSH_MATCH_FILE
+    trusted(path)
+    original = path.read_text()
+    lines = original.splitlines(keepends=True)
+    scope = []; matches = []
+    for index, line in enumerate(lines):
+        fields = line.strip().split()
+        if not fields or fields[0].startswith('#'): continue
+        if fields[0].lower() == 'match':
+            scope = [fields[1].lower(), *fields[2:]] if len(fields) > 1 else []
+        elif fields[0].lower() == 'forcecommand' and scope == ['user', 'judeos-deploy']:
+            matches.append((index, ' '.join(fields[1:])))
+    if len(matches) != 1 or matches[0][1] not in (str(LEGACY_ENTRYPOINT), SSH_CONTROLLER_COMMAND):
+        raise RuntimeError('Expected exactly one known ForceCommand in Match User judeos-deploy; review the file locally.')
+    if matches[0][1] == SSH_CONTROLLER_COMMAND:
+        run(['/usr/sbin/sshd', '-t'])
+        validate_sshd_config(sshd_config('judeos-deploy'), KEY_HOME)
+        # -T reads files on disk, not the running daemon's cached configuration.
+        run(['/usr/bin/systemctl', 'reload', 'ssh'])
+        print('SSH Match rule already correct; validated and reloaded.'); return
+    root_before = sshd_config('root')
+    backup = path.with_name(path.name + '.before-json-' + secrets.token_hex(4))
+    write(backup, original, 0o600)
+    index = matches[0][0]
+    indent = lines[index][:len(lines[index]) - len(lines[index].lstrip())]
+    lines[index] = indent + 'ForceCommand ' + SSH_CONTROLLER_COMMAND + '\n'
+    mode = stat.S_IMODE(path.stat().st_mode)
+    changed = reload_attempted = False
+    try:
+        write(path, ''.join(lines), mode); changed = True
+        run(['/usr/sbin/sshd', '-t'])
+        if sshd_config('root') != root_before:
+            raise RuntimeError('Root SSH policy changed.')
+        validate_sshd_config(sshd_config('judeos-deploy'), KEY_HOME)
+        reload_attempted = True
+        run(['/usr/bin/systemctl', 'reload', 'ssh'])
+    except Exception:
+        if changed:
+            write(path, original, mode)
+            if reload_attempted:
+                try: run(['/usr/bin/systemctl', 'reload', 'ssh'])
+                except RuntimeError: pass
+        raise RuntimeError('SSH repair failed; original file retained/restored. Inspect the backup and ssh service locally.') from None
+    print('Restricted SSH controller configured; root policy unchanged. Backup:', backup)
 
 
 def preflight():
@@ -271,6 +344,7 @@ def preflight():
     keys = Path(user.pw_dir) / '.ssh' / 'authorized_keys'
     trusted(keys)
     validate_authorized_keys(keys.read_text())
+    validate_sshd_config(sshd_config(user.pw_name), Path(user.pw_dir))
     listing = run(['/usr/bin/sudo', '-l', '-U', 'judeos-deploy']).decode()
     grants = [line.strip() for line in listing.splitlines() if line.strip().startswith('(')]
     if grants != ['(root) NOPASSWD: /usr/local/lib/judeos-deploy/controller.py']:

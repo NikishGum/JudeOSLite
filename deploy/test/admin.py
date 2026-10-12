@@ -14,7 +14,7 @@ def main():
         raise RuntimeError('Run as root.')
     p = argparse.ArgumentParser(description=__doc__)
     sub = p.add_subparsers(dest='command', required=True)
-    for name in ('init-secrets', 'registry-login', 'preflight', 'backup', 'status'):
+    for name in ('init-secrets', 'registry-login', 'preflight', 'backup', 'status', 'repair-ssh'):
         sub.add_parser(name)
     a = sub.add_parser('activate-controller')
     a.add_argument('--expected-old-sha256', required=True)
@@ -35,6 +35,7 @@ def main():
     elif args.command == 'activate-controller': ops.activate_controller(args.expected_old_sha256)
     elif args.command == 'install-key': ops.install_key(Path(args.public_key_file))
     elif args.command == 'preflight': ops.preflight()
+    elif args.command == 'repair-ssh': ops.repair_ssh()
     elif args.command == 'status': ops.status()
     else:
         with ops.lock():

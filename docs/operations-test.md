@@ -89,6 +89,41 @@ python3 -I /usr/local/lib/judeos-deploy/admin.py activate-controller \
 
 Активация откажет, если прежний файл изменился, и сохранит root-only архив.
 **Не менять sudoers на ALL, не добавлять пользователя в docker/sudo.**
+
+### Эффективные правила sshd и прежний ForceCommand
+
+Владелец подтвердил: `/etc/ssh/sshd_config.d/60-judeos-deploy.conf` содержит
+`Match User judeos-deploy` и `ForceCommand /usr/local/lib/judeos-deploy/ssh-entry.py`.
+Серверный ForceCommand имеет приоритет над command в authorized_keys: даже новый
+правильный ключ направлялся в старый обработчик, который возвращал
+`command_denied` на новый JSON-протокол. Утверждение о неправильном ключе не
+было доказано; обнаруженная причина — правило sshd.
+
+После установки проверенного admin.py/operations.py и активированного контроллера
+владелец выполняет **явную root-команду**, когда worker не работает:
+
+```bash
+python3 -I /usr/local/lib/judeos-deploy/admin.py repair-ssh
+python3 -I /usr/local/lib/judeos-deploy/admin.py preflight
+```
+
+repair-ssh меняет только известный ForceCommand внутри **точного**
+`Match User judeos-deploy` в указанном файле на
+`ForceCommand /usr/bin/sudo -n /usr/local/lib/judeos-deploy/controller.py`.
+Сохраняет root-only backup рядом с файлом (суффикс не включается в *.conf),
+проверяет `sshd -t`, равенство эффективной политики root до/после и эффективное
+правило deploy-user, затем делает `systemctl reload ssh`, сохраняя текущие SSH-сеансы.
+При ошибке исходный файл восстанавливается; при ошибке reload также предпринимается
+reload восстановленного файла. Иные scopes/неизвестные команды не изменяются.
+Bootstrap сам конфигурацию SSH не меняет. Keys/Secrets/sudoers/Docker-группа
+этой операцией не изменяются; интерактивный shell deploy-user не разрешается.
+
+Не закрывать существующую root-сессию до проверки второго административного
+SSH-сеанса. Проверка sshd -T читает файлы на диске и использует модельный адрес
+192.0.2.10; она не доказывает состояние работающего daemon и Match Address/Host
+для реального runner. Реальный SSH из Actions после reload остаётся обязательным.
+Перечитывание выполняется и при уже правильной строке на диске: daemon мог
+продолжать работать со старой конфигурацией.
 Старый forced command может использовать прежний протокол; Actions использует
 новый отдельный ключ и фиксированную команду ниже. Остальные старые ключи
 владелец отдельно проверяет/удаляет при ненадобности; bootstrap их не удаляет.
@@ -240,6 +275,7 @@ python3 -I /usr/local/lib/judeos-deploy/admin.py preflight
 
 Проверяет root-owned tree/config/secret consistency, активированный контроллер,
 restricted key, ровно одну sudo-гранту, отсутствие дополнительных групп,
+эффективные ForceCommand и источник authorized_keys через sshd -T,
 Docker/Compose/config, закрытые DB/app ports, uploads permissions, DNS, активный
 UFW, необходимость reboot и конфликт Traefik/портов. Успех — локальная подготовка;
 доступ GHCR, firewall Hostinger, реальный SSH из Actions, сертификат/HTTPS и PWA
@@ -307,9 +343,36 @@ Server flock охватывает backup/migrate/start/restore/rollback. Waterma
 предпочтителен новый revert-commit с успешным CI.
 
 SSH-запрос не переносит compose/scripts и не даёт shell. systemd worker работает
-независимо от SSH/Actions, `TimeoutStartSec=0` не обрывает миграцию. При timeout
+независимо от SSH/Actions, `TimeoutStartSec=infinity` отключает startup timeout.
+Нельзя заменять infinity на 0: transient D-Bus property в systemd-run передаёт
+нулевой deadline, хотя parser обычного unit-файла трактует 0 иначе. При timeout
 Actions сначала проверить status/unit; не отменять worker и не запускать restore.
 Миграции Go имеют собственный timeout и transaction/advisory lock.
+
+### Обновление прежнего V1-19 controller с нулевым timeout
+
+Владелец подтвердил пустой state и `code=killed/status=15/TERM` у worker.
+Контрольный `/usr/bin/true` с transient `TimeoutStartSec=0` вернул 1;
+та же команда с `infinity` завершилась success/exit 0. Ошибка в контроллере
+исправлена; GHCR/миграции в этих попытках ещё не проверялись.
+
+После получения и изучения исправленного checkout, остановив новые Actions
+и убедившись, что worker не выполняется, root обновляет только controller.
+Следующий hash соответствует прежнему V1-19 controller из merged PR #168;
+при отличии файла активация откажет — hash не подменять без изучения причины:
+
+```bash
+install -o root -g root -m 0755 deploy/test/controller.py /usr/local/lib/judeos-deploy/controller.v1-19.py.new
+mv -T /usr/local/lib/judeos-deploy/controller.v1-19.py.new /usr/local/lib/judeos-deploy/controller.v1-19.py
+python3 -I /usr/local/lib/judeos-deploy/admin.py activate-controller \
+  --expected-old-sha256 d0caef5ad48d2b9568c00481f10b0f8dc05b639ad407412e5590f8745bd5b7fe
+python3 -I /usr/local/lib/judeos-deploy/admin.py preflight
+```
+
+Активация сохраняет root-only архив старого controller. SSH reload, новые ключи,
+изменение Secrets/sudoers/Docker-группы не требуются. После обновления можно
+повторить Deploy test для текущего main; если main изменился, нужен его новый
+успешный CI. Реальный deploy/HTTPS проверяет владелец отдельно.
 
 ## Backup, проверка restore и recovery
 
