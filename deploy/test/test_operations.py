@@ -8,6 +8,7 @@ import subprocess
 import tempfile
 import threading
 import unittest
+import urllib.error
 from unittest.mock import patch
 
 import operations as ops
@@ -22,6 +23,74 @@ IMAGE = ops.IMAGE + '@sha256:' + 'b' * 64
 REQUEST = {'sha': SHA, 'image': IMAGE, 'generation': 12}
 SSH_CONFIG = ('pubkeyauthentication yes\nauthorizedkeyscommand none\n'
               'authorizedkeysfile /var/lib/judeos-deploy/.ssh/authorized_keys\n')
+
+
+class GitHubAPITests(unittest.TestCase):
+    def setUp(self):
+        environment = patch.dict(os.environ, {'GH_TOKEN': 'test-only-token'})
+        environment.start(); self.addCleanup(environment.stop)
+        sleep = patch.object(selection.time, 'sleep')
+        self.sleep = sleep.start(); self.addCleanup(sleep.stop)
+        stderr = contextlib.redirect_stderr(io.StringIO())
+        self.stderr = stderr.__enter__(); self.addCleanup(stderr.__exit__, None, None, None)
+
+    def http_error(self, code):
+        return urllib.error.HTTPError('https://api.github.com/test', code, 'test-only-token', {}, io.BytesIO())
+
+    def test_transient_http_failure_recovers_without_logging_credentials(self):
+        for code in (500, 502, 503, 504):
+            with self.subTest(code=code), patch.object(selection.urllib.request, 'urlopen',
+                    side_effect=[self.http_error(code), io.BytesIO(b'{"id": 12}')]) as fetch:
+                self.assertEqual(selection.get('/actions/runs/12'), {'id': 12})
+                self.assertEqual(fetch.call_count, 2)
+                self.assertEqual(fetch.call_args.kwargs['timeout'], 30)
+        self.assertNotIn('test-only-token', self.stderr.getvalue())
+
+    def test_connection_and_timeout_failures_recover(self):
+        with patch.object(selection.urllib.request, 'urlopen', side_effect=[
+                urllib.error.URLError('test-only-token'), TimeoutError(), ConnectionResetError(),
+                io.BytesIO(b'{"id": 12}')]) as fetch:
+            self.assertEqual(selection.get('/actions/runs/12'), {'id': 12})
+            self.assertEqual(fetch.call_count, 4)
+            self.assertEqual([call.args[0] for call in self.sleep.call_args_list], [2, 4, 8])
+        self.assertNotIn('test-only-token', self.stderr.getvalue())
+
+    def test_persistent_api_failure_stops_after_bounded_retries(self):
+        with patch.object(selection.urllib.request, 'urlopen',
+                side_effect=[self.http_error(502) for _ in range(4)]) as fetch:
+            with self.assertRaisesRegex(RuntimeError, '4 attempts.*HTTP 502'):
+                selection.get('/actions/runs/12')
+            self.assertEqual(fetch.call_count, 4)
+            self.assertEqual([call.args[0] for call in self.sleep.call_args_list], [2, 4, 8])
+
+    def test_permanent_http_errors_are_not_retried(self):
+        for code in (401, 403, 404, 422, 429):
+            with self.subTest(code=code), patch.object(selection.urllib.request, 'urlopen',
+                    side_effect=self.http_error(code)) as fetch:
+                with self.assertRaises(urllib.error.HTTPError): selection.get('/actions/runs/12')
+                self.assertEqual(fetch.call_count, 1)
+        self.sleep.assert_not_called()
+
+    def test_invalid_response_is_not_retried(self):
+        with patch.object(selection.urllib.request, 'urlopen', return_value=io.BytesIO(b'not JSON')) as fetch:
+            with self.assertRaises(json.JSONDecodeError): selection.get('/actions/runs/12')
+            self.assertEqual(fetch.call_count, 1)
+        self.sleep.assert_not_called()
+
+    def test_main_advance_during_api_retry_still_blocks_deployment_outputs(self):
+        run = {'repository': {'id': 1}, 'head_repository': {'id': 1},
+               'workflow_id': 2, 'event': 'push', 'head_branch': 'main',
+               'status': 'completed', 'conclusion': 'success', 'head_sha': SHA, 'run_number': 12}
+        responses = [self.http_error(502)] + [io.BytesIO(json.dumps(value).encode())
+                    for value in (run, {'id': 1}, {'id': 2}, {'commit': {'sha': 'c' * 40}})]
+        with tempfile.TemporaryDirectory() as temporary:
+            event = Path(temporary) / 'event.json'; event.write_text('{"workflow_run":{"id":12}}')
+            output = Path(temporary) / 'output'; output.write_text('')
+            with patch.dict(os.environ, {'GITHUB_REPOSITORY': selection.REPO,
+                    'GITHUB_EVENT_NAME': 'workflow_run', 'GITHUB_EVENT_PATH': str(event),
+                    'GITHUB_OUTPUT': str(output)}), patch.object(selection.urllib.request, 'urlopen', side_effect=responses):
+                with self.assertRaisesRegex(ValueError, 'current main'): selection.main()
+            self.assertEqual(output.read_text(), '')
 
 
 class PolicyTests(unittest.TestCase):

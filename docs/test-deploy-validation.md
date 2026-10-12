@@ -3,7 +3,7 @@
 12.10.2026. Проверки выполнены только в Cloud. VPS не подключался, серверные
 secret файлы/ключи владельца не читались, реальный деплой не выполнялся.
 
-- 23 Python tests: selection только успешного push-CI текущего main, отказ
+- 29 Python tests: selection только успешного push-CI текущего main, отказ
   PR/fork/failed/old CI, ограниченный digest/SHA payload, root ownership/symlinks,
   запуск worker через systemd без привязки к SSH, настоящий flock двух workers,
   порядок backup/migration/readiness, reservation при ошибке миграции,
@@ -60,3 +60,13 @@ Root-only repair-ssh — отдельная ручная операция вла
 отказ неизвестным scopes/командам, restore при syntax/root-policy/reload failures
 и reload уже правильного файла без rewrite. 23 Cloud tests прошли. Реальные
 repair/reload и первый успешный deploy ещё не подтверждены владельцем.
+
+Владелец затем подтвердил успешные `repair-ssh` (backup сохранён, root policy
+не изменена) и local preflight. Следующая попытка Deploy test остановилась до SSH:
+GitHub API `/actions/runs/...` вернул HTTP 502 при повторной проверке CI.
+Для HTTP 500/502/503/504 и ошибок соединения добавлены максимум четыре попытки
+с паузами 2/4/8 секунд. Auth/другие 4xx, неверный JSON и нарушения policy
+не обходятся. Шесть regression tests проверяют recovery, bounded failure,
+отсутствие секретов в сообщениях retry, немедленный отказ permanent errors
+и запрет выдачи deploy outputs, если main изменился во время retry.
+Всего 29 Cloud tests прошли; реальный первый деплой по-прежнему не подтверждён.

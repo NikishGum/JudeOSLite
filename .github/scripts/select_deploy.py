@@ -2,9 +2,14 @@
 import json
 import os
 import re
+import sys
+import time
+import urllib.error
 import urllib.request
 
 REPO = 'NikishGum/JudeOSLite'
+RETRY_DELAYS = (2, 4, 8)
+RETRY_HTTP_CODES = {500, 502, 503, 504}
 
 
 def validate(run, repository_id, workflow_id, main_sha):
@@ -23,8 +28,22 @@ def get(path):
     request = urllib.request.Request('https://api.github.com/repos/' + REPO + path,
         headers={'Authorization': 'Bearer ' + os.environ['GH_TOKEN'],
                  'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
-    with urllib.request.urlopen(request, timeout=30) as response:
-        return json.load(response)
+    for attempt in range(len(RETRY_DELAYS) + 1):
+        try:
+            with urllib.request.urlopen(request, timeout=30) as response:
+                return json.load(response)
+        except urllib.error.HTTPError as error:
+            if error.code not in RETRY_HTTP_CODES:
+                raise
+            failure = 'HTTP ' + str(error.code)
+            error.close()
+        except (urllib.error.URLError, TimeoutError, ConnectionError):
+            failure = 'connection error'
+        if attempt == len(RETRY_DELAYS):
+            raise RuntimeError(f'GitHub API failed after {attempt + 1} attempts ({failure}); deployment selection stopped.') from None
+        delay = RETRY_DELAYS[attempt]
+        print(f'GitHub API {failure}; retry {attempt + 1}/{len(RETRY_DELAYS)} in {delay}s.', file=sys.stderr)
+        time.sleep(delay)
 
 
 def main():
