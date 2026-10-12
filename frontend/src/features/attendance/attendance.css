@@ -1,0 +1,20 @@
+.attendance-cards { max-width: 640px; margin: 20px auto; min-width: 0; }
+.attendance-cards progress { width: 100%; height: 12px; accent-color: var(--pride-brand); }
+.attendance-card { display: grid; gap: 16px; margin-top: 20px; padding: 24px 16px; border: 1px solid var(--pride-border); border-radius: 20px; background: var(--pride-surface); overflow-wrap: anywhere; }
+.attendance-card p { margin: 0; }
+.attendance-card h4, .attendance-cards > h4 { font-size: 24px; line-height: 1.3; overflow-wrap: anywhere; }
+.attendance-actions, .attendance-reasons { display: grid; gap: 12px; }
+.attendance-actions button, .attendance-reasons button { min-height: 56px; }
+.attendance-secondary { background: var(--pride-surface-subtle); color: var(--pride-text); border: 1px solid var(--pride-border); }
+.attendance-secondary:hover:not(:disabled) { color: var(--pride-on-brand); }
+.attendance-secondary:disabled { color: var(--pride-on-brand); }
+.attendance-summary { list-style: none; padding: 0; display: grid; gap: 12px; }
+.attendance-summary li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px; border: 1px solid var(--pride-border); border-radius: 10px; overflow-wrap: anywhere; }
+.attendance-summary li > div { min-width: 0; flex: 1 1 220px; }
+.attendance-summary p { margin: 4px 0; }
+.attendance-sheet { position: fixed; inset: auto 0 0; margin: auto auto 0; width: min(100%, 640px); max-width: 100%; max-height: calc(100dvh - 24px - env(safe-area-inset-top)); box-sizing: border-box; overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--pride-border); border-radius: 20px 20px 0 0; padding: 24px max(16px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); background: var(--pride-surface); color: var(--pride-text); }
+.attendance-sheet::backdrop { background: rgb(33 37 41 / 55%); }
+.attendance-sheet h4 { margin-top: 0; font-size: 22px; overflow-wrap: anywhere; }
+.attendance-sheet > button { width: 100%; margin-top: 16px; }
+.attendance-sheet .attendance-reasons button { width: 100%; text-align: left; }
+@media (min-width: 601px) { .attendance-actions { grid-template-columns: 1fr 1fr; } }
