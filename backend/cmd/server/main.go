@@ -19,6 +19,7 @@ import (
 	"github.com/NikishGum/JudeOSLite/backend/internal/clubs"
 	"github.com/NikishGum/JudeOSLite/backend/internal/participants"
 	"github.com/NikishGum/JudeOSLite/backend/internal/platform"
+	"github.com/NikishGum/JudeOSLite/backend/internal/reports"
 	"github.com/NikishGum/JudeOSLite/backend/internal/training/attendance"
 	"github.com/NikishGum/JudeOSLite/backend/internal/training/corrections"
 	"github.com/NikishGum/JudeOSLite/backend/internal/training/groups"
@@ -73,6 +74,7 @@ func run() error {
 	scheduleService := schedule.New(pool, authService)
 	handler = corrections.New(pool, authService).Handler(handler)
 	handler = audit.New(pool, authService).Handler(handler)
+	handler = reports.New(pool, authService).Handler(handler)
 	handler = authService.Handler(attendance.New(pool, authService).Handler(sessions.New(pool, authService).Handler(scheduleService.Handler(groups.New(pool, authService).Handler(participants.New(pool, authService).Handler(clubs.New(pool, authService).Handler(handler)))))))
 	srv := &http.Server{Addr: cfg.HTTPAddr, Handler: handler, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 15 * time.Second, WriteTimeout: 15 * time.Second, IdleTimeout: 60 * time.Second}
 	listener, err := net.Listen("tcp", cfg.HTTPAddr)

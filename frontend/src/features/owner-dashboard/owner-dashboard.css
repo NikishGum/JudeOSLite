@@ -1,0 +1,20 @@
+.owner-dashboard { min-width: 0; }
+.report-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 24px 0; }
+.report-filters .field { margin: 0; }
+.report-totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.report-totals > div { background: var(--pride-surface-subtle); border-radius: 10px; padding: 16px; }
+.report-totals dt { color: var(--pride-text-secondary); overflow-wrap: anywhere; }
+.report-totals dd { margin: 8px 0 0; font-size: 28px; font-weight: 600; }
+.report-table-scroll { max-width: 100%; overflow: auto; margin-top: 24px; border: 1px solid var(--pride-border); border-radius: 10px; }
+.report-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.report-table caption { text-align: left; padding: 16px; font-weight: 600; }
+.report-table th, .report-table td { text-align: right; padding: 12px; border-top: 1px solid var(--pride-border); }
+.report-table thead { background: var(--pride-surface-subtle); }
+.report-table th:first-child { text-align: left; min-width: 180px; max-width: 280px; overflow-wrap: anywhere; }
+.report-table td { white-space: nowrap; }
+@media (max-width: 600px) {
+  .report-filters { grid-template-columns: minmax(0, 1fr); }
+  .report-totals { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .report-totals > div { padding: 12px; }
+  .report-totals dd { font-size: 24px; overflow-wrap: anywhere; }
+}

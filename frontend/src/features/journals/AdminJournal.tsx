@@ -28,6 +28,7 @@ export function AdminJournal({ clubId, initial, onUnavailable }: { clubId: strin
       const result = await apiPut<Journal>(`${base}/records/${draft.record.id}`, { version: draft.record.version, state: draft.value === 'present' ? 'present' : 'absent', absenceReason: draft.value === 'present' ? null : draft.value, changeReason: draft.reason });
       if (!mounted.current) return;
       setJournal(result); setDraft(null); setHistoryId(draft.record.id); setNotice('Отметка подтверждена сервером.');
+      window.dispatchEvent(new Event('attendance-changed'));
     } catch (e) {
       if (!mounted.current) return;
       setError(e instanceof ApiError ? e.message : 'Нет соединения. Исправление не подтверждено. Ввод сохранён для повтора.');

@@ -7,6 +7,7 @@
 Расписание/предпросмотр/генерация/история: [schedule-v1.md](docs/schedule-v1.md).
 
 Журнал филиала/коррекции/история: [corrections-v1.md](docs/corrections-v1.md).
+Статистика владельца/контрольные суммы: [reports-v1.md](docs/reports-v1.md).
 
 ## Быстрый запуск из чистого checkout
 
