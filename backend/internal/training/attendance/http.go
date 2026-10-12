@@ -137,6 +137,12 @@ func records(ctx context.Context, tx pgx.Tx, id string) ([]Record, error) {
 	}
 	return out, rows.Err()
 }
+
+// ReadRecords returns the immutable roster and current marks. Callers must
+// authorize the club and lock the session in the same transaction first.
+func ReadRecords(ctx context.Context, tx pgx.Tx, id string) ([]Record, error) {
+	return records(ctx, tx, id)
+}
 func journal(ctx context.Context, tx pgx.Tx, v sessions.Session) (Journal, error) {
 	rs, e := records(ctx, tx, v.ID)
 	return Journal{v, rs}, e

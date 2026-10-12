@@ -1,6 +1,6 @@
 # Журнал занятия V1-09
 
-12.10.2026, [#157](https://github.com/NikishGum/JudeOSLite/issues/157). Реализованы список собственных фактических занятий на сегодня/выбранную дату, снимок состава, отдельные отметки и атомарное завершение. Интерфейс пока список с формой на строку; последовательные мобильные карточки и панель причин — V1-10, журнал администратора/коррекции — V1-11.
+12.10.2026, [#157](https://github.com/NikishGum/JudeOSLite/issues/157). Реализованы список собственных фактических занятий на сегодня/выбранную дату, снимок состава, отдельные отметки и атомарное завершение. Интерфейс пока список с формой на строку; последовательные мобильные карточки и панель причин — V1-10, журнал администратора/коррекции — [готовый V1-11](corrections-v1.md).
 
 ## Снимок и состояния
 
@@ -32,7 +32,7 @@ Session сохраняет контракт V1-08. Record: id,membershipId,sourc
 
 Каждый запрос повторяет текущий enabled actor, live session и trainer-роль своего филиала **внутри транзакции**, затем schedule advisory lock; запись дополнительно блокирует active club. Journal берёт session FOR UPDATE и проверяет actual trainer_id/superseded_at/status. Owner/admin без роли и фактического назначения тренера не получают этот endpoint; их отдельный доступ появляется в V1-11. Чужой session/record/club и отсутствующий ID одинаково 404, no-store/Origin/CSRF действуют для всех запросов. Составная FK — целостность, а не замена прав.
 
-Порядок locks: actor → live session → actor trainer-role → schedule → active club (при записи) → session. Совместим с V1-07/V1-08; общий schedule lock исключает пересечение с генерацией/исключениями, строка занятия сериализует mark/close/cancel/replace. Прямой SQL insert/update attendance также блокирует сеанс через trigger. INSERT возможен только до freeze в planned, UPDATE только open, ключи/DELETE запрещены. V1-11 расширит именно guard/check для поштучной correction, не должна переписать старые миграции.
+Порядок locks: actor → live session → actor trainer-role → schedule → active club (при записи) → session. Совместим с V1-07/V1-08; общий schedule lock исключает пересечение с генерацией/исключениями, строка занятия сериализует mark/close/cancel/replace. Прямой SQL insert/update attendance также блокирует сеанс через trigger. INSERT возможен только до freeze в planned, UPDATE только open, ключи/DELETE запрещены. V1-11 расширяет guard/check новой миграцией 0010 для поштучной correction, прежние миграции сохранены.
 
 400 invalid_input (строгие поля, даты/версии/сочетание причины); 409 version_conflict/journal_state_conflict/session_not_available/club_archived; 404 not_found; безопасный 503 not_ready. Гонка mark/close или cancel/close даёт одному запросу успех, другому 409; после reload существует однозначный open/closed/cancelled и никаких частичных автопропусков.
 
@@ -47,3 +47,7 @@ Session сохраняет контракт V1-08. Record: id,membershipId,sourc
 Браузерная регрессия: `python3 frontend/e2e/attendance_v1.py`. Требуются disposable контейнер `attendance157-db` (или ATTENDANCE_TEST_DB_CONTAINER с префиксом attendance157-), PostgreSQL пользователь test и БД browser157, сервер со собранной статикой на http://127.0.0.1:8080 с тем же APP_ORIGIN/AUTH_INSECURE_LOCAL=true, bootstrap synthetic owner / synthetic-browser-password. Только синтетические данные; скрипт создаёт уникальные клуб/участников/тренеров через API и разовые сеансы на сегодня напрямую в **тестовой** БД. Python Playwright/Chromium, CHROMIUM_PATH по умолчанию /usr/bin/chromium.
 
 Chromium 154.0.8037.57: UI → API → PostgreSQL → UI, open/double submit, network failure/retry с сохранённой причиной, поштучная правка/409/reload, warning/cancel completion/close/autodefaults/reload, настоящая cancellation snapshot, replacement с запретом старому тренеру, logout. 320/390/1280 без overflow/JS errors, видимые кнопки ≥44 px, снимки /tmp/attendance157-{320,390,1280}.png. Реальные устройства/PWA/пользовательская приёмка остаются следующими задачами. Production Docker build и Compose clean startup/rerun/restart/readiness recovery/непубличная БД прошли. Перезапуск PostgreSQL сохранил настоящие snapshot/marks/history. SHA/CI/delivery — в отчёте issue.
+
+## Расширение V1-11
+
+0010 расширяет guard/value CHECK только для closed correction с отдельной change_reason и новой версией записи; snapshot/closed status/trainer запрет сохранены. Admin API и поштучная история — [corrections-v1.md](corrections-v1.md). Trainer API продолжает возвращать текущие значения, включая origin=correction, без текста объяснения. Отчёт V1-12 должен читать актуальные attendance_records закрытых сеансов.
