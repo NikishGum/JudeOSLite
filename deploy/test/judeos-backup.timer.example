@@ -1,0 +1,12 @@
+# Proposed schedule; install/enable only after the owner agrees to this policy.
+[Unit]
+Description=Daily JudeOS offsite backup (owner-approved schedule required)
+
+[Timer]
+OnCalendar=*-*-* 03:00:00 Europe/Minsk
+Persistent=true
+RandomizedDelaySec=5m
+Unit=judeos-backup.service
+
+[Install]
+WantedBy=timers.target
