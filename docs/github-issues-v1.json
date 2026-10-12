@@ -4,8 +4,8 @@
   "status": "verified",
   "repository": "NikishGum/JudeOSLite",
   "source_commit": "4b650dea4b0d6f811e9d92e775e004b3199d8bc1",
-  "task_count": 19,
-  "dependency_count": 29,
+  "task_count": 20,
+  "dependency_count": 30,
   "deleted_issue_numbers": [
     1,
     2,
@@ -381,6 +381,17 @@
       ],
       "body_sha256": "c19211f4d054aa24a9f4d881c5ac6a5f90fa13cc045171c9f47abbbf34ed640f",
       "title": "Автоматический деплой тестового стенда после успешного CI в main"
+    },
+    {
+      "id": "V1-20",
+      "number": 170,
+      "github_id": 5815770769,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/170",
+      "dependencies": [
+        "V1-07"
+      ],
+      "body_sha256": "de3f8cb3887f4eb4fe2f87b2ee9206e5a7b393d9933518131ccacc03512c2653",
+      "title": "Просмотр истории изменений владельцем и администратором"
     }
   ],
   "status_automation": {
@@ -420,5 +431,10 @@
     "source": "User request: early test deployment; VPS and GitHub Secrets prepared manually by owner",
     "issue": 167,
     "acceptance": "pending real VPS deployment"
+  },
+  "audit_history": {
+    "date": "2026-10-12",
+    "source": "User request: create issue and implement audit history in current chat",
+    "issue": 170
   }
 }
