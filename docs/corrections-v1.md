@@ -38,3 +38,5 @@ Lock order: current enabled actor/live session → administrator-роль (owner
 UI→API→PostgreSQL→UI: группа/дата/архив, история прежнего trainer, обязательная причина, network failure/retry/сохранённый ввод, double submit, owner concurrent correction/409/reload, смена типа/причины, история обоих авторов, reload, изоляция/trainer запрет/owner club switch/live revoke/logout. 320/390/1280 без overflow/JS errors, видимые кнопки ≥44 px; снимки /tmp/corrections159-{320,390,1280}.png. Реальные устройства/PWA/приёмка остаются соответствующим задачам. SHA/CI/main — в отчёте issue.
 
 Production Docker build и Compose clean startup/rerun/restart/readiness recovery/непубличная БД прошли. Отдельный restart disposable PostgreSQL сохранил полные fingerprints snapshot/current corrections, sessions и audit_events.
+
+Перед доставкой объединён актуальный main 06dd736 с мобильными карточками #158/PR #173; обе части документации сохранены. TypeScript/production build и полный браузерный сценарий коррекций повторно прошли на совместном интерфейсе.
