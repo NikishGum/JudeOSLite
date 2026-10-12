@@ -5,6 +5,7 @@ import { OwnerManagement } from '../features/clubs/OwnerManagement';
 import { ParticipantRegistry } from '../features/participants/ParticipantRegistry';
 import { TrainerManagement } from '../features/staff/TrainerManagement';
 import { GroupManagement } from '../features/groups/GroupManagement';
+import { ScheduleManagement } from '../features/schedule/ScheduleManagement';
 
 type Club = { id: string; name: string; timezone: string; archived: boolean; roles: string[] };
 type Session = { user: { id: string; displayName: string; isOwner: boolean }; clubs: Club[]; csrfToken: string };
@@ -132,6 +133,7 @@ export function App() {
         </section>
         {club && (session.user.isOwner || club.roles.includes('administrator')) && <ParticipantRegistry key={`participants:${session.user.id}:${club.id}:${roles}`} clubId={club.id} timezone={club.timezone} onSessionRefresh={() => loadSession()} />}
         {club && (session.user.isOwner || club.roles.includes('administrator')) && <GroupManagement key={`groups:${session.user.id}:${club.id}:${roles}`} clubId={club.id} timezone={club.timezone} />}
+        {club && (session.user.isOwner || club.roles.includes('administrator')) && <ScheduleManagement key={`schedule:${session.user.id}:${club.id}:${roles}`} clubId={club.id} timezone={club.timezone} />}
         {club && (session.user.isOwner || club.roles.includes('administrator')) && <TrainerManagement key={`trainers:${session.user.id}:${club.id}:${roles}`} clubId={club.id} isOwner={session.user.isOwner} onSessionRefresh={() => loadSession()} />}
         {session.user.isOwner && <OwnerManagement key={session.user.id} onChanged={() => loadSession()} />}
       </> : <section className="connection login-panel" aria-labelledby="login-title"><h2 id="login-title">Ваш аккаунт PRIDE</h2>

@@ -1,0 +1,10 @@
+.schedule { overflow-wrap: anywhere; }
+.schedule-time { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.schedule .schedule-weekdays { display: flex; gap: 8px; flex-wrap: wrap; margin: 24px 0; }
+.schedule-weekdays legend { margin-bottom: 8px; }
+.schedule-weekdays label, .schedule-toggle { display: flex; gap: 8px; align-items: center; min-height: 44px; padding: 4px; }
+.schedule-weekdays input, .schedule-toggle input { width: 20px; height: 20px; padding: 0; margin: 0; }
+.schedule-dates { padding-left: 20px; max-height: 360px; overflow-y: auto; }
+.schedule-dates li { padding: 8px 0; }
+.schedule-preview { margin-top: 24px; border-top: 1px solid var(--pride-border); padding-top: 24px; }
+@media (max-width: 600px) { .schedule-time { grid-template-columns: 1fr; } }

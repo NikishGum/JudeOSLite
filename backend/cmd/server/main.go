@@ -19,6 +19,7 @@ import (
 	"github.com/NikishGum/JudeOSLite/backend/internal/participants"
 	"github.com/NikishGum/JudeOSLite/backend/internal/platform"
 	"github.com/NikishGum/JudeOSLite/backend/internal/training/groups"
+	"github.com/NikishGum/JudeOSLite/backend/internal/training/schedule"
 	"github.com/NikishGum/JudeOSLite/backend/migrations"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -65,7 +66,8 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	handler = authService.Handler(groups.New(pool, authService).Handler(participants.New(pool, authService).Handler(clubs.New(pool, authService).Handler(handler))))
+	scheduleService := schedule.New(pool, authService)
+	handler = authService.Handler(scheduleService.Handler(groups.New(pool, authService).Handler(participants.New(pool, authService).Handler(clubs.New(pool, authService).Handler(handler)))))
 	srv := &http.Server{Addr: cfg.HTTPAddr, Handler: handler, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 15 * time.Second, WriteTimeout: 15 * time.Second, IdleTimeout: 60 * time.Second}
 	listener, err := net.Listen("tcp", cfg.HTTPAddr)
 	if err != nil {
@@ -73,6 +75,26 @@ func run() error {
 	}
 	signals, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
+	jobs, stopJobs := context.WithCancel(signals)
+	jobsDone := make(chan struct{})
+	defer func() { stopJobs(); <-jobsDone }()
+	go func() {
+		defer close(jobsDone)
+		tick := time.NewTicker(time.Hour)
+		defer tick.Stop()
+		for {
+			generation, cancel := context.WithTimeout(jobs, 45*time.Second)
+			if err := scheduleService.Generate(generation, time.Now()); err != nil && jobs.Err() == nil {
+				log.Print("schedule generation failed; will retry")
+			}
+			cancel()
+			select {
+			case <-jobs.Done():
+				return
+			case <-tick.C:
+			}
+		}
+	}()
 	result := make(chan error, 1)
 	go func() { result <- srv.Serve(listener) }()
 	log.Print("server listening")
