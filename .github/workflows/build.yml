@@ -49,6 +49,11 @@ jobs:
           if env -u DATABASE_URL /tmp/judeos-server; then exit 1; fi
       - name: Build production image
         run: docker build -f deploy/Dockerfile -t judeoslite:ci .
+      - name: PWA, all roles, private cache and safe update regression
+        run: |
+          python3 -m pip install playwright==1.62.0
+          python3 -m playwright install --with-deps chromium
+          python3 frontend/e2e/pwa_v1.py
       - name: Deployment policy, controller and server operation tests
         run: python3 -m unittest discover -s deploy/test -p 'test_*.py' -v
       - name: Compose clean startup, migration rerun and restart

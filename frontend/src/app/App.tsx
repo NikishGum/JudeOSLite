@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { flushSync } from 'react-dom';
+import { notifySessionChanged } from '../shared/app-lifecycle';
+import { PwaStatus } from './PwaStatus';
 import logo from '../../../design-system/assets/logo-pride.png';
 import { ApiError, apiGet, apiPost, setCsrfToken } from '../shared/api';
 import { OwnerManagement } from '../features/clubs/OwnerManagement';
@@ -34,13 +37,14 @@ export function App() {
   const pending = useRef(false);
   const authenticated = useRef(false);
   const selectedRef = useRef(selectedId);
+  const pageTitle = useRef<HTMLHeadingElement>(null);
   selectedRef.current = selectedId;
 
   function forgetSession() {
     epoch.current += 1;
     authenticated.current = false;
     setCsrfToken(null); setSession(null); setClub(null); setSelectedId('');
-    setPassword(''); setLoading(false); navigate('/login');
+    setLogin(''); setPassword(''); setClubError(''); setLoading(false); navigate('/login');
   }
   async function loadSession(signal?: AbortSignal) {
     const generation = ++epoch.current;
@@ -60,7 +64,13 @@ export function App() {
   useEffect(() => {
     const controller = new AbortController();
     const ended = () => { const wasAuthenticated = authenticated.current; forgetSession(); if (wasAuthenticated) setError('Сессия завершена. Войдите снова.'); };
+    const changed = () => { flushSync(() => { forgetSession(); setLoading(true); setError(''); }); void loadSession(controller.signal); };
+    // Remove personal DOM before a document can enter the back/forward cache.
+    const hide = () => { flushSync(() => { epoch.current += 1; setCsrfToken(null); setSession(null); setClub(null); setPassword(''); setLoading(true); }); };
+    const show = (event: PageTransitionEvent) => { if (event.persisted) void loadSession(controller.signal); };
     window.addEventListener('session-ended', ended);
+    window.addEventListener('session-changed', changed);
+    window.addEventListener('pagehide', hide); window.addEventListener('pageshow', show);
     void loadSession(controller.signal);
     const refresh = () => { if (authenticated.current && document.visibilityState === 'visible' && !pending.current) void loadSession(controller.signal); };
     const popstate = () => { selectedRef.current = routeClub(); setSelectedId(selectedRef.current); refresh(); };
@@ -71,12 +81,15 @@ export function App() {
     return () => {
       controller.abort(); window.clearInterval(interval);
       window.removeEventListener('session-ended', ended);
+      window.removeEventListener('session-changed', changed);
+      window.removeEventListener('pagehide', hide); window.removeEventListener('pageshow', show);
       window.removeEventListener('focus', refresh); window.removeEventListener('popstate', popstate);
       document.removeEventListener('visibilitychange', refresh);
     };
   }, []);
 
   const userId = session?.user.id;
+  useEffect(() => { if (!loading) pageTitle.current?.focus(); }, [userId, loading]);
   const available = session?.clubs.find((item) => item.id === selectedId);
   const roles = available?.roles.join(',');
   const clubName = available?.name;
@@ -97,14 +110,14 @@ export function App() {
   async function signIn(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); if (pending.current) return;
     pending.current = true; setBusy(true); setError(''); epoch.current += 1;
-    try { await apiPost('/api/auth/login', { login, password }); setPassword(''); await loadSession(); }
+    try { await apiPost('/api/auth/login', { login, password }); notifySessionChanged(); setPassword(''); await loadSession(); }
     catch (cause) { setPassword(''); setError(message(cause)); }
     finally { pending.current = false; setBusy(false); }
   }
   async function signOut() {
     if (pending.current) return;
     pending.current = true; setBusy(true); setError(''); epoch.current += 1;
-    try { await apiPost('/api/auth/logout'); forgetSession(); }
+    try { await apiPost('/api/auth/logout'); forgetSession(); notifySessionChanged(); }
     catch (cause) {
       if (!(cause instanceof ApiError && cause.status === 401)) setError(message(cause));
       if (cause instanceof ApiError && cause.code === 'csrf_failed') await loadSession();
@@ -117,10 +130,11 @@ export function App() {
       <span className="header-label">Для сотрудников клуба</span>
     </div></header>
     <main id="workspace" className="workspace" tabIndex={-1}>
+      <PwaStatus />
       <p className="eyebrow">PRIDE · Вместе к результату</p>
-      <h1>{session ? 'Рабочее пространство клуба' : 'Вход для сотрудников'}</h1>
+      <h1 ref={pageTitle} tabIndex={-1}>{session ? 'Рабочее пространство клуба' : 'Вход для сотрудников'}</h1>
       <p className="intro">Каждая тренировка имеет значение.</p>
-      {error && <p className="error" role="alert">{error}</p>}
+      {error && <div className="error" role="alert"><p>{error}</p>{!session && !loading && <button onClick={() => { setLoading(true); void loadSession(); }}>Проверить подключение и доступ</button>}</div>}
       {loading ? <p role="status">Проверяем доступ…</p> : session ? <>
         <section className="connection account" aria-labelledby="account-title">
           <div><h2 id="account-title">{session.user.displayName}</h2><p>{session.user.isOwner ? 'Владелец сети' : 'Сотрудник клуба'}</p></div>
