@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PRIDE — прототип дашборда: ПК и телефон</title>
+  <link rel="icon" href="../../assets/logo-pride.png">
+  <style>
+    @import '../../fonts/fonts.css';
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #e8ebef; color: #212529; font: 14px/1.5 Rubik, sans-serif; }
+    .tools { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; padding: 12px 20px; background: white; border-bottom: 1px solid #dedede; }
+    .tools strong { font-weight: 500; }
+    .tools small { display: block; color: #626b72; font-size: 11px; }
+    .tools label { display: flex; align-items: center; gap: 8px; color: #626b72; font-size: 12px; }
+    select, button { font: 14px Rubik, sans-serif; min-height: 44px; padding: 8px 12px; border: 1px solid #dedede; border-radius: 5px; background: white; color: #212529; }
+    button { cursor: pointer; }
+    .devices { display: flex; gap: 4px; }
+    button[aria-pressed="true"] { color: #db0c0c; border-color: #db0c0c; }
+    :focus-visible { outline: 2px solid #db0c0c; outline-offset: 3px; }
+    .offline { margin-left: auto; }
+    .stage { display: flex; justify-content: center; padding: 0; }
+    iframe { display: block; width: 100%; height: calc(100dvh - 81px); min-height: 760px; border: 0; background: #f5f7fa; }
+    .stage.mobile { padding: 24px; }
+    .stage.mobile iframe { width: 390px; max-width: 100%; height: 844px; min-height: 0; border-radius: 24px; outline: 7px solid #34383d; box-shadow: 0 14px 38px rgba(25,31,37,.15); }
+    .caption { text-align: center; color: #626b72; font-size: 12px; padding: 12px 20px 24px; }
+    .caption a { color: #db0c0c; text-underline-offset: 3px; }
+    @media (max-width: 760px) { .tools { gap: 10px 12px; padding: 12px; } .tools > div:first-child { width: 100%; } .tools label { flex-wrap: wrap; } .offline { margin-left: 0; } iframe { min-height: 740px; } .stage.mobile { padding: 20px 10px; } }
+  </style>
+</head>
+<body>
+  <header class="tools">
+    <div><strong>PRIDE · Прототип дашборда</strong><small>Отдельный HTML/CSS/JS · Демосценарий: 12.10.2026, 16:10</small></div>
+    <label>Роль<select id="role"><option value="owner">Владелец</option><option value="admin">Администратор</option><option value="trainer">Тренер</option></select></label>
+    <div class="devices" aria-label="Размер экрана"><button id="desktop" aria-pressed="true">ПК</button><button id="mobile" aria-pressed="false">Телефон</button></div>
+    <label>Экран<select id="state"><option value="normal">Данные</option><option value="loading">Загрузка</option><option value="empty">Пусто</option><option value="error">Ошибка</option></select></label>
+    <label class="offline"><input id="offline" type="checkbox">Ошибка сохранения</label>
+  </header>
+  <div class="stage" id="stage"><iframe id="frame" title="Интерактивный прототип PRIDE" src="index.html?role=owner"></iframe></div>
+  <p class="caption" id="caption">Вымышленные имена и показатели. Переключение роли перезапускает демосценарий. <a href="index.html" target="_blank" rel="noopener">Открыть без панели просмотра</a></p>
+  <script>
+    const query = new URLSearchParams(location.search);
+    const role = document.querySelector('#role'), scenario = document.querySelector('#state'), frame = document.querySelector('#frame'), stage = document.querySelector('#stage');
+    let device = query.get('device') === 'mobile' ? 'mobile' : 'desktop';
+    if (['owner', 'admin', 'trainer'].includes(query.get('role'))) role.value = query.get('role');
+    function update() {
+      stage.classList.toggle('mobile', device === 'mobile');
+      for (const id of ['desktop', 'mobile']) document.getElementById(id).setAttribute('aria-pressed', String(device === id));
+      frame.src = `index.html?role=${role.value}&state=${scenario.value}`;
+      history.replaceState(null, '', `?role=${role.value}&device=${device}`);
+      document.querySelector('#caption a').href = `index.html?role=${role.value}`;
+    }
+    for (const id of ['desktop', 'mobile']) document.getElementById(id).addEventListener('click', () => { device = id; stage.classList.toggle('mobile', device === 'mobile'); for (const name of ['desktop', 'mobile']) document.getElementById(name).setAttribute('aria-pressed', String(device === name)); history.replaceState(null, '', `?role=${role.value}&device=${device}`); });
+    role.addEventListener('change', update); scenario.addEventListener('change', update);
+    const notify = () => frame.contentWindow.postMessage({ type: 'pride-preview', offline: document.querySelector('#offline').checked }, location.origin === 'null' ? '*' : location.origin);
+    document.querySelector('#offline').addEventListener('change', notify); frame.addEventListener('load', notify);
+    update();
+  </script>
+</body>
+</html>
