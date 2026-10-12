@@ -10,6 +10,7 @@ import { AuditHistory } from '../features/audit/AuditHistory';
 import { TrainerSessions } from '../features/trainer-sessions/TrainerSessions';
 import { AdminJournals } from '../features/journals/AdminJournals';
 import { SessionCalendar } from '../features/sessions/SessionCalendar';
+import { OwnerDashboard } from '../features/owner-dashboard/OwnerDashboard';
 
 type Club = { id: string; name: string; timezone: string; archived: boolean; roles: string[] };
 type Session = { user: { id: string; displayName: string; isOwner: boolean }; clubs: Club[]; csrfToken: string };
@@ -125,6 +126,7 @@ export function App() {
           <div><h2 id="account-title">{session.user.displayName}</h2><p>{session.user.isOwner ? 'Владелец сети' : 'Сотрудник клуба'}</p></div>
           <button onClick={() => void signOut()} disabled={busy}>{busy ? 'Выходим…' : 'Выйти'}</button>
         </section>
+        {session.user.isOwner && <OwnerDashboard key={`reports:${session.user.id}`} />}
         <section className="connection" aria-labelledby="clubs-title"><h2 id="clubs-title">Доступные филиалы</h2>
           {session.clubs.length === 0 ? <p>{session.user.isOwner ? 'Филиалы пока не добавлены.' : 'Нет доступных филиалов. Обратитесь к владельцу клуба.'}</p> : <>
             <div className="field"><label htmlFor="club-select">Филиал</label><select id="club-select" value={selectedId} onChange={(event) => { const id = event.target.value; setSelectedId(id); navigate(id ? `/clubs/${id}` : '/'); }}>

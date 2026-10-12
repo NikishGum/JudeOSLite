@@ -51,3 +51,5 @@ Chromium 154.0.8037.57: UI → API → PostgreSQL → UI, open/double submit, ne
 ## Расширение V1-11
 
 0010 расширяет guard/value CHECK только для closed correction с отдельной change_reason и новой версией записи; snapshot/closed status/trainer запрет сохранены. Admin API и поштучная история — [corrections-v1.md](corrections-v1.md). Trainer API продолжает возвращать текущие значения, включая origin=correction, без текста объяснения. Отчёт V1-12 должен читать актуальные attendance_records закрытых сеансов.
+
+V1-12 реализует [статистику владельца](reports-v1.md): отдельные суммы сеансов/отметок, включительные даты в сохранённой зоне занятия, текущие исправленные closed records, cancelled/retired исключены, planned/open отдельно, пустой closed учитывается. Перевод/архив не меняет исторические уровни сравнения.
