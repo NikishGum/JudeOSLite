@@ -64,6 +64,17 @@ func scan(row pgx.Row) (Session, error) {
 	e := row.Scan(&v.ID, &v.ClubID, &v.GroupID, &v.GroupName, &v.RuleID, &v.TrainerID, &v.TrainerName, &v.Date, &v.SourceDate, &v.Timezone, &v.StartsAt, &v.EndsAt, &v.Status, &v.Manual, &v.Frozen, &v.ClosedAt, &v.CancelledAt, &v.Reason, &v.SupersededAt, &v.Version)
 	return v, e
 }
+
+// Read returns an existing club-scoped session, optionally locking its row.
+// Journal callers take the schedule lock before requesting the row lock.
+func Read(ctx context.Context, tx pgx.Tx, clubID, sessionID string, lock bool) (Session, error) {
+	query := `SELECT ` + columns + joins + `WHERE s.club_id::text=$1 AND s.id::text=$2`
+	if lock {
+		query += ` FOR UPDATE OF s`
+	}
+	return scan(tx.QueryRow(ctx, query, clubID, sessionID))
+}
+
 func reply(w http.ResponseWriter, code int, v any) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("Cache-Control", "no-store")
