@@ -19,6 +19,55 @@ GitHub API retry и transient timeout пока открыт; issue #167 оста
 до результата в main и остальных критериев. PWA/полная CRM/offsite recovery
 по-прежнему относятся к V1-17 после V1-13.
 
+## Приёмка завершения — 12.10.2026
+
+По поручению владельца продолжить и закрыть #167 проверен и объединён
+[PR #169](https://github.com/NikishGum/JudeOSLite/pull/169); merge commit
+`2d13c7f0fda736e24cd024c878999cd1f63a5e04`. На объединённом коде 29 тестов
+`deploy/test/test_operations.py` прошли. CI этого main:
+[38263182332](https://github.com/NikishGum/JudeOSLite/actions/runs/38263182332).
+
+Агент независимо проверил HTTPS readyz `ok` и release SHA
+`56e9f6dcdd2b6f8b96bc59ba1427fda50e59b6f8`, соответствующий успешному
+[Deploy test 38254544147](https://github.com/NikishGum/JudeOSLite/actions/runs/38254544147).
+Владелец сообщил серверный `operation.phase=ready`, generation 30, миграции 1–6.
+
+Владелец создал backup `20261012T142857-81978086` и выполнил restore-check:
+отдельная БД `restorecheck_b3b1063d62ad`, checksums и migration history проверены;
+live-БД не заменялась. До следующего deploy зафиксированы только агрегаты:
+2 сотрудника, 1 филиал, 0 участников/карточек/групп. В uploads создан
+неперсональный контрольный файл `v1-19-acceptance.txt`.
+
+[Deploy test 38263292422](https://github.com/NikishGum/JudeOSLite/actions/runs/38263292422)
+отклонил устаревший CI предыдущего main на шаге select: main уже изменился.
+Publish и SSH не выполнялись. Это реальная проверка отказа устаревшему CI;
+запрет PR/fork/failed CI и серверные admission/flock также проверены Cloud-тестами.
+
+Владелец дополнительно проверил восстановленные записи: 2 сотрудника и
+1 филиал, как в live-БД. Попытка rollback при разной истории миграций вернула
+`Migration history changed; rollback refused.`; accepted/current/previous/operation
+проверены до/после и остались неизменными. CI объединённого main завершился success.
+
+[Deploy test 38263524825](https://github.com/NikishGum/JudeOSLite/actions/runs/38263524825)
+автоматически завершился success после успешного push-CI объединённого main.
+Агент независимо проверил публичный HTTPS: readiness `ok`, release SHA
+`2d13c7f0fda736e24cd024c878999cd1f63a5e04`.
+
+Финальный серверный протокол сохранения данных и совместимого rollback
+публикуется в [issue #167](https://github.com/NikishGum/JudeOSLite/issues/167).
+Закрытие issue допускается только после этих проверок, успешных CI/deploy
+отчётного коммита и возврата стенда на его SHA. Новый отчёт меняет только docs:
+схема и приложение совпадают с предыдущим проверенным релизом `2d13c7f`.
+Это позволяет владельцу проверить настоящий переход между двумя SHA:
+rollback на предыдущий release, затем второй rollback обратно; каждое действие
+проверяет HTTPS/SHA, DB и admission watermark сохраняются. Выполнять только
+при совпадающей migration history и без параллельных записей/deploy.
+
+Приёмка раннего стенда покрывает существующие staff/club и контрольный файл;
+предметные данные занятий/отметок, реальные устройства/PWA и регулярный offsite
+backup/retention остаются V1-17. Изолированную restorecheck-БД и контрольный
+файл можно удалить владельцу после проверки; live-БД/volumes не удаляются.
+
 ## Проверки агента в Cloud
 
 - 29 Python tests: selection только успешного push-CI текущего main, отказ
