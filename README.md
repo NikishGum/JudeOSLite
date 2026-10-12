@@ -86,3 +86,5 @@ bash deploy/check.sh
 - [Оформление](DESIGN.md), [дизайн-система](design-system/README.md), [витрина](design-system/preview.html).
 
 Финансы/iPay, Excel и отдельные справки отложены; прежние требования сохранены в [истории](docs/archive/README.md). Фундамент развиваемый, без инфраструктуры для предполагаемой большой нагрузки.
+
+Ранний HTTPS-тестовый стенд и ручная подготовка VPS владельцем: [operations-test.md](docs/operations-test.md). Реальная серверная приёмка ещё не подтверждена.
