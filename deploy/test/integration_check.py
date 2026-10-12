@@ -19,8 +19,11 @@ import time
 import urllib.request
 import uuid
 from unittest.mock import patch
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import operations as ops
+import offsite
 
 
 def main():
@@ -121,6 +124,56 @@ def main():
                 assert len(headers) == 2 and all('Secure' in h and 'HttpOnly' in h and 'SameSite=Strict' in h for h in headers)
             with opener.open('https://localhost:18443/api/auth/me', timeout=5) as response:
                 assert response.status == 200
+            return opener
+
+        def api(opener, method, path, data=None):
+            with opener.open('https://localhost:18443/api/auth/me', timeout=5) as response:
+                csrf = json.load(response)['csrfToken']
+            request = urllib.request.Request('https://localhost:18443' + path, method=method,
+                data=None if data is None else json.dumps(data).encode(),
+                headers={'Content-Type': 'application/json', 'Origin': 'https://localhost:18443', 'X-CSRF-Token': csrf})
+            with opener.open(request, timeout=10) as response:
+                assert response.headers['Cache-Control'] == 'no-store'
+                return json.load(response)
+
+        def subject_data(owner):
+            club = api(owner, 'POST', '/api/clubs', {'name': 'Synthetic recovery club', 'timezone': 'Europe/Minsk'})
+            path = '/api/clubs/' + club['id']
+            group = api(owner, 'POST', path + '/groups', {'name': 'Synthetic recovery group'})
+            password = secrets.token_urlsafe(24)
+            trainer = api(owner, 'POST', path + '/trainers', {'login': 'restore-trainer', 'displayName': 'Synthetic Trainer', 'password': password})
+            today = str(datetime.now(ZoneInfo('Europe/Minsk')).date())
+            for name in ('Synthetic recovery A', 'Synthetic recovery B'):
+                api(owner, 'POST', path + '/participants', {'identity': {'fullName': name, 'birthDate': '2010-01-01'},
+                    'joinedOn': '2020-01-01', 'contactKind': 'phone', 'contactValue': '+375291234567',
+                    'initialGroup': {'groupId': group['id'], 'from': '2020-01-01'}})
+            rule = {'groupId': group['id'], 'trainerId': trainer['id'], 'mode': 'weekly', 'weekdays': [1, 3, 5],
+                    'startsTime': '18:00', 'durationMinutes': 60, 'from': today}
+            preview = api(owner, 'POST', path + '/schedule/preview', rule)
+            api(owner, 'POST', path + '/schedule', dict(rule, previewToken=preview['token']))
+            # Historical synthetic session exercises a real snapshot and close
+            # regardless of the wall-clock time at which CI runs.
+            sql = f"INSERT INTO pride.training_sessions(club_id,group_id,trainer_id,starts_on,timezone,starts_at,ends_at) VALUES('{club['id']}','{group['id']}','{trainer['id']}','{today}','Europe/Minsk','{today} 09:00+03','{today} 10:00+03') RETURNING id"
+            sid = compose(None, 'exec', '-T', 'db', 'psql', '-U', 'judeoslite', '-d', 'judeoslite', '-At', '-c', sql).decode().splitlines()[0]
+            trainer_http = urllib.request.build_opener(urllib.request.ProxyHandler({}),
+                urllib.request.HTTPSHandler(context=ssl.create_default_context(cafile=str(base / 'root.crt'))),
+                urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
+            request = urllib.request.Request('https://localhost:18443/api/auth/login',
+                data=json.dumps({'login': 'restore-trainer', 'password': password}).encode(),
+                headers={'Content-Type': 'application/json', 'Origin': 'https://localhost:18443'})
+            with trainer_http.open(request, timeout=10) as response: assert response.status == 200
+            journal_path = path + '/trainer-sessions/' + sid + '/journal'
+            journal = api(trainer_http, 'POST', journal_path + '/open', {'version': 1})
+            record = journal['records'][0]
+            journal = api(trainer_http, 'PUT', journal_path + '/records/' + record['id'],
+                {'version': record['version'], 'sessionVersion': journal['session']['version'], 'state': 'absent', 'absenceReason': 'illness'})
+            journal = api(trainer_http, 'POST', journal_path + '/close', {'version': journal['session']['version']})
+            record = next(item for item in journal['records'] if item['id'] == record['id'])
+            api(owner, 'PUT', path + '/journals/' + sid + '/records/' + record['id'],
+                {'version': record['version'], 'state': 'present', 'absenceReason': None, 'changeReason': 'Synthetic recovery correction'})
+            report = api(owner, 'GET', '/api/reports/attendance?from=' + today + '&until=' + today)
+            assert report['total']['closed'] == 1 and report['total']['present'] == 1 and report['total']['absent'] == 1 and report['total']['percentage'] == 50
+            return report
 
         # Production ownership, sudo, DNS, UFW and public ACME cannot be proved
         # by a disposable container test; production validation remains intact.
@@ -132,11 +185,17 @@ def main():
                 ops.init_secrets()
                 request = {'sha': sha, 'image': image, 'generation': 1}
                 with ops.lock(): ops.deploy(request)
-                bootstrap_and_login()
+                owner = bootstrap_and_login()
+                report = subject_data(owner)
                 compose(None, 'exec', '-T', 'db', 'psql', '-U', 'judeoslite', '-d', 'judeoslite', '-v', 'ON_ERROR_STOP=1', '-c', "CREATE TABLE pride.deploy_probe (id text PRIMARY KEY); INSERT INTO pride.deploy_probe VALUES ('retained');")
                 (base / 'uploads' / 'probe.txt').write_text('retained-file')
-                with ops.lock(): backup_name = ops.backup()
+                with ops.lock(): backup_name = ops.maintenance_backup()
+                before = ops.data_manifest()
+                with ops.lock(): ops.restart_check()
+                assert ops.data_manifest() == before, 'Restart changed rows, generated duplicates or lost marks/audit.'
                 with ops.lock(): ops.deploy(dict(request, generation=2))
+                assert ops.data_manifest() == before, 'Repeat deploy changed subject data.'
+                assert api(owner, 'GET', '/api/reports/attendance?from=' + report['from'] + '&until=' + report['until']) == report
                 assert compose(None, 'exec', '-T', 'db', 'psql', '-U', 'judeoslite', '-d', 'judeoslite', '-At', '-c', 'SELECT id FROM pride.deploy_probe').strip() == b'retained'
                 assert (base / 'uploads' / 'probe.txt').read_text() == 'retained-file'
                 output = io.StringIO()
@@ -145,13 +204,27 @@ def main():
                 assert compose(None, 'exec', '-T', 'db', 'psql', '-U', 'judeoslite', '-d', database, '-At', '-c', 'SELECT id FROM pride.deploy_probe').strip() == b'retained'
                 with tarfile.open(base / 'backups' / backup_name / 'uploads.tar') as archive:
                     assert archive.extractfile('uploads/probe.txt').read() == b'retained-file'
+                restic_binary = os.environ.get('RESTIC_TEST_BINARY') or shutil.which('restic')
+                if not restic_binary: raise RuntimeError('restic required for the encrypted repository recovery check.')
+                password_file = base / 'config' / 'restic-password'
+                password_file.write_text(secrets.token_urlsafe(32)); password_file.chmod(0o600)
+                # Only the test uses a local, disposable repository. This proves
+                # encryption/upload/download mechanics, not real offsite access.
+                offsite_config = {'repository': str(base / 'restic-repo'), 'password_file': str(password_file),
+                                  'environment': {}, 'retention': {'daily': 7, 'weekly': 4, 'monthly': 3}, 'local_keep': 7}
+                with patch.object(offsite, 'RESTIC', restic_binary), ops.lock():
+                    offsite.restic(offsite_config, 'init')
+                    offsite.backup_offsite(offsite_config)
+                    snapshot = ops.load('offsite')['snapshot']
+                    remote_db = offsite.restore_offsite(offsite_config, snapshot)
+                    assert ops.data_manifest(database=remote_db) == ops.data_manifest()
                 with ops.lock(): ops.rollback()
                 assert ops.load('accepted')['generation'] == 2
                 assert ops.load('current')['generation'] == 1
                 try: ops.admission(request, ops.load('accepted'))
                 except RuntimeError: pass
                 else: raise AssertionError('Stale deploy was admitted after manual rollback.')
-                print('PASS: isolated TLS/readiness/SHA, hidden owner bootstrap, HTTPS login/secure cookies, migrations, repeated deploy, DB/files preservation, backup/restore rows, rollback and watermark.')
+                print('PASS: disposable TLS/cookies, users/roster/schedule/journal/correction/report, DB+app restart and repeat deploy without duplicates, every restored row/file, encrypted local repository upload/download/restore, rollback and watermark. Real VPS/offsite/PWA acceptance is separate.')
             finally:
                 # Destructive cleanup is limited to random disposable check volumes.
                 assert project.startswith('judeoslite-deploy-check-')

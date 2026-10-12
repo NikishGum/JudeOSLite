@@ -14,7 +14,7 @@ def main():
         raise RuntimeError('Run as root.')
     p = argparse.ArgumentParser(description=__doc__)
     sub = p.add_subparsers(dest='command', required=True)
-    for name in ('init-secrets', 'registry-login', 'preflight', 'backup', 'status', 'repair-ssh'):
+    for name in ('init-secrets', 'registry-login', 'preflight', 'backup', 'status', 'repair-ssh', 'restart-check'):
         sub.add_parser(name)
     a = sub.add_parser('activate-controller')
     a.add_argument('--expected-old-sha256', required=True)
@@ -24,6 +24,7 @@ def main():
     a.add_argument('sha'); a.add_argument('image'); a.add_argument('generation', type=int)
     a = sub.add_parser('restore-check')
     a.add_argument('backup_name')
+    sub.add_parser('drop-restore-check').add_argument('database')
     a = sub.add_parser('rollback')
     a.add_argument('--confirm-compatible', action='store_true', required=True)
     a = sub.add_parser('create-owner')
@@ -40,8 +41,10 @@ def main():
     else:
         with ops.lock():
             if args.command == 'deploy': ops.deploy(ops.validate_request({'sha': args.sha, 'image': args.image, 'generation': args.generation}))
-            elif args.command == 'backup': print('Backup:', ops.backup())
+            elif args.command == 'backup': print('Backup:', ops.maintenance_backup())
+            elif args.command == 'restart-check': ops.restart_check()
             elif args.command == 'restore-check': ops.restore_check(args.backup_name)
+            elif args.command == 'drop-restore-check': ops.drop_restore_check(args.database)
             elif args.command == 'rollback': ops.rollback()
             elif args.command == 'create-owner': ops.create_owner(args.login, args.name)
 
