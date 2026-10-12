@@ -170,7 +170,7 @@
       "github_id": 5810997255,
       "url": "https://github.com/NikishGum/JudeOSLite/issues/149",
       "dependencies": [],
-      "body_sha256": "2933a84b02401e599b4585041ebac3dbe8e25920c3bc66705b680457e71420a8",
+      "body_sha256": "e69c8b458d0d065bde0431b0f172628f923b8eb2a9da5a3134d9fcb54a44c8e4",
       "title": "Рабочая основа Go + React + PostgreSQL и проверки сборки"
     },
     {
@@ -181,7 +181,7 @@
       "dependencies": [
         "V1-01"
       ],
-      "body_sha256": "2d00f2b72edc5a767b35bff923078c2c6a8e50ab0609b6cd39d0ac2355f38b5e",
+      "body_sha256": "ef15149c58afb5b88393494c387d86aa863487a8d9f24c9e48deb63dda002f57",
       "title": "Вход сотрудников, выход и серверная проверка доступа"
     },
     {
@@ -192,7 +192,7 @@
       "dependencies": [
         "V1-02"
       ],
-      "body_sha256": "79fba7af3b72504182b37343b83dd6def0ebdd1aec315c1e75f93ce434a5c2da",
+      "body_sha256": "25986c3f590fcf2f579d6856dcbdf97760b7beafac8baaf8f2be96f34d6fb865",
       "title": "Филиалы и назначения администраторов для владельца"
     },
     {
@@ -203,7 +203,7 @@
       "dependencies": [
         "V1-03"
       ],
-      "body_sha256": "1037e2176391b7e4759482da83507bb8af505694e44ca232e59703eae5a6f01d",
+      "body_sha256": "1b31081a3ad5edb475246768d9832496b0d6fe130745137e3ea954f23ae0f6dd",
       "title": "Создание и управление тренерами своего филиала"
     },
     {
@@ -214,7 +214,7 @@
       "dependencies": [
         "V1-03"
       ],
-      "body_sha256": "1e76c7d339768119b2b0bc9164e9ecbac537628532f9ff9b0ee682f1a2e6b358",
+      "body_sha256": "a5f7a2c45e736b11fe9a504c4a44f69827cd7d1a24f29733f5c9e913631537f4",
       "title": "Ручной реестр участников и карточки филиала"
     },
     {
@@ -226,7 +226,7 @@
         "V1-04",
         "V1-05"
       ],
-      "body_sha256": "d3c1e5668bca7cf9707350e80a0be117516d16124d7fdc4edd0c786ac662df91",
+      "body_sha256": "ad2570ea46219b2e24b48d7c05e89e1a9cbb9d4d082bc96cd5604a1e5274afc3",
       "title": "Группы и датированная история состава"
     },
     {
@@ -237,7 +237,7 @@
       "dependencies": [
         "V1-06"
       ],
-      "body_sha256": "df0c7eb24641acf98c28ff01f475d34b1beff428f94ee79af84797051d930812",
+      "body_sha256": "9b5e2ecc698446d897a71bd534f5d27dfb925d2c240533325f749fe1f7b3f0a8",
       "title": "Расписание: дни недели, чётность дат, календарные даты и разовое занятие"
     },
     {
@@ -248,7 +248,7 @@
       "dependencies": [
         "V1-07"
       ],
-      "body_sha256": "43f0e6f8019886c58ac9c3f43b6f8469b7918ff57c72cc822730c41f71453b1b",
+      "body_sha256": "2139e4e26d4a33e3099ca578bda51305a3c8e5ec8c4ef1632569eecb7568ac7b",
       "title": "Календарь занятий, отмена и замена тренера администратором"
     },
     {
@@ -259,7 +259,7 @@
       "dependencies": [
         "V1-08"
       ],
-      "body_sha256": "6d31648627c9caa869b5e657def97703cde441a3b4b2c547ffd030fcbc0088ac",
+      "body_sha256": "dec44b2f0bafde2e56a7666a6d8b1859a39e04ed1aeb6a9eebea33eef7f5e0e2",
       "title": "Журнал занятия: снимок состава, отметки и атомарное завершение"
     },
     {
@@ -270,7 +270,7 @@
       "dependencies": [
         "V1-09"
       ],
-      "body_sha256": "19818f14f6f1e2a630981997aa1382bac140a9a2df9f587222dff8d8cdbd7d8e",
+      "body_sha256": "0a134674d3237387aafd666fde5a90c484008a5ad3b157f411f778c5da70e2f7",
       "title": "Мобильные карточки посещаемости тренера с кнопками и выбором причины"
     },
     {
@@ -281,7 +281,7 @@
       "dependencies": [
         "V1-09"
       ],
-      "body_sha256": "eb03b220afb83bc42dc74d8c2f6e13056c7486803cf4a3e5cb792dd69ca6a5d1",
+      "body_sha256": "84ca082268d008412f45a133495dc836d5b33d88b3e39803ec2d79665e4db21c",
       "title": "Журнал администратора и поштучное исправление закрытых отметок"
     },
     {
@@ -292,7 +292,7 @@
       "dependencies": [
         "V1-11"
       ],
-      "body_sha256": "c02a5ead8af1d65aace2a5ed9521b3ba64dec525ad42e9e8ee4063f460c9fd78",
+      "body_sha256": "41061e88a12fc341cd5d1b94f3f4246b66001de3e568728c420dcee5e5d80a9c",
       "title": "Статистика владельца по филиалам, группам и периоду"
     },
     {
@@ -305,7 +305,7 @@
         "V1-11",
         "V1-12"
       ],
-      "body_sha256": "1580261de1ae348a54fca3a1be7c2c0986aef9ea4afbdd416646b8159a4ccbe2",
+      "body_sha256": "df76e351382ec349377c7a7a875e4a01bcfe0458651ba4927f22190f4f1bdb94",
       "title": "Адаптация всех ролей и установка PWA"
     },
     {
@@ -318,7 +318,7 @@
         "V1-11",
         "V1-12"
       ],
-      "body_sha256": "6023e4099c8689a54f90063aa605861fac9bfe1ead01eceb1ca60014dfd1c048",
+      "body_sha256": "eaec1ed2f6663578a8663c1dc3c66cb4a81ba8e5dae84b1a749e2495fd5eff51",
       "title": "Проверка изоляции филиалов и полной матрицы ролей"
     },
     {
@@ -330,7 +330,7 @@
         "V1-11",
         "V1-12"
       ],
-      "body_sha256": "bbaf1344022923729493205c7aa4e43291d655c177ff07622f60e2b7ed069510",
+      "body_sha256": "12dda26ef6985df37707ef5f5c7aa3196741aa6c3a49f1aa9cd5e21b1fe6c6c4",
       "title": "Проверка расписания, исторических данных и конкурентных отметок"
     },
     {
@@ -342,7 +342,7 @@
         "V1-13",
         "V1-17"
       ],
-      "body_sha256": "b3894233ca124bf2395cbc7fc9a3ea5967c02c91ebe0e54f3215f7ca5a7c48fd",
+      "body_sha256": "956855da9c2291d395344f8085dc94a768a87f19b1c871552611c59743b48e19",
       "title": "Сквозные проверки браузеров и мобильной PWA"
     },
     {
@@ -353,7 +353,7 @@
       "dependencies": [
         "V1-13"
       ],
-      "body_sha256": "31666994cab52fd66ffd1cf1600c8e080d3413211ecead023a2e993172acdbd6",
+      "body_sha256": "394e49e10881009f1b335e65fdd516d257ed232fda1a60ddd366df09bfbae2a9",
       "title": "Развёртывание на VPS, HTTPS и восстановление резервной копии"
     },
     {
@@ -367,7 +367,7 @@
         "V1-16",
         "V1-17"
       ],
-      "body_sha256": "2662545e19a9ea01f62c8d4a4b428adf2154fab713c0d9d48f719d0079f4cc8c",
+      "body_sha256": "755e0aad1c809f5095dc70ee3edc998b4b249487cecf4f0de577eb753c05a720",
       "title": "Приёмка первой версии и запуск с ручным вводом данных"
     }
   ],
@@ -375,6 +375,32 @@
     "workflow": ".github/workflows/issue-status.yml",
     "opened_runs_passed": 18,
     "live_label_repair_run": "https://github.com/NikishGum/JudeOSLite/actions/runs/38226762759",
-    "local_cases": "5 transitions, unrelated label preservation, multiple/bot assignment refusal"
+    "local_cases": "5 transitions, unrelated label preservation, multiple/bot assignment refusal",
+    "claim_workflow": ".github/workflows/issue-claim.yml",
+    "shared_concurrency_group": "issue-coordination-{issue_number}",
+    "queue": "max",
+    "claim_checks_run": "https://github.com/NikishGum/JudeOSLite/actions/runs/38231723787",
+    "claim_dry_run": "https://github.com/NikishGum/JudeOSLite/actions/runs/38231745252",
+    "claim_local_cases": 11,
+    "concurrent_dry_runs": [
+      {
+        "run_url": "https://github.com/NikishGum/JudeOSLite/actions/runs/38231959163",
+        "started_at": "2026-10-12T09:45:43Z",
+        "completed_at": "2026-10-12T09:45:50Z"
+      },
+      {
+        "run_url": "https://github.com/NikishGum/JudeOSLite/actions/runs/38231959383",
+        "started_at": "2026-10-12T09:45:52Z",
+        "completed_at": "2026-10-12T09:45:56Z"
+      }
+    ],
+    "blocked_claim_refusal": "https://github.com/NikishGum/JudeOSLite/actions/runs/38232146769"
+  },
+  "coordination_update": {
+    "date": "2026-10-12",
+    "source": "User instruction: automatic queued assignment and chat renaming",
+    "workflow_commit": "5f1b473dff699e88e18ce9b95baa3cd5ceca11b0",
+    "issue_bodies_verified": 18,
+    "scope_criteria_dependencies_changed": false
   }
 }
