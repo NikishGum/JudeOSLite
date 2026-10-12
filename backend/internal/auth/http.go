@@ -111,6 +111,9 @@ func (s *Service) cookies(w http.ResponseWriter, token, csrf string, expires tim
 }
 func (s *Service) clearCookies(w http.ResponseWriter) { s.cookies(w, "", "", time.Unix(1, 0), -1) }
 func (s *Service) sameOrigin(r *http.Request) bool    { return r.Header.Get("Origin") == s.cfg.Origin }
+
+// A stale unauthorized response must not clear a newer session cookie.
+// Only explicit logout deletes cookies; login overwrites invalid/expired ones.
 func unauthorized(w http.ResponseWriter) {
 	platform.WriteError(w, 401, "unauthorized", "Войдите в систему.")
 }
@@ -124,7 +127,6 @@ func (s *Service) Require(next http.Handler) http.Handler {
 		sessionName, _ := s.cookieNames()
 		cookie, err := r.Cookie(sessionName)
 		if err != nil || !validToken(cookie.Value) {
-			s.clearCookies(w)
 			unauthorized(w)
 			return
 		}
@@ -133,7 +135,6 @@ func (s *Service) Require(next http.Handler) http.Handler {
             FROM pride.staff_sessions ss JOIN pride.staff_users u ON u.id=ss.staff_user_id
             WHERE ss.token_hash=$1 AND ss.revoked_at IS NULL AND ss.expires_at>now() AND u.disabled_at IS NULL`, p.tokenHash).Scan(&p.User.ID, &p.User.Login, &p.User.DisplayName, &p.User.IsOwner, &p.csrfHash)
 		if errors.Is(err, pgx.ErrNoRows) {
-			s.clearCookies(w)
 			unauthorized(w)
 			return
 		}
@@ -191,7 +192,6 @@ func (s *Service) me(w http.ResponseWriter, r *http.Request) {
 	_, csrfName := s.cookieNames()
 	cookie, err := r.Cookie(csrfName)
 	if err != nil || !validToken(cookie.Value) || subtle.ConstantTimeCompare(digest(cookie.Value), p.csrfHash) != 1 {
-		s.clearCookies(w)
 		unauthorized(w)
 		return
 	}

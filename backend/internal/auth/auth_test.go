@@ -97,6 +97,9 @@ func status(t *testing.T, w *httptest.ResponseRecorder, want int) {
 	if w.Code != want {
 		t.Fatalf("status %d, want %d: %s", w.Code, want, w.Body.String())
 	}
+	if w.Code == 401 && len(w.Header().Values("Set-Cookie")) != 0 {
+		t.Fatal("stale unauthorized response can erase a newer session cookie")
+	}
 	if w.Header().Get("Cache-Control") != "no-store" {
 		t.Fatal("personal response may be cached")
 	}
