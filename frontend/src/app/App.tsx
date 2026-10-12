@@ -6,6 +6,7 @@ import { ParticipantRegistry } from '../features/participants/ParticipantRegistr
 import { TrainerManagement } from '../features/staff/TrainerManagement';
 import { GroupManagement } from '../features/groups/GroupManagement';
 import { ScheduleManagement } from '../features/schedule/ScheduleManagement';
+import { AuditHistory } from '../features/audit/AuditHistory';
 import { SessionCalendar } from '../features/sessions/SessionCalendar';
 
 type Club = { id: string; name: string; timezone: string; archived: boolean; roles: string[] };
@@ -138,6 +139,7 @@ export function App() {
         {club && <SessionCalendar key={`sessions:${session.user.id}:${club.id}:${roles}`} clubId={club.id} timezone={club.timezone} canManage={session.user.isOwner || club.roles.includes('administrator')} />}
         {club && (session.user.isOwner || club.roles.includes('administrator')) && <TrainerManagement key={`trainers:${session.user.id}:${club.id}:${roles}`} clubId={club.id} isOwner={session.user.isOwner} onSessionRefresh={() => loadSession()} />}
         {session.user.isOwner && <OwnerManagement key={session.user.id} onChanged={() => loadSession()} />}
+        <AuditHistory key={`audit:${session.user.id}:${session.user.isOwner}:${session.clubs.map((item) => `${item.id}:${item.roles.join(',')}`).join(';')}:${selectedId}`} selectedClubId={session.user.isOwner || available?.roles.includes('administrator') ? selectedId : ''} />
       </> : <section className="connection login-panel" aria-labelledby="login-title"><h2 id="login-title">Ваш аккаунт PRIDE</h2>
         <form onSubmit={(event) => void signIn(event)} aria-busy={busy}>
           <label className="field">Логин<input name="username" autoComplete="username" autoCapitalize="none" spellCheck={false} required maxLength={100} value={login} onChange={(event) => setLogin(event.target.value)} disabled={busy} /></label>
