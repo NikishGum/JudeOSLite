@@ -1,0 +1,15 @@
+.admin-journals, .admin-journal { min-width: 0; }
+.admin-journal-filters { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
+.admin-journal-filters .field { flex: 1 1 200px; }
+.admin-session-list, .admin-records { list-style: none; padding: 0; display: grid; gap: 12px; }
+.admin-session-list > li, .admin-records > li { border: 1px solid var(--pride-border, #dedede); border-radius: 10px; padding: 16px; overflow-wrap: anywhere; min-width: 0; }
+.admin-session-list > li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+.admin-journal { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--pride-border, #dedede); }
+.correction-form { margin-top: 16px; display: grid; gap: 12px; }
+.correction-form textarea, .correction-form select { width: 100%; min-width: 0; font: inherit; }
+.correction-form textarea { padding: 12px; border: 1px solid #dedede; border-radius: 10px; resize: vertical; }
+.record-history { margin-top: 16px; }
+.record-history ol { padding-inline-start: 20px; }
+.record-history li { margin-bottom: 16px; }
+.change-reason { white-space: pre-wrap; }
+@media (max-width: 480px) { .admin-journal-filters > *, .admin-session-list button { width: 100%; } .admin-records > li { padding: 12px; } }
