@@ -15,15 +15,16 @@ permissions:
   issues: write
 
 concurrency:
-  group: issue-status-${{ github.event.issue.number || inputs.issue_number }}
+  group: issue-coordination-${{ github.event.issue.number || inputs.issue_number }}
   cancel-in-progress: false
+  queue: max
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
-      - name: Synchronize status from current state and human assignment
+      - name: Synchronize status from current state and assignment
         env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue_number }}
@@ -35,7 +36,7 @@ jobs:
           import urllib.request
 
           number = os.environ["ISSUE_NUMBER"]
-          if not number.isdigit():
+          if not re.fullmatch(r"[1-9][0-9]*", number):
               raise SystemExit("Invalid issue number")
           url = (
               os.environ["GITHUB_API_URL"]

@@ -66,9 +66,9 @@ bash deploy/check.sh
 ## Контекст проекта
 
 - [План: 18 полных задач](docs/development-plan-v1.md) и [GitHub issues](docs/github-issues-v1.md).
-- [Совместная работа](docs/collaboration.md): человек назначает исполнителя, метки Todo / In progress / Done автоматические; In review и ревью коллеги необязательны.
+- [Совместная работа](docs/collaboration.md): агент автоматически занимает свободную задачу через общую очередь GitHub; исполнитель и In progress видны в issues, один issue — один автоматически названный чат. In review/ревью коллеги необязательны.
 - [Архитектура](docs/architecture-v1.md), [схема БД](docs/database/schema-v1.md), [диаграммы](docs/database/diagrams-v1.md).
-- [Промпт исполнителя первой задачи](docs/task-agent-prompt.md), [промпт планировщика](docs/planning-agent-prompt.md).
+- [Промпт исполнителя с переименованием чата и назначением](docs/task-agent-prompt.md), [промпт планировщика](docs/planning-agent-prompt.md).
 - [База знаний](docs/knowledge-base/README.md) и [память](docs/knowledge-base/memory.md); агентам начинать с них и [AGENTS.md](AGENTS.md).
 - [Оформление](DESIGN.md), [дизайн-система](design-system/README.md), [витрина](design-system/preview.html).
 

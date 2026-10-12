@@ -27,6 +27,9 @@ go.work.sum
 
 # env file
 .env
+
+# GitHub coordination tools
+__pycache__/
 .env.*
 !.env.example
 node_modules/
