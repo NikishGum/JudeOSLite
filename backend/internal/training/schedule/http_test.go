@@ -438,6 +438,42 @@ func TestScheduleIntegration(t *testing.T) {
 			t.Fatal(e)
 		}
 	})
+	t.Run("started planned session reserves today after later-time edit", func(t *testing.T) {
+		g := parse[groups.Group](t, ca.call("POST", ga, map[string]any{"name": "Started plan"}), 201)
+		in := Input{GroupID: g.ID, TrainerID: trainerID, Mode: "weekly", Weekdays: []int{1, 2, 3, 4, 5, 6, 7}, Time: "17:00", Duration: 60, From: "2027-12-01"}
+		r := save(in)
+		var id string
+		if e := pool.QueryRow(ctx, `SELECT id::text FROM pride.training_sessions WHERE group_id=$1 AND starts_on='2028-01-01'`, g.ID).Scan(&id); e != nil {
+			t.Fatal(e)
+		}
+		originalNow := s.now
+		later := now.Add(20 * time.Hour)
+		s.now = func() time.Time { return later }
+		defer func() { s.now = originalNow }()
+		in.From = "2028-01-01"
+		in.Time = "23:30"
+		in.Version = r.Version
+		p := preview(base+"/"+r.ID, in)
+		if len(p.Preserved) != 1 || p.Preserved[0].ID != id {
+			t.Fatal("started ordinary plan not preserved")
+		}
+		for _, d := range p.Dates {
+			if d.Date == "2028-01-01" {
+				t.Fatal("today would get second plan")
+			}
+		}
+		in.PreviewToken = p.Token
+		parse[Rule](t, ca.call("PUT", base+"/"+r.ID, in), 201)
+		for range 2 {
+			if e := s.Generate(ctx, later); e != nil {
+				t.Fatal(e)
+			}
+		}
+		if count(`SELECT count(*) FROM pride.training_sessions WHERE group_id=$1 AND starts_on='2028-01-01' AND superseded_at IS NULL`, g.ID) != 1 {
+			t.Fatal("generator recreated started plan at new time")
+		}
+		status(t, ca.call("POST", ga+"/"+g.ID+"/archive", map[string]int{"version": 1}), 200)
+	})
 	t.Run("future one-off conflict preserves slot and extends remaining horizon", func(t *testing.T) {
 		once := input
 		once.Mode = "once"

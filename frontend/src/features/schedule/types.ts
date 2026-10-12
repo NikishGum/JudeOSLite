@@ -1,3 +1,5 @@
+import { ApiError } from '../../shared/api';
+
 export type ScheduleInput = {
   groupId: string; trainerId: string; mode: 'weekly' | 'day_parity' | 'date_list' | 'once';
   weekdays?: number[]; dayParity?: string; selectedDates?: string[];
@@ -9,7 +11,7 @@ export type Preview = { token: string; timezone: string; dates: { date: string; 
 export type TrainerOption = { id: string; displayName: string };
 export const modeNames = { weekly: 'Дни недели', day_parity: 'Чётные / нечётные числа месяца', date_list: 'Выбранные даты календаря', once: 'Разовое занятие' };
 export const statusNames: Record<string, string> = { planned: 'Плановое', open: 'Журнал открыт', closed: 'Завершено', cancelled: 'Отменено' };
-export const message = (cause: unknown) => cause instanceof Error ? cause.message : 'Не удалось выполнить запрос. Проверьте соединение и повторите.';
+export const message = (cause: unknown) => cause instanceof ApiError ? cause.message : 'Нет соединения. Проверьте интернет и повторите.';
 export function localDate(zone: string) {
   const parts = new Intl.DateTimeFormat('en', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
   return ['year', 'month', 'day'].map((part) => parts.find((p) => p.type === part)?.value).join('-');

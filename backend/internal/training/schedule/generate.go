@@ -77,7 +77,7 @@ func (s *Service) generateRule(ctx context.Context, id string, now time.Time) er
 	var conflict error
 	for _, o := range dates {
 		var preserved bool
-		e = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM pride.training_sessions s JOIN pride.schedule_rules r ON r.id=s.schedule_rule_id WHERE r.series_id=$1 AND s.starts_on=$2::date AND s.superseded_at IS NULL AND (s.status<>'planned' OR s.is_manual_override OR s.roster_frozen_at IS NOT NULL))`, rule.SeriesID, o.Date).Scan(&preserved)
+		e = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM pride.training_sessions s JOIN pride.schedule_rules r ON r.id=s.schedule_rule_id WHERE r.series_id=$1 AND s.starts_on=$2::date AND s.superseded_at IS NULL AND (s.status<>'planned' OR s.is_manual_override OR s.roster_frozen_at IS NOT NULL OR s.starts_at<=$3))`, rule.SeriesID, o.Date, now).Scan(&preserved)
 		if e != nil {
 			return e
 		}
