@@ -23,6 +23,56 @@ REQUEST = {'sha': SHA, 'image': IMAGE, 'generation': 12}
 
 
 class PolicyTests(unittest.TestCase):
+    def test_existing_pinned_wrapper_is_preserved_with_direct_actions_key(self):
+        canonical = 'restrict,command="/usr/bin/sudo -n /usr/local/lib/judeos-deploy/controller.py" ssh-ed25519 AAAA\n'
+        with tempfile.TemporaryDirectory() as temporary:
+            wrapper = Path(temporary) / 'ssh-entry.py'; wrapper.write_text('owner-controlled fixture')
+            with patch.object(ops, 'LEGACY_ENTRYPOINT', wrapper), patch.object(ops, 'LEGACY_ENTRYPOINT_SHA256', ops.checksum(wrapper)), patch.object(ops, 'trusted'):
+                for command in (str(wrapper), '/usr/bin/python3 ' + str(wrapper), '/usr/bin/python3 -I ' + str(wrapper)):
+                    with self.subTest(command=command):
+                        ops.validate_authorized_keys(f'command="{command}",restrict ssh-ed25519 BBBB\n' + canonical)
+                with self.assertRaisesRegex(RuntimeError, 'Actions key missing'):
+                    ops.validate_authorized_keys(f'restrict,command="{wrapper}" ssh-ed25519 BBBB\n')
+                wrapper.write_text('changed file')
+                with self.assertRaisesRegex(RuntimeError, 'hash changed'):
+                    ops.validate_authorized_keys(f'restrict,command="{wrapper}" ssh-ed25519 BBBB\n' + canonical)
+
+    def test_wrapper_arguments_shell_and_ownership_are_not_bypasses(self):
+        canonical = 'restrict,command="/usr/bin/sudo -n /usr/local/lib/judeos-deploy/controller.py" ssh-ed25519 AAAA\n'
+        with tempfile.TemporaryDirectory() as temporary:
+            wrapper = Path(temporary) / 'ssh-entry.py'; wrapper.write_text('fixture')
+            with patch.object(ops, 'LEGACY_ENTRYPOINT', wrapper), patch.object(ops, 'LEGACY_ENTRYPOINT_SHA256', ops.checksum(wrapper)), patch.object(ops, 'trusted') as trusted:
+                for command in (str(wrapper) + ' extra', str(wrapper) + '; id', '/bin/sh ' + str(wrapper), 'echo /usr/local/lib/judeos-deploy/controller.py'):
+                    with self.subTest(command=command), self.assertRaises(RuntimeError):
+                        ops.validate_authorized_keys(f'restrict,command="{command}" ssh-ed25519 BBBB\n' + canonical)
+                trusted.side_effect = RuntimeError('Unsafe ownership')
+                with self.assertRaisesRegex(RuntimeError, 'Unsafe ownership'):
+                    ops.validate_authorized_keys(f'restrict,command="{wrapper}" ssh-ed25519 BBBB\n' + canonical)
+
+    def test_key_option_order_quotes_and_comments(self):
+        command = '/usr/bin/sudo -n /usr/local/lib/judeos-deploy/controller.py'
+        for field in [f'restrict,command="{command}"', f'command="{command}",restrict',
+                      f'from="127.0.0.1,::1",command="{command}",restrict']:
+            with self.subTest(field=field):
+                ops.validate_authorized_keys('# ignored\n  ' + field + ' ssh-ed25519 AAAA comment\n')
+        key_type, options = ops.authorized_options('command="echo \\"comma,inside\\"",restrict ssh-ed25519 AAAA')
+        self.assertEqual(key_type, 'ssh-ed25519')
+        self.assertEqual(options['command'], 'echo "comma,inside"')
+
+    def test_unreviewed_legacy_handler_identifies_line_without_echoing_command(self):
+        contents = 'restrict,command="/usr/local/lib/judeos-deploy/legacy.py secret-value" ssh-ed25519 AAAA\n'
+        with self.assertRaises(RuntimeError) as error: ops.validate_authorized_keys(contents)
+        self.assertIn('line 1', str(error.exception))
+        self.assertNotIn('secret-value', str(error.exception))
+
+    def test_restrict_cannot_be_faked_in_command_or_overridden(self):
+        command = '/usr/bin/sudo -n /usr/local/lib/judeos-deploy/controller.py'
+        for field in [f'command="restrict,{command}"', f'no-restrict,command="{command}"',
+                      f'restrict,port-forwarding,command="{command}"',
+                      f'restrict,command="{command}",command="other"']:
+            with self.subTest(field=field), self.assertRaises(RuntimeError):
+                ops.validate_authorized_keys(field + ' ssh-ed25519 AAAA restrict')
+
     def test_controller_starts_detached_supervised_worker_without_shell(self):
         with patch.object(controller.os, 'geteuid', return_value=0), patch.object(controller.sys, 'argv', ['controller.py']), \
              patch.object(controller.sys, 'stdin') as stdin, patch.object(controller, 'trusted_tree'), \

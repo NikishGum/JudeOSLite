@@ -10,6 +10,7 @@ from pathlib import Path
 import pwd
 import re
 import secrets
+import shlex
 import socket
 import stat
 import subprocess
@@ -20,6 +21,10 @@ BASE = Path('/srv/judeos-test')
 CONFIG = Path('/srv/judeos-test-config')
 LIB = Path('/usr/local/lib/judeos-deploy')
 KEY_HOME = Path('/var/lib/judeos-deploy')
+LEGACY_ENTRYPOINT = LIB / 'ssh-entry.py'
+# Preserve the exact owner-managed restricted entrypoint reported by the owner.
+# This does not claim that it understands the new JSON deployment protocol.
+LEGACY_ENTRYPOINT_SHA256 = '85a9dd8c570d315e563b0b83e71caf698916388efa0320193e17e58946f21af3'
 DOMAIN = 'test.judopride.tech'
 IMAGE = 'ghcr.io/nikishgum/judeoslite-test'
 ENV = {'PATH': '/usr/sbin:/usr/bin:/sbin:/bin', 'HOME': '/root',
@@ -192,6 +197,54 @@ def install_key(public_file):
     print('Restricted Actions public key installed; other owner keys retained for review.')
 
 
+def authorized_options(line):
+    # Whitespace/commas inside a quoted forced command are not separators.
+    match = re.match(r'((?:[^"\s]|"(?:\\.|[^"\\])*")+)\s+(\S+)\s+\S+', line.strip())
+    if not match: raise ValueError('Malformed authorized_keys entry.')
+    field, key_type = match.groups()
+    parts = re.findall(r'(?:[^",]|"(?:\\.|[^"\\])*")+', field)
+    if ','.join(parts) != field: raise ValueError('Malformed key options.')
+    options = {}
+    for part in parts:
+        name, equal, value = part.partition('=')
+        name = name.lower()
+        if not re.fullmatch(r'[a-z0-9-]+', name) or name in options:
+            raise ValueError('Malformed or duplicate key option.')
+        if equal:
+            value = json.loads(value) if value.startswith('"') else value
+            if not isinstance(value, str): raise ValueError('Invalid key option value.')
+        else: value = None
+        options[name] = value
+    return key_type, options
+
+
+def validate_authorized_keys(contents):
+    canonical = '/usr/bin/sudo -n /usr/local/lib/judeos-deploy/controller.py'
+    actions_key = False
+    for number, line in enumerate(contents.splitlines(), 1):
+        if not line.strip() or line.lstrip().startswith('#'): continue
+        try: key_type, options = authorized_options(line)
+        except ValueError:
+            raise RuntimeError(f'authorized_keys line {number}: malformed/duplicate options; review locally.') from None
+        if 'restrict' not in options or options['restrict'] is not None:
+            raise RuntimeError(f'authorized_keys line {number}: restrict flag missing.')
+        if set(options) & {'pty', 'port-forwarding', 'agent-forwarding', 'x11-forwarding', 'user-rc'}:
+            raise RuntimeError(f'authorized_keys line {number}: an option re-enables a restricted capability.')
+        command = options.get('command')
+        if command != canonical:
+            try: argv = tuple(shlex.split(command or ''))
+            except ValueError: argv = ()
+            allowed = {(str(LEGACY_ENTRYPOINT),), ('/usr/bin/python3', str(LEGACY_ENTRYPOINT)),
+                       ('/usr/bin/python3', '-I', str(LEGACY_ENTRYPOINT))}
+            if argv not in allowed:
+                raise RuntimeError(f'authorized_keys line {number}: forced command uses an unreviewed handler; audit or retire this legacy key explicitly.')
+            trusted(LEGACY_ENTRYPOINT)
+            if checksum(LEGACY_ENTRYPOINT) != LEGACY_ENTRYPOINT_SHA256:
+                raise RuntimeError(f'authorized_keys line {number}: legacy handler hash changed; review locally.')
+        if key_type == 'ssh-ed25519' and command == canonical: actions_key = True
+    if not actions_key: raise RuntimeError('Restricted Actions key missing.')
+
+
 def preflight():
     trusted_tree(LIB); trusted(CONFIG); trusted(BASE); trusted(BASE / 'state')
     for directory in (BASE, CONFIG, BASE / 'state', BASE / 'backups', CONFIG / 'registry'):
@@ -217,13 +270,7 @@ def preflight():
         raise RuntimeError('Deploy user has unexpected supplemental groups.')
     keys = Path(user.pw_dir) / '.ssh' / 'authorized_keys'
     trusted(keys)
-    if not any(line.startswith('restrict,command="/usr/bin/sudo -n /usr/local/lib/judeos-deploy/controller.py" ssh-ed25519 ') for line in keys.read_text().splitlines()):
-        raise RuntimeError('Restricted Actions key missing.')
-    for line in keys.read_text().splitlines():
-        if line.strip() and not line.lstrip().startswith('#') and (
-            'restrict' not in line.split('command=', 1)[0] or
-            'command=' not in line or '/usr/local/lib/judeos-deploy/controller.py' not in line):
-            raise RuntimeError('Review every existing deploy key restriction before activation.')
+    validate_authorized_keys(keys.read_text())
     listing = run(['/usr/bin/sudo', '-l', '-U', 'judeos-deploy']).decode()
     grants = [line.strip() for line in listing.splitlines() if line.strip().startswith('(')]
     if grants != ['(root) NOPASSWD: /usr/local/lib/judeos-deploy/controller.py']:

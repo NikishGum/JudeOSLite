@@ -93,6 +93,29 @@ python3 -I /usr/local/lib/judeos-deploy/admin.py activate-controller \
 новый отдельный ключ и фиксированную команду ниже. Остальные старые ключи
 владелец отдельно проверяет/удаляет при ненадобности; bootstrap их не удаляет.
 
+Уточнение по диагностике владельца: старый ключ вызывает root-owned
+`/usr/local/lib/judeos-deploy/ssh-entry.py` (0755), с hash
+`85a9dd8c570d315e563b0b83e71caf698916388efa0320193e17e58946f21af3`.
+Preflight сохраняет эту существующую точку входа только при точном совпадении
+пути/hash и безопасном владении; допускается прямой вызов либо абсолютный
+`/usr/bin/python3` с необязательным `-I`, без иных аргументов. Это не проверка
+совместимости старого протокола с новым контроллером. Новый Actions-ключ обязан
+по-прежнему вызывать контроллер напрямую. Порядок `restrict`/`command` не влияет
+на проверку; опции, повторно включающие forwarding/PTY/user-rc, запрещены.
+Сообщение об отказе указывает номер строки, не раскрывая ключ или команду.
+
+При обновлении только этой проверки из проверенного checkout достаточно
+атомарно заменить operations.py, когда worker не выполняется:
+
+```bash
+install -o root -g root -m 0644 /root/JudeOSLite/deploy/test/operations.py /usr/local/lib/judeos-deploy/operations.py.new
+mv -T /usr/local/lib/judeos-deploy/operations.py.new /usr/local/lib/judeos-deploy/operations.py
+python3 -I /usr/local/lib/judeos-deploy/admin.py preflight
+```
+
+Повторная активация контроллера, переустановка ключей и повторный ввод секретов
+для этой правки не требуются.
+
 ## Публичный SSH-ключ Actions и host key
 
 Создать отдельную пару ключей в доверенной административной среде владельца.

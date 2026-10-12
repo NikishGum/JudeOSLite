@@ -3,7 +3,7 @@
 12.10.2026. Проверки выполнены только в Cloud. VPS не подключался, серверные
 secret файлы/ключи владельца не читались, реальный деплой не выполнялся.
 
-- 14 Python tests: selection только успешного push-CI текущего main, отказ
+- 19 Python tests: selection только успешного push-CI текущего main, отказ
   PR/fork/failed/old CI, ограниченный digest/SHA payload, root ownership/symlinks,
   запуск worker через systemd без привязки к SSH, настоящий flock двух workers,
   порядок backup/migration/readiness, reservation при ошибке миграции,
@@ -39,3 +39,13 @@ Environment, Variables и Secrets описана в operations-test.md и ост
 Issue остаётся open/In progress до результата в main и реальной приёмки.
 V1-17 сохраняет ответственность за полную CRM/PWA, регулярный offsite backup
 с согласованным retention и восстановление предметных данных после V1-13.
+
+Уточнение по выводу владельца: preflight остановился на старом restricted ключе
+с forced command через ssh-entry.py, тогда как новый Actions-ключ указывал
+на controller.py напрямую. Исправлена проверка промежуточного обработчика:
+только подтверждённый путь/root ownership/SHA-256, без произвольных аргументов,
+и отдельный canonical Actions-ключ всё ещё обязателен. Дополнительно исправлен
+разбор порядка опций, quoted spaces/commas; проверены отказ изменённому wrapper,
+shell/аргументам, подделке restrict и повторному включению forwarding. Пять новых
+regression tests прошли в Cloud. Владельцу остаётся обновить operations.py и
+повторить реальный preflight; его успех пока не подтверждён.
