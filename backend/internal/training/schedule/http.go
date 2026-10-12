@@ -90,7 +90,7 @@ func (s *Service) access(write bool, fn http.HandlerFunc) http.Handler {
 
 // Serialize generation, previews and rule changes across all Go processes. This
 // is a small single database job, not a separate worker/queue service.
-func lock(ctx context.Context, tx pgx.Tx) error {
+func Lock(ctx context.Context, tx pgx.Tx) error {
 	_, e := tx.Exec(ctx, `SELECT pg_advisory_xact_lock(155007)`)
 	return e
 }
@@ -104,7 +104,7 @@ func (s *Service) transaction(r *http.Request, fn func(pgx.Tx) error, commit boo
 	if _, e = auth.LockClubAdministrator(ctx, tx, r.PathValue("clubID")); e != nil {
 		return e
 	}
-	if e = lock(ctx, tx); e != nil {
+	if e = Lock(ctx, tx); e != nil {
 		return e
 	}
 	if e = clubs.RequireActive(ctx, tx, r.PathValue("clubID")); e != nil {

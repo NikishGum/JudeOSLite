@@ -1,0 +1,10 @@
+.session-calendar { overflow-wrap: anywhere; }
+.session-filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 24px 0; }
+.session-time { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.session-calendar .session-list li { display: block; }
+.session-list .actions { margin-top: 16px; }
+.session-warning { padding: 16px; background: var(--pride-surface-section); border-radius: 10px; margin: 16px 0; }
+.session-warning label { display: flex; align-items: center; gap: 12px; min-height: 44px; }
+.session-warning input { width: 20px; height: 20px; flex: 0 0 20px; padding: 0; }
+.session-form textarea { width: 100%; min-width: 0; min-height: 100px; resize: vertical; border: 1px solid var(--pride-border); border-radius: var(--pride-radius-field); padding: 12px; background: var(--pride-surface); color: var(--pride-text); font: 400 16px/1.4 var(--pride-font); }
+@media (max-width: 600px) { .session-filters, .session-time { grid-template-columns: 1fr; } }

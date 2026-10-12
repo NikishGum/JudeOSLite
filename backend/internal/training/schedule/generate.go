@@ -54,7 +54,7 @@ func (s *Service) generateRule(ctx context.Context, id string, now time.Time) er
 		return e
 	}
 	defer tx.Rollback(context.Background())
-	if e = lock(ctx, tx); e != nil {
+	if e = Lock(ctx, tx); e != nil {
 		return e
 	}
 	rule, e := scanRule(tx.QueryRow(ctx, `SELECT `+ruleColumns+` FROM pride.schedule_rules WHERE id=$1`, id))

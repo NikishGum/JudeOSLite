@@ -127,6 +127,20 @@ func occurrence(date, clock, zone string, minutes int) (Occurrence, error) {
 	return Occurrence{date, start, start.Add(time.Duration(minutes) * time.Minute)}, nil
 }
 
+// FutureOccurrence shares the strict local calendar/DST rules with manual
+// session creation and moves. The source date of a rule occurrence stays intact.
+func FutureOccurrence(date, clock, zone string, minutes int, now time.Time) (Occurrence, error) {
+	t, err := time.Parse("15:04", clock)
+	if !groups.ValidDate(date) || err != nil || t.Format("15:04") != clock || minutes < 1 || minutes > 1440 {
+		return Occurrence{}, ErrInput
+	}
+	o, err := occurrence(date, clock, zone, minutes)
+	if err != nil || !o.StartsAt.After(now) {
+		return Occurrence{}, ErrInput
+	}
+	return o, nil
+}
+
 func expand(in Input, zone string, now time.Time) ([]Occurrence, error) {
 	loc, e := time.LoadLocation(zone)
 	if e != nil {
