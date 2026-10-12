@@ -14,6 +14,8 @@ import shlex
 import socket
 import stat
 import subprocess
+import tarfile
+import tempfile
 import time
 import urllib.request
 
@@ -389,11 +391,106 @@ def checksum(path):
     return digest.hexdigest()
 
 
+def data_manifest(image=None, database='judeoslite'):
+    """Hash canonical, sorted rows without putting personal data into logs/RAM."""
+    arguments = ('exec', '-T', 'db', 'psql', '-X', '-U', 'judeoslite', '-d', database,
+                 '-v', 'ON_ERROR_STOP=1', '-At')
+    tables = compose(image, *arguments, '-c',
+        "SELECT schemaname, tablename FROM pg_tables WHERE schemaname IN ('public','pride') ORDER BY 1,2").decode().splitlines()
+    result = {}
+    for table in tables:
+        schema, name = table.split('|')
+        # Identifiers originate in PostgreSQL, never in a caller's SQL argument.
+        quoted = '.'.join('"' + part.replace('"', '""') + '"' for part in (schema, name))
+        sql = f'COPY (SELECT to_jsonb(t)::text FROM {quoted} t ORDER BY to_jsonb(t)::text COLLATE "C") TO STDOUT'
+        # COPY escapes embedded newlines, so one line is exactly one row.
+        with tempfile.TemporaryFile() as output:
+            compose(image, *arguments, '-c', sql, output=output)
+            output.seek(0)
+            digest = hashlib.sha256(); rows = 0
+            for line in output:
+                digest.update(line); rows += 1
+        result[table] = {'rows': rows, 'sha256': digest.hexdigest()}
+    return result
+
+
+def uploads_manifest(directory):
+    result = {}
+    for path in sorted(directory.rglob('*')):
+        if path.is_symlink() or not (path.is_file() or path.is_dir()):
+            raise RuntimeError('Unsupported upload file type; backup refused.')
+        relative = str(path.relative_to(directory))
+        result[relative] = {'sha256': checksum(path)} if path.is_file() else {'directory': True}
+    return result
+
+
+def verify_uploads(directory, expected):
+    # Extract only regular files/directories into a private, disposable tree.
+    # A valid checksum alone does not make paths or links in a tar safe.
+    with tempfile.TemporaryDirectory(prefix='judeos-restore-files-') as temporary:
+        target = Path(temporary)
+        with tarfile.open(directory / 'uploads.tar', 'r|') as archive:
+            for member in archive:
+                path = Path(member.name)
+                if path.is_absolute() or '..' in path.parts or not path.parts or path.parts[0] != 'uploads':
+                    raise RuntimeError('Unsafe upload archive path.')
+                destination = target / path
+                if member.isdir(): destination.mkdir(parents=True, exist_ok=True, mode=0o700)
+                elif member.isfile():
+                    destination.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+                    with archive.extractfile(member) as source, destination.open('xb') as output:
+                        os.chmod(destination, 0o600)
+                        for chunk in iter(lambda: source.read(1024 * 1024), b''): output.write(chunk)
+                else: raise RuntimeError('Unsupported upload archive link/type.')
+        if not (target / 'uploads').is_dir() or uploads_manifest(target / 'uploads') != expected:
+            raise RuntimeError('Restored upload contents differ.')
+
+
+def maintenance_backup():
+    current = load('current')
+    operation = load('operation') or {}
+    if not current or operation.get('phase') not in ('ready', 'manual-rollback') or history() != current['history']:
+        raise RuntimeError('Verified release required; resolve deployment failure before backup.')
+    running = compose(None, 'ps', '--status', 'running', '--services').decode().splitlines()
+    if 'app' not in running: raise RuntimeError('Application is stopped; backup will not start it implicitly.')
+    try:
+        compose(None, 'stop', 'app')
+        return backup()
+    finally:
+        # The caller holds the same lock as deploy/restore/rollback throughout.
+        compose(None, 'up', '-d', '--no-deps', '--wait', '--wait-timeout', '180', 'app')
+        verify_https(current['sha'])
+
+
+def restart_check():
+    current = load('current')
+    operation = load('operation') or {}
+    if not current or operation.get('phase') not in ('ready', 'manual-rollback') or history() != current['history']:
+        raise RuntimeError('Verified release required before restart check.')
+    if 'app' not in compose(None, 'ps', '--status', 'running', '--services').decode().splitlines():
+        raise RuntimeError('Application is stopped; resolve the failure before restart check.')
+    try:
+        compose(None, 'stop', 'app')
+        data = data_manifest(); uploads = uploads_manifest(BASE / 'uploads')
+        save('restart-check', {'phase': 'restart-db', 'sha': current['sha']})
+        compose(None, 'restart', 'db')
+        compose(None, 'up', '-d', '--wait', '--wait-timeout', '180', 'db')
+    finally:
+        compose(None, 'up', '-d', '--no-deps', '--wait', '--wait-timeout', '180', 'app')
+        verify_https(current['sha'])
+    if data_manifest() != data or uploads_manifest(BASE / 'uploads') != uploads:
+        raise RuntimeError('Contents changed across restart; inspect generator/data before accepting.')
+    save('restart-check', {'phase': 'ready', 'sha': current['sha'], 'verified_at': datetime.now(timezone.utc).isoformat()})
+    print('PASS: app/database restarted; all table rows and files preserved, HTTPS/SHA verified.')
+
+
 def backup(image=None):
     trusted(BASE / 'backups')
     name = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S') + '-' + secrets.token_hex(4)
     directory = BASE / 'backups' / name
     directory.mkdir(mode=0o700)
+    data = data_manifest(image)
+    uploads = uploads_manifest(BASE / 'uploads')
     partial = directory / 'database.dump.partial'
     with partial.open('xb') as output:
         os.chmod(partial, 0o600)
@@ -404,7 +501,10 @@ def backup(image=None):
     partial.rename(directory / 'database.dump')
     run(['/usr/bin/tar', '-C', str(BASE), '-cf', str(directory / 'uploads.tar'), 'uploads'])
     os.chmod(directory / 'uploads.tar', 0o600)
+    if data_manifest(image) != data or uploads_manifest(BASE / 'uploads') != uploads:
+        raise RuntimeError('Data changed during backup; stop writes and retry. Incomplete archive retained.')
     write(directory / 'metadata.json', json.dumps({'current': load('current'), 'history': history(image),
+         'data': data, 'uploads': uploads,
          'database_sha256': checksum(directory / 'database.dump'),
          'uploads_sha256': checksum(directory / 'uploads.tar')}) + '\n')
     return name
@@ -457,9 +557,9 @@ def deploy(request):
     print('Deployment ready; SHA, schema history and backup recorded.')
 
 
-def restore_check(name):
+def restore_check(name, *, source_root=None):
     if not re.fullmatch(r'[0-9]{8}T[0-9]{6}-[0-9a-f]{8}', name): raise ValueError('Invalid backup name.')
-    directory = BASE / 'backups' / name
+    directory = (BASE / 'backups' if source_root is None else source_root) / name
     trusted_tree(directory)
     metadata = json.loads((directory / 'metadata.json').read_text())
     if checksum(directory / 'database.dump') != metadata['database_sha256']: raise RuntimeError('Backup checksum mismatch.')
@@ -471,9 +571,21 @@ def restore_check(name):
     with (directory / 'database.dump').open('rb') as source:
         compose(None, 'exec', '-T', 'db', 'pg_restore', '-U', 'judeoslite', '-d', db, '--exit-on-error', '--single-transaction', input=source)
     if history(database=db) != metadata['history']: raise RuntimeError('Restored migration history differs.')
-    run(['/usr/bin/tar', '-tf', str(directory / 'uploads.tar')])
+    if 'data' not in metadata or 'uploads' not in metadata:
+        raise RuntimeError('Legacy archive restored, but lacks content manifest. Verify it manually; take a new V1-17 backup.')
+    if data_manifest(database=db) != metadata['data']: raise RuntimeError('Restored table contents differ.')
+    verify_uploads(directory, metadata['uploads'])
     print('Archive restored into isolated database:', db)
-    print('Migration history verified. Manually verify business rows and uploaded files before dropping it.')
+    print('PASS: migration history, every table row and uploaded file verified.')
+    print('Row counts:', json.dumps({name: item['rows'] for name, item in metadata['data'].items()}, sort_keys=True))
+    return db
+
+
+def drop_restore_check(database):
+    if not re.fullmatch(r'restorecheck_[0-9a-f]{12}', database):
+        raise RuntimeError('Only an isolated restorecheck database may be removed.')
+    compose(None, 'exec', '-T', 'db', 'dropdb', '-U', 'judeoslite', database)
+    print('Isolated restore database removed; live database unchanged.')
 
 
 def rollback():
@@ -491,7 +603,7 @@ def rollback():
 
 
 def status():
-    for name in ('accepted', 'current', 'previous', 'operation'):
+    for name in ('accepted', 'current', 'previous', 'operation', 'offsite', 'offsite-restore', 'restart-check'):
         print(name + ':', json.dumps(load(name)))
 
 
