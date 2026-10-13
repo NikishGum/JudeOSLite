@@ -63,6 +63,17 @@ WebKit (`PWA_BROWSER=webkit`), CDP installability остаётся Chromium-пр
 Tab/Shift+Tab. Реальные результаты на старом SHA и нужный повтор после
 изменения CSS/focus записаны в [протоколе V1-16](testing-v1.md).
 
+Повтор владельца 13.10.2026 18:21:51 на f532e6b: четыре неизменённых Mac E2E
+(Chromium151/Chrome154/Edge155/WebKit26.5) PASS без обходов; реальные обновлённые
+Chrome/Edge .app и iPhone13/iOS26.6.2 Home Screen PWA прошли согласованные
+select/date/contact/panel/relaunch/session/logout проверки. Actual iPhone PWA
+Inspector подтвердил standalone, семь select48.39px и 11 static-only assets;
+физический offline-before-save не записал отметки. Ограничения и исходные
+неуспешные результаты сохранены в протоколе. По новой UX-находке выбранный
+trainer-журнал получает фокус/прокрутку, разделы филиала — ссылки перехода;
+эта последняя поправка отдельно проверяется автоматической регрессией, прежние
+physical PASS не объявляются её ручной проверкой.
+
 Уточнение заказчика 13.10.2026 в основном чате #164: реальный Android/Chrome,
 установка и relaunch отложены и не блокируют завершение #164. Их результат —
 DEFERRED / NOT RUN; возможные ошибки разбирать отдельными задачами. Mac Chrome/Edge

@@ -151,7 +151,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 for width in (320, 390, 1280):
                     value.set_viewport_size({'width': width, 'height': 900})
                     assert value.evaluate('document.documentElement.scrollWidth <= innerWidth'), (role, width)
-                    for control in value.locator('button:visible,input:visible,select:visible,summary:visible').all():
+                    for control in value.locator('button:visible,input:visible,select:visible,summary:visible,.workspace-navigation a:visible').all():
                         if control.get_attribute('type') not in ('checkbox', 'radio'):
                             rect = control.bounding_box()
                             assert rect['height'] >= 44 and rect['width'] >= 44, (role, width, control.outer_html() if hasattr(control, 'outer_html') else control.get_attribute('class'), rect)
@@ -227,6 +227,12 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             admin.on('response', lambda response: group_reads.append({'status': response.status}) if response.url == group_url else None)
             admin.on('requestfailed', lambda request: group_reads.append({'failure': request.failure}) if request.url == group_url else None)
             admin.get_by_label('Филиал', exact=True).select_option(club['id'])
+            navigation = admin.get_by_role('navigation', name='Разделы филиала')
+            expect(navigation.get_by_role('link', name='Участники', exact=True)).to_be_visible()
+            navigation.get_by_role('link', name='Расписание', exact=True).click()
+            expect(admin.locator('#schedule-title')).to_be_in_viewport(ratio=1)
+            navigation.get_by_role('link', name='Участники', exact=True).click()
+            expect(admin.locator('#registry-title')).to_be_in_viewport(ratio=1)
             groups = admin.locator('.groups')
             groups.get_by_role('button', name='Создать группу', exact=True).click()
             groups.get_by_label('Название группы', exact=True).fill('Synthetic PWA group')
@@ -333,13 +339,26 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 schedule_counts[mode] = len(actual)
             # Historical synthetic session allows opening regardless of time of CI run.
             sid = sql(f"INSERT INTO pride.training_sessions(club_id,group_id,trainer_id,starts_on,timezone,starts_at,ends_at) VALUES('{club['id']}','{group['id']}','{trainer['id']}','{today}','Europe/Minsk','{today} 09:00+03','{today} 10:00+03') RETURNING id").splitlines()[0]
+            # Cancelled disposable fixtures create a genuine long daily list.
+            # They never contribute marks or the closed-session report ledger.
+            sql(f"INSERT INTO pride.training_sessions(club_id,group_id,trainer_id,starts_on,timezone,starts_at,ends_at,status,cancelled_at,cancellation_reason) SELECT '{club['id']}','{group['id']}','{trainer['id']}','{today}','Europe/Minsk','{today} 16:00+03'::timestamptz+n*interval '15 minutes','{today} 16:10+03'::timestamptz+n*interval '15 minutes','cancelled',now(),'Synthetic scroll fixture' FROM generate_series(1,12) AS n")
             # Playwright WebKit cannot route fetches from SW-controlled pages.
             # Network fault injection uses a separate context without a worker;
             # owner/admin contexts exercise the real worker/cache/update behavior.
             trainer_context = browser.new_context(viewport={'width': 390, 'height': 844}, has_touch=True, service_workers='block' if ENGINE == 'webkit' else 'allow')
             tp = page(trainer_context); signin(tp, 'trainer')
             tp.get_by_label('Филиал', exact=True).select_option(club['id'])
+            expect(tp.get_by_role('navigation', name='Разделы филиала').get_by_role('link')).to_have_count(2)
+            expect(tp.locator('.trainer-session-list li')).to_have_count(13)
+            tp.set_viewport_size({'width': 320, 'height': 480})
             tp.get_by_role('button', name='Открыть журнал', exact=True).click()
+            confirmation = tp.get_by_role('button', name='Подтвердить открытие журнала', exact=True)
+            expect(confirmation).to_be_visible()
+            expect(tp.locator('.session-journal h3')).to_be_focused()
+            expect(tp.locator('.session-journal h3')).to_be_in_viewport(ratio=1)
+            expect(confirmation).to_be_in_viewport(ratio=1)
+            assert sql(f"SELECT status FROM pride.training_sessions WHERE id='{sid}'") == 'planned'
+            assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{sid}'") == '0'
             tp.get_by_role('button', name='Подтвердить открытие журнала', exact=True).click()
             expect(tp.locator('.attendance-card')).to_contain_text('Synthetic Participant A')
             dimensions(tp, 'trainer-card')

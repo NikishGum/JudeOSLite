@@ -5,8 +5,8 @@
 HTTPS-стенд: <https://test.judopride.tech>, [серверная приёмка](operations-v1.md).
 Устройство/браузер/установка считаются проверенными только после фактического
 выполнения. Playwright WebKit не является Safari на iPhone, Chromium не является
-ручной проверкой Chrome/Edge. Пока согласованная физическая матрица ниже
-не принята, issue открыта. Android отложен решением заказчика 13.10.2026
+ручной проверкой Chrome/Edge. Согласованная физическая матрица принята по
+повторному отчёту владельца 13.10.2026 18:21:51 Europe/Minsk. Android отложен решением заказчика 13.10.2026
 и больше не блокирует завершение #164; его проверки не считаются выполненными.
 
 ## Автоматическая регрессия
@@ -54,6 +54,10 @@ Safari. Offline mark в отдельном trainer-context проверяетс�
 - Исторический сеанс на сегодня создаётся в **disposable SQL fixture**, чтобы
   journal flow не зависел от времени запуска CI. Четыре UI-расписания создают
   настоящие будущие сеансы; этот исторический сеанс не выдаётся за созданный UI.
+  Двенадцать cancelled SQL fixtures создают длинный список занятий: на 320×480
+  после выбора журнал/подтверждение видны без ручной прокрутки, фокус на заголовке.
+  До подтверждения серверный статус planned и записей нет. Проверяются ссылки
+  «Участники»/«Расписание» и их цели ≥44 px; отменённые fixtures не входят в 40% ledger.
 - Trainer открывает снимок пяти карточек: A present, B unknown, C illness,
   D excused; E становится close_default/unknown. Проверены причины, отмена
   панели/Escape/focus cycle, двойной тап, задержка, явный offline, отказ до commit,
@@ -81,9 +85,9 @@ physicalInstallation=NOT TESTED. Снимки `/tmp/pwa161-{engine}-{screen}-{wi
 включая повтор изменённых select/panel после исправлений. Android в отчёте —
 DEFERRED / NOT RUN, не PASS; эмуляция не заменяет реальные проверки.
 
-Получен локальный отчёт владельца от 13.10.2026 15:13 Europe/Minsk: реальные
-Chrome/Edge и iPhone проверены на 88edc2e, Android недоступен. Матрица и границы
-ниже; после исправления select/focus нужен короткий повтор на новой версии.
+Получены исходный локальный отчёт владельца от 13.10.2026 15:13 Europe/Minsk
+на 88edc2e и повтор от 18:21:51 на f532e6b после исправления select/focus.
+Chrome/Edge и физический iPhone проверены; Android отложен. Матрица и границы ниже.
 Пароли задавать/вводить в защищённой CRM, не в Git/чате.
 Перед началом записать дату, устройство, ОС, полную версию браузера и
 `https://test.judopride.tech/release.json` → sha. При обновлении release между
@@ -176,17 +180,17 @@ PASS означает выполненный шаг с ожидаемым рез
 
 | Проверка | Устройство / ОС / браузер | SHA / дата / исполнитель | Ввод, формы, размеры, панель, сеть, смена сотрудника | Установка | Повторный запуск / выход |
 | --- | --- | --- | --- | --- | --- |
-| iPhone / Safari | iPhone 13 / iOS 26.6.2 / UA Safari Version/26.6.1 | 88edc2e / 13.10.2026 / владелец + локальный агент | PASS перечисленных проверок форм; panel/safe area/keyboard/landscape и offline-before-save по наблюдению владельца; ограничения ниже | PASS: значок Home Screen, цель Web App обнаружена Inspector | PASS по наблюдению владельца: сессия сохраняется, после logout/relaunch вход без прежних карточек |
+| iPhone / Safari | iPhone 13 / iOS 26.6.2 / UA Safari Version/26.6.1 | f532e6b / 13.10.2026 / владелец + локальный агент | PASS native select/четырёх portrait форм/date/contact через Mirroring; panel/landscape/offline по владельцу + API; standalone/cache/48.39 px через actual PWA Inspector; ограничения ниже | PASS: прежняя Home Screen установка, явное обновление, standalone=true | PASS: trainer по владельцу, полный admin quit/relaunch и logout/relaunch через Mirroring |
 | Android / Chrome | Устройство недоступно; проверка отложена | 13.10.2026 / решение заказчика в основном чате #164 | DEFERRED / NOT RUN | DEFERRED / NOT RUN | DEFERRED / NOT RUN |
-| ПК / Chrome | MacBook Pro Mac17,9 arm64 / macOS 27.0.1 (26A434) / Chrome 154.0.8037.98 | 88edc2e / 13.10.2026 / локальный агент + владелец | PASS: полный UI-путь/40%, формы/сеть/focus/смена ролей, native narrow/wide без overflow | PASS: штатная установка .app, standalone=true | PASS: реальный relaunch/session/logout |
-| ПК / Edge | Тот же Mac / Edge 155.0.4283.45 | 88edc2e / 13.10.2026 / локальный агент + владелец | PASS: формы, панель/focus/offline, отмена/отзыв роли, смена сотрудника, native narrow/wide без overflow | PASS: штатная установка .app, standalone=true | PASS: реальный relaunch/session/logout |
+| ПК / Chrome | MacBook Pro Mac17,9 arm64 / macOS 27.0.1 (26A434) / Chrome 154.0.8037.98 | f532e6b / 13.10.2026 / локальный агент + владелец | PASS: select/формы/date/contact/save/readback/panel/focus/browser-context offline, native narrow/wide без overflow; полный HTTPS 40% — прежний 88edc2e | PASS: прежняя штатная .app, явное обновление, standalone=true | PASS: native quit/0 окон/relaunch/session/logout |
+| ПК / Edge | Тот же Mac / Edge 155.0.4283.45 | f532e6b / 13.10.2026 / локальный агент + владелец | PASS: тот же повтор select/форм/date/contact/panel/focus/browser-context offline и размеры; прежние cancellation/revoke — 88edc2e | PASS: прежняя штатная .app, явное обновление, standalone=true | PASS: native quit/0 окон/relaunch/session/logout |
 
 Источник — переданный владельцем **LOCAL-QA-164 REPORT, 13.10.2026 15:13
-Europe/Minsk**, дополненный его последними наблюдениями iPhone. Версии указаны
+Europe/Minsk**, дополненный **LOCAL-QA-164 RETEST REPORT, 18:21:51**. Версии указаны
 как измеренные локальным агентом/владельцем; замороженный OS18_7 в iPhone UA не
 использован как версия ОС. Полные логи, профили и транскрипты в Git не копируются.
 
-### Что именно подтверждено на устройствах
+### Исторические проверки на 88edc2e, отчёт 15:13
 
 Chrome на настоящем HTTPS: admin создал trainer/группу/A–E/четыре режима
 (2/4/2/1), trainer сохранил причины/close defaults, admin исправил C; owner
@@ -231,11 +235,9 @@ Edge155.0.4283.45 (D1) и Mac Playwright WebKit26.5 (D2, затем D3 в диа
   явно переводит фокус при каждом Tab/Shift+Tab, включая heading/wrap/disabled;
   Escape и возврат фокуса сохранены. E2E проверяет каждую кнопку в обоих направлениях.
 
-Исправления проходят Cloud/Linux регрессию и CI; **их результат на macOS ещё
-требует повторного запуска исходных тестов без диагностических обходов**.
-После обновления установленной PWA повторить select/date/contact, panel
-Tab/Shift+Tab/Escape на Mac и native select/panel/relaunch на iPhone. Старые
-physical PASS относятся к 88edc2e, не автоматически к изменённому CSS/focus.
+Исправления прошли Cloud/Linux регрессию/CI и повтор исходных Mac тестов
+без диагностических обходов. Select/date/contact, panel Tab/Shift+Tab/Escape
+на Mac и native select/panel/relaunch iPhone повторены на f532e6b; результаты ниже.
 
 Первый main CI a358b87 (38400282537) прошёл Chromium, но остановился в WebKit
 на disabled выборе начальной группы. Последующий локальный прогон остановился
@@ -246,17 +248,77 @@ select/options и последние HTTP status/request failure для disposab
 Проверка не ослаблена: нет force, автоматического retry или зачёта diagnostic
 обходов. Итоговый успешный CI нового SHA и первоначальный FAIL сохраняются в issue.
 
+### Повтор 13.10.2026, 18:21:51 Europe/Minsk
+
+Владелец передал отдельный LOCAL-QA-164 RETEST REPORT. Чистый detached QA-worktree
+HEAD/origin/main=f532e6b; исходный E2E SHA256
+929ed7df32eaa7164688d731ca5e6891c1bca548bb7d3715594e462c9cdac92a до/после всех
+запусков совпал. Node24.19/Python3.14.8/Playwright1.62, arm64 production build
+прошли. Каждый E2E запущен один раз, без overrides/force/скрытых retries:
+
+| Mac E2E | Измеренная версия | Exit / результат |
+| --- | --- | --- |
+| Bundled Chromium | 151.0.7922.34 | 0 / PASS |
+| Google Chrome | 154.0.8037.98 | 0 / PASS |
+| Microsoft Edge | 155.0.4283.45 | 0 / PASS |
+| Playwright WebKit | 26.5 | 0 / PASS |
+
+Во всех JSON weekly/parity/date_list/once=2/4/2/1; 1 closed/2 present/3 absent,
+unknown=2/illness=0/excused=1/40%. D1 exact trainer A/B до explicit activation
+проверен в трёх Chromium прогонах; WebKit trainer-context без SW, общий owner/admin
+update/cache/save guard прошёл отдельно. D2/D3 прошли и на Mac WebKit.
+Неизвестные прежние form-loading остановки не воспроизведены; это не доказательство
+исправления их причины. Логи вспомогательных GUI/preflight ошибок сохранены
+отдельно: они не являются FAIL или повтором оригинальных E2E.
+
+На HTTPS Chrome/Edge реальные native popup/CUA, четыре формы, повтор сохранения
+QA164 A и readback, причины/Cancel/Escape/focus в двух направлениях прошли.
+Native окна дают viewport 500×442/1280×862, overflow нет; причины 56 px,
+Cancel 48.398 px. Offline **browser context**, не Mac Wi-Fi: «Нет сети. Изменение
+не отправлено. Подключитесь и повторите действие.», без успеха/перехода;
+после reload D/E unmarked. Existing .app явно обновлены, native quit/0 standalone
+окон/relaunch сохранили trainer, logout/relaunch дал login без журнала. Один
+static-only кеш/11 assets, waiting=null. Полный HTTPS 40% на 88edc2e не переписан;
+на f532e6b полный путь проверен всеми четырьмя disposable E2E.
+
+Физический iPhone: Mirroring управлял настоящими iOS select/date popup,
+четырьмя portrait формами и save/readback контакта/даты. Владелец подтвердил
+панель/Cancel в портрете/альбоме, trainer relaunch и физический offline-before-save.
+После Present без сети журнал скрыт/показана ошибка «Нет соединения, проверьте
+интернет и попробуйте снова.»; после сети/reload пять null подтверждены API
+на Mac и самой PWA. Точная последовательность auth/network events не записана,
+исчезновение DOM не объявляется завершением серверной сессии. Полный admin
+quit/relaunch и logout/quit/relaunch с экраном входа выполнены через Mirroring.
+USB Inspector **установленной PWA** теперь работает: standalone=true,
+390×797/DPR3, семь select по 48.390625 px, overflow нет, active=activated,
+waiting=null, pride-shell-0129cb668ebea186/11 static-only assets без JSON.
+Прежнее ограничение console не переносится на этот повтор. Release изменился
+929483d→f532e6b во время проверки; diff только docs, продукт/E2E одинаковы.
+
+Новая UX-находка: после выбора trainer-сеанса журнал/подтверждение появляется
+после длинного списка, пользователь не видит результат нажатия. Исправлено
+в продолжении #164: новый журнал получает фокус/прокрутку к заголовку один раз
+при выборе; открытие всё ещё требует отдельного подтверждения. Для поиска
+карточек/расписания добавлены ссылки на доступные разделы филиала. Новая
+регрессия использует реальные cancelled SQL fixtures/320×480 и проверяет
+видимость подтверждения без ручной прокрутки и отсутствие преждевременной записи.
+Последняя навигационная поправка проверяется Chromium/WebKit/CI; физические
+результаты выше относятся к f532e6b и не выдаются за её отдельный ручной повтор.
+
 ### Оставшиеся ограничения
 
 Android physical installation/relaunch и вся его матрица DEFERRED / NOT RUN
 по решению заказчика 13.10.2026; это больше не блокер закрытия #164. Физический
 разрыв связи именно во время HTTPS save — NOT RUN; deterministic E2E before
 commit/lost response и physical offline-before-save записаны отдельно.
-Дополнительные iPhone landscape/system-text/admin-journal/owner-report проверки
-и аппаратный Tab не выполнены. Инструментальные safe-area inset/focus измерения
+Дополнительные iPhone landscape-матрица всех четырёх форм/system-text/admin-journal/
+owner-report и аппаратный Tab не выполнены. Экранная клавиатура/поворот формы
+после select/focus изменений NOT RUN; прежний PASS на 88edc2e сохранён отдельно,
+Mirroring использует аппаратный ввод. Инструментальные safe-area inset/focus измерения
 не проведены; физическая доступность панели подтверждена наблюдением владельца.
 Синтетический QA164 филиал/группа/A–E на HTTPS сохранены: основной 21:00 closed,
-22:00 cancelled, 23:00 и 23:30 open; trainer-role восстановлена штатным owner UI.
+22:00 cancelled, 23:00/23:30 open (A/B/C absent с тремя причинами, D/E unmarked),
+новый phone-only 20:30 open с пятью null; trainer-role восстановлена штатным owner UI.
 Пароли и browser profiles не запрашивать, рабочие карточки не изменять.
 
 Копируемая форма для каждого браузера:
@@ -279,6 +341,6 @@ release SHA / группа QA164:
 ```
 
 Автоматические результаты и окончательный SHA/CI/main записываются после
-выполнения в live #164. До завершения повтора Mac/iPhone issue остаётся открытой;
-Android исключён из текущего условия закрытия решением заказчика.
-#166 зависит от #164 и не становится доступной от одного push тестов.
+выполнения в live #164. Согласованный Mac/iPhone повтор принят; завершение после
+доставки последней навигационной поправки и её проверок в main. Android исключён
+из условия закрытия решением заказчика. #166 зависит от фактического завершения #164.

@@ -17,9 +17,14 @@ export function SessionJournal({ clubId, initial, onChanged }: Props) {
   const [attempt, setAttempt] = useState(0);
   const [confirm, setConfirm] = useState(false);
   const mounted = useRef(true);
+  const heading = useRef<HTMLHeadingElement>(null);
   const pending = useRef(false);
   const changed = useRef(onChanged); changed.current = onChanged;
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
+  useEffect(() => {
+    heading.current?.focus();
+    heading.current?.scrollIntoView({ block: 'start' });
+  }, []);
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true); setError(''); setUnavailable(false); setConflict(false); setConfirm(false); setJournal(null);
@@ -59,7 +64,7 @@ export function SessionJournal({ clubId, initial, onChanged }: Props) {
   const unmarked = journal?.records.filter((item) => item.state === null).length ?? 0;
   const canWrite = journal?.session.status === 'open' && !conflict && !unavailable;
   return <div className="session-journal" aria-busy={busy || loading}>
-    <h3>Журнал · {initial.groupName}</h3>
+    <h3 ref={heading} tabIndex={-1}>Журнал · {initial.groupName}</h3>
     <button disabled={busy} onClick={() => setAttempt((value) => value + 1)}>{conflict ? 'Загрузить актуальный журнал и сбросить ввод' : 'Обновить журнал'}</button>
     {error && <p className="error" role="alert">{error}</p>}
     {unavailable && <p>Доступ к журналу отозван или занятие больше вам не назначено. Обновите список занятий.</p>}

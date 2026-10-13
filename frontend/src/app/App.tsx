@@ -151,6 +151,17 @@ export function App() {
             {club && <div className="club-summary"><h3>{club.name}</h3><p>{club.roles.map((role) => roleNames[role] ?? role).join(' · ')}</p></div>}
           </>}
         </section>
+        {club && <nav className="workspace-navigation" aria-label="Разделы филиала">
+          {(session.user.isOwner || club.roles.includes('administrator')) && <>
+            <a href="#registry-title">Участники</a>
+            <a href="#groups-title">Группы</a>
+            <a href="#schedule-title">Расписание</a>
+            <a href="#admin-journals-title">Журналы</a>
+            <a href="#trainers-title">Тренеры</a>
+          </>}
+          {club.roles.includes('trainer') && <a href="#trainer-sessions-title">Мой журнал</a>}
+          <a href="#sessions-title">Календарь</a>
+        </nav>}
         {club && (session.user.isOwner || club.roles.includes('administrator')) && <ParticipantRegistry key={`participants:${session.user.id}:${club.id}:${roles}`} clubId={club.id} timezone={club.timezone} onSessionRefresh={() => loadSession()} />}
         {club && (session.user.isOwner || club.roles.includes('administrator')) && <GroupManagement key={`groups:${session.user.id}:${club.id}:${roles}`} clubId={club.id} timezone={club.timezone} />}
         {club && (session.user.isOwner || club.roles.includes('administrator')) && <ScheduleManagement key={`schedule:${session.user.id}:${club.id}:${roles}`} clubId={club.id} timezone={club.timezone} />}
