@@ -45,9 +45,32 @@ HTTPS readyz/SHA и HTTP→HTTPS 308 с включённой проверкой 
   HostOnly. Значения не публикуются.
 
 Физическая установка iPhone/Android и матрица Chrome/Edge остаются #164.
-Эти серверные PASS не повторяются без причины. Единственный оставшийся критерий
-#165 — установка и успешный запуск локального backup service/timer с проверкой
-новой завершённой копии, расписания и retention. До результата VPS issue открыта.
+Эти серверные PASS не повторяются без причины.
+
+### Приёмка локального service/timer — 13.10.2026
+
+[Владелец передал вывод VPS](https://github.com/NikishGum/JudeOSLite/issues/165#issuecomment-6142229067)
+после установки reviewed main `3a8d56a615cdf3d7eda433a49938602c8ff293da`:
+
+- SHA-256 четырёх source-файлов и установленных admin.py/operations.py — OK;
+  systemd verify и local preflight — PASS.
+- Настоящий `systemctl start judeos-backup.service`: Result=success,
+  ExecMainStatus=0; inactive/dead после завершения oneshot нормально.
+- local-backup.phase=ready, новая копия `20261013T090815-6f48fc14`;
+  завершение 13.10.2026 09:08:24 UTC.
+- Retention: keep_last=7, completed=7, removed=12, preserved_unknown=0.
+  Среди сохранённых — referenced previous `20261012T191202-a8bc16dd` и
+  current `20261013T082808-099bf4c2`. Неизвестных архивов в этом запуске не было;
+  их сохранение и дополнительные старые references проверены policy/integration тестами.
+- Timer enabled/active, OnCalendar `*-*-* 03:00:00 Europe/Minsk`, Persistent=yes,
+  AccuracyUSec=1s, RandomizedDelayUSec=0. Следующий запуск — 14.10.2026
+  00:00 UTC = 03:00 Europe/Minsk. Фактический service проверен ручным запуском;
+  первый календарный запуск на момент приёмки ещё не наступил.
+
+Current/accepted/operation ready соответствовали SHA 3a8d56a, generation=75.
+Main CI [38368620120](https://github.com/NikishGum/JudeOSLite/actions/runs/38368620120)
+и Deploy test [38369260362](https://github.com/NikishGum/JudeOSLite/actions/runs/38369260362)
+успешны. Все согласованные серверные критерии #165 подтверждены.
 
 ## Развёртывание, диагностика и rollback
 
@@ -69,7 +92,7 @@ live DB автоматически: проверить стадию/worker и п
 python3 -I /usr/local/lib/judeos-deploy/admin.py status
 python3 -I /usr/local/lib/judeos-deploy/admin.py preflight
 systemctl list-units --all 'judeos-test-deploy-*' --no-pager
-systemctl show judeos-backup.service --property=ActiveState,SubState,Result,ExecMainStatus
+systemctl show judeos-backup.service --no-pager --property=ActiveState,SubState,Result,ExecMainStatus
 systemctl list-timers judeos-backup.timer --no-pager
 df -h /srv
 curl --fail --silent --show-error https://test.judopride.tech/api/readyz
@@ -189,13 +212,13 @@ sha256sum /usr/local/lib/judeos-deploy/admin.py /usr/local/lib/judeos-deploy/ope
 
 ```sh
 systemctl start judeos-backup.service
-systemctl show judeos-backup.service --property=ActiveState,SubState,Result,ExecMainStatus
+systemctl show judeos-backup.service --no-pager --property=ActiveState,SubState,Result,ExecMainStatus
 python3 -I /usr/local/lib/judeos-deploy/admin.py status
 systemctl enable --now judeos-backup.timer
 systemctl is-enabled judeos-backup.timer
 systemctl is-active judeos-backup.timer
 systemctl list-timers judeos-backup.timer --no-pager
-systemctl show judeos-backup.timer --property=TimersCalendar,NextElapseUSecRealtime,Persistent,AccuracyUSec,RandomizedDelayUSec
+systemctl show judeos-backup.timer --no-pager --property=TimersCalendar,NextElapseUSecRealtime,Persistent,AccuracyUSec,RandomizedDelayUSec
 ```
 
 Для закрытия #165 владелец передаёт: installed hashes, preflight PASS,
