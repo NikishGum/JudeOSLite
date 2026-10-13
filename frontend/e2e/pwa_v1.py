@@ -107,6 +107,10 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             def page(context):
                 value = context.new_page()
                 value.on('pageerror', lambda error: errors.append(str(error)))
+                value.pwa_api_events = []
+                value.on('request', lambda request: value.pwa_api_events.append({'event': 'request', 'time': time.monotonic(), 'method': request.method, 'path': request.url.removeprefix(ROOT)}) if request.url.startswith(ROOT+'/api/') else None)
+                value.on('response', lambda response: value.pwa_api_events.append({'event': 'response', 'time': time.monotonic(), 'status': response.status, 'path': response.url.removeprefix(ROOT)}) if response.url.startswith(ROOT+'/api/') else None)
+                value.on('requestfailed', lambda request: value.pwa_api_events.append({'event': 'failed', 'time': time.monotonic(), 'failure': request.failure, 'path': request.url.removeprefix(ROOT)}) if request.url.startswith(ROOT+'/api/') else None)
                 return value
             def signin(value, login='owner', navigate=True):
                 if navigate:
@@ -524,12 +528,22 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             expect(second.locator('.account')).to_contain_text('Synthetic Admin')
             expect(second.locator('.owner-dashboard')).to_have_count(0)
             # Back/forward snapshot: data is removed before pagehide, fresh me on pageshow.
+            # A restored document is foreground. Background WebKit pages can
+            # suspend work; dispatching synthetic pageshow does not activate them.
+            second.bring_to_front()
+            second.wait_for_function("document.visibilityState === 'visible'")
             second.get_by_label('Филиал', exact=True).select_option(club['id'])
             expect(second.locator('#registry-title')).to_be_visible()
             second.evaluate("window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true}))")
             expect(second.locator('#registry-title')).to_have_count(0)
             second.evaluate("window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}))")
-            expect(second.locator('#registry-title')).to_be_visible()
+            try:
+                expect(second.locator('#registry-title')).to_be_visible()
+            except Exception:
+                print(json.dumps({'engine': ENGINE, 'check': 'restored-page', 'url': second.url,
+                    'visibility': second.evaluate('document.visibilityState'),
+                    'api': second.pwa_api_events[-40:], 'body': second.locator('body').inner_text()[:6000], 'errors': errors}, ensure_ascii=False), flush=True)
+                raise
             # Explicit update cannot interrupt current response/body processing.
             if ENGINE == 'chromium':
                 # Keep A alive in this separate context across later navigations.

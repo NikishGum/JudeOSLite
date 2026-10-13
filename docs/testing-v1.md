@@ -305,6 +305,17 @@ waiting=null, pride-shell-0129cb668ebea186/11 static-only assets без JSON.
 Последняя навигационная поправка проверяется Chromium/WebKit/CI; физические
 результаты выше относятся к f532e6b и не выдаются за её отдельный ручной повтор.
 
+Первый main CI навигации 3621a0c/run38425435001 прошёл Chromium и основные
+WebKit шаги, но остановился после синтетического persisted pageshow второй вкладки:
+через стандартные 5 s DOM ещё показывал «Проверяем доступ…». Это отдельный FAIL,
+не прежний disabled group/select. Fixture теперь перед pagehide/pageshow явно
+выводит восстанавливаемую вкладку на передний план и проверяет visible — как при
+реальном возврате из истории. WebKit может приостанавливать фоновые страницы;
+синтетическое событие само вкладку не активирует. Timeout/очистка DOM/fresh me
+ожидания не ослаблены. При повторном FAIL печатаются visibility и timed API
+request/response/failure events без cookies/headers/паролей. Точный источник
+первоначальной задержки не установлен; первый FAIL не удалять из результата.
+
 ### Оставшиеся ограничения
 
 Android physical installation/relaunch и вся его матрица DEFERRED / NOT RUN
