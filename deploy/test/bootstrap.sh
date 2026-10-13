@@ -32,7 +32,6 @@ install -o root -g root -m 0600 "$source_dir/compose.yml" /srv/judeos-test/compo
 install -o root -g root -m 0600 "$source_dir/Caddyfile" /srv/judeos-test/Caddyfile
 install -o root -g root -m 0755 "$source_dir/admin.py" /usr/local/lib/judeos-deploy/admin.py
 install -o root -g root -m 0644 "$source_dir/operations.py" /usr/local/lib/judeos-deploy/operations.py
-install -o root -g root -m 0755 "$source_dir/offsite.py" /usr/local/lib/judeos-deploy/offsite.py
 install -o root -g root -m 0755 "$source_dir/controller.py" /usr/local/lib/judeos-deploy/controller.v1-19.py
 python3 -I /usr/local/lib/judeos-deploy/admin.py init-secrets
 echo 'Staged. Existing controller, authorized_keys, sudoers and firewall are unchanged.'

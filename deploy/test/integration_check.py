@@ -23,7 +23,6 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 import operations as ops
-import offsite
 
 
 def main():
@@ -204,27 +203,38 @@ def main():
                 assert compose(None, 'exec', '-T', 'db', 'psql', '-U', 'judeoslite', '-d', database, '-At', '-c', 'SELECT id FROM pride.deploy_probe').strip() == b'retained'
                 with tarfile.open(base / 'backups' / backup_name / 'uploads.tar') as archive:
                     assert archive.extractfile('uploads/probe.txt').read() == b'retained-file'
-                restic_binary = os.environ.get('RESTIC_TEST_BINARY') or shutil.which('restic')
-                if not restic_binary: raise RuntimeError('restic required for the encrypted repository recovery check.')
-                password_file = base / 'config' / 'restic-password'
-                password_file.write_text(secrets.token_urlsafe(32)); password_file.chmod(0o600)
-                # Only the test uses a local, disposable repository. This proves
-                # encryption/upload/download mechanics, not real offsite access.
-                offsite_config = {'repository': str(base / 'restic-repo'), 'password_file': str(password_file),
-                                  'environment': {}, 'retention': {'daily': 7, 'weekly': 4, 'monthly': 3}, 'local_keep': 7}
-                with patch.object(offsite, 'RESTIC', restic_binary), ops.lock():
-                    offsite.restic(offsite_config, 'init')
-                    offsite.backup_offsite(offsite_config)
-                    snapshot = ops.load('offsite')['snapshot']
-                    remote_db = offsite.restore_offsite(offsite_config, snapshot)
-                    assert ops.data_manifest(database=remote_db) == ops.data_manifest()
+                # Real archives exercise regular local backup/retention, not
+                # just a metadata mock. Older referenced copies remain usable.
+                copies = []
+                for index in range(10):
+                    copy = base / 'backups' / f'20200101T0000{index:02d}-aaaaaaaa'
+                    shutil.copytree(base / 'backups' / backup_name, copy)
+                    os.utime(copy / 'metadata.json', ns=(1_500_000_000_000_000_000 + index,)*2)
+                    copies.append(copy.name)
+                ops.save('operation', dict(ops.load('operation'), backup=copies[0]))
+                unknown = base / 'backups' / 'unfamiliar'; unknown.mkdir(); (unknown / 'keep').write_text('retain')
+                incomplete = base / 'backups' / '20200101T235959-bbbbbbbb'; incomplete.mkdir(); (incomplete / 'database.dump.partial').write_text('retain')
+                references = {(ops.load(name) or {}).get('backup') for name in ('current', 'previous', 'operation')}
+                with ops.lock(): regular_backup = ops.local_backup()
+                state = ops.load('local-backup')
+                assert state['phase'] == 'ready' and state['backup'] == regular_backup
+                assert state['retention']['keep_last'] == 7 and state['retention']['removed'] > 0
+                assert state['retention']['preserved_unknown'] == 2
+                remaining = {path.name for path in (base / 'backups').iterdir() if ops.completed_archive(path)}
+                assert 7 <= len(remaining) <= 7 + len(references)
+                assert references <= remaining and regular_backup in remaining
+                assert unknown.is_dir() and incomplete.is_dir()
+                with ops.lock():
+                    verified_db = ops.restore_check(regular_backup)
+                    assert ops.data_manifest(database=verified_db) == ops.data_manifest()
+                    ops.drop_restore_check(verified_db)
                 with ops.lock(): ops.rollback()
                 assert ops.load('accepted')['generation'] == 2
                 assert ops.load('current')['generation'] == 1
                 try: ops.admission(request, ops.load('accepted'))
                 except RuntimeError: pass
                 else: raise AssertionError('Stale deploy was admitted after manual rollback.')
-                print('PASS: disposable TLS/cookies, users/roster/schedule/journal/correction/report, DB+app restart and repeat deploy without duplicates, every restored row/file, encrypted local repository upload/download/restore, rollback and watermark. Real VPS/offsite/PWA acceptance is separate.')
+                print('PASS: disposable TLS/cookies, users/roster/schedule/journal/correction/report, DB+app restart and repeat deploy without duplicates, every restored row/file, regular local backup/retention/restore with referenced/incomplete/unknown preservation, rollback and watermark. Real VPS service/timer and physical PWA acceptance are separate.')
             finally:
                 # Destructive cleanup is limited to random disposable check volumes.
                 assert project.startswith('judeoslite-deploy-check-')

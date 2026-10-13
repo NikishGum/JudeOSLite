@@ -1,0 +1,12 @@
+# Owner-approved local policy, 13.10.2026; install explicitly on the VPS.
+[Unit]
+Description=Daily JudeOS local backup at 03:00 Europe/Minsk
+
+[Timer]
+OnCalendar=*-*-* 03:00:00 Europe/Minsk
+Persistent=true
+AccuracySec=1s
+Unit=judeos-backup.service
+
+[Install]
+WantedBy=timers.target

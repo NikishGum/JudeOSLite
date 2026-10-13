@@ -59,7 +59,4 @@ jobs:
       - name: Compose clean startup, migration rerun and restart
         run: bash deploy/check.sh judeoslite-ci
       - name: Disposable Caddy TLS, deploy persistence and backup restore
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y restic
-          python3 deploy/test/integration_check.py
+        run: python3 deploy/test/integration_check.py
