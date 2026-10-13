@@ -169,12 +169,9 @@ sha256sum deploy/test/admin.py deploy/test/operations.py
 if systemctl cat judeos-backup.timer >/dev/null 2>&1; then
   systemctl stop judeos-backup.timer
 fi
-if systemctl is-active --quiet judeos-backup.service; then
-  echo 'Backup service is active; wait for completion before installing.'
-  exit 1
-fi
-test -z "$(systemctl list-units --state=active,activating --no-legend 'judeos-test-deploy-*')"
+test -z "$(systemctl list-units --state=active,activating,deactivating,reloading --no-legend 'judeos-backup.service' 'judeos-test-deploy-*')"
 flock /srv/judeos-test/state/deploy.lock bash -euo pipefail <<'INSTALL'
+test -z "$(systemctl list-units --state=active,activating,deactivating,reloading --no-legend 'judeos-backup.service' 'judeos-test-deploy-*')"
 install -o root -g root -m 0755 deploy/test/admin.py /usr/local/lib/judeos-deploy/admin.py.new
 install -o root -g root -m 0644 deploy/test/operations.py /usr/local/lib/judeos-deploy/operations.py.new
 mv -T /usr/local/lib/judeos-deploy/operations.py.new /usr/local/lib/judeos-deploy/operations.py
@@ -210,6 +207,9 @@ Service oneshot после успеха обычно inactive/dead — это н
 новая копия важнее ActiveState. Первый start создаёт реальную копию сразу, не ждёт
 ближайшего 03:00. Persistent запускает пропущенный backup после возвращения VPS;
 при работающем deploy service ждёт общий lock. AccuracySec=1s, случайной задержки нет.
+Во время ExecStart oneshot обычно activating: это занятый worker, даже если
+systemctl is-active не вернул 0. Установка проверяет эти состояния и до, и после
+получения lock; если появился ожидающий worker, установка отказывает до записи файлов.
 
 ## Проверки реализации
 
