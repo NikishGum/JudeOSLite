@@ -292,7 +292,12 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 expect(registry).to_contain_text('Участник добавлен.')
                 registry.get_by_role('button', name='Закрыть карточку', exact=True).click()
             schedule = admin.locator('.schedule')
-            schedule.get_by_role('button', name='Обновить расписание', exact=True).click()
+            # Wait for the refresh initiated by this action before opening an
+            # editor; the old enabled button can precede the loading effect.
+            def schedule_read(response):
+                return response.request.method == 'GET' and response.url == ROOT+base+'/schedule' and response.status == 200
+            with admin.expect_response(schedule_read):
+                schedule.get_by_role('button', name='Обновить расписание', exact=True).click()
             today = datetime.now(ZoneInfo('Europe/Minsk')).date()
             tomorrow = today+timedelta(days=1)
             until = tomorrow+timedelta(days=8)
@@ -300,13 +305,13 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             for mode, hour in (('weekly', '18:00'), ('day_parity', '19:00'), ('date_list', '20:00'), ('once', '21:00')):
                 try:
                     schedule.get_by_role('button', name='Создать расписание', exact=True).click()
+                    schedule.get_by_label('Группа расписания', exact=True).select_option(group['id'])
+                    schedule.get_by_label('Тренер занятия', exact=True).select_option(trainer['id'])
+                    schedule.get_by_label('Режим расписания', exact=True).select_option(mode)
+                    schedule.get_by_label('Время начала', exact=True).fill(hour)
                 except Exception:
-                    diagnose_admin('create-schedule-'+mode)
+                    diagnose_admin('schedule-form-'+mode)
                     raise
-                schedule.get_by_label('Группа расписания', exact=True).select_option(group['id'])
-                schedule.get_by_label('Тренер занятия', exact=True).select_option(trainer['id'])
-                schedule.get_by_label('Режим расписания', exact=True).select_option(mode)
-                schedule.get_by_label('Время начала', exact=True).fill(hour)
                 if mode in ('weekly', 'day_parity'):
                     schedule.get_by_label('Начало действия', exact=True).fill(str(tomorrow))
                     schedule.get_by_label('Конец действия (не включён, необязательно)', exact=True).fill(str(until))
@@ -332,7 +337,8 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                     if request.method == 'POST' and request.url == ROOT+base+'/schedule':
                         calls.append(request.url)
                 admin.on('request', saved)
-                schedule.get_by_role('button', name='Подтвердить расписание', exact=True).evaluate('(b)=>{b.click();b.click()}')
+                with admin.expect_response(schedule_read):
+                    schedule.get_by_role('button', name='Подтвердить расписание', exact=True).evaluate('(b)=>{b.click();b.click()}')
                 expect(schedule.locator('.schedule-editor')).to_have_count(0)
                 admin.remove_listener('request', saved)
                 assert len(calls) == 1, (mode, calls)
@@ -534,13 +540,35 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             second.wait_for_function("document.visibilityState === 'visible'")
             second.get_by_label('Филиал', exact=True).select_option(club['id'])
             expect(second.locator('#registry-title')).to_be_visible()
+            # Snapshot a settled page, rather than its initial heading while all
+            # club reads are still starting. Keep the direct persisted-event
+            # contract in both engines, with the same restoration deadline.
+            second.wait_for_load_state('networkidle')
             second.evaluate("window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true}))")
             expect(second.locator('#registry-title')).to_have_count(0)
             second.evaluate("window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}))")
             try:
                 expect(second.locator('#registry-title')).to_be_visible()
             except Exception:
-                print(json.dumps({'engine': ENGINE, 'check': 'restored-page', 'url': second.url,
+                print(json.dumps({'engine': ENGINE, 'check': 'settled-persisted-page', 'url': second.url,
+                    'visibility': second.evaluate('document.visibilityState'),
+                    'api': second.pwa_api_events[-40:], 'body': second.locator('body').inner_text()[:6000], 'errors': errors}, ensure_ascii=False), flush=True)
+                raise
+            # Dispatched events do not perform a native document/history restore.
+            # Exercise an actual departure and return in both engines. The earlier WebKit
+            # synthetic-event stall remains recorded, without claiming its cause.
+            api_start = len(second.pwa_api_events)
+            second.goto(ROOT+'/api/readyz', wait_until='domcontentloaded')
+            second.go_back(wait_until='domcontentloaded')
+            try:
+                expect(second.locator('#registry-title')).to_be_visible()
+                expect(second.locator('.account')).to_contain_text('Synthetic Admin')
+                expect(second.locator('.owner-dashboard')).to_have_count(0)
+                restored_api = second.pwa_api_events[api_start:]
+                assert any(v['event'] == 'request' and v['path'] == '/api/auth/me' for v in restored_api), restored_api
+                assert any(v['event'] == 'response' and v['path'] == '/api/auth/me' and v['status'] == 200 for v in restored_api), restored_api
+            except Exception:
+                print(json.dumps({'engine': ENGINE, 'check': 'native-restored-page', 'url': second.url,
                     'visibility': second.evaluate('document.visibilityState'),
                     'api': second.pwa_api_events[-40:], 'body': second.locator('body').inner_text()[:6000], 'errors': errors}, ensure_ascii=False), flush=True)
                 raise
@@ -625,7 +653,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             assert not errors, errors
             owner_context.close()
             browser.close()
-        print(json.dumps({'engine': ENGINE, 'version': browser.version, 'scheduleCounts': schedule_counts, 'report': {'conducted': 1, 'present': 2, 'absent': 3, 'unknown': 2, 'illness': 0, 'excused': 1, 'percentage': 40}, 'checks': 'manifest/icons; admin UI/five participants/four schedules; cards/three reasons/defaults/correction/report; 320/390/1280; double tap/delay/offline/precommit error/lost response/idempotent retry/reload/closed/cancelled/role revoke; static-only cache/logout/account swap/expiry/pagehide; two builds/waiting/save guard/other-tab save', 'physicalInstallation': 'NOT TESTED'}, ensure_ascii=False))
+        print(json.dumps({'engine': ENGINE, 'version': browser.version, 'scheduleCounts': schedule_counts, 'report': {'conducted': 1, 'present': 2, 'absent': 3, 'unknown': 2, 'illness': 0, 'excused': 1, 'percentage': 40}, 'nativeHistoryReturn': 'fresh session and role verified; BFCache not measured', 'checks': 'manifest/icons; admin UI/five participants/four schedules; cards/three reasons/defaults/correction/report; 320/390/1280; double tap/delay/offline/precommit error/lost response/idempotent retry/reload/closed/cancelled/role revoke; static-only cache/logout/account swap/expiry/pagehide/native history return/fresh me; two builds/waiting/save guard/other-tab save', 'physicalInstallation': 'NOT TESTED'}, ensure_ascii=False))
     finally:
         subprocess.run(['docker', 'rm', '-f', APP, DB], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         subprocess.run(['docker', 'network', 'rm', NETWORK], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
