@@ -368,7 +368,7 @@
         "V1-16",
         "V1-17"
       ],
-      "body_sha256": "755e0aad1c809f5095dc70ee3edc998b4b249487cecf4f0de577eb753c05a720",
+      "body_sha256": "6d595f5dfbbbad6c8ddac6265f0d2471835a26545c4334cff0d78cac6a75a4ab",
       "title": "Приёмка первой версии и запуск с ручным вводом данных"
     },
     {
@@ -436,5 +436,15 @@
     "date": "2026-10-12",
     "source": "User request: create issue and implement audit history in current chat",
     "issue": 170
+  },
+  "acceptance_scope_update": {
+    "date": "2026-10-13",
+    "source": "Customer response in issue #166 chat: Нет, просто придумай вымышленное, и всё; prior instruction delegates HTTPS role walkthrough to the agent",
+    "issue": 166,
+    "previous_recorded_body_sha256": "755e0aad1c809f5095dc70ee3edc998b4b249487cecf4f0de577eb753c05a720",
+    "previous_live_body_sha256": "755e0aad1c809f5095dc70ee3edc998b4b249487cecf4f0de577eb753c05a720",
+    "body_readback_verified": true,
+    "dependencies_changed": false,
+    "accepted_scope": "Actual HTTPS control on separate fictional F1/F2 UI-created data and staff guide; real data, employee review/training and operational launch deferred; Android DEFERRED / NOT RUN"
   }
 }
