@@ -72,8 +72,10 @@ physicalInstallation=NOT TESTED. Снимки `/tmp/pwa161-{engine}-{screen}-{wi
 
 ## Ручной сценарий на настоящем HTTPS
 
-Владелец подтвердил 13.10.2026: проверит все четыре браузера. Модели, версии и
-результаты ещё не переданы. Пароли задавать/вводить в защищённой CRM, не в Git/чате.
+Получен локальный отчёт владельца от 13.10.2026 15:13 Europe/Minsk: реальные
+Chrome/Edge и iPhone проверены на 88edc2e, Android недоступен. Матрица и границы
+ниже; после исправления select/focus нужен короткий повтор на новой версии.
+Пароли задавать/вводить в защищённой CRM, не в Git/чате.
 Перед началом записать дату, устройство, ОС, полную версию браузера и
 `https://test.judopride.tech/release.json` → sha. При обновлении release между
 проверками записать оба SHA. Использовать только тестовые карточки в отдельной
@@ -144,13 +146,14 @@ physicalInstallation=NOT TESTED. Снимки `/tmp/pwa161-{engine}-{screen}-{wi
 
 ## Протокол результата
 
-Выполнено 13.10.2026 в Cloud: production frontend/TypeScript/Docker build;
+Первый Cloud-прогон 13.10.2026: production frontend/TypeScript/Docker build;
 Chromium 154.0.8037.57 и Playwright WebKit 26.5 — сквозной сценарий с реальными
 Go/PostgreSQL18.6, counts weekly/parity/date_list/once=2/4/2/1 и итогом 40%.
-Исправлены переносимые тестовые ожидания/interception/delayed-response, блокирующих
-продуктовых дефектов в покрытых сценариях не выявлено. Границы инъекции сбоев выше.
+Исправлены переносимые тестовые ожидания/interception/delayed-response, в первом
+Linux-прогоне продуктовых дефектов не выявлено. Границы инъекции сбоев выше.
 Итоговый повтор Chromium после последних изменений прошёл; CI/SHA/main
-фиксируются в live issue. Физическая установка/ручные результаты пока не получены.
+фиксируются в live issue. Последующая локальная проверка на Mac выявила D1–D3;
+успешный Linux CI не заменяет её результаты и Mac-повтор после исправлений.
 
 Публичный HTTPS a1b9e33: TLS verification, readyz=ok/release SHA, Chromium
 persistent profile login/secureContext/controller/installability/11 static-only
@@ -164,10 +167,78 @@ PASS означает выполненный шаг с ожидаемым рез
 
 | Проверка | Устройство / ОС / браузер | SHA / дата / исполнитель | Ввод, формы, размеры, панель, сеть, смена сотрудника | Установка | Повторный запуск / выход |
 | --- | --- | --- | --- | --- | --- |
-| iPhone / Safari | Ожидается | Ожидается | NOT RUN | NOT RUN | NOT RUN |
-| Android / Chrome | Ожидается | Ожидается | NOT RUN | NOT RUN | NOT RUN |
-| ПК / Chrome | Ожидается | Ожидается | NOT RUN | NOT RUN | NOT RUN |
-| ПК / Edge | Ожидается | Ожидается | NOT RUN | NOT RUN | NOT RUN |
+| iPhone / Safari | iPhone 13 / iOS 26.6.2 / UA Safari Version/26.6.1 | 88edc2e / 13.10.2026 / владелец + локальный агент | PASS перечисленных проверок форм; panel/safe area/keyboard/landscape и offline-before-save по наблюдению владельца; ограничения ниже | PASS: значок Home Screen, цель Web App обнаружена Inspector | PASS по наблюдению владельца: сессия сохраняется, после logout/relaunch вход без прежних карточек |
+| Android / Chrome | Устройство недоступно | 13.10.2026 / владелец | BLOCKED | BLOCKED | BLOCKED |
+| ПК / Chrome | MacBook Pro Mac17,9 arm64 / macOS 27.0.1 (26A434) / Chrome 154.0.8037.98 | 88edc2e / 13.10.2026 / локальный агент + владелец | PASS: полный UI-путь/40%, формы/сеть/focus/смена ролей, native narrow/wide без overflow | PASS: штатная установка .app, standalone=true | PASS: реальный relaunch/session/logout |
+| ПК / Edge | Тот же Mac / Edge 155.0.4283.45 | 88edc2e / 13.10.2026 / локальный агент + владелец | PASS: формы, панель/focus/offline, отмена/отзыв роли, смена сотрудника, native narrow/wide без overflow | PASS: штатная установка .app, standalone=true | PASS: реальный relaunch/session/logout |
+
+Источник — переданный владельцем **LOCAL-QA-164 REPORT, 13.10.2026 15:13
+Europe/Minsk**, дополненный его последними наблюдениями iPhone. Версии указаны
+как измеренные локальным агентом/владельцем; замороженный OS18_7 в iPhone UA не
+использован как версия ОС. Полные логи, профили и транскрипты в Git не копируются.
+
+### Что именно подтверждено на устройствах
+
+Chrome на настоящем HTTPS: admin создал trainer/группу/A–E/четыре режима
+(2/4/2/1), trainer сохранил причины/close defaults, admin исправил C; owner
+получил 1 closed/2 present/3 absent/unknown=2/illness=0/excused=1/40%.
+Double click дал один PUT, reload продолжил с E, offline-before-save не записал
+E. Edge: readonly cancellation с пятью unmarked, отзыв роли убрал DOM/дал 404;
+live write после отзыва не выполнен, отказ записи покрыт диагностическим E2E.
+
+Native desktop window минимум 500 px; реально проверены 500×480 и 1280×900,
+viewport 500×442/500×806 и 1280×862. Supplementary 320/390/844×390 не названы
+физическими телефонами. Safari на физическом iPhone: viewport 390×739/dpr3,
+поля date/contact save/readback, четыре формы, цели 44/45 px, без overflow;
+обычный select открывает нативное меню iOS и работает касанием.
+
+Home Screen PWA установлена и запущена владельцем; Inspector обнаружил отдельную
+Web App, но её console не принимает ввод. Поэтому численный standalone, focus
+и Cache Storage именно установленной iPhone PWA **не измерены**. Обычный Safari,
+Chrome/Edge: 11 cache entries только /assets, без API/карточек/контактов.
+Наблюдения владельца подтверждают real relaunch/session/logout, keyboard,
+landscape/back и доступную панель без перекрытия системной полосой. В landscape
+«Отмена» появляется при внутренней прокрутке — это предусмотрено overflow-y:auto.
+После отключения обеих сетей, попытки present и возврата сети/reload A остался
+unmarked. Точный текст сетевой ошибки и отсутствие transient success-message
+не записаны; цвет кнопки не использован как доказательство отметки.
+
+### Локальные дефекты и исправления
+
+На исходном 88edc2e Node24.19/frontend и arm64 production Docker прошли;
+неизменённый E2E **FAIL** на bundled Chromium151.0.7922.34, Chrome154.0.8037.98,
+Edge155.0.4283.45 (D1) и Mac Playwright WebKit26.5 (D2, затем D3 в диагностике).
+Диагностические копии с обходами не считаются PASS исходной регрессии.
+
+- **D1:** cache_check требовал один кеш до активации waiting B. Два versioned
+  static-only кеша в этот момент корректны. Регрессия теперь удерживает A
+  дополнительной вкладкой, проверяет точные кеши A/B до explicit update,
+  затем controller activation/reload и единственный B. Проверки приватности
+  сохраняются для обоих кешей.
+- **D2:** native appearance в Mac WebKit давал select 24 px. Select использует
+  appearance:none и стрелку в CSS с цветом PRIDE; настоящий HTML select,
+  подписи и нативный выбор опций сохраняются, применяется цель ≥44 px.
+- **D3:** нативный Tab от средней кнопки мог уходить на BODY. ActionSheet
+  явно переводит фокус при каждом Tab/Shift+Tab, включая heading/wrap/disabled;
+  Escape и возврат фокуса сохранены. E2E проверяет каждую кнопку в обоих направлениях.
+
+Исправления проходят Cloud/Linux регрессию и CI; **их результат на macOS ещё
+требует повторного запуска исходных тестов без диагностических обходов**.
+После обновления установленной PWA повторить select/date/contact, panel
+Tab/Shift+Tab/Escape на Mac и native select/panel/relaunch на iPhone. Старые
+physical PASS относятся к 88edc2e, не автоматически к изменённому CSS/focus.
+
+### Оставшиеся ограничения
+
+Android physical installation/relaunch и вся его матрица BLOCKED. Физический
+разрыв связи именно во время HTTPS save — NOT RUN; deterministic E2E before
+commit/lost response и physical offline-before-save записаны отдельно.
+Дополнительные iPhone landscape/system-text/admin-journal/owner-report проверки
+и аппаратный Tab не выполнены. Инструментальные safe-area inset/focus измерения
+не проведены; физическая доступность панели подтверждена наблюдением владельца.
+Синтетический QA164 филиал/группа/A–E на HTTPS сохранены: основной 21:00 closed,
+22:00 cancelled, 23:00 и 23:30 open; trainer-role восстановлена штатным owner UI.
+Пароли и browser profiles не запрашивать, рабочие карточки не изменять.
 
 Копируемая форма для каждого браузера:
 

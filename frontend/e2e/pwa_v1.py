@@ -156,7 +156,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                             rect = control.bounding_box()
                             assert rect['height'] >= 44 and rect['width'] >= 44, (role, width, control.outer_html() if hasattr(control, 'outer_html') else control.get_attribute('class'), rect)
                     value.screenshot(path=f'/tmp/pwa161-{ENGINE}-{role}-{width}.png')
-            def cache_check(value):
+            def cache_check(value, expected_names=None):
                 caches = value.evaluate('''async () => {
                   const result = [];
                   for (const name of await caches.keys()) {
@@ -169,7 +169,11 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                   return result;
                 }''')
                 assert caches and all(v['name'].startswith('pride-shell-') and v['path'].startswith('/assets/') for v in caches), caches
-                assert len({v['name'] for v in caches}) == 1, caches
+                names = {v['name'] for v in caches}
+                if expected_names is None:
+                    assert len(names) == 1, caches
+                else:
+                    assert names == expected_names, caches
                 assert not any(v['type'] and 'json' in v['type'] for v in caches), caches
                 assert all('Synthetic' not in v['text'] and 'csrfToken' not in v['text'] for v in caches)
                 return caches[0]['name']
@@ -317,9 +321,17 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             tp.get_by_role('button', name='Болезнь', exact=True).focus()
             assert tp.get_by_role('button', name='Болезнь', exact=True).evaluate('el=>el===document.activeElement')
             assert tp.evaluate('document.documentElement.scrollWidth <= innerWidth')
-            for _ in range(6):
+            # Every intermediate Tab must work even when macOS skips native buttons.
+            for name in ('Уважительная', 'Отмена', 'Неизвестна', 'Болезнь') * 2:
                 tp.keyboard.press('Tab')
-                assert tp.get_by_role('dialog').evaluate('d=>d.contains(document.activeElement)')
+                expect(tp.get_by_role('dialog').get_by_role('button', name=name, exact=True)).to_be_focused()
+            tp.get_by_role('dialog').locator('[data-initial-focus]').focus()
+            tp.keyboard.press('Tab')
+            expect(tp.get_by_role('button', name='Неизвестна', exact=True)).to_be_focused()
+            tp.get_by_role('dialog').locator('[data-initial-focus]').focus()
+            for name in ('Отмена', 'Уважительная', 'Болезнь', 'Неизвестна', 'Отмена'):
+                tp.keyboard.press('Shift+Tab')
+                expect(tp.get_by_role('dialog').get_by_role('button', name=name, exact=True)).to_be_focused()
             tp.get_by_role('dialog').screenshot(path=f'/tmp/pwa161-{ENGINE}-sheet-320x480.png')
             tp.keyboard.press('Escape')
             expect(tp.get_by_role('dialog')).to_have_count(0)
@@ -472,6 +484,12 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             second.evaluate("window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}))")
             expect(second.locator('#registry-title')).to_be_visible()
             # Explicit update cannot interrupt current response/body processing.
+            if ENGINE == 'chromium':
+                # Keep A alive in this separate context across later navigations.
+                # This reproduces macOS's legitimate waiting B + two static caches.
+                trainer_anchor = page(trainer_context)
+                trainer_anchor.goto(ROOT)
+                trainer_anchor.wait_for_function('navigator.serviceWorker.controller !== null')
             hold_response(admin, base+'/groups', 'POST')
             groups.get_by_role('button', name='Создать группу', exact=True).click()
             groups.get_by_label('Название группы', exact=True).fill('Synthetic update group')
@@ -503,7 +521,8 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             assert ' · B' not in second.title()
             release_response(second)
             expect(second.get_by_label('Название группы', exact=True)).to_have_count(0)
-            assert cache_check(admin) != cache_a
+            cache_b = cache_check(admin)
+            assert cache_b != cache_a
             # Expiration clears the journal; next employee cannot recover it via reload.
             sql(f"UPDATE pride.staff_sessions SET expires_at=now()-interval '1 second' WHERE staff_user_id='{trainer['id']}'")
             tp.get_by_role('button', name='Обновить журнал', exact=True).click()
@@ -513,7 +532,21 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             expect(tp.locator('.trainer-sessions')).to_have_count(0)
             tp.reload(); expect(tp.locator('.trainer-sessions')).to_have_count(0)
             if ENGINE == 'chromium':
-                cache_check(tp)
+                expect(tp.locator('.account')).to_contain_text('Synthetic Admin')
+                tp.evaluate('navigator.serviceWorker.getRegistration().then(r => r.update())')
+                expect(tp.get_by_role('button', name='Обновить приложение', exact=True)).to_be_visible(timeout=20_000)
+                assert tp.evaluate('navigator.serviceWorker.getRegistration().then(r => r.waiting?.state)') == 'installed'
+                # Both versions are allowed while B waits; privacy checks still apply.
+                cache_check(tp, expected_names={cache_a, cache_b})
+                # HTML can already have title B while controller A is still active.
+                # Wait for the actual reload, not just that already-visible title.
+                with tp.expect_event('load'):
+                    tp.get_by_role('button', name='Обновить приложение', exact=True).click()
+                expect(tp).to_have_title('PRIDE — рабочее пространство · B')
+                expect(tp.locator('.account')).to_contain_text('Synthetic Admin')
+                assert cache_check(tp) == cache_b
+                assert ' · B' not in trainer_anchor.title()
+                trainer_anchor.close()
             assert not errors, errors
             # Live role withdrawal rejects a save and removes the displayed snapshot.
             tp.get_by_role('button', name='Выйти', exact=True).click()
