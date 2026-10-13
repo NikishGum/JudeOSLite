@@ -2,7 +2,7 @@ import { useEffect, useId, useRef, type ReactNode } from 'react';
 
 type Props = { title: string; children: ReactNode; busy: boolean; onCancel: () => void; cancelLabel?: string };
 
-// Native modal dialog keeps keyboard focus inside and makes the page behind it inert.
+// Native dialog makes the background inert; Tab navigation is explicit.
 export function ActionSheet({ title, children, busy, onCancel, cancelLabel = 'Отмена' }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const titleId = useId();
@@ -22,11 +22,13 @@ export function ActionSheet({ title, children, busy, onCancel, cancelLabel = 'О
   return <dialog ref={dialog} className="attendance-sheet" aria-labelledby={titleId} aria-busy={busy}
     onKeyDown={(event) => {
       if (event.key !== 'Tab') return;
+      event.preventDefault();
       const buttons = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>('button:not(:disabled)'));
-      const first = buttons[0]; const last = buttons.at(-1);
-      if (!first) { event.preventDefault(); event.currentTarget.querySelector<HTMLElement>('[data-initial-focus]')?.focus(); }
-      else if (event.shiftKey && (document.activeElement === first || document.activeElement?.hasAttribute('data-initial-focus'))) { event.preventDefault(); last?.focus(); }
-      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      if (!buttons.length) { event.currentTarget.querySelector<HTMLElement>('[data-initial-focus]')?.focus(); return; }
+      const current = buttons.findIndex((button) => button === document.activeElement);
+      const next = current < 0 ? (event.shiftKey ? buttons.length - 1 : 0)
+        : (current + (event.shiftKey ? -1 : 1) + buttons.length) % buttons.length;
+      buttons[next].focus();
     }}
     onCancel={(event) => { event.preventDefault(); if (!busy) onCancel(); }}>
     <h4 id={titleId} tabIndex={-1} data-initial-focus>{title}</h4>
