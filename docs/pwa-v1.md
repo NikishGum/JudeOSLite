@@ -44,3 +44,11 @@ python3 frontend/e2e/pwa_v1.py
 Проверяются UI → API → PostgreSQL → UI: admin создаёт группу/тренера/участника с начальным составом и разовое расписание; trainer открывает настоящий снимок, повторяет неотправленную offline mark и закрывает; admin исправляет с причиной, owner видит исправленные SQL суммы. Все три роли/вход/формы/карточки/коррекция/таблица на 320/390/1280 без горизонтального overflow и JS errors, размеры целей; нижняя панель на 320×480, фокус и Escape без записи. Chromium DevTools проверяет manifest/installability и размеры иконок в обычном persistent profile; incognito намеренно не используется для installability. Проверены install prompt/standalone сигналы (эмуляция), публичная offline оболочка, отсутствие API fallback и личного кеша, logout/смена сотрудника в двух вкладках, expiry журнала и pagehide/pageshow. Две сборки: ожидание обновления, disabled при задержанном подтверждении записи, успешный reload/новая сессия/очистка старого кеша, сохранение другой вкладки во время activation. Снимки `/tmp/pwa161-{экран}-{320,390,1280}.png`.
 
 Go formatting/vet/build и полный PostgreSQL `go test -race ./...`, production Docker, Compose clean/rerun/restart/readiness/непубличная БД также проверяются. Итоговые SHA, CI, доставка в main и статус — в live issue. **Реальные iPhone/Safari, Android/Chrome, Chrome/Edge и установка на физические устройства остаются V1-16/#164; production HTTPS/предметное восстановление — V1-17/#165.** Chromium и имитация standalone не заменяют эту приёмку.
+
+13.10.2026 V1-16 расширяет тот же сценарий: пять карточек, все четыре режима,
+разрыв/потеря ответа/double tap/reload/отмена/отзыв роли и независимый итог
+2 present / 3 absent = 40% после коррекции. Добавлено исполнение на Playwright
+WebKit (`PWA_BROWSER=webkit`), CDP installability остаётся Chromium-проверкой.
+Команды, реальные результаты и отдельная матрица физических устройств —
+[docs/testing-v1.md](testing-v1.md). Серверная HTTPS/restore-приёмка #165 завершена;
+она не заменяет установку и запуск на устройствах #164.
