@@ -228,6 +228,15 @@ Edge155.0.4283.45 (D1) и Mac Playwright WebKit26.5 (D2, затем D3 в диа
 Tab/Shift+Tab/Escape на Mac и native select/panel/relaunch на iPhone. Старые
 physical PASS относятся к 88edc2e, не автоматически к изменённому CSS/focus.
 
+Первый main CI a358b87 (38400282537) прошёл Chromium, но остановился в WebKit
+на disabled выборе начальной группы. Последующий локальный прогон остановился
+на открытии формы расписания; следующий полный WebKit-прогон прошёл. Эти
+остановки не объявлены устранённым продуктовым дефектом без причины/повторения.
+При следующем таком FAIL скрипт выводит состояния loading/error/busy, disabled
+select/options и последние HTTP status/request failure для disposable admin UI.
+Проверка не ослаблена: нет force, автоматического retry или зачёта diagnostic
+обходов. Итоговый успешный CI нового SHA и первоначальный FAIL сохраняются в issue.
+
 ### Оставшиеся ограничения
 
 Android physical installation/relaunch и вся его матрица BLOCKED. Физический

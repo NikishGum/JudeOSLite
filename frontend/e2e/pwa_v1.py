@@ -217,6 +217,15 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             api(owner, 'POST', '/api/staff', {'login': 'admin', 'displayName': 'Synthetic Admin', 'password': PASSWORD, 'clubIds': [club['id']]})
             admin_context = browser.new_context(viewport={'width': 320, 'height': 900})
             admin = page(admin_context); signin(admin, 'admin')
+            api_events = []
+            admin.on('response', lambda response: api_events.append({'status': response.status, 'path': response.url.removeprefix(ROOT)}) if response.url.startswith(ROOT+'/api/') else None)
+            admin.on('requestfailed', lambda request: api_events.append({'failure': request.failure, 'path': request.url.removeprefix(ROOT)}) if request.url.startswith(ROOT+'/api/') else None)
+            def diagnose_admin(check):
+                print(json.dumps({'engine': ENGINE, 'check': check, 'url': admin.url, 'api': api_events[-30:], 'body': admin.locator('body').inner_text()[:6000], 'errors': errors}, ensure_ascii=False), flush=True)
+            group_reads = []
+            group_url = ROOT+base+'/groups?state=all'
+            admin.on('response', lambda response: group_reads.append({'status': response.status}) if response.url == group_url else None)
+            admin.on('requestfailed', lambda request: group_reads.append({'failure': request.failure}) if request.url == group_url else None)
             admin.get_by_label('Филиал', exact=True).select_option(club['id'])
             groups = admin.locator('.groups')
             groups.get_by_role('button', name='Создать группу', exact=True).click()
@@ -234,12 +243,27 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             expect(staff).to_contain_text('Тренер создан.')
             trainer = api(admin, 'GET', base+'/trainers?available=true')[0]
             registry = admin.locator('.registry').filter(has=admin.locator('#registry-title'))
+            def select_initial_group():
+                try:
+                    registry.get_by_label('Начальная группа (необязательно)', exact=True).select_option(group['id'])
+                except Exception:
+                    # This fixture uses only disposable synthetic data. Keep failure
+                    # evidence instead of silently retrying or forcing a disabled select.
+                    state = registry.evaluate('''el=>({
+                      alerts:[...el.querySelectorAll('[role="alert"]')].map(v=>v.textContent),
+                      statuses:[...el.querySelectorAll('[role="status"]')].map(v=>v.textContent),
+                      selects:[...el.querySelectorAll('select')].map(v=>({id:v.id,disabled:v.matches(':disabled'),options:v.options.length})),
+                      busy:el.querySelector('form[aria-busy="true"]')!==null
+                    })''')
+                    print(json.dumps({'engine': ENGINE, 'check': 'initial-group-load', 'groupReads': group_reads[-12:], 'ui': state}, ensure_ascii=False), flush=True)
+                    diagnose_admin('initial-group-load')
+                    raise
             registry.get_by_role('button', name='Добавить участника', exact=True).click()
             registry.get_by_label('ФИО участника', exact=True).fill('Synthetic Participant A')
             registry.get_by_label('Дата рождения', exact=True).fill('2010-01-01')
             registry.get_by_label('Дата вступления', exact=True).fill('2020-01-01')
             registry.get_by_label('Номер телефона', exact=True).fill('+375291234567')
-            registry.get_by_label('Начальная группа (необязательно)', exact=True).select_option(group['id'])
+            select_initial_group()
             registry.get_by_label('Дата включения в группу', exact=True).fill('2020-01-01')
             registry.get_by_role('button', name='Сохранить участника', exact=True).click()
             expect(registry).to_contain_text('Участник добавлен.')
@@ -252,7 +276,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 registry.get_by_label('Дата рождения', exact=True).fill('2010-01-01')
                 registry.get_by_label('Дата вступления', exact=True).fill('2020-01-01')
                 registry.get_by_label('Номер телефона', exact=True).fill('+375291234567')
-                registry.get_by_label('Начальная группа (необязательно)', exact=True).select_option(group['id'])
+                select_initial_group()
                 registry.get_by_label('Дата включения в группу', exact=True).fill('2020-01-01')
                 registry.get_by_role('button', name='Сохранить участника', exact=True).click()
                 expect(registry).to_contain_text('Участник добавлен.')
@@ -264,7 +288,11 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             until = tomorrow+timedelta(days=8)
             schedule_counts = {}
             for mode, hour in (('weekly', '18:00'), ('day_parity', '19:00'), ('date_list', '20:00'), ('once', '21:00')):
-                schedule.get_by_role('button', name='Создать расписание', exact=True).click()
+                try:
+                    schedule.get_by_role('button', name='Создать расписание', exact=True).click()
+                except Exception:
+                    diagnose_admin('create-schedule-'+mode)
+                    raise
                 schedule.get_by_label('Группа расписания', exact=True).select_option(group['id'])
                 schedule.get_by_label('Тренер занятия', exact=True).select_option(trainer['id'])
                 schedule.get_by_label('Режим расписания', exact=True).select_option(mode)
