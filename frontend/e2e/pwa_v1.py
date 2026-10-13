@@ -538,7 +538,10 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 assert tp.evaluate('navigator.serviceWorker.getRegistration().then(r => r.waiting?.state)') == 'installed'
                 # Both versions are allowed while B waits; privacy checks still apply.
                 cache_check(tp, expected_names={cache_a, cache_b})
-                tp.get_by_role('button', name='Обновить приложение', exact=True).click()
+                # HTML can already have title B while controller A is still active.
+                # Wait for the actual reload, not just that already-visible title.
+                with tp.expect_event('load'):
+                    tp.get_by_role('button', name='Обновить приложение', exact=True).click()
                 expect(tp).to_have_title('PRIDE — рабочее пространство · B')
                 expect(tp.locator('.account')).to_contain_text('Synthetic Admin')
                 assert cache_check(tp) == cache_b
