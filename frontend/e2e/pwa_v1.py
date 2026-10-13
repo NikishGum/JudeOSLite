@@ -1,4 +1,4 @@
-"""Disposable production Go/PostgreSQL/Chromium PWA regression; docs/pwa-v1.md."""
+"""Disposable UI -> Go -> PostgreSQL PWA/browser QA; docs/testing-v1.md."""
 import json
 import os
 from pathlib import Path
@@ -21,6 +21,8 @@ PREFIX = 'pwa161-' + uuid.uuid4().hex[:8]
 DB, APP, NETWORK = PREFIX+'-db', PREFIX+'-app', PREFIX+'-net'
 IMAGE = os.environ.get('PWA_TEST_IMAGE', 'judeoslite:ci')
 assert IMAGE.startswith('judeoslite:')
+ENGINE = os.environ.get('PWA_BROWSER', 'chromium')
+assert ENGINE in ('chromium', 'webkit')
 
 def command(*args, **kwargs):
     return subprocess.check_output(args, text=True, **kwargs).strip()
@@ -98,15 +100,17 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
         else:
             raise AssertionError(command('docker', 'logs', APP))
         with sync_playwright() as p:
-            path = os.environ.get('CHROMIUM_PATH') or ('/usr/bin/chromium' if Path('/usr/bin/chromium').exists() else None)
-            browser = p.chromium.launch(headless=True, executable_path=path)
+            path = (os.environ.get('CHROMIUM_PATH') or ('/usr/bin/chromium' if Path('/usr/bin/chromium').exists() else None)) if ENGINE == 'chromium' else None
+            browser_type = getattr(p, ENGINE)
+            browser = browser_type.launch(headless=True, executable_path=path)
             errors = []
             def page(context):
                 value = context.new_page()
                 value.on('pageerror', lambda error: errors.append(str(error)))
                 return value
-            def signin(value, login='owner'):
-                value.goto(ROOT)
+            def signin(value, login='owner', navigate=True):
+                if navigate:
+                    value.goto(ROOT)
                 value.get_by_label('Логин', exact=True).fill(login)
                 value.get_by_label('Пароль', exact=True).fill(PASSWORD)
                 value.get_by_role('button', name='Войти', exact=True).click()
@@ -119,6 +123,30 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 }''', [method, path, data])
                 assert result['status'] in (200, 201) and result['cache'] == 'no-store', result
                 return result['body']
+            def wait_for_route(value, intercepted):
+                # DOM busy state can precede delivery of the network callback in WebKit.
+                deadline = time.monotonic()+5
+                while not intercepted:
+                    assert time.monotonic() < deadline, 'Expected an intercepted request'
+                    value.wait_for_timeout(10)
+            def hold_response(value, target, method):
+                # Hold the actual server response before the API client can process it.
+                # Unlike routing, this also works with WebKit's controlled pages.
+                value.evaluate('''([target,method])=>{
+                  const original=window.fetch; window.pwaTestHeld=[];
+                  window.pwaTestRestore=()=>{window.fetch=original};
+                  window.fetch=async (...args)=>{
+                    const response=await original(...args);
+                    const url=new URL(typeof args[0]==='string'?args[0]:args[0].url,location.href);
+                    if(url.pathname===target && (args[1]?.method||'GET')===method)
+                      await new Promise(resolve=>window.pwaTestHeld.push(resolve));
+                    return response;
+                  };
+                }''', [target, method])
+            def wait_for_response(value):
+                value.wait_for_function('window.pwaTestHeld.length === 1')
+            def release_response(value):
+                value.evaluate('window.pwaTestRestore();window.pwaTestHeld.forEach(resolve=>resolve());delete window.pwaTestHeld;delete window.pwaTestRestore')
             def dimensions(value, role):
                 for width in (320, 390, 1280):
                     value.set_viewport_size({'width': width, 'height': 900})
@@ -127,7 +155,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                         if control.get_attribute('type') not in ('checkbox', 'radio'):
                             rect = control.bounding_box()
                             assert rect['height'] >= 44 and rect['width'] >= 44, (role, width, control.outer_html() if hasattr(control, 'outer_html') else control.get_attribute('class'), rect)
-                    value.screenshot(path=f'/tmp/pwa161-{role}-{width}.png')
+                    value.screenshot(path=f'/tmp/pwa161-{ENGINE}-{role}-{width}.png')
             def cache_check(value):
                 caches = value.evaluate('''async () => {
                   const result = [];
@@ -145,7 +173,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 assert not any(v['type'] and 'json' in v['type'] for v in caches), caches
                 assert all('Synthetic' not in v['text'] and 'csrfToken' not in v['text'] for v in caches)
                 return caches[0]['name']
-            owner_context = p.chromium.launch_persistent_context(str(temp/'profile'), headless=True, executable_path=path, viewport={'width': 320, 'height': 900})
+            owner_context = browser_type.launch_persistent_context(str(temp/'profile'), headless=True, executable_path=path, viewport={'width': 320, 'height': 900})
             owner = page(owner_context)
             owner.goto(ROOT)
             expect(owner.get_by_role('heading', name='Вход для сотрудников')).to_be_visible()
@@ -156,16 +184,17 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             owner.locator('.install-help summary').click()
             signin(owner)
             owner.wait_for_function('navigator.serviceWorker.controller !== null')
-            cdp = owner_context.new_cdp_session(owner)
-            manifest = cdp.send('Page.getAppManifest')
-            assert not manifest.get('errors'), manifest
-            parsed = json.loads(manifest['data'])
+            parsed = owner.evaluate("fetch('/manifest.webmanifest').then(r=>r.json())")
             assert parsed['display'] == 'standalone' and parsed['start_url'] == '/' and parsed['scope'] == '/'
             for icon in parsed['icons']:
                 size = int(icon['sizes'].split('x')[0])
                 assert owner.evaluate('''async ([src,size])=>{const img=new Image();img.src=src;await img.decode();return img.naturalWidth===size&&img.naturalHeight===size;}''', [icon['src'], size])
-            installability = cdp.send('Page.getInstallabilityErrors')['installabilityErrors']
-            assert not installability, installability
+            if ENGINE == 'chromium':
+                cdp = owner_context.new_cdp_session(owner)
+                manifest = cdp.send('Page.getAppManifest')
+                assert not manifest.get('errors'), manifest
+                installability = cdp.send('Page.getInstallabilityErrors')['installabilityErrors']
+                assert not installability, installability
             # Browser signals/standalone UI, distinct from real-device installation.
             owner.evaluate("const event=new Event('beforeinstallprompt',{cancelable:true});event.prompt=async()=>{};event.userChoice=Promise.resolve({outcome:'dismissed'});window.dispatchEvent(event)")
             owner.locator('.install-help summary').click()
@@ -202,7 +231,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             trainer = api(admin, 'GET', base+'/trainers?available=true')[0]
             registry = admin.locator('.registry').filter(has=admin.locator('#registry-title'))
             registry.get_by_role('button', name='Добавить участника', exact=True).click()
-            registry.get_by_label('ФИО участника', exact=True).fill('Synthetic PWA Participant')
+            registry.get_by_label('ФИО участника', exact=True).fill('Synthetic Participant A')
             registry.get_by_label('Дата рождения', exact=True).fill('2010-01-01')
             registry.get_by_label('Дата вступления', exact=True).fill('2020-01-01')
             registry.get_by_label('Номер телефона', exact=True).fill('+375291234567')
@@ -212,29 +241,75 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             expect(registry).to_contain_text('Участник добавлен.')
             dimensions(admin, 'admin-card')
             registry.get_by_role('button', name='Закрыть карточку', exact=True).click()
+            # Five synthetic cards, all entered by the administrator through UI.
+            for letter in 'BCDE':
+                registry.get_by_role('button', name='Добавить участника', exact=True).click()
+                registry.get_by_label('ФИО участника', exact=True).fill('Synthetic Participant '+letter)
+                registry.get_by_label('Дата рождения', exact=True).fill('2010-01-01')
+                registry.get_by_label('Дата вступления', exact=True).fill('2020-01-01')
+                registry.get_by_label('Номер телефона', exact=True).fill('+375291234567')
+                registry.get_by_label('Начальная группа (необязательно)', exact=True).select_option(group['id'])
+                registry.get_by_label('Дата включения в группу', exact=True).fill('2020-01-01')
+                registry.get_by_role('button', name='Сохранить участника', exact=True).click()
+                expect(registry).to_contain_text('Участник добавлен.')
+                registry.get_by_role('button', name='Закрыть карточку', exact=True).click()
             schedule = admin.locator('.schedule')
             schedule.get_by_role('button', name='Обновить расписание', exact=True).click()
-            schedule.get_by_role('button', name='Создать расписание', exact=True).click()
-            schedule.get_by_label('Группа расписания', exact=True).select_option(group['id'])
-            schedule.get_by_label('Тренер занятия', exact=True).select_option(trainer['id'])
-            schedule.get_by_label('Режим расписания', exact=True).select_option('once')
             today = datetime.now(ZoneInfo('Europe/Minsk')).date()
-            tomorrow = str(today+timedelta(days=1))
-            schedule.get_by_label('Дата в календаре', exact=True).fill(tomorrow)
-            schedule.get_by_role('button', name='Выбрать дату', exact=True).click()
-            schedule.get_by_role('button', name='Показать предпросмотр', exact=True).click()
-            expect(schedule.locator('.schedule-preview')).to_be_visible()
-            dimensions(admin, 'admin-schedule')
-            schedule.get_by_role('button', name='Подтвердить расписание', exact=True).click()
-            expect(schedule).to_contain_text('Расписание сохранено.')
+            tomorrow = today+timedelta(days=1)
+            until = tomorrow+timedelta(days=8)
+            schedule_counts = {}
+            for mode, hour in (('weekly', '18:00'), ('day_parity', '19:00'), ('date_list', '20:00'), ('once', '21:00')):
+                schedule.get_by_role('button', name='Создать расписание', exact=True).click()
+                schedule.get_by_label('Группа расписания', exact=True).select_option(group['id'])
+                schedule.get_by_label('Тренер занятия', exact=True).select_option(trainer['id'])
+                schedule.get_by_label('Режим расписания', exact=True).select_option(mode)
+                schedule.get_by_label('Время начала', exact=True).fill(hour)
+                if mode in ('weekly', 'day_parity'):
+                    schedule.get_by_label('Начало действия', exact=True).fill(str(tomorrow))
+                    schedule.get_by_label('Конец действия (не включён, необязательно)', exact=True).fill(str(until))
+                    if mode == 'weekly':
+                        for i, label in enumerate(('Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс')):
+                            schedule.get_by_label(label, exact=True).set_checked(i == tomorrow.weekday())
+                        expected_dates = [str(tomorrow), str(tomorrow+timedelta(days=7))]
+                    else:
+                        schedule.get_by_label('Чётность числа месяца', exact=True).select_option('odd')
+                        expected_dates = [str(tomorrow+timedelta(days=i)) for i in range(8) if (tomorrow+timedelta(days=i)).day % 2]
+                else:
+                    expected_dates = [str(tomorrow)] if mode == 'once' else [str(tomorrow), str(tomorrow+timedelta(days=3))]
+                    for picked in expected_dates:
+                        schedule.get_by_label('Дата в календаре', exact=True).fill(picked)
+                        schedule.get_by_role('button', name='Выбрать дату', exact=True).click()
+                schedule.get_by_role('button', name='Показать предпросмотр', exact=True).click()
+                expect(schedule.locator('.schedule-preview')).to_be_visible()
+                preview = schedule.locator('.schedule-preview .schedule-dates li').all_text_contents()
+                assert [v.split(' · ')[0] for v in preview] == ['.'.join(reversed(d.split('-'))) for d in expected_dates], (mode, preview, expected_dates)
+                dimensions(admin, 'admin-schedule-'+mode)
+                calls = []
+                def saved(request):
+                    if request.method == 'POST' and request.url == ROOT+base+'/schedule':
+                        calls.append(request.url)
+                admin.on('request', saved)
+                schedule.get_by_role('button', name='Подтвердить расписание', exact=True).evaluate('(b)=>{b.click();b.click()}')
+                expect(schedule.locator('.schedule-editor')).to_have_count(0)
+                admin.remove_listener('request', saved)
+                assert len(calls) == 1, (mode, calls)
+                sessions = api(admin, 'GET', base+'/schedule/sessions?from='+str(tomorrow)+'&until='+str(until))
+                actual = [s for s in sessions if s['startsAt'][11:16] == f'{int(hour[:2])-3:02d}:00']
+                assert [s['date'] for s in actual] == expected_dates, (mode, actual, expected_dates)
+                assert all((s['ruleId'] is None) == (mode == 'once') for s in actual)
+                schedule_counts[mode] = len(actual)
             # Historical synthetic session allows opening regardless of time of CI run.
             sid = sql(f"INSERT INTO pride.training_sessions(club_id,group_id,trainer_id,starts_on,timezone,starts_at,ends_at) VALUES('{club['id']}','{group['id']}','{trainer['id']}','{today}','Europe/Minsk','{today} 09:00+03','{today} 10:00+03') RETURNING id").splitlines()[0]
-            trainer_context = browser.new_context(viewport={'width': 390, 'height': 844})
+            # Playwright WebKit cannot route fetches from SW-controlled pages.
+            # Network fault injection uses a separate context without a worker;
+            # owner/admin contexts exercise the real worker/cache/update behavior.
+            trainer_context = browser.new_context(viewport={'width': 390, 'height': 844}, has_touch=True, service_workers='block' if ENGINE == 'webkit' else 'allow')
             tp = page(trainer_context); signin(tp, 'trainer')
             tp.get_by_label('Филиал', exact=True).select_option(club['id'])
             tp.get_by_role('button', name='Открыть журнал', exact=True).click()
             tp.get_by_role('button', name='Подтвердить открытие журнала', exact=True).click()
-            expect(tp.locator('.attendance-card')).to_contain_text('Synthetic PWA Participant')
+            expect(tp.locator('.attendance-card')).to_contain_text('Synthetic Participant A')
             dimensions(tp, 'trainer-card')
             tp.set_viewport_size({'width': 320, 'height': 480})
             tp.get_by_role('button', name='Отсутствует', exact=True).click()
@@ -242,7 +317,10 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             tp.get_by_role('button', name='Болезнь', exact=True).focus()
             assert tp.get_by_role('button', name='Болезнь', exact=True).evaluate('el=>el===document.activeElement')
             assert tp.evaluate('document.documentElement.scrollWidth <= innerWidth')
-            tp.get_by_role('dialog').screenshot(path='/tmp/pwa161-sheet-320x480.png')
+            for _ in range(6):
+                tp.keyboard.press('Tab')
+                assert tp.get_by_role('dialog').evaluate('d=>d.contains(document.activeElement)')
+            tp.get_by_role('dialog').screenshot(path=f'/tmp/pwa161-{ENGINE}-sheet-320x480.png')
             tp.keyboard.press('Escape')
             expect(tp.get_by_role('dialog')).to_have_count(0)
             # Offline never sends a mutation or advances the card.
@@ -252,17 +330,58 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             expect(tp.locator('.session-journal [role="alert"]')).to_contain_text('Изменение не отправлено')
             assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{sid}' AND state IS NOT NULL") == '0'
             trainer_context.set_offline(False)
-            tp.get_by_role('button', name='Повторить сохранение присутствия', exact=True).click()
+            held_mark = []
+            tp.route('**/journal/records/*', lambda route: held_mark.append(route))
+            tp.get_by_role('button', name='Повторить сохранение присутствия', exact=True).evaluate('(b)=>{b.click();b.click()}')
+            expect(tp.get_by_role('button', name='Сохраняем…', exact=True)).to_be_disabled()
+            wait_for_route(tp, held_mark)
+            assert len(held_mark) == 1
+            assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{sid}' AND state IS NOT NULL") == '0'
+            held_mark[0].continue_()
+            tp.unroute('**/journal/records/*')
+            expect(tp.locator('.attendance-card')).to_contain_text('Synthetic Participant B')
+            # Failed request before commit, then lost response after a real commit.
+            tp.get_by_role('button', name='Отсутствует', exact=True).tap()
+            tp.route('**/journal/records/*', lambda route: route.abort())
+            tp.get_by_role('button', name='Неизвестна', exact=True).tap()
+            expect(tp.get_by_role('dialog').get_by_role('alert')).to_contain_text('Нет соединения')
+            assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{sid}' AND state IS NOT NULL") == '1'
+            tp.unroute('**/journal/records/*')
+            def lost_response(route):
+                response = route.fetch()
+                assert response.ok
+                route.abort()
+            tp.route('**/journal/records/*', lost_response)
+            tp.get_by_role('button', name='Повторить сохранение: Неизвестна', exact=True).tap()
+            expect(tp.get_by_role('dialog').get_by_role('alert')).to_contain_text('Нет соединения')
+            expect(tp.locator('.attendance-card')).to_contain_text('Synthetic Participant B')
+            assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{sid}' AND state IS NOT NULL") == '2'
+            audit_count = sql(f"SELECT count(*) FROM pride.audit_events WHERE entity_type='attendance_record' AND after_state->>'sessionId'='{sid}'")
+            tp.unroute('**/journal/records/*')
+            tp.get_by_role('button', name='Повторить сохранение: Неизвестна', exact=True).evaluate('(b)=>{b.click();b.click()}')
+            expect(tp.locator('.attendance-card')).to_contain_text('Synthetic Participant C')
+            assert sql(f"SELECT count(*) FROM pride.audit_events WHERE entity_type='attendance_record' AND after_state->>'sessionId'='{sid}'") == audit_count
+            for reason, next_name in (('Болезнь', 'Synthetic Participant D'), ('Уважительная', 'Synthetic Participant E')):
+                tp.get_by_role('button', name='Отсутствует', exact=True).tap()
+                tp.get_by_role('button', name=reason, exact=True).tap()
+                expect(tp.locator('.attendance-card')).to_contain_text(next_name)
+            tp.reload()
+            tp.get_by_role('button', name='Посмотреть журнал', exact=True).click()
+            expect(tp.locator('.attendance-card')).to_contain_text('Synthetic Participant E')
+            tp.get_by_role('button', name='К сводке и предыдущим отметкам', exact=True).click()
             expect(tp.get_by_role('heading', name='Сводка посещаемости')).to_be_visible()
             tp.get_by_role('button', name='Завершить журнал', exact=True).click()
             tp.get_by_role('button', name='Подтвердить завершение', exact=True).click()
             expect(tp.locator('.session-journal')).to_contain_text('Завершено')
             assert sql(f"SELECT status FROM pride.training_sessions WHERE id='{sid}'") == 'closed'
+            assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{sid}' AND origin='close_default' AND absence_reason='unknown'") == '1'
+            expect(tp.locator('.attendance-card')).to_have_count(0)
             journals = admin.locator('.admin-journals')
             journals.get_by_role('button', name='Обновить журналы', exact=True).click()
             journals.locator('[data-session-id="'+sid+'"]').get_by_role('button', name='Посмотреть журнал филиала', exact=True).click()
-            journals.get_by_role('button', name='Исправить отметку', exact=True).click()
-            journals.get_by_label('Новая отметка', exact=True).select_option('illness')
+            # Correct the manually marked illness; independent ledger becomes 2/5=40%.
+            journals.get_by_role('button', name='Исправить отметку', exact=True).nth(2).click()
+            journals.get_by_label('Новая отметка', exact=True).select_option('present')
             journals.get_by_label('Причина исправления', exact=True).fill('Synthetic PWA correction')
             dimensions(admin, 'admin-correction')
             journals.get_by_role('button', name='Сохранить исправление', exact=True).click()
@@ -270,40 +389,77 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             owner.reload()
             owner.get_by_label('Филиал отчёта', exact=True).select_option(club['id'])
             owner.get_by_role('button', name='Обновить статистику', exact=True).click()
-            expect(owner.locator('[data-metric="absent"]')).to_have_text('1')
-            expect(owner.locator('[data-metric="percentage"]')).to_have_text('0,0%')
+            expect(owner.locator('[data-metric="closed"]')).to_have_text('1')
+            expect(owner.locator('[data-metric="present"]')).to_have_text('2')
+            expect(owner.locator('[data-metric="absent"]')).to_have_text('3')
+            expect(owner.locator('[data-metric="percentage"]')).to_have_text('40,0%')
+            expect(owner.locator('[data-metric="reasons"]')).to_have_text('Причины пропусков: неизвестна — 2; болезнь — 0; уважительная — 1.')
+            assert sql(f"SELECT count(*) FILTER (WHERE state='present') || '|' || count(*) FILTER (WHERE state='absent') || '|' || count(*) FILTER (WHERE absence_reason='unknown') || '|' || count(*) FILTER (WHERE absence_reason='illness') || '|' || count(*) FILTER (WHERE absence_reason='excused') FROM pride.attendance_records WHERE training_session_id='{sid}'") == '2|3|2|0|1'
             dimensions(owner, 'owner-report')
+            # Real cancellation keeps an open snapshot unmarked and read-only.
+            cancelled_id = sql(f"INSERT INTO pride.training_sessions(club_id,group_id,trainer_id,starts_on,timezone,starts_at,ends_at) VALUES('{club['id']}','{group['id']}','{trainer['id']}','{today}','Europe/Minsk','{today} 11:00+03','{today} 12:00+03') RETURNING id").splitlines()[0]
+            tp.reload()
+            tp.locator('.trainer-session-list li').filter(has_text='11:00').get_by_role('button', name='Открыть журнал', exact=True).click()
+            tp.get_by_role('button', name='Подтвердить открытие журнала', exact=True).click()
+            expect(tp.locator('.attendance-card')).to_contain_text('Synthetic Participant A')
+            current = api(tp, 'GET', base+'/trainer-sessions/'+cancelled_id+'/journal')
+            api(admin, 'POST', base+'/sessions/'+cancelled_id+'/cancel', {'version': current['session']['version'], 'confirmOpen': True, 'reason': 'Synthetic browser cancellation'})
+            tp.get_by_role('button', name='Присутствует', exact=True).click()
+            expect(tp.locator('.session-journal [role="alert"]')).to_contain_text('Журнал недоступен')
+            tp.get_by_role('button', name='Загрузить актуальный журнал и сбросить ввод', exact=True).click()
+            expect(tp.locator('.session-journal')).to_contain_text('Занятие отменено')
+            expect(tp.locator('.attendance-card')).to_have_count(0)
+            assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{cancelled_id}' AND state IS NULL") == '5'
             cache_a = cache_check(owner)
-            cache_check(admin); cache_check(tp)
+            cache_check(admin)
+            if ENGINE == 'chromium':
+                cache_check(tp)
             # An API navigation must not receive the shell when offline.
             offline = page(owner_context)
-            owner_context.set_offline(True)
-            owner.reload()
-            expect(owner.get_by_role('heading', name='Вход для сотрудников')).to_be_visible()
-            expect(owner.locator('.owner-dashboard')).to_have_count(0)
-            expect(owner.locator('.pwa-status [role="alert"]')).to_contain_text('Нет сети')
+            if ENGINE == 'chromium':
+                owner_context.set_offline(True)
+            else:
+                # WebKit's set_offline fails navigation before dispatching the SW.
+                # A real disposable server outage exercises fetch rejection/fallback.
+                command('docker', 'stop', APP)
             try:
-                response = offline.goto(ROOT+'/api/auth/me')
-                assert response and 'text/html' not in response.headers.get('content-type', '')
-            except Exception as cause:
-                assert 'net::ERR_' in str(cause), cause
-            owner_context.set_offline(False)
+                owner.reload()
+                expect(owner.get_by_role('heading', name='Вход для сотрудников')).to_be_visible()
+                expect(owner.locator('.owner-dashboard')).to_have_count(0)
+                expect(owner.locator('.pwa-status [role="alert"]')).to_contain_text('Нет сети')
+                try:
+                    response = offline.goto(ROOT+'/api/auth/me')
+                    assert response and 'text/html' not in response.headers.get('content-type', '')
+                except Exception as cause:
+                    assert any(message in str(cause) for message in ('net::ERR_', 'WebKit encountered an internal error', 'cancelled', 'Could not connect', 'Internet connection')), cause
+            finally:
+                if ENGINE == 'chromium':
+                    owner_context.set_offline(False)
+                else:
+                    command('docker', 'start', APP)
+                    for _ in range(30):
+                        try:
+                            with urllib.request.urlopen(ROOT+'/api/readyz', timeout=1) as response:
+                                if response.status == 200:
+                                    break
+                        except OSError:
+                            pass
+                        time.sleep(.1)
+                    else:
+                        raise AssertionError('App did not recover after disposable outage')
             owner.get_by_role('button', name='Проверить подключение и доступ', exact=True).click()
             expect(owner.locator('.owner-dashboard')).to_be_visible()
             # Two tabs share cookies: logout/login invalidates personal DOM immediately.
             second = page(owner_context); second.goto(ROOT+'/clubs/'+club['id'])
             expect(second.locator('.owner-dashboard')).to_be_visible()
-            late_report = []
-            owner.route('**/api/reports/attendance?*', lambda route: late_report.append((route, route.fetch())))
+            hold_response(owner, '/api/reports/attendance', 'GET')
             owner.get_by_role('button', name='Обновить статистику', exact=True).click()
-            owner.wait_for_timeout(200); assert late_report
+            wait_for_response(owner)
             owner.get_by_role('button', name='Выйти', exact=True).click()
             expect(second.get_by_label('Логин', exact=True)).to_be_visible()
             expect(second.locator('.owner-dashboard')).to_have_count(0)
-            signin(owner, 'admin')
-            for route, response in late_report:
-                route.fulfill(response=response)
-            owner.unroute('**/api/reports/attendance?*')
+            signin(owner, 'admin', navigate=False)
+            release_response(owner)
             expect(owner.locator('.owner-dashboard')).to_have_count(0)
             expect(owner.locator('.account')).to_contain_text('Synthetic Admin')
             expect(second.locator('.account')).to_contain_text('Synthetic Admin')
@@ -316,18 +472,12 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             second.evaluate("window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}))")
             expect(second.locator('#registry-title')).to_be_visible()
             # Explicit update cannot interrupt current response/body processing.
-            held = []
-            def hold(route):
-                if route.request.method == 'POST':
-                    held.append((route, route.fetch()))
-                else:
-                    route.continue_()
-            admin.route('**/api/clubs/'+club['id']+'/groups', hold)
+            hold_response(admin, base+'/groups', 'POST')
             groups.get_by_role('button', name='Создать группу', exact=True).click()
             groups.get_by_label('Название группы', exact=True).fill('Synthetic update group')
             groups.get_by_role('button', name='Сохранить группу', exact=True).click()
-            admin.wait_for_timeout(200)
-            assert held
+            wait_for_response(admin)
+            assert sql(f"SELECT count(*) FROM pride.training_groups WHERE club_id='{club['id']}' AND name='Synthetic update group'") == '1'
             for path in (source/'dist').rglob('*'):
                 if path.is_file():
                     target = static/path.relative_to(source/'dist'); target.parent.mkdir(parents=True, exist_ok=True)
@@ -338,23 +488,20 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             expect(admin.get_by_role('button', name='Обновить приложение', exact=True)).to_be_visible(timeout=20_000)
             expect(admin.get_by_role('button', name='Обновить приложение', exact=True)).to_be_disabled()
             assert ' · B' not in admin.title()
-            for route, response in held:
-                route.fulfill(response=response)
+            release_response(admin)
             expect(groups.get_by_label('Название группы', exact=True)).to_have_count(0)
             expect(admin.get_by_role('button', name='Обновить приложение', exact=True)).to_be_enabled()
             # Another tab has an outstanding save: activating B must not reload it.
-            held_second = []
-            second.route('**/api/clubs/'+club['id']+'/groups', lambda route: held_second.append((route, route.fetch())) if route.request.method == 'POST' else route.continue_())
+            hold_response(second, base+'/groups', 'POST')
             second.locator('.groups').get_by_role('button', name='Создать группу', exact=True).click()
             second.get_by_label('Название группы', exact=True).fill('Synthetic other tab save')
             second.get_by_role('button', name='Сохранить группу', exact=True).click()
-            second.wait_for_timeout(200); assert held_second
+            wait_for_response(second)
             admin.get_by_role('button', name='Обновить приложение', exact=True).click()
             expect(admin).to_have_title('PRIDE — рабочее пространство · B')
             expect(admin.locator('.account')).to_contain_text('Synthetic Admin')
             assert ' · B' not in second.title()
-            for route, response in held_second:
-                route.fulfill(response=response)
+            release_response(second)
             expect(second.get_by_label('Название группы', exact=True)).to_have_count(0)
             assert cache_check(admin) != cache_a
             # Expiration clears the journal; next employee cannot recover it via reload.
@@ -365,11 +512,26 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             signin(tp, 'admin')
             expect(tp.locator('.trainer-sessions')).to_have_count(0)
             tp.reload(); expect(tp.locator('.trainer-sessions')).to_have_count(0)
-            cache_check(tp)
+            if ENGINE == 'chromium':
+                cache_check(tp)
+            assert not errors, errors
+            # Live role withdrawal rejects a save and removes the displayed snapshot.
+            tp.get_by_role('button', name='Выйти', exact=True).click()
+            revoked_id = sql(f"INSERT INTO pride.training_sessions(club_id,group_id,trainer_id,starts_on,timezone,starts_at,ends_at) VALUES('{club['id']}','{group['id']}','{trainer['id']}','{today}','Europe/Minsk','{today} 13:00+03','{today} 14:00+03') RETURNING id").splitlines()[0]
+            signin(tp, 'trainer')
+            tp.get_by_label('Филиал', exact=True).select_option(club['id'])
+            tp.locator('.trainer-session-list li').filter(has_text='13:00').get_by_role('button', name='Открыть журнал', exact=True).click()
+            tp.get_by_role('button', name='Подтвердить открытие журнала', exact=True).click()
+            expect(tp.locator('.attendance-card')).to_contain_text('Synthetic Participant A')
+            sql(f"DELETE FROM pride.staff_club_roles WHERE club_id='{club['id']}' AND staff_user_id='{trainer['id']}' AND role='trainer'")
+            tp.get_by_role('button', name='Присутствует', exact=True).click()
+            expect(tp.locator('.session-journal')).to_contain_text('Доступ к журналу отозван')
+            expect(tp.locator('.attendance-card')).to_have_count(0)
+            assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{revoked_id}' AND state IS NOT NULL") == '0'
             assert not errors, errors
             owner_context.close()
             browser.close()
-        print('PWA: manifest/installability/icons; three roles UI→API→PostgreSQL; 320/390/1280; offline/no false save; static-only cache; logout/account swap/expiry/pagehide; two builds/waiting/save guard/other-tab save passed')
+        print(json.dumps({'engine': ENGINE, 'version': browser.version, 'scheduleCounts': schedule_counts, 'report': {'conducted': 1, 'present': 2, 'absent': 3, 'unknown': 2, 'illness': 0, 'excused': 1, 'percentage': 40}, 'checks': 'manifest/icons; admin UI/five participants/four schedules; cards/three reasons/defaults/correction/report; 320/390/1280; double tap/delay/offline/precommit error/lost response/idempotent retry/reload/closed/cancelled/role revoke; static-only cache/logout/account swap/expiry/pagehide; two builds/waiting/save guard/other-tab save', 'physicalInstallation': 'NOT TESTED'}, ensure_ascii=False))
     finally:
         subprocess.run(['docker', 'rm', '-f', APP, DB], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         subprocess.run(['docker', 'network', 'rm', NETWORK], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
