@@ -33,6 +33,8 @@ DOMAIN = 'test.judopride.tech'
 IMAGE = 'ghcr.io/nikishgum/judeoslite-test'
 ENV = {'PATH': '/usr/sbin:/usr/bin:/sbin:/bin', 'HOME': '/root',
        'DOCKER_CONFIG': str(CONFIG / 'registry')}
+LOCAL_BACKUP_KEEP = 7
+BACKUP_NAME = r'[0-9]{8}T[0-9]{6}-[0-9a-f]{8}'
 
 
 def trusted(path):
@@ -462,6 +464,96 @@ def maintenance_backup():
         verify_https(current['sha'])
 
 
+def completed_archive(path):
+    """Recognize only our complete V1-19/V1-17 archives; preserve everything else."""
+    try:
+        if not re.fullmatch(BACKUP_NAME, path.name): return False
+        datetime.strptime(path.name[:15], '%Y%m%dT%H%M%S')
+        if not stat.S_ISDIR(path.lstat().st_mode): return False
+        trusted(path)
+        files = {p.name: p for p in path.iterdir()}
+        if set(files) != {'database.dump', 'uploads.tar', 'metadata.json'}: return False
+        for item in files.values():
+            info = item.lstat()
+            if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1: return False
+            trusted(item)
+        metadata = json.loads(files['metadata.json'].read_text())
+        fields = {'current', 'history', 'database_sha256', 'uploads_sha256'}
+        if not isinstance(metadata, dict) or set(metadata) not in (fields, fields | {'data', 'uploads'}): return False
+        if not isinstance(metadata['history'], str) or not (metadata['current'] is None or isinstance(metadata['current'], dict)): return False
+        if 'data' in metadata:
+            if not isinstance(metadata['data'], dict) or not isinstance(metadata['uploads'], dict): return False
+            for item in metadata['data'].values():
+                if not isinstance(item, dict) or set(item) != {'rows', 'sha256'}: return False
+                if type(item['rows']) is not int or item['rows'] < 0 or not isinstance(item['sha256'], str) or not re.fullmatch(r'[0-9a-f]{64}', item['sha256']): return False
+            for name, item in metadata['uploads'].items():
+                relative = Path(name)
+                if not relative.parts or relative.is_absolute() or '..' in relative.parts: return False
+                directory = isinstance(item, dict) and set(item) == {'directory'} and item['directory'] is True
+                regular = isinstance(item, dict) and set(item) == {'sha256'} and isinstance(item['sha256'], str) and re.fullmatch(r'[0-9a-f]{64}', item['sha256'])
+                if not (directory or regular): return False
+        for filename, field in [('database.dump', 'database_sha256'), ('uploads.tar', 'uploads_sha256')]:
+            if not isinstance(metadata[field], str) or not re.fullmatch(r'[0-9a-f]{64}', metadata[field]): return False
+            if checksum(files[filename]) != metadata[field]: return False
+        with files['database.dump'].open('rb') as stream:
+            if stream.read(5) != b'PGDMP': return False
+        if not tarfile.is_tarfile(files['uploads.tar']): return False
+        return True
+    except (OSError, RuntimeError, ValueError, TypeError):
+        return False
+
+
+def prune_local_backups(keep=LOCAL_BACKUP_KEEP):
+    if type(keep) is not int or keep < 1: raise RuntimeError('Positive local retention required.')
+    trusted(BASE / 'backups')
+    protected = set()
+    for state in ('current', 'previous', 'operation'):
+        reference = (load(state) or {}).get('backup')
+        if reference is not None:
+            if not isinstance(reference, str) or not re.fullmatch(BACKUP_NAME, reference):
+                raise RuntimeError('Invalid release backup reference; cleanup refused.')
+            protected.add(reference)
+    archives = []; unknown = 0
+    for path in (BASE / 'backups').iterdir():
+        if completed_archive(path): archives.append(path)
+        else: unknown += 1
+    # metadata is written last: its mtime orders completed backups, including
+    # multiple archives made in one second. Names are a deterministic tie-break.
+    archives.sort(key=lambda path: ((path / 'metadata.json').stat().st_mtime_ns, path.name), reverse=True)
+    latest = {path.name for path in archives[:keep]}
+    retained = []; removed = 0
+    for path in archives:
+        if path.name in latest or path.name in protected:
+            retained.append(path.name); continue
+        # Under the deployment lock, recheck before any deletion. A manual root
+        # edit making an archive unfamiliar must not turn it into a deletion.
+        if not completed_archive(path):
+            unknown += 1; continue
+        for filename in ('database.dump', 'uploads.tar', 'metadata.json'):
+            (path / filename).unlink()
+        path.rmdir(); removed += 1
+    return {'keep_last': keep, 'completed': len(retained), 'archives': retained,
+            'referenced': sorted(protected), 'removed': removed, 'preserved_unknown': unknown}
+
+
+def local_backup():
+    """Caller holds the deploy lock through maintenance, readiness and retention."""
+    state = {'phase': 'backup', 'started_at': datetime.now(timezone.utc).isoformat()}
+    save('local-backup', state)
+    try:
+        state.update(phase='cleanup', backup=maintenance_backup())
+        save('local-backup', state)
+        retention = prune_local_backups()
+        save('local-backup', dict(state, phase='ready', retention=retention,
+                                 completed_at=datetime.now(timezone.utc).isoformat()))
+    except Exception:
+        save('local-backup', dict(state, phase='failed'))
+        raise
+    print('PASS: local backup completed, HTTPS verified and retention applied. Backup:', state['backup'])
+    print('Retention:', json.dumps(retention, sort_keys=True))
+    return state['backup']
+
+
 def restart_check():
     current = load('current')
     operation = load('operation') or {}
@@ -603,7 +695,7 @@ def rollback():
 
 
 def status():
-    for name in ('accepted', 'current', 'previous', 'operation', 'offsite', 'offsite-restore', 'restart-check'):
+    for name in ('accepted', 'current', 'previous', 'operation', 'local-backup', 'restart-check'):
         print(name + ':', json.dumps(load(name)))
 
 

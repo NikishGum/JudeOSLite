@@ -1,5 +1,5 @@
 [Unit]
-Description=JudeOS encrypted offsite backup
+Description=JudeOS local backup and retention
 Requires=docker.service
 After=docker.service network-online.target
 Wants=network-online.target
@@ -9,7 +9,7 @@ Type=oneshot
 User=root
 Group=root
 UMask=0077
-ExecStart=/usr/bin/python3 -I /usr/local/lib/judeos-deploy/offsite.py backup
+ExecStart=/usr/bin/python3 -I /usr/local/lib/judeos-deploy/admin.py backup-local
 TimeoutStartSec=infinity
 Nice=10
 IOSchedulingClass=best-effort

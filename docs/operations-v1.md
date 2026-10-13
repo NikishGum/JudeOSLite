@@ -1,86 +1,69 @@
 # Эксплуатация и восстановление V1-17
 
-12.10.2026, [#165](https://github.com/NikishGum/JudeOSLite/issues/165).
+Обновлено 13.10.2026, [#165](https://github.com/NikishGum/JudeOSLite/issues/165).
 Переиспользуются Compose/Caddy, digest-deploy, один migration runner,
 server flock и restricted SSH из [#167](operations-test.md). Второго pipeline нет.
 
-## Подтверждённое и ожидаемое
+## Согласованная политика
 
-#161/#167 закрыты; их код и успешные проверки находятся в main `f8a95ea`.
-Из Cloud проверены публичные TLS (certificate verification включён),
-`https://test.judopride.tech/api/readyz` → `ok`, `/release.json` → полный
-`f8a95eae0d6efef196bdcc890316f7c2e477c308`, manifest, sw.js с no-cache,
-HTTP → HTTPS (308). CI main 38285072512 и Deploy test 38285528621 успешны.
+Источник — [обновлённое issue и итоговый протокол владельца](https://github.com/NikishGum/JudeOSLite/issues/165#issuecomment-6140917093):
 
-**Для V1-17 ещё требуются ответы владельца:** использовать ли существующий
-VPS `187.7.69.230` / `test.judopride.tech` как рабочий стенд первой версии,
-кто выполняет root-команды, какое независимое offsite-хранилище и retention.
-В #167 серверные операции выполнял владелец; у Cloud-чата нет настроенного
-SSH/VPN-доступа. Приватные ключи, пароли, контакты и dump в чат/Git не присылать.
-Публичная readiness не доказывает HTTPS-вход, серверный рестарт или restore.
+- VPS `187.7.69.230`, HTTPS `https://test.judopride.tech`; root-команды выполняет владелец.
+- Копии исключительно локальные: `/srv/judeos-test/backups`, root-only.
+- Ежедневно **03:00 Europe/Minsk**; хранить **7 последних завершённых** копий
+  и дополнительно архивы, на которые ссылаются current/previous/operation.
+- Незавершённые, неизвестные и повреждённые архивы сохранять.
+- S3/SFTP/restic/offsite не используются и не являются критерием закрытия #165.
 
-Предложение политики, **пока не согласованное**: ежедневно около 03:00
-Europe/Minsk (задержка до 5 минут), 7 дневных / 4 недельных / 3 месячных snapshots
-offsite и 7 последних завершённых локальных архивов. Отдельные серверы/S3 bucket
-в другом аккаунте/месте отказа предпочтительнее диска или snapshot того же VPS.
-Пример конфигурации и таймер не устанавливаются/не включаются автоматически.
-При отсутствии результатов VPS/offsite #165 остаётся открытой.
+Прежняя offsite-политика от 12.10.2026 заменена этим прямым решением владельца.
+Потеря VPS/диска означает потерю и данных, и локальных копий. Secrets, контакты,
+пароли и dump не передавать в чат/Git. У Cloud нет настроенного SSH/VPN к VPS.
 
-## Проверки в Cloud
+## Подтверждённая серверная приёмка
 
-12.10.2026: production Docker build (TypeScript/Vite/Go), 40 policy/recovery
-tests, actionlint 1.7.12, Python compilation, bash syntax, git diff check;
-Compose clean/rerun/restart/readiness recovery/непубличная БД — passed.
-Календарь предлагаемого таймера разобран systemd-analyze с явной Europe/Minsk;
-сервис/таймер на VPS ещё не установлен/не проверен.
-В CI выявлена и исправлена гонка PWA setup: pg_isready теперь ждёт TCP,
-который использует migrate из соседнего контейнера, а не Unix socket временного
-init-сервера официального PostgreSQL image. Это изменение только теста.
+13.10.2026 владелец установил reviewed root admin.py/operations.py из main
+`1b480de32d0edf8263ef9dcaccbcef676808d300`, сверил SHA-256, получил preflight PASS.
+Автоматический deploy этого main 38295830684 успешен; Cloud независимо проверил
+HTTPS readyz/SHA и HTTP→HTTPS 308 с включённой проверкой сертификата.
 
-`deploy/test/integration_check.py` запускает только случайный disposable Compose:
-PostgreSQL 18.6, Caddy local CA с проверкой сертификата, hidden owner bootstrap,
-HTTPS login/Secure/HttpOnly/SameSite cookies. Создаёт synthetic trainer,
-2 participants/cards/intervals, weekly rule, 22 sessions и настоящий frozen
-journal: illness → close/default unknown → correction present, отчёт 1/1=50%.
-Новый restart-check, повтор deploy/migrate, локальный dump/restore и restic
-encrypted **local** repository upload/check/forget/download/restore совпали
-по каждой строке/файлу, включая 2 marks/13 audit events/10 migrations.
-Application rollback/watermark проверены; disposable volumes удалены.
+Результаты владельца из итогового протокола:
 
-Публичный test.judopride.tech: Chromium с проверкой TLS, login screen,
-secure context, действующий SW, ноль installability/JS errors, 11 cache entries
-только /assets, widths 320/390/1280 без overflow. Вход реального сотрудника,
-физические устройства и серверный/offsite restore этим не проверяются.
+- HTTPS CRM: absent/illness → закрытый журнал → correction present с причиной;
+  история/разные авторы и отчёт 1 closed / 1 present / 0 absent = 100% подтверждены.
+  50% с двумя участниками были примером для Cloud, а не дополнительным критерием.
+- Свежий backup `20261013T073342-d469e4ce` восстановлен в отдельную
+  `restorecheck_10f99ca0b181`. Migration history, точное содержимое каждой строки
+  и uploads совпали с manifest. Непустые schedule_rules=1, training_sessions=7,
+  attendance_records=1, audit_events=21; 10 migrations.
+- Restart-check приложения/БД сохранил все строки/файлы и подтвердил HTTPS/SHA.
+  Затем удалена только проверочная БД; live DB не заменялась.
+- Внешний probe 5432 с компьютера владельца завершился TCP timeout; порт
+  недоступен из этой сети. Preflight проверил отсутствие опубликованных app/db ports.
+- Firefox на настоящем HTTPS: secure context, активный/управляющий SW,
+  11 cache entries только same-origin /assets без query/API. Обе cookie
+  __Host-pride_session и __Host-pride_csrf — Secure/HttpOnly/SameSite=Strict/Path=/,
+  HostOnly. Значения не публикуются.
 
-Воспроизведение (готовый образ judeoslite:ci, Docker/Compose, Python, restic):
+Физическая установка iPhone/Android и матрица Chrome/Edge остаются #164.
+Эти серверные PASS не повторяются без причины. Единственный оставшийся критерий
+#165 — установка и успешный запуск локального backup service/timer с проверкой
+новой завершённой копии, расписания и retention. До результата VPS issue открыта.
 
-```sh
-python3 -m unittest discover -s deploy/test -p 'test_*.py' -v
-bash deploy/check.sh judeoslite-ci-165
-python3 deploy/test/integration_check.py
-```
+## Развёртывание, диагностика и rollback
 
-Если restic не в PATH, задать RESTIC_TEST_BINARY абсолютным путём к проверенному
-бинарнику. На CI устанавливается пакет restic из ОС. Integration не читает
-серверные secrets/каталоги и не использует рабочие DB/volumes. Финальные CI/SHA,
-доставка в main и реальная приёмка публикуются в live #165.
+`deploy/test/compose.yml`: Caddy 80/443, Go с React, PostgreSQL 18.6, одноразовый
+migrate. App/db не публикуют host ports; db/app имеют healthchecks, постоянные
+volumes сохраняют данные/сертификаты. APP_ORIGIN HTTPS, insecure-local выключен.
+DB пароль/pgpass находятся вне Git/образа в root-only `/srv/judeos-test-config`.
+App работает UID 65532, read-only, без capabilities; логи ограничены ротацией.
 
-## Развёртывание и диагностика
-
-Рабочая конфигурация — `deploy/test/compose.yml`: Caddy 80/443, один Go с React,
-PostgreSQL 18.6, migrate как одноразовая операция. App/db не публикуют host ports;
-db/app имеют healthchecks, данные/сертификаты — постоянные volumes. Новый деплой
-не выполняет seed/reset. APP_ORIGIN HTTPS, insecure-local выключен. DB пароль и
-pgpass монтируются файлами из root-only `/srv/judeos-test-config`, вне Git/образа.
-App работает UID 65532, read-only, без capabilities. Логи ограничены ротацией.
-
-Обновление: commit → успешный push-CI текущего main → существующий Deploy test →
-GHCR digest → server lock → остановка app → backup → один migrate → запуск →
-TLS readiness и точный SHA. Есть короткое окно обслуживания. Старый/PR/failed CI
-отвергается; admission watermark сохраняется даже при ошибке/ручном rollback.
-Миграции дополнительно защищены advisory lock и checksum.
-
-Root-диагностика на VPS:
+Обновление: commit → успешный push-CI текущего main → Deploy test → GHCR digest →
+server lock → stop app → backup → один migrate → start → HTTPS readiness/точный SHA.
+Есть короткое окно обслуживания, без seed/reset. Старый/PR/failed CI отвергается;
+admission watermark сохраняется при ошибке/rollback. Миграции имеют advisory lock
+и checksum. При migration failure не запускать старый бинарник и не восстанавливать
+live DB автоматически: проверить стадию/worker и повторить исправленный digest
+или доставить новый проверенный commit.
 
 ```sh
 python3 -I /usr/local/lib/judeos-deploy/admin.py status
@@ -93,199 +76,155 @@ curl --fail --silent --show-error https://test.judopride.tech/api/readyz
 curl --fail --silent --show-error https://test.judopride.tech/release.json
 ```
 
-В status добавлены `offsite` и `offsite-restore`: стадия, archive/snapshot ID,
-время, имя отдельной восстановленной БД; там нет credentials или строк CRM.
-Технические команды скрывают Docker/SQL/restic stderr: он может содержать
-секреты/контакты. Не отправлять raw logs, inspect Config.Env, config/env-файлы
-или SQL-строки в issue/чат. Диагностику содержимого делать только локально root.
-Ошибка backup/timer видна через ненулевой exit/Result; проверять время последнего
-`offsite.phase=ready`, а не только состояние timer. `check` проверяет индексы,
-фактическое чтение данных доказывает отдельный `restore-check`.
+Status `local-backup` показывает последнюю стадию, archive ID, время и retention:
+keep_last/completed/archives/referenced/removed/preserved_unknown. Phase ready
+означает завершённую копию, восстановленную HTTPS readiness и успешную очистку;
+phase failed и ненулевой service Result требуют диагностики. Enabled timer сам
+по себе не доказывает выполненный backup. Технические команды скрывают SQL/Docker
+stderr; raw logs, Config.Env, env/secret файлы и строки CRM в чат не отправлять.
 
-После migration failure не стартовать старый бинарник и не восстанавливать live
-БД автоматически: выяснить стадию/worker, исправить и повторить тот же digest или
-доставить новый проверенный commit. Rollback — только previous verified image,
-точно одинаковая migration history/checksum и подтверждённая совместимость данных:
+Rollback допускается только на previous verified image с **точно одинаковой**
+migration history/checksum и подтверждённой совместимостью данных:
 
 ```sh
 python3 -I /usr/local/lib/judeos-deploy/admin.py rollback --confirm-compatible
 ```
 
-## Установка обновлённых операций
-
-Владелец получает проверенный commit main на VPS в `/root/JudeOSLite`.
-При обновлении root-owned операций сначала приостановить новые Actions deploy,
-остановить backup timer и дождаться уже работающих worker/service. Остановка timer
-сама не завершает активный service. Снять только временную паузу после preflight.
-
-```sh
-cd /root/JudeOSLite
-git status --short
-git rev-parse HEAD
-systemctl stop judeos-backup.timer  # если таймер уже был установлен
-bash deploy/test/bootstrap.sh
-python3 -I /usr/local/lib/judeos-deploy/admin.py preflight
-```
-
-Bootstrap сохраняет существующие secrets, volumes, controller.py, sudoers и ключи;
-обновляет admin.py/operations.py, staging controller и offsite.py. Протокол
-controller в V1-17 не меняется, повторная активация/SSH reload не нужны.
-Новых sudo-грант, Docker-группы или shell для judeos-deploy нет.
-
-## Локальная копия и предметное восстановление
+## Копия, retention и восстановление
 
 ```sh
 python3 -I /usr/local/lib/judeos-deploy/admin.py backup
+python3 -I /usr/local/lib/judeos-deploy/admin.py backup-local
 python3 -I /usr/local/lib/judeos-deploy/admin.py restore-check YYYYMMDDTHHMMSS-xxxxxxxx
 ```
 
-Ручной backup теперь требует verified current release, совпадение migration
-history, phase ready/manual-rollback и работающий app. В том же server lock
-останавливает app, сохраняет копию и в finally запускает эту же версию с TLS
-readiness. При прерванном/неуспешном deploy или уже остановленном app не запускает
-его сам. Предмиграционный backup использует ту же функцию после stop app.
-Не делать параллельных ручных SQL-записей/изменений uploads во время backup.
+`backup` создаёт ручную копию без очистки. `backup-local` — тот же maintenance_backup
+и затем согласованная retention; именно его вызывает service. Общий deploy.lock
+держится от проверки verified current release до завершения cleanup. Требуются
+history=current.history, phase ready/manual-rollback и работающий app. App коротко
+останавливается для согласованной пары DB/uploads, в finally возвращается на ту же
+версию с TLS readiness. При failed deploy или уже остановленном app команда не
+запускает его сама. При backup/readiness failure cleanup не выполняется.
 
-Архив root-only: custom-format `database.dump`, `uploads.tar`, `metadata.json`.
-Metadata содержит SHA-256 архивов, migration history и для каждой таблицы
-public/pride число и SHA-256 всех канонических отсортированных JSON-строк, а для
-uploads — структуру/хеши файлов. Личные данные не печатаются; временные COPY-файлы
-приватные и удаляются. Содержимое до/после dump должно совпадать; при изменении
-backup отказывает без завершённой metadata. Неполные архивы не отправляются
-offsite и автоматически не удаляются. Следить за диском и разбирать их root.
+Архив root-only: custom-format database.dump, uploads.tar, metadata.json.
+Backup проверяет pg_restore --list, SHA-256 архивов и неизменность данных до/после
+копирования. Manifest содержит число и SHA-256 канонических отсортированных строк
+каждой public/pride таблицы и структуру/хеши файлов. Временные COPY-файлы приватны
+и удаляются, личные строки не печатаются. Предмиграционный backup использует ту же
+функцию после stop app; сам deploy не запускает новую retention.
 
-Restore сначала проверяет checksum, создаёт случайную **новую**
-`restorecheck_<12 hex>` и применяет pg_restore одной транзакцией. Сравнивает
-history и точное содержимое каждой таблицы: сотрудники/сессии/роли, участники,
-карточки, группы/интервалы, правила/занятия, frozen snapshot/отметки и аудит.
-Одного совпадения количества строк недостаточно. Uploads распаковываются в
-отдельный private temporary каталог и сверяются; абсолютные пути, `..`,
-symlink/hardlink и специальные файлы запрещены. Live DB/uploads не заменяются.
-При успехе выводятся только имя БД, PASS и counts таблиц; отдельно проверить,
-что нужные предметные таблицы **не пусты**. Старые V1-19 архивы без manifest
-можно восстановить, но автоматическая предметная проверка откажет; они требуют
-ручной сверки. Для V1-17 взять новую копию.
+Очистка распознаёт только штатное имя YYYYMMDDTHHMMSS-xxxxxxxx с корректной датой,
+root-owned каталог и ровно три обычных файла без ссылок, известную metadata
+V1-19/V1-17, совпадающие SHA-256 dump/uploads, custom-dump magic и tar format.
+Порядок — время записи завершённой
+metadata, затем имя для одинакового времени; это учитывает несколько копий в секунду.
+Хранит семь последних завершённых **всех типов** (manual/deploy/scheduled) плюс
+все current/previous/operation references, даже если они старше. Повреждённые,
+неполные, неизвестные форматы/файлы, дополнительные файлы/каталоги и ссылки не
+попадают в семь и не удаляются. Неверная release reference запрещает cleanup.
+Поэтому суммарно каталогов может быть больше семи; следить за диском и разбирать
+неизвестные архивы вручную root. Во время backup/retention не менять архивы/SQL
+параллельными root-командами. Перед удалением кандидат проверяется повторно.
 
-После проверки удалить только отдельную БД явной командой (live имя отвергается):
+Restore сначала проверяет checksums, создаёт случайную новую restorecheck_<12 hex>
+и применяет pg_restore одной транзакцией. Сверяет history и каждую строку, включая
+сотрудников/роли/состав/расписание/занятия/frozen snapshot/отметки/аудит. Uploads
+распаковывает только в отдельный private temporary каталог; absolute paths/../links
+и специальные файлы запрещены. Live DB/uploads не заменяются. Старые V1-19 архивы
+без content manifest восстановимы, но требуют ручной предметной проверки.
+При ошибке отдельная БД остаётся для root-диагностики. После успеха явно удалить
+только её (live имя/wildcard отвергаются):
 
 ```sh
 python3 -I /usr/local/lib/judeos-deploy/admin.py drop-restore-check restorecheck_XXXXXXXXXXXX
 ```
 
-При ошибке restore отдельная БД остаётся для root-диагностики. Перечень таких БД
-посмотреть локально через PostgreSQL, не удалять по wildcard. Эта команда не
-отключает активные подключения принудительно и не удаляет volumes.
+Восстановление повторять при существенном изменении схемы/backup-процедуры
+и по договорённости эксплуатации. Наличие Docker image digest для recovery
+проверять заранее: metadata не сохраняет образ. При реальном переключении на
+восстановленную БД согласовать потерю более новых данных, подготовить DB credentials,
+отозвать прежние staff_sessions до открытия доступа, проверить migrate/HTTPS/вход/
+роли/отчёт/PWA. Автоматического стирания live DB нет. Без уцелевшей локальной копии
+при потере VPS/диска эта политика не обеспечивает disaster recovery.
 
-## Зашифрованное offsite-хранилище и расписание
+## Установка service/timer владельцем
 
-После согласования хранилища установить restic из доверенного пакета ОС:
-`apt-get update && apt-get install -y restic`. В Cloud проверяется restic 0.19.1;
-использованы базовые команды backup/check/forget/restore.
-
-Root создаёт config 0600 на основе `deploy/test/offsite.example.json` и локально
-редактирует endpoint/bucket, credentials, retention и local_keep. Это пример
-S3, не готовый bucket и не подтверждение подключения. Не включать сетевой
-backend без согласования. `offsite.py` допускает restic S3 HTTPS, SFTP и другие
-поддерживаемые удалённые backend; shell не используется, credential env ограничен.
-Для SFTP root заранее настраивает ключ/known_hosts по доверенному fingerprint;
-отключать host-key/TLS verification нельзя.
-
-```sh
-install -o root -g root -m 0600 deploy/test/offsite.example.json /srv/judeos-test-config/offsite.json
-editor /srv/judeos-test-config/offsite.json
-python3 - <<'PY'
-import getpass, os
-password = getpass.getpass('Restic repository password from the owner password manager: ')
-if len(password) < 16 or password != getpass.getpass('Repeat password: '):
-    raise SystemExit('Password not saved.')
-fd = os.open('/srv/judeos-test-config/restic-password', os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-with os.fdopen(fd, 'w') as stream:
-    stream.write(password + '\n')
-PY
-python3 -I /usr/local/lib/judeos-deploy/offsite.py init
-python3 -I /usr/local/lib/judeos-deploy/offsite.py backup
-python3 -I /usr/local/lib/judeos-deploy/offsite.py restore-check FULL_64_HEX_SNAPSHOT_ID
-```
-
-Пароль репозитория и credentials должны быть сохранены также в отдельном
-защищённом хранилище владельца: файлы только на потерянном VPS не позволяют
-восстановиться. Не класть пароль рядом с зашифрованным repository. Серверные DB
-secret files отдельно сохранять зашифрованно у владельца; GitHub/GHCR/SSH tokens
-не добавлять в DB backup. Init выполняется явно только для нового repository;
-для существующего использовать `check`, не переинициализировать его.
-
-Offsite backup держит общий deploy lock; app останавливается лишь на создание
-согласованного локального архива и возвращается до сетевой передачи. Restic
-шифрует содержимое, сохраняет snapshot host=judeos-test/tag=judeos-v1,
-проверяет repository и только затем применяет согласованный forget/prune.
-Retention группируется **host,tags**: меняющийся путь архива не создаёт вечную
-группу на каждую копию. Локальная очистка только после успеха remote-команд,
-сохраняет архивы current/previous/operation даже сверх local_keep. Сбой upload
-или check не запускает retention; незавершённые/неизвестные архивы не стираются.
-
-Restore принимает полный immutable snapshot ID, сверяет host/tag, скачивает
-архив в отдельный private каталог и выполняет тот же настоящий предметный
-restore-check. Изолированная БД остаётся для проверки, staging files удаляются.
-В state offsite-restore фиксируется snapshot/БД/время успеха. Проверка локального
-repository в CI не доказывает доступ к настоящему offsite месту.
-
-Только после первого успешного upload → download → restore и утверждения
-расписания root устанавливает reviewed service/timer (пример 03:00 Minsk):
+Root на VPS использует чистый `/root/JudeOSLite` и конкретный reviewed main commit
+из отчёта исполнителя. Сначала получить/сверить checkout; не использовать force/reset.
+Временно приостановить новые Deploy test в Actions и остановить timer;
+дождаться уже работающих и ожидающих worker/service. Установка ниже держит тот же
+flock, что deploy/backup. Проверка отсутствия worker важна: Python-процесс мог
+прочитать старый модуль ещё до ожидания lock. После установки/preflight вернуть
+Deploy test в прежний автоматический режим.
+Не менять sudoers/controller/SSH/Secrets/volumes. Прежний offsite.py, если остался
+на сервере, не вызывается новым service; внешние хранилища не настраиваются.
 
 ```sh
+cd /root/JudeOSLite
+test -z "$(git status --porcelain)"
+git fetch origin main
+git merge --ff-only REVIEWED_MAIN_SHA
+git rev-parse HEAD
+sha256sum deploy/test/admin.py deploy/test/operations.py
+if systemctl cat judeos-backup.timer >/dev/null 2>&1; then
+  systemctl stop judeos-backup.timer
+fi
+if systemctl is-active --quiet judeos-backup.service; then
+  echo 'Backup service is active; wait for completion before installing.'
+  exit 1
+fi
+test -z "$(systemctl list-units --state=active,activating --no-legend 'judeos-test-deploy-*')"
+flock /srv/judeos-test/state/deploy.lock bash -euo pipefail <<'INSTALL'
+install -o root -g root -m 0755 deploy/test/admin.py /usr/local/lib/judeos-deploy/admin.py.new
+install -o root -g root -m 0644 deploy/test/operations.py /usr/local/lib/judeos-deploy/operations.py.new
+mv -T /usr/local/lib/judeos-deploy/operations.py.new /usr/local/lib/judeos-deploy/operations.py
+mv -T /usr/local/lib/judeos-deploy/admin.py.new /usr/local/lib/judeos-deploy/admin.py
 install -o root -g root -m 0644 deploy/test/judeos-backup.service /etc/systemd/system/judeos-backup.service
-install -o root -g root -m 0644 deploy/test/judeos-backup.timer.example /etc/systemd/system/judeos-backup.timer
+install -o root -g root -m 0644 deploy/test/judeos-backup.timer /etc/systemd/system/judeos-backup.timer
 systemd-analyze verify /etc/systemd/system/judeos-backup.service /etc/systemd/system/judeos-backup.timer
 systemctl daemon-reload
-systemctl enable --now judeos-backup.timer
-systemctl list-timers judeos-backup.timer --no-pager
+python3 -I /usr/local/lib/judeos-deploy/admin.py preflight
+INSTALL
+sha256sum /usr/local/lib/judeos-deploy/admin.py /usr/local/lib/judeos-deploy/operations.py
 ```
 
-Persistent запускает пропущенную копию после возвращения сервера; timezone
-задаётся явно, до 5 минут jitter. Второй ручной/таймерный backup сериализуется с
-deploy/restore/rollback. Проверить хотя бы один реальный запуск **через service**,
-Result=success и новый ready snapshot; enabled timer сам по себе не доказывает
-выполненную копию. Восстановление повторять после существенного изменения
-схемы/backup-процедуры и периодически по договорённости эксплуатации.
-
-## Приёмка владельцем и восстановление после потери VPS
-
-На согласованном HTTPS стенде создать синтетический филиал/тренера/двух участников
-и группу, правило weekly и отдельное занятие, открыть журнал, отметить/закрыть,
-исправить одну закрытую отметку с причиной и сверить отчёт владельца. Пароли/ФИО
-реальных людей не передавать. Проверить вход и Secure/HttpOnly/SameSite=Strict
-cookie, manifest/SW/static-only cache и текущую сессию после запуска PWA.
-Матрица физических iPhone/Android/Chrome/Edge и установки остаётся #164.
-
-Снять backup/content counts, перезапустить **app и БД** без удаления volumes:
+После установки проверить **настоящий systemd service**, затем включить таймер:
 
 ```sh
-python3 -I /usr/local/lib/judeos-deploy/admin.py restart-check
+systemctl start judeos-backup.service
+systemctl show judeos-backup.service --property=ActiveState,SubState,Result,ExecMainStatus
+python3 -I /usr/local/lib/judeos-deploy/admin.py status
+systemctl enable --now judeos-backup.timer
+systemctl is-enabled judeos-backup.timer
+systemctl is-active judeos-backup.timer
+systemctl list-timers judeos-backup.timer --no-pager
+systemctl show judeos-backup.timer --property=TimersCalendar,NextElapseUSecRealtime,Persistent,AccuracyUSec,RandomizedDelayUSec
 ```
 
-Команда держит общий lock, требует verified release, останавливает app, снимает
-manifest, перезапускает db/ждёт health, возвращает app и сверяет каждую строку/файл.
-В случае ошибки БД не восстанавливается автоматически; `restart-check` в status
-показывает последнюю стадию. Проверять в согласованное окно без ручных записей.
-Переход месяца может законно добавить новый горизонт генерации: несовпадение
-в этом случае требует разбора и повторной проверки, а не обещания PASS.
+Для закрытия #165 владелец передаёт: installed hashes, preflight PASS,
+service Result=success/ExecMainStatus=0, local-backup.phase=ready с **новым**
+archive ID/completed_at и retention (7 последних или меньше, если пока накоплено
+меньше семи, плюс referenced; unknown сохранены), timer enabled/active и следующий
+запуск 03:00 Europe/Minsk (00:00 UTC). Не передавать содержимое dump/metadata/Secrets.
+Service oneshot после успеха обычно inactive/dead — это нормально; exit/Result и
+новая копия важнее ActiveState. Первый start создаёт реальную копию сразу, не ждёт
+ближайшего 03:00. Persistent запускает пропущенный backup после возвращения VPS;
+при работающем deploy service ждёт общий lock. AccuracySec=1s, случайной задержки нет.
 
-Дождаться HTTPS readiness:
-дождаться HTTPS readiness: сеансы не дублируются, snapshot/marks/audit/отчёт
-сохраняются. Выполнить локальный и затем offsite restore свежей копии; PASS должен
-покрывать непустые staff/group_memberships/schedule_rules/training_sessions/
-attendance_records/audit_events. Проверить непубличность 5432 извне; Compose
-отсутствие host ports и внешний сетевой probe — разные свидетельства.
-Передавать только SHA/run IDs, PASS/агрегаты, snapshot/restore DB IDs, результаты
-service/timer/cookies/портов, без секретов или содержимого CRM.
+## Проверки реализации
 
-Disaster recovery: остановить новые deploy/backup, получить пароль репозитория
-из независимого хранилища; на подготовленном втором VPS/отдельной БД скачать
-выбранный snapshot, проверить manifest/data и доступный совместимый image digest.
-Dump содержит хеши staff-паролей/серверные сессии: после реального переключения
-отозвать прежние staff_sessions до открытия внешнего доступа. Создать новые
-серверные DB credentials и настроить secret files для новой роли/БД. Переключение
-проверенной конфигурации/volume и возможную потерю более новых записей согласовать
-с владельцем; автоматического стирания/замены live-БД нет. Пройти migrate/HTTPS,
-вход/три роли/отчёт/PWA и новый offsite backup. Наличие старого digest в registry
-проверить заранее; backup metadata сама не сохраняет Docker image.
+Из корня с готовым judeoslite:ci, Docker/Compose и Python:
+
+```sh
+python3 -m unittest discover -s deploy/test -p 'test_*.py' -v
+python3 deploy/test/integration_check.py
+```
+
+Тесты покрывают сохранение трёх release references, семь завершённых и legacy
+архивы, одинаковую секунду, incomplete/unknown/corrupt/extra files/links, отказ
+очистки после backup/readiness failure и общий CLI deploy lock. Disposable PG18.6/
+Caddy TLS сценарий проверяет настоящую регулярную локальную копию, cleanup реальных
+архивов с references/unknown/incomplete и точный restore этой новой копии.
+Service/timer синтаксис и Europe/Minsk calendar проверяются в Cloud; запуск systemd
+на VPS остаётся подтверждением владельца. Restic/remote credentials не требуются.
+Финальные CI/commits/серверный service результат — в live #165.

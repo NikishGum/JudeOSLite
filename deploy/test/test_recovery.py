@@ -8,7 +8,6 @@ import unittest
 from unittest.mock import patch
 
 import operations as ops
-import offsite
 
 
 class RecoveryTests(unittest.TestCase):
@@ -82,67 +81,4 @@ class RecoveryTests(unittest.TestCase):
                     if '-d' in args: self.assertRegex(args[args.index('-d')+1], r'^restorecheck_[0-9a-f]{12}$')
 
 
-class OffsiteTests(unittest.TestCase):
-    def test_configuration_rejects_local_fallback_broad_permissions_and_environment_hooks(self):
-        with tempfile.TemporaryDirectory() as temporary:
-            base = Path(temporary); password = base / 'password'; password.write_text('synthetic'); password.chmod(0o600)
-            config = {'repository': 's3:https://example/bucket', 'password_file': str(password),
-                      'environment': {}, 'retention': {'daily': 7, 'weekly': 4, 'monthly': 3}, 'local_keep': 7}
-            path = base / 'offsite.json'
-            with patch.object(ops, 'CONFIG', base), patch.object(ops, 'trusted'):
-                for change in ({'repository': '/local/pretend-offsite'}, {'password_file': str(base / '../password')},
-                               {'environment': {'RESTIC_PASSWORD_COMMAND': 'arbitrary command'}},
-                               {'retention': {'daily': 0, 'weekly': 4, 'monthly': 3}}, {'local_keep': 1}):
-                    path.write_text(json.dumps(dict(config, **change))); path.chmod(0o600)
-                    with self.subTest(change=change), self.assertRaises(RuntimeError): offsite.configuration()
-                path.write_text(json.dumps(config)); path.chmod(0o644)
-                with self.assertRaisesRegex(RuntimeError, 'root-only'): offsite.configuration()
-                path.chmod(0o600); self.assertEqual(offsite.configuration(), config)
-
-    def test_failed_upload_or_check_does_not_expire_any_backups(self):
-        config = {'retention': {'daily': 7, 'weekly': 4, 'monthly': 3}, 'local_keep': 7}
-        summary = json.dumps({'message_type': 'summary', 'snapshot_id': 'a'*64}).encode()
-        for fail in ('backup', 'check'):
-            calls = []
-            def restic(config, *args):
-                calls.append(args)
-                if args[0] == fail: raise RuntimeError('failed')
-                return summary
-            with patch.object(ops, 'BASE', Path('/unused')), patch.object(ops, 'save'), \
-                 patch.object(ops, 'maintenance_backup', return_value='20261012T000000-aaaaaaaa'), \
-                 patch.object(offsite, 'restic', side_effect=restic), patch.object(offsite, 'prune_local') as prune:
-                with self.assertRaises(RuntimeError): offsite.backup_offsite(config)
-                self.assertFalse(any(c[0] == 'forget' for c in calls)); prune.assert_not_called()
-
-    def test_retention_groups_by_installation_even_when_archive_paths_change(self):
-        config = {'retention': {'daily': 7, 'weekly': 4, 'monthly': 3}, 'local_keep': 7}
-        with patch.object(ops, 'BASE', Path('/unused')), patch.object(ops, 'save'), \
-             patch.object(ops, 'maintenance_backup', return_value='20261012T000000-aaaaaaaa'), \
-             patch.object(offsite, 'restic', return_value=json.dumps({'message_type': 'summary', 'snapshot_id': 'a'*64}).encode()) as restic, patch.object(offsite, 'prune_local'):
-            offsite.backup_offsite(config)
-            forget = restic.call_args.args
-            self.assertIn('host,tags', forget); self.assertIn('--host', forget); self.assertIn('--tag', forget)
-            self.assertNotIn('paths', forget)
-
-    def test_local_cleanup_preserves_release_references_and_incomplete_backups(self):
-        with tempfile.TemporaryDirectory() as temporary:
-            base = Path(temporary); (base / 'backups').mkdir()
-            for n in range(6):
-                archive = base / 'backups' / f'20261012T00000{n}-aaaaaaaa'; archive.mkdir()
-                for name in ('database.dump', 'uploads.tar', 'metadata.json'): (archive / name).write_text('x')
-            incomplete = base / 'backups' / '20261011T000000-aaaaaaaa'; incomplete.mkdir(); (incomplete / 'database.dump.partial').write_text('x')
-            protected = '20261012T000000-aaaaaaaa'
-            with patch.object(ops, 'BASE', base), patch.object(ops, 'trusted_tree'), patch.object(ops, 'load', return_value={'backup': protected}):
-                offsite.prune_local({'local_keep': 2})
-            self.assertEqual({p.name for p in (base / 'backups').iterdir()}, {protected, incomplete.name, '20261012T000004-aaaaaaaa', '20261012T000005-aaaaaaaa'})
-
-    def test_restic_errors_do_not_relay_credentials_or_backend_output(self):
-        config = {'repository': 's3:https://bucket', 'password_file': '/private/password', 'environment': {'AWS_SECRET_ACCESS_KEY': 'private-key'}}
-        with patch.object(offsite.subprocess, 'run') as run:
-            run.return_value.returncode = 1; run.return_value.stderr = b'private-key'
-            with self.assertRaises(RuntimeError) as error: offsite.restic(config, 'check')
-            self.assertNotIn('private-key', str(error.exception))
-            self.assertNotIn('private-key', run.call_args.args[0])
-
-
-if __name__ == '__main__': unittest.main()
+if __name__ == "__main__": unittest.main()

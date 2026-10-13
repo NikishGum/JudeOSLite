@@ -16,3 +16,8 @@ PostgreSQL, migrate, app и Caddy с локальным CA, проверяя с�
 доверенную публичную root.crt без отключения TLS verification.
 Public DNS/ACME, VPS ownership/sudo/systemd/firewall/SSH/GHCR и PWA этим не проверяются.
 Ручная подготовка владельцем: [operations-test.md](../../docs/operations-test.md).
+
+Регулярный local-only backup, согласованный 13.10.2026: admin.py backup-local,
+service/timer 03:00 Europe/Minsk и семь последних завершённых плюс references;
+инструкция установки и подтверждённый VPS restore — [operations-v1.md](../../docs/operations-v1.md).
+Restic и внешнее хранилище не требуются.
