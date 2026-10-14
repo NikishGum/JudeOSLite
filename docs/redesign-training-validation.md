@@ -108,3 +108,16 @@ reader/computed contrast самостоятельно не измерялись.
 исходниками и существующей дизайн-системой. Уточнены размеры текста действий
 на ПК/телефоне; новых глобальных токенов или примитивов для DESIGN/sidecar нет.
 Повторные browser-тесты в этом документирующем проходе не выполнялись.
+
+## Совместная доставка с RD-02
+
+Первый RD-03 commit cdb2800: [PR #192](https://github.com/NikishGum/JudeOSLite/pull/192),
+полные [PR CI38552628462](https://github.com/NikishGum/JudeOSLite/actions/runs/38552628462)
+и [push CI38552620665](https://github.com/NikishGum/JudeOSLite/actions/runs/38552620665)
+SUCCESS. Перед merge в main вошёл PR #191/eabae80. Объединены обе добавленные
+записи памяти; продуктового конфликта нет. App/shared код RD-02 сохранён.
+На объединённой ветви production build и Chromium154/WebKit26.5
+`redesign_training.py` PASS; сценарий расширен фактическим переходом из group
+detail RD-02 в календарь RD-03 с проверкой URL, выбранного UUID и занятия.
+Это интеграционный повтор после изменения main, не третий цикл полировки.
+Итоговые CI и merge SHA публикуются в PR/live issue после завершения.

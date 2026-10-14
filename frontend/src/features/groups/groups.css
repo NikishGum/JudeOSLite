@@ -1,6 +1,16 @@
 .groups, .membership-history { overflow-wrap: anywhere; }
-.membership-history { margin-top: 24px; }
+.membership-history { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--panel-line); }
 .groups fieldset, .membership-history fieldset { min-width: 0; border: 0; margin: 0; padding: 0; }
 .groups .registry-list li, .membership-history .registry-list li { flex-wrap: wrap; }
-.groups .actions { flex-wrap: wrap; }
+.groups .actions { flex-wrap: wrap; justify-content: flex-start; }
 .groups h3, .groups h4 { line-height: 1.4; }
+.groups .member-detail { margin-top: 24px; }
+.groups .member-detail .membership-history { margin-top: 16px; }
+.group-detail > .field { max-width: 300px; }
+.membership-history .help { max-width: 70ch; }
+.membership-history h4, .membership-history h5 { font-size: 16px; font-weight: 600; margin: 0 0 12px; }
+.membership-history li p { font-variant-numeric: tabular-nums; }
+@media (min-width: 1051px) {
+  .groups > .registry-list > li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
+  .groups > .registry-list > li .actions { justify-content: flex-end; }
+}

@@ -83,9 +83,10 @@ manager с `trainer` также проходит серверную провер
 
 [Согласованный RD-02 контракт](https://github.com/NikishGum/JudeOSLite/issues/185#issuecomment-6166323309)
 использует тот же `?group=`. Переход из detail группы монтирует календарь с этим
-ID. Проверено чтением опубликованной ветви RD-02 c868fc9. RD-03 не меняет
+ID. RD-02 c868fc9 вошла в main через PR #191/eabae80 и объединена с RD-03;
+новый browser-сценарий проверяет сам переход из detail группы. RD-03 не меняет
 занятые RD-02 `app/App.tsx`/`app/navigation.ts`, shared/API/lifecycle/PWA или
-токены. Их совместная доставка проверяется после обновления main.
+токены. Совместный результат проходит CI обоих браузеров.
 
 `trainingChanged()` отправляет существующее DOM-событие `attendance-changed`
 без payload после **подтверждённого сервером** open/mark/close/correct, изменения

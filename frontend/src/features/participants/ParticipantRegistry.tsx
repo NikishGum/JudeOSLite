@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ApiError, apiGet, apiPost, apiPut } from '../../shared/api';
 import { ParticipantEditor, type Card, type Draft } from './ParticipantEditor';
+import { Dialog } from '../../shared/ui/Dialog';
 import './participants.css';
 import { MembershipHistory } from '../groups/MembershipHistory';
 import type { Group } from '../groups/types';
@@ -10,7 +11,7 @@ type List = { items: Card[]; hasMore: boolean };
 const message = (cause: unknown) => cause instanceof ApiError ? cause.message : 'Нет соединения. Проверьте интернет и повторите действие.';
 const displayDate = (value: string) => value.split('-').reverse().join('.');
 
-export function ParticipantRegistry({ clubId, timezone, onSessionRefresh, detailId = '', onDetailChange, beforeNavigate }: { beforeNavigate?: (action: () => void) => void; detailId?: string; onDetailChange?: (id: string) => void; clubId: string; timezone: string; onSessionRefresh: () => Promise<void> }) {
+export function ParticipantRegistry({ clubId, clubName, timezone, onSessionRefresh, detailId = '', onDetailChange, beforeNavigate }: { beforeNavigate?: (action: () => void) => void; detailId?: string; onDetailChange?: (id: string) => void; clubId: string; clubName: string; timezone: string; onSessionRefresh: () => Promise<void> }) {
   const [list, setList] = useState<List>({ items: [], hasMore: false });
   const [queryDraft, setQueryDraft] = useState('');
   const [query, setQuery] = useState('');
@@ -30,7 +31,9 @@ export function ParticipantRegistry({ clubId, timezone, onSessionRefresh, detail
   const [notice, setNotice] = useState('');
   const [conflict, setConflict] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [historyBusy, setHistoryBusy] = useState(false);
   const [groups, setGroups] = useState<Group[]>([]);
+  const [groupsAttempt, setGroupsAttempt] = useState(0);
   const [groupsLoading, setGroupsLoading] = useState(true);
   const [groupsError, setGroupsError] = useState('');
   const pending = useRef(false);
@@ -48,7 +51,7 @@ export function ParticipantRegistry({ clubId, timezone, onSessionRefresh, detail
       .catch((cause: unknown) => { if (!controller.signal.aborted) setGroupsError(message(cause)); })
       .finally(() => { if (!controller.signal.aborted) setGroupsLoading(false); });
     return () => controller.abort();
-  }, [clubId, selected, attempt]);
+  }, [clubId, groupsAttempt]);
 
   useEffect(() => {
     const controller = new AbortController(); setLoading(true); setLoadError(''); setList({ items: [], hasMore: false });
@@ -105,16 +108,21 @@ export function ParticipantRegistry({ clubId, timezone, onSessionRefresh, detail
   function search(event: FormEvent<HTMLFormElement>) { event.preventDefault(); setQuery(queryDraft.trim()); setPage(0); setAttempt((value) => value + 1); }
 
   return <section className="connection registry" aria-labelledby="registry-title">
-    <div className="section-heading"><div><p className="eyebrow">Ручной учёт</p><h2 id="registry-title">Участники филиала</h2></div>
+    <div className="section-heading"><div><h2 id="registry-title">Участники филиала</h2><p className="help context-name">{clubName}</p></div>
       <button disabled={busy} onClick={() => open('new')}>Добавить участника</button></div>
     {notice && <p role="status">{notice}</p>}
     {selected && <div className="registry-card">
-      <div className="section-heading"><h3 ref={heading} tabIndex={-1}>{selected === 'new' ? 'Новый участник' : editing ? 'Редактирование участника' : 'Карточка участника'}</h3><button className="secondary" disabled={busy} onClick={close}>Закрыть карточку</button></div>
-      {error && <p className="error" role="alert">{error}</p>}
-      {conflict && <><p className="help">Ваши правки остались в форме. Загрузка актуальной карточки сбросит их.</p><button className="secondary" disabled={busy} onClick={refreshCard}>Загрузить актуальную карточку</button></>}
+      <div className="section-heading"><h3 ref={heading} tabIndex={-1}>{selected === 'new' ? 'Новый участник' : editing ? 'Редактирование участника' : 'Карточка участника'}</h3><button className="secondary" disabled={busy || historyBusy} onClick={close}>Закрыть карточку</button></div>
+      {!editing && error && <p className="error" role="alert">{error}</p>}
+      {!editing && conflict && <><p className="help">Ваши правки остались в форме. Загрузка актуальной карточки сбросит их.</p><button className="secondary" disabled={busy} onClick={refreshCard}>Загрузить актуальную карточку</button></>}
       {cardLoading && <p role="status">Загружаем карточку…</p>}
       {cardError && <div role="alert"><p>{cardError}</p><button className="secondary" onClick={refreshCard}>Попробовать снова</button></div>}
-      {editing && (selected === 'new' || card) && <ParticipantEditor key={selected} card={selected === 'new' ? null : card} busy={busy} today={today} groups={groups} groupsLoading={groupsLoading} groupsError={groupsError} onSave={save} onCancel={() => { if (selected === 'new') close(); else { setEditing(false); setError(''); setConflict(false); } }} />}
+      {editing && (selected === 'new' || card) && <Dialog className="subject-panel" title={selected === 'new' ? 'Новый участник' : 'Редактирование участника'} busy={busy} cancelLabel="Закрыть форму" onCancel={() => { if (beforeNavigate) beforeNavigate(() => { if (selected === 'new') closeNow(); else setEditing(false); }); else if (selected === 'new') closeNow(); else setEditing(false); }}>
+        <p className="help context-name">{clubName}</p>
+        {error && <p className="error" role="alert">{error}</p>}
+        {conflict && <><p className="help">Ваши правки остались в форме. Загрузка актуальной карточки сбросит их.</p><button className="secondary" disabled={busy} onClick={refreshCard}>Загрузить актуальную карточку</button></>}
+        <ParticipantEditor key={selected} card={selected === 'new' ? null : card} busy={busy} today={today} groups={groups} groupsLoading={groupsLoading} groupsError={groupsError} onRetryGroups={() => setGroupsAttempt((value) => value + 1)} onSave={save} onCancel={() => { if (selected === 'new') closeNow(); else { setEditing(false); setError(''); setConflict(false); } }} />
+      </Dialog>}
       {card && !editing && <>
         <h4>{card.fullName}</h4><dl><dt>Дата рождения</dt><dd>{displayDate(card.birthDate)}</dd><dt>Дата вступления</dt><dd>{displayDate(card.joinedOn)}</dd>
           <dt>{card.contactKind === 'phone' ? 'Телефон' : 'Электронная почта'}</dt><dd>{card.contactValue}</dd><dt>Контактное лицо</dt><dd>{card.contactName || 'Не указано'}</dd><dt>Состояние карточки</dt><dd>{card.archived ? 'В архиве' : 'Действующая'}</dd></dl>
@@ -124,7 +132,7 @@ export function ParticipantRegistry({ clubId, timezone, onSessionRefresh, detail
           <button disabled={busy} onClick={() => { setEditing(true); setError(''); setConflict(false); }}>Редактировать участника</button>
           {card.archived ? <button className="secondary" disabled={busy} onClick={() => void mutate(() => apiPost<Card>(`${base}/${card.id}/restore`, { version: card.version }), 'Карточка возвращена из архива.')}>Вернуть из архива</button> : <button className="secondary" disabled={busy} onClick={() => setConfirmArchive(true)}>В архив</button>}
         </div>}
-        <MembershipHistory key={`${card.id}:${card.version}`} clubId={clubId} membershipId={card.id} archived={card.archived} joinedOn={card.joinedOn} groups={groups} />
+        <MembershipHistory onBusyChange={setHistoryBusy} onChanged={() => setAttempt((value) => value + 1)} key={`${card.id}:${card.version}`} clubId={clubId} membershipId={card.id} archived={card.archived} joinedOn={card.joinedOn} groups={groups} />
       </>}
     </div>}
     <form className="registry-search" onSubmit={search}><label className="field">Поиск по ФИО или контакту<input type="search" maxLength={200} value={queryDraft} onChange={(event) => setQueryDraft(event.target.value)} /></label><button type="submit" disabled={busy}>Найти</button></form>
@@ -133,8 +141,9 @@ export function ParticipantRegistry({ clubId, timezone, onSessionRefresh, detail
     {loading && <p role="status">Загружаем участников…</p>}
     {loadError && <div role="alert"><p>{loadError}</p><button className="secondary" onClick={() => setAttempt((value) => value + 1)}>Попробовать снова</button></div>}
     {!loading && !loadError && <>
-      {list.items.length === 0 && <p>{query ? 'По вашему запросу участников нет.' : 'В этом списке пока нет участников.'}</p>}
-      <ul className="registry-list">{list.items.map((item) => <li key={item.id}><div><h4>{item.fullName}</h4><p>{displayDate(item.birthDate)} · {item.archived ? 'В архиве' : 'Действующая карточка'}<br />{item.contactValue}{item.contactName && ` · ${item.contactName}`}</p></div><button className="secondary" disabled={busy} onClick={() => open(item.id)} aria-label={`Открыть карточку ${item.fullName}, ${displayDate(item.birthDate)}`}>Открыть карточку</button></li>)}</ul>
+      {list.items.length === 0 && <p>{query ? 'По вашему запросу участников нет. Уточните ФИО или контакт.' : filter === 'archived' ? 'В архиве пока нет участников.' : 'В этом списке пока нет участников. Добавьте первую карточку с датой рождения и контактом.'}</p>}
+      <div className="registry-columns" aria-hidden="true"><span>Участник / дата рождения</span><span>Контакт</span><span>Состояние</span><span>Карточка</span></div>
+      <ul className="registry-list participant-rows">{list.items.map((item) => <li key={item.id}><div><h4>{item.fullName}</h4><p className="row-meta">{displayDate(item.birthDate)}</p></div><div className="row-contact"><span>{item.contactValue}</span><p className="row-meta">{item.contactName || 'Контакт родителя или взрослого'}</p></div><span className={`registry-status ${item.archived ? '' : 'is-active'}`}>{item.archived ? 'В архиве' : 'Действующая карточка'}</span><button className="secondary" disabled={busy} onClick={() => open(item.id)} aria-label={`Открыть карточку ${item.fullName}, ${displayDate(item.birthDate)}`}>Открыть карточку</button></li>)}</ul>
       <div className="actions"><button className="secondary" disabled={busy || page === 0} onClick={() => setPage((value) => value - 1)}>Предыдущие</button><span>Страница {page + 1}</span><button className="secondary" disabled={busy || !list.hasMore} onClick={() => setPage((value) => value + 1)}>Следующие</button></div>
     </>}
   </section>;

@@ -123,7 +123,10 @@ try:
         tomorrow = today+timedelta(days=1)
         sid = sql(f"INSERT INTO pride.training_sessions(club_id,group_id,trainer_id,starts_on,timezone,starts_at,ends_at) VALUES('{a['id']}','{group['id']}','{trainer['id']}','{today}','Europe/Minsk','{today} 09:00+03','{today} 10:00+03') RETURNING id").splitlines()[0]
         calendar = ROOT+'/clubs/'+a['id']+'/sessions?group='+group['id']
-        admin = page('admin'); admin.goto(calendar)
+        admin = page('admin')
+        admin.goto(ROOT+'/clubs/'+a['id']+'/groups?detail='+group['id'])
+        admin.get_by_role('button', name='К занятиям группы', exact=True).click()
+        expect(admin).to_have_url(calendar)
         expect(admin.get_by_label('Группа календаря', exact=True)).to_have_value(group['id'])
         expect(admin.locator('.session-list > li')).to_have_count(1)
         admin.get_by_role('button', name='Неделя', exact=True).click()

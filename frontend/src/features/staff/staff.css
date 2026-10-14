@@ -1,17 +1,23 @@
-.staff-management { margin-top: 24px; }
-.staff-management .section-heading, .staff-management .actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.staff-management { margin-top: 0; }
+.staff-management .section-heading, .staff-management .actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .staff-management .section-heading { justify-content: space-between; }
-.staff-management .secondary { background: var(--pride-surface-subtle); color: var(--pride-text); border: 1px solid var(--pride-border); }
-.staff-management .secondary:hover:not(:disabled) { background: var(--pride-border); }
+.staff-management .context-name { margin: 8px 0 0; }
+.staff-management .secondary { background: var(--pride-surface); color: var(--pride-text); border: 1px solid var(--pride-border); }
+.staff-management .secondary:hover:not(:disabled) { background: var(--pride-surface-section); }
 .staff-management fieldset { padding: 0; margin: 0; border: 0; min-width: 0; }
 .staff-management h3, .staff-management p { overflow-wrap: anywhere; }
-.staff-card { border: 1px solid var(--pride-border); border-radius: var(--pride-radius-field); padding: 24px; margin: 24px 0; }
+.staff-card { border-top: 1px solid var(--panel-line); padding: 24px 0; margin: 24px 0; }
+.staff-card h3 { font-size: 18px; margin-top: 0; }
 .staff-list { list-style: none; padding: 0; margin: 24px 0; }
-.staff-list li { padding: 24px 0; border-top: 1px solid var(--pride-border); }
-.staff-list h3 { font-size: 18px; margin: 0; }
+.staff-list li { padding: 16px 0; border-top: 1px solid var(--panel-line); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 24px; align-items: center; }
+.staff-list li > div { min-width: 0; }
+.staff-list .actions { justify-content: flex-end; }
+.staff-list h3 { font-size: 16px; font-weight: 500; margin: 0; }
+.staff-list p { margin: 8px 0; }
 .staff-checkbox { display: flex; gap: 12px; align-items: center; min-height: 44px; }
-.staff-checkbox input { width: 24px; height: 24px; }
-@media (max-width: 600px) {
-  .staff-card { padding: 16px; }
+.staff-checkbox input { width: 24px; height: 24px; flex: none; }
+@media (max-width: 1050px) { .staff-list li { grid-template-columns: minmax(0, 1fr); gap: 12px; } .staff-list .actions { justify-content: flex-start; } }
+@media (max-width: 760px) {
   .staff-management .section-heading, .staff-management .actions { flex-direction: column; align-items: stretch; }
+  .staff-list h3 { font-size: 17px; }
 }

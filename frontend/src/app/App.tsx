@@ -54,7 +54,7 @@ export function App() {
     else window.history.pushState({ prideIndex: ++historyIndex.current }, '', path);
     routeRef.current = next; setRoute(next); setMore(false); setNavigationNotice('');
   }
-  function openSection(section: Section) { if (section === route.section && !route.detail && !route.invalid) { setMore(false); return; } requestLeave(() => navigate({ ...route, section, detail: '', invalid: false })); }
+  function openSection(section: Section) { if (section === route.section && !route.detail && !route.invalid) { setMore(false); return; } requestLeave(() => navigate({ ...route, section, detail: '', group: '', invalid: false })); }
   const [club, setClub] = useState<Club | null>(null);
   const [clubError, setClubError] = useState('');
   const [clubAttempt, setClubAttempt] = useState(0);
@@ -161,7 +161,7 @@ export function App() {
   const canManage = !!session && (session.user.isOwner || !!currentClub?.roles.includes('administrator'));
   const canTrain = !!currentClub?.roles.includes('trainer');
   const permitted = session ? allowedSections(session.user.isOwner, available?.roles ?? [...new Set(session.clubs.flatMap((c) => c.roles))], session.clubs.some((c) => c.roles.includes('administrator'))) : [];
-  const invalid = route.invalid || (!!selectedId && !available) || !permitted.includes(route.section) || (!!route.detail && route.section !== 'participants');
+  const invalid = route.invalid || (!!selectedId && !available) || !permitted.includes(route.section) || (!!route.detail && !['participants', 'groups'].includes(route.section));
   const items = permitted.map((section) => ({ section, label: sections[section] }));
   const assignmentKey = session?.clubs.map((c) => `${c.id}:${c.roles.join(',')}`).sort().join(';');
   const hasAdministration = !!session?.clubs.some((c) => c.roles.includes('administrator'));
@@ -175,7 +175,7 @@ export function App() {
     <header className="header"><div className="header-inner">
       <a className="brand" href="/" aria-label="PRIDE — главная" onClick={(event) => { if (session && !event.ctrlKey && !event.metaKey) { event.preventDefault(); openSection('home'); } }}><img src={logo} width="56" height="56" alt="" /><span>Клуб дзюдо <strong>PRIDE</strong></span></a>
       {session ? <><label className="club-context">Филиал<select aria-label="Филиал" value={available ? selectedId : ''} onChange={(event) => {
-        const id = event.target.value; requestLeave(() => navigate({ clubId: id, section: route.section, detail: '', invalid: false }));
+        const id = event.target.value; requestLeave(() => navigate({ clubId: id, section: route.section, detail: '', group: '', invalid: false }));
       }}><option value="">{session.user.isOwner ? 'Вся сеть' : 'Выберите филиал'}</option>{session.clubs.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
         <div className="account"><div><strong>{session.user.displayName}</strong><span>{session.user.isOwner ? 'Владелец сети' : available?.roles.map((r) => roleNames[r] ?? r).join(' · ') || 'Сотрудник клуба'}</span></div><button type="button" className="secondary" disabled={busy} onClick={() => requestLeave(() => void signOut())}>{busy ? 'Выходим…' : 'Выйти'}</button></div>
       </> : <span className="header-label">Для сотрудников клуба</span>}
@@ -194,17 +194,17 @@ export function App() {
           <NavigationBoundary key={`${session.user.id}:${session.user.isOwner}:${assignmentKey}:${selectedId}:${clubTimezone}:${route.section}`} dirty={dirty}>
             {route.section === 'home' && <section className="connection home-context"><p className="eyebrow">Рабочая панель PRIDE</p><h2>{available?.name ?? (session.user.isOwner ? 'Обзор сети' : 'Ваши назначения')}</h2><p>{session.user.isOwner ? 'Управляйте филиалами и сотрудниками, следите за статистикой сети.' : (canManage || (!selectedId && hasAdministration)) ? 'Откройте занятия, реестр или журналы выбранного филиала.' : 'Откройте назначенные занятия и журнал для отметок.'}</p>{!session.clubs.length && <p>{session.user.isOwner ? 'Филиалы пока не добавлены.' : 'Нет доступных филиалов. Обратитесь к владельцу клуба.'}</p>}<div className="home-links">{links()}</div></section>}
             {route.section === 'statistics' && session.user.isOwner && <OwnerDashboard />}
-            {route.section === 'clubs' && session.user.isOwner && <OwnerManagement mode="clubs" onChanged={() => loadSession()} />}
+            {route.section === 'clubs' && session.user.isOwner && <OwnerManagement beforeNavigate={requestLeave} mode="clubs" onChanged={() => loadSession()} />}
             {route.section === 'history' && <AuditHistory selectedClubId={canManage ? selectedId : ''} />}
             {['sessions', 'participants', 'groups', 'journals', 'staff'].includes(route.section) && !selectedId && <section className="connection"><h2>Выберите филиал</h2><p>Используйте выбор филиала в верхней панели.</p></section>}
             {currentClub && <>
-              {route.section === 'participants' && canManage && <ParticipantRegistry clubId={currentClub.id} timezone={currentClub.timezone} onSessionRefresh={() => loadSession()} detailId={route.detail} beforeNavigate={requestLeave} onDetailChange={(detail) => navigate({ ...routeRef.current, detail })} />}
-              {route.section === 'groups' && canManage && <GroupManagement clubId={currentClub.id} timezone={currentClub.timezone} />}
+              {route.section === 'participants' && canManage && <ParticipantRegistry clubName={currentClub.name} clubId={currentClub.id} timezone={currentClub.timezone} onSessionRefresh={() => loadSession()} detailId={route.detail} beforeNavigate={requestLeave} onDetailChange={(detail) => navigate({ ...routeRef.current, detail })} />}
+              {route.section === 'groups' && canManage && <GroupManagement clubId={currentClub.id} clubName={currentClub.name} timezone={currentClub.timezone} detailId={route.detail} beforeNavigate={requestLeave} onDetailChange={(detail) => navigate({ ...routeRef.current, detail })} onOpenSessions={(group) => requestLeave(() => navigate({ ...routeRef.current, section: 'sessions', detail: '', group }))} />}
               {route.section === 'sessions' && <><SessionCalendar clubId={currentClub.id} timezone={currentClub.timezone} canManage={canManage} />{canManage && <ScheduleManagement clubId={currentClub.id} timezone={currentClub.timezone} />}</>}
               {route.section === 'journals' && <>{canTrain && <TrainerSessions clubId={currentClub.id} timezone={currentClub.timezone} />}{canManage && <AdminJournals clubId={currentClub.id} timezone={currentClub.timezone} />}</>}
-              {route.section === 'staff' && canManage && <TrainerManagement clubId={currentClub.id} isOwner={session.user.isOwner} onSessionRefresh={() => loadSession()} />}
+              {route.section === 'staff' && canManage && <TrainerManagement beforeNavigate={requestLeave} clubName={currentClub.name} clubId={currentClub.id} isOwner={session.user.isOwner} onSessionRefresh={() => loadSession()} />}
             </>}
-            {route.section === 'staff' && session.user.isOwner && <OwnerManagement mode="staff" onChanged={() => loadSession()} />}
+            {route.section === 'staff' && session.user.isOwner && <OwnerManagement beforeNavigate={requestLeave} mode="staff" onChanged={() => loadSession()} />}
           </NavigationBoundary>
         </>}
       </> : <section className="connection login-panel" aria-labelledby="login-title"><p className="eyebrow">Каждая тренировка имеет значение</p><h2 id="login-title">Ваш аккаунт PRIDE</h2>

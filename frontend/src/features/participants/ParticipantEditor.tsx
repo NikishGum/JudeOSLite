@@ -9,8 +9,8 @@ export type Card = {
 export type Draft = { fullName: string; birthDate: string; joinedOn: string; contactKind: 'phone' | 'email'; contactValue: string; contactName: string; groupId: string; groupFrom: string };
 const empty: Draft = { fullName: '', birthDate: '', joinedOn: '', contactKind: 'phone', contactValue: '', contactName: '', groupId: '', groupFrom: '' };
 
-export function ParticipantEditor({ card, busy, today, groups, groupsLoading, groupsError, onSave, onCancel }: {
-  groups: Group[]; groupsLoading: boolean; groupsError: string;
+export function ParticipantEditor({ card, busy, today, groups, groupsLoading, groupsError, onRetryGroups, onSave, onCancel }: {
+  groups: Group[]; groupsLoading: boolean; groupsError: string; onRetryGroups: () => void;
   card: Card | null; busy: boolean; today: string; onSave: (draft: Draft) => void; onCancel: () => void;
 }) {
   const groupSelectId = useId();
@@ -32,7 +32,7 @@ export function ParticipantEditor({ card, busy, today, groups, groupsLoading, gr
       <label className="field">Имя контактного лица (необязательно)<input maxLength={200} autoComplete="off" value={draft.contactName} onChange={(event) => setDraft({ ...draft, contactName: event.target.value })} /></label>
       {!card && <>
         <div className="field"><label htmlFor={groupSelectId}>Начальная группа (необязательно)</label><select id={groupSelectId} disabled={groupsLoading || !!groupsError} value={draft.groupId} onChange={(event) => setDraft({ ...draft, groupId: event.target.value })}><option value="">Без группы</option>{groups.filter((g) => !g.archived).map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}</select></div>
-        {groupsLoading && <p role="status">Загружаем группы…</p>}{groupsError && <p role="alert">{groupsError} Обновите участников для повторной загрузки групп.</p>}
+        {groupsLoading && <p role="status">Загружаем группы…</p>}{groupsError && <div role="alert"><p>{groupsError}</p><button type="button" className="secondary" onClick={onRetryGroups}>Повторить загрузку групп</button></div>}
         {draft.groupId && <label className="field">Дата включения в группу<input type="date" required min={draft.joinedOn || '0001-01-01'} value={draft.groupFrom} onChange={(event) => setDraft({ ...draft, groupFrom: event.target.value })} /></label>}
         <p className="help">Карточка и начальный состав сохраняются вместе. При ошибке участник не будет создан частично.</p>
       </>}

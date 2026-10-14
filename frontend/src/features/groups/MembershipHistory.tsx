@@ -3,8 +3,8 @@ import { ApiError, apiGet, apiPost } from '../../shared/api';
 import { displayDate, type Group, type Interval } from './types';
 const message = (cause: unknown) => cause instanceof ApiError ? cause.message : 'Нет соединения. Проверьте интернет и повторите действие.';
 
-export function MembershipHistory({ clubId, membershipId, archived, joinedOn, groups, onChanged }: {
-  clubId: string; membershipId: string; archived: boolean; joinedOn: string; groups: Group[]; onChanged?: () => void;
+export function MembershipHistory({ clubId, membershipId, archived, joinedOn, groups, onChanged, onBusyChange }: {
+  clubId: string; membershipId: string; archived: boolean; joinedOn: string; groups: Group[]; onChanged?: () => void; onBusyChange?: (busy: boolean) => void;
 }) {
   const groupSelectId = useId();
   const base: `/api/${string}` = `/api/clubs/${clubId}/participants/${membershipId}/groups`;
@@ -35,14 +35,14 @@ export function MembershipHistory({ clubId, membershipId, archived, joinedOn, gr
   function reset() { setMode('add'); setChosen(null); setDate(''); setUntil(''); setGroupId(''); setError(''); setConflict(false); }
   function choose(item: Interval, next: 'exclude' | 'transfer') { setChosen(item); setMode(next); setDate(''); setUntil(''); setGroupId(''); setError(''); setConflict(false); requestAnimationFrame(() => formHeading.current?.focus()); }
   async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); if (pending.current) return; pending.current = true; setBusy(true); setError(''); setNotice('');
+    event.preventDefault(); if (pending.current) return; pending.current = true; setBusy(true); onBusyChange?.(true); setError(''); setNotice('');
     try {
       if (mode === 'add') await apiPost(base, { groupId, from: date, until: until || null });
       else if (chosen) await apiPost(`${base}/${chosen.id}/${mode}`, { date, version: chosen.version, ...(mode === 'transfer' ? { groupId } : {}) });
       if (!mounted.current) return;
       reset(); setNotice('Состав сохранён. Предыдущие периоды и снимки занятий сохранены.'); setAttempt((v) => v + 1); onChanged?.();
     } catch (cause) { if (mounted.current) { setError(message(cause)); setConflict(cause instanceof ApiError && cause.code === 'version_conflict'); } }
-    finally { if (mounted.current) { pending.current = false; setBusy(false); } }
+    finally { if (mounted.current) { pending.current = false; setBusy(false); onBusyChange?.(false); } }
   }
   return <section className="membership-history" aria-label="История групп участника">
     <div className="section-heading"><h4>История групп</h4><button className="secondary" disabled={busy || loading} onClick={() => { reset(); setAttempt((v) => v + 1); }}>Обновить историю и сбросить форму</button></div>
