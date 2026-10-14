@@ -10,7 +10,7 @@ const emptyClub: ClubDraft = { name: '', address: '', timezone: 'Europe/Minsk' }
 const emptyStaff: StaffDraft = { login: '', displayName: '', password: '', clubIds: [], disabled: false };
 const message = (cause: unknown) => cause instanceof ApiError ? cause.message : 'Нет соединения. Проверьте интернет и повторите действие.';
 
-export function OwnerManagement({ onChanged }: { onChanged: () => Promise<void> }) {
+export function OwnerManagement({ onChanged, mode = 'clubs' }: { mode?: 'clubs' | 'staff'; onChanged: () => Promise<void> }) {
   const [clubs, setClubs] = useState<Club[]>([]);
   const [staff, setStaff] = useState<Staff[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,7 +77,7 @@ export function OwnerManagement({ onChanged }: { onChanged: () => Promise<void> 
   function toggleClub(id: string, checked: boolean) { setStaffDraft((value) => ({ ...value, clubIds: checked ? [...value.clubIds, id] : value.clubIds.filter((item) => item !== id) })); }
 
   return <section className="connection management" aria-labelledby="management-title">
-    <div className="section-heading"><div><p className="eyebrow">Управление сетью</p><h2 id="management-title">Филиалы и администраторы</h2></div>
+    <div className="section-heading"><div><p className="eyebrow">Управление сетью</p><h2 id="management-title">{mode === 'clubs' ? 'Филиалы' : 'Администраторы сети'}</h2></div>
       <button className="secondary" disabled={busy || loading} onClick={() => setAttempt((value) => value + 1)}>Обновить список</button></div>
     {error && <p className="error" role="alert">{error}</p>}
     {notice && <p role="status">{notice}</p>}
@@ -121,14 +121,16 @@ export function OwnerManagement({ onChanged }: { onChanged: () => Promise<void> 
       <div className="actions"><button disabled={busy} onClick={() => void save(() => apiPost(`/api/clubs/${archive.id}/archive`, { version: archive.version }), 'Филиал перенесён в архив. История сохранена.')}>{busy ? 'Архивируем…' : 'Подтвердить архивирование'}</button><button className="secondary" disabled={busy} onClick={closeEditor}>Отмена</button></div>
     </div>}
 
-    <div className="section-heading"><h3>Филиалы</h3><button disabled={busy || loading || !!loadError} onClick={() => editClub('new')}>Добавить филиал</button></div>
+    {mode === 'clubs' && <><div className="section-heading"><h3>Филиалы</h3><button disabled={busy || loading || !!loadError} onClick={() => editClub('new')}>Добавить филиал</button></div>
     {!loading && !loadError && clubs.length === 0 && <p>Каждый зал добавляется как отдельный филиал.</p>}
     <ul className="management-list">{clubs.map((item) => <li key={item.id}><div><h4>{item.name}</h4><p>{item.address || 'Адрес не указан'}<br />{item.timezone} · {item.archived ? 'В архиве' : 'Действующий'}</p></div><div className="actions">
       <button className="secondary" disabled={busy || loading} onClick={() => editClub(item)} aria-label={`Редактировать филиал ${item.name}`}>Редактировать</button>
       {!item.archived && <button className="secondary" disabled={busy || loading} onClick={() => { closeEditor(); setError(''); setNotice(''); setArchive(item); }} aria-label={`Архивировать филиал ${item.name}`}>В архив</button>}</div></li>)}</ul>
-    <div className="section-heading"><h3>Сотрудники и назначения</h3><button disabled={busy || loading || !!loadError || !clubs.some((item) => !item.archived)} onClick={() => editStaff('new')}>Создать администратора</button></div>
+    </>}
+    {mode === 'staff' && <><div className="section-heading"><h3>Сотрудники и назначения</h3><button disabled={busy || loading || !!loadError || !clubs.some((item) => !item.archived)} onClick={() => editStaff('new')}>Создать администратора</button></div>
     {!loading && !loadError && staff.length === 0 && <p>Создайте отдельный аккаунт для каждого сотрудника.</p>}
     <ul className="management-list">{staff.map((item) => <li key={item.id}><div><h4>{item.displayName}</h4><p>{item.login} · {item.disabled ? 'Аккаунт отключён' : 'Аккаунт включён'}</p><p>Администратор: {item.clubIds.map((id) => { const club = clubs.find((value) => value.id === id); return `${club?.name ?? 'Филиал'}${club?.archived ? ' (архив)' : ''}`; }).join(', ') || 'нет назначений'}</p></div>
       <button className="secondary" disabled={busy || loading} onClick={() => editStaff(item)} aria-label={`Изменить назначения ${item.displayName}`}>Изменить назначения</button></li>)}</ul>
+    </>}
   </section>;
 }

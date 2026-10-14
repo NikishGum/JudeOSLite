@@ -32,7 +32,7 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET' || url.origin !== self.location.origin || url.pathname === '/api' || url.pathname.startsWith('/api/')) return;
   if (allowed.has(url.pathname) && !url.search) {
     event.respondWith((async () => (await (await caches.open(CACHE)).match(url.pathname)) ?? fetch(request))());
-  } else if (request.mode === 'navigate' && /^\/(?:login|clubs\/[^/]+)?$/.test(url.pathname)) {
+  } else if (request.mode === 'navigate' && /^\/(?:login|home|sessions|participants|groups|journals|statistics|staff|clubs|history|clubs\/[^/]+(?:\/(?:home|sessions|participants|groups|journals|statistics|staff|clubs|history))?)?$/.test(url.pathname)) {
     // Navigations are never stored. The fallback is the public build-time HTML.
     event.respondWith(fetch(new Request(request, { cache: 'no-store' })).catch(async () => {
       return (await (await caches.open(CACHE)).match(SHELL)) ?? Response.error();

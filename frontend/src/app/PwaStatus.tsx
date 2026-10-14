@@ -5,7 +5,7 @@ interface InstallPrompt extends Event {
   prompt(): Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
-export function PwaStatus() {
+export function PwaStatus({ beforeUpdate }: { beforeUpdate?: (action: () => void) => void }) {
   const [online, setOnline] = useState(navigator.onLine);
   const [standalone, setStandalone] = useState(() => matchMedia('(display-mode: standalone)').matches || !!(navigator as Navigator & { standalone?: boolean }).standalone);
   const [install, setInstall] = useState<InstallPrompt | null>(null);
@@ -78,7 +78,7 @@ export function PwaStatus() {
   return <aside className="pwa-status" aria-label="Приложение PRIDE">
     {!online && <p className="error" role="alert">Нет сети. Операции недоступны. Изменения не сохраняются без связи; после подключения повторите действие.</p>}
     {notice && <p role="status">{notice}</p>}
-    {waiting && <div className="pwa-update"><p role="status">Доступно обновление. {saving ? 'Дождитесь окончания сохранения.' : 'Перед обновлением сохраните введённые данные.'}</p><button disabled={!!saving || applying || !online} onClick={applyUpdate}>{applying ? 'Обновляем…' : 'Обновить приложение'}</button></div>}
+    {waiting && <div className="pwa-update"><p role="status">Доступно обновление. {saving ? 'Дождитесь окончания сохранения.' : 'Перед обновлением сохраните введённые данные.'}</p><button disabled={!!saving || applying || !online} onClick={() => beforeUpdate ? beforeUpdate(applyUpdate) : applyUpdate()}>{applying ? 'Обновляем…' : 'Обновить приложение'}</button></div>}
     {!standalone && <details className="install-help"><summary>Установить PRIDE на устройство</summary>
       <p>iPhone / Safari: «Поделиться» → «На экран Домой» → «Добавить».</p>
       <p>Android / Chrome: меню ⋮ → «Установить приложение» или «Добавить на главный экран». На ПК в Chrome / Edge используйте значок установки в адресной строке.</p>

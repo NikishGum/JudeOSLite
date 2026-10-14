@@ -1,0 +1,110 @@
+"""RD-01 shell checks on disposable real API/DB fixtures, called by pwa_v1.py."""
+from pathlib import Path
+from playwright.sync_api import expect
+
+
+def check_shell(browser, page, signin, api, owner, club, group, trainer, root, engine, sql, open_section, dimensions):
+    other = api(owner, 'POST', '/api/clubs', {'name': 'Synthetic RD other', 'timezone': 'Europe/Minsk'})
+    multi = api(owner, 'POST', '/api/staff', {'login': 'multi', 'displayName': 'Synthetic Multi',
+        'password': 'synthetic-browser-password', 'clubIds': [club['id'], other['id']]})
+    api(owner, 'POST', '/api/staff/'+multi['id']+'/trainer-assignments', {'clubId': club['id'], 'version': multi['version']})
+    context = browser.new_context(viewport={'width': 1440, 'height': 900}, reduced_motion='reduce')
+    value = page(context)
+    signin(value, 'multi')
+    value.goto(root+'/clubs/'+club['id'])
+    expect(value.locator('main h1')).to_have_text('Главная')
+    expected = ['Главная', 'Занятия', 'Участники', 'Группы', 'Журналы', 'Сотрудники', 'История']
+    assert value.locator('.sidebar a').all_text_contents() == expected
+    expect(value.locator('.account')).to_contain_text('Администратор · Тренер')
+    open_section(value, 'Журналы')
+    expect(value.locator('.trainer-sessions')).to_be_visible()
+    expect(value.locator('.admin-journals')).to_be_visible()
+    open_section(value, 'Участники')
+    participant = api(owner, 'GET', '/api/clubs/'+club['id']+'/participants')['items'][0]
+    value.goto(root+'/clubs/'+club['id']+'/participants?detail='+participant['id'])
+    expect(value.locator('.registry-card')).to_contain_text(participant['fullName'])
+    value.reload()
+    expect(value.locator('.registry-card')).to_contain_text(participant['fullName'])
+    value.get_by_role('button', name='Закрыть карточку', exact=True).click()
+    assert '?detail=' not in value.url
+    value.go_back()
+    expect(value.locator('.registry-card')).to_contain_text(participant['fullName'])
+    value.go_forward()
+    expect(value.get_by_role('button', name='Закрыть карточку', exact=True)).to_have_count(0)
+    # Edit -> navigation cancellation preserves the draft; Escape returns focus.
+    open_section(value, 'Занятия')
+    open_section(value, 'Участники')
+    value.get_by_role('button', name='Добавить участника', exact=True).click()
+    value.get_by_label('ФИО участника', exact=True).fill('Unsaved synthetic draft')
+    assert value.evaluate("(()=>{const e=new Event('beforeunload',{cancelable:true});window.dispatchEvent(e);return e.defaultPrevented})()")
+    value.get_by_role('navigation', name='Разделы филиала').get_by_role('link', name='Группы', exact=True).click()
+    dialog = value.get_by_role('dialog')
+    expect(dialog).to_contain_text('Есть несохранённые изменения')
+    value.keyboard.press('Escape')
+    expect(dialog).to_have_count(0)
+    expect(value.get_by_label('ФИО участника', exact=True)).to_have_value('Unsaved synthetic draft')
+    expect(value.get_by_role('navigation', name='Разделы филиала').get_by_role('link', name='Группы', exact=True)).to_be_focused()
+    # The same protection applies to changing club and browser back/forward.
+    value.get_by_label('Филиал', exact=True).select_option(other['id'])
+    expect(dialog).to_be_visible()
+    value.get_by_role('button', name='Продолжить редактирование', exact=True).click()
+    expect(value.get_by_label('Филиал', exact=True)).to_have_value(club['id'])
+    value.go_back()
+    expect(dialog).to_be_visible()
+    value.get_by_role('button', name='Продолжить редактирование', exact=True).click()
+    expect(value.locator('main h1')).to_have_text('Участники')
+    value.go_back()
+    expect(dialog).to_be_visible()
+    value.get_by_role('button', name='Перейти без сохранения', exact=True).click()
+    expect(value.locator('main h1')).to_have_text('Занятия')
+    value.go_forward()
+    expect(value.locator('main h1')).to_have_text('Участники')
+    expect(value.get_by_label('ФИО участника', exact=True)).to_have_count(0)
+    # Every existing feature is reachable; primary links and More on all widths.
+    for name in expected:
+        open_section(value, name)
+        value.wait_for_load_state('networkidle')
+    dimensions(value, 'multi-shell')
+    value.set_viewport_size({'width': 320, 'height': 480})
+    more = value.get_by_role('button', name='Ещё', exact=True)
+    more.click()
+    expect(dialog).to_be_visible()
+    assert value.evaluate("document.body.style.overflow === 'hidden'")
+    dialog.locator('[data-initial-focus]').focus()
+    value.keyboard.press('Shift+Tab')
+    expect(dialog.get_by_role('button', name='Закрыть меню', exact=True)).to_be_focused()
+    value.keyboard.press('Tab')
+    expect(dialog.get_by_role('link', name='Главная', exact=True)).to_be_focused()
+    value.screenshot(path=f'/tmp/rd183-{engine}-more-320.png')
+    value.keyboard.press('Escape')
+    expect(more).to_be_focused()
+    assert value.evaluate("document.body.style.overflow !== 'hidden'")
+    # Revoke only administrator; trainer remains, including the other admin club.
+    open_section(value, 'Участники')
+    sql(f"DELETE FROM pride.staff_club_roles WHERE staff_user_id='{multi['id']}' AND club_id='{club['id']}' AND role='administrator'")
+    value.evaluate("window.dispatchEvent(new Event('focus'))")
+    expect(value.locator('#registry-title')).to_have_count(0)
+    expect(value.locator('main')).to_contain_text('Раздел или филиал недоступен')
+    assert value.locator('.sidebar a').all_text_contents() == ['Главная', 'Занятия', 'Журналы', 'История']
+    denied = value.evaluate("async path => {const r=await fetch(path);return {status:r.status,type:r.headers.get('content-type')}}", '/api/clubs/'+club['id']+'/participants')
+    assert denied['status'] == 404 and 'json' in denied['type'], denied
+    value.get_by_label('Филиал', exact=True).select_option(other['id'])
+    expect(value.locator('#registry-title')).to_be_visible()
+    expect(value.locator('main')).not_to_contain_text(participant['fullName'])
+    value.goto(root+'/clubs/'+other['id']+'/no-such-section')
+    expect(value.locator('main')).to_contain_text('Раздел или филиал недоступен')
+    context.close()
+    # Owner/administrator/trainer composition and original shell, paired sizes.
+    for login, label in [('owner', 'owner'), ('admin', 'admin'), ('trainer', 'trainer')]:
+        ctx = browser.new_context(viewport={'width': 1440, 'height': 900})
+        item = page(ctx); signin(item, login)
+        item.goto(root+'/clubs/'+club['id'])
+        expect(item.locator('main h1')).to_have_text('Главная')
+        dimensions(item, label+'-shell')
+        if login == 'trainer':
+            item.goto(root+'/clubs/'+other['id']+'/participants')
+            expect(item.locator('main')).to_contain_text('Раздел или филиал недоступен')
+            expect(item.locator('.registry')).to_have_count(0)
+        ctx.close()
+    assert not (Path(__file__).parents[1]/'dist'/'dashboard.js').exists()
+    print('RD-01: separate roles/multi-role; real detail/reload/legacy/history; draft/club/back guard; revoke/foreign API; 320/390/768/1280/1440; keyboard/safe-area/reduced motion passed', flush=True)
