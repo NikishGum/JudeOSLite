@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <title>PRIDE — рабочее пространство</title>
+  <link rel="icon" href="../../assets/logo-pride.png">
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="dashboard.js" defer></script>
+</head>
+<body>
+<!--
+THESIS: Role-specific workspaces connect the club overview to the next training task; the long stack of management forms becomes navigable.
+OWN-WORLD: PRIDE Rubik, white and cool gray, #DB0C0C for action and selection, original emblem, 20px panels and 5px controls.
+STORY: Owner compares the network, administrator manages today's sessions, trainer opens attendance. Context always names the accessible club.
+FIRST VIEWPORT: 224px left navigation; central comparison or next-session workspace; today's chronological agenda on the right. Mobile puts the role's task first and navigation at the bottom.
+FORM: Working panel, grounded structure 3, surface seed f62fcfae; chosen by the user. Signature interaction: session → sequential attendance → explicit close with remaining absences.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+-->
+  <a class="skip-link" href="#main">К содержимому</a>
+  <aside class="sidebar" aria-label="Рабочее пространство">
+    <a class="brand" href="#overview"><img src="../../assets/logo-pride.png" alt="" width="48" height="48"><span><strong>PRIDE</strong><small>Клуб дзюдо</small></span></a>
+    <nav id="desktop-nav" aria-label="Основная навигация"></nav>
+    <div class="sidebar-end"><span class="demo-mark">Прототип · Демоданные</span><div id="identity"></div></div>
+  </aside>
+  <div class="app-body">
+    <header class="topbar">
+      <a class="mobile-brand" href="#overview" aria-label="PRIDE — главная"><img src="../../assets/logo-pride.png" alt="" width="40" height="40"></a>
+      <div class="context-control"><label for="club">Филиал</label><select id="club" aria-label="Филиал"></select></div>
+      <div class="topbar-end"><span class="today-date">Понедельник, 12 октября</span><span id="top-role" class="role-label"></span><span class="mobile-demo">Демоданные</span></div>
+    </header>
+    <main id="main" tabindex="-1"></main>
+    <footer class="app-footer"><span>PRIDE · Рабочее пространство</span><span>Демонстрационные данные · 12 октября 2026</span></footer>
+  </div>
+  <nav id="mobile-nav" class="bottom-nav" aria-label="Мобильная навигация"></nav>
+  <dialog id="sheet" class="sheet" aria-labelledby="sheet-title"><div id="sheet-content"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <noscript>Для работы интерактивного прототипа включите JavaScript.</noscript>
+</body>
+</html>

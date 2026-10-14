@@ -11,6 +11,27 @@ class ClaimRejected(RuntimeError):
     pass
 
 
+def load_plan_registry(root):
+    """Keep completed V1 and the redesign separate while sharing one queue."""
+    plans = [json.loads((root / 'docs' / name).read_text()) for name in (
+        'github-issues-v1.json', 'github-issues-redesign.json',
+    )]
+    repository = plans[0]['repository']
+    issues, ids, numbers = [], set(), set()
+    for plan in plans:
+        if plan['repository'] != repository:
+            raise ClaimRejected('Plan registries refer to different repositories.')
+        for item in plan['issues']:
+            if item['id'] in ids or item['number'] in numbers:
+                raise ClaimRejected('Duplicate issue ID or number in plan registries.')
+            ids.add(item['id'])
+            numbers.add(item['number'])
+            issues.append(item)
+    if any(dep not in ids for item in issues for dep in item['dependencies']):
+        raise ClaimRejected('Unknown prerequisite in plan registries.')
+    return {'repository': repository, 'issues': issues}
+
+
 class GitHub:
     def __init__(self, repository, token, api_url):
         self.base = api_url.rstrip('/') + '/repos/' + repository
@@ -43,10 +64,10 @@ class GitHub:
 def claim(api, number, actor, registry, dry_run=False):
     record = next((item for item in registry['issues'] if item['number'] == number), None)
     if record is None:
-        raise ClaimRejected('Issue is outside the current V1 plan.')
+        raise ClaimRejected('Issue is outside the registered plans.')
     issue = api.request('GET', f'/issues/{number}')
     if 'pull_request' in issue or not issue['title'].startswith(f"[{record['id']}] "):
-        raise ClaimRejected('Issue does not match the V1 registry.')
+        raise ClaimRejected('Issue does not match the plan registry.')
     if issue['state'] != 'open':
         raise ClaimRejected('Issue is closed.')
     # Never treat assignment to the same account as a new claim: another chat
@@ -61,7 +82,7 @@ def claim(api, number, actor, registry, dry_run=False):
     expected = {by_id[dep]['number'] for dep in record['dependencies']}
     dependencies = api.dependencies(number)
     if {item['number'] for item in dependencies} != expected:
-        raise ClaimRejected('Live dependencies differ from the V1 registry; reconcile them first.')
+        raise ClaimRejected('Live dependencies differ from the plan registry; reconcile them first.')
     blocked = [str(item['number']) for item in dependencies if item['state'] != 'closed']
     if blocked:
         raise ClaimRejected('Open prerequisites: #' + ', #'.join(blocked) + '.')
@@ -96,8 +117,7 @@ def main():
         raise ClaimRejected('Invalid request ID.')
     if os.environ['GITHUB_REF'] != 'refs/heads/main' or os.environ['GITHUB_RUN_ATTEMPT'] != '1':
         raise ClaimRejected('Use a new dispatch on main, not another branch or a rerun.')
-    registry_path = Path(__file__).resolve().parents[2] / 'docs/github-issues-v1.json'
-    registry = json.loads(registry_path.read_text())
+    registry = load_plan_registry(Path(__file__).resolve().parents[2])
     if os.environ['GITHUB_REPOSITORY'] != registry['repository']:
         raise ClaimRejected('Unexpected repository.')
     api = GitHub(registry['repository'], os.environ['GH_TOKEN'], os.environ['GITHUB_API_URL'])
