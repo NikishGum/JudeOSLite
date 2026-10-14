@@ -40,4 +40,3 @@ Reached relative to the supplied incumbent PRIDE evidence. The build uses its na
 ## keep
 
 Keep the original PRIDE emblem and Rubik, cool white/gray ground, source radii, owner network comparison, visible mobile next-session action, role-scoped data and explicit attendance-close consequences.
-
