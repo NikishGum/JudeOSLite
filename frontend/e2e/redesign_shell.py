@@ -80,9 +80,13 @@ def check_shell(browser, page, signin, api, owner, club, group, trainer, root, e
     expect(more).to_be_focused()
     assert value.evaluate("document.body.style.overflow !== 'hidden'")
     # Revoke only administrator; trainer remains, including the other admin club.
-    open_section(value, 'Участники')
+    value.goto(root+'/history')
+    expect(value.get_by_label('Филиал истории', exact=True).locator('option[value="'+club['id']+'"]')).to_have_count(1)
     sql(f"DELETE FROM pride.staff_club_roles WHERE staff_user_id='{multi['id']}' AND club_id='{club['id']}' AND role='administrator'")
     value.evaluate("window.dispatchEvent(new Event('focus'))")
+    expect(value.get_by_label('Филиал истории', exact=True).locator('option[value="'+club['id']+'"]')).to_have_count(0)
+    expect(value.get_by_label('Филиал истории', exact=True).locator('option[value="'+other['id']+'"]')).to_have_count(1)
+    value.goto(root+'/clubs/'+club['id']+'/participants')
     expect(value.locator('#registry-title')).to_have_count(0)
     expect(value.locator('main')).to_contain_text('Раздел или филиал недоступен')
     assert value.locator('.sidebar a').all_text_contents() == ['Главная', 'Занятия', 'Журналы', 'История']

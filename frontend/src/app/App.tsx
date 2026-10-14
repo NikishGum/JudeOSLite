@@ -126,6 +126,7 @@ export function App() {
   const available = session?.clubs.find((item) => item.id === selectedId);
   const roles = available?.roles.join(',');
   const clubName = available?.name;
+  const clubTimezone = available?.timezone;
   useEffect(() => {
     setClub(null); setClubError('');
     if (!userId || !selectedId || roles === undefined) return;
@@ -138,7 +139,7 @@ export function App() {
         if (cause instanceof ApiError && cause.status === 404) void loadSession();
       });
     return () => controller.abort();
-  }, [userId, selectedId, roles, clubName, clubAttempt]);
+  }, [userId, selectedId, roles, clubName, clubTimezone, clubAttempt]);
 
   async function signIn(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); if (pending.current) return;
@@ -156,12 +157,13 @@ export function App() {
       if (cause instanceof ApiError && cause.code === 'csrf_failed') await loadSession();
     } finally { pending.current = false; setBusy(false); }
   }
-  const currentClub = club && available && club.id === available.id && club.name === available.name && club.roles.join(',') === roles ? club : null;
+  const currentClub = club && available && club.id === available.id && club.name === available.name && club.timezone === available.timezone && club.roles.join(',') === roles ? club : null;
   const canManage = !!session && (session.user.isOwner || !!currentClub?.roles.includes('administrator'));
   const canTrain = !!currentClub?.roles.includes('trainer');
   const permitted = session ? allowedSections(session.user.isOwner, available?.roles ?? [...new Set(session.clubs.flatMap((c) => c.roles))], session.clubs.some((c) => c.roles.includes('administrator'))) : [];
   const invalid = route.invalid || (!!selectedId && !available) || !permitted.includes(route.section) || (!!route.detail && route.section !== 'participants');
   const items = permitted.map((section) => ({ section, label: sections[section] }));
+  const assignmentKey = session?.clubs.map((c) => `${c.id}:${c.roles.join(',')}`).join(';');
   const hasAdministration = !!session?.clubs.some((c) => c.roles.includes('administrator'));
   const primary = session?.user.isOwner ? ['home', 'statistics', 'sessions'] : (canManage || (!selectedId && hasAdministration)) ? ['home', 'sessions', 'participants'] : ['home', 'sessions', 'journals'];
   const links = (mobile = false) => items.filter((item) => !mobile || primary.includes(item.section)).map(({ section, label }) => <a key={section} href={routePath({ clubId: selectedId, section })} aria-current={route.section === section ? 'page' : undefined} onClick={(event) => {
@@ -189,7 +191,7 @@ export function App() {
         {invalid ? <section className="connection" role="alert"><h2>Раздел или филиал недоступен</h2><p>Проверьте ссылку и свои назначения. Доступ к данным проверяет сервер.</p><button type="button" onClick={() => requestLeave(() => navigate({ clubId: '', section: 'home', detail: '', invalid: false }))}>На главную</button></section> : <>
           {clubError && <div role="alert"><p>{clubError}</p><button type="button" onClick={() => setClubAttempt((v) => v + 1)}>Попробовать снова</button></div>}
           {selectedId && !currentClub && !clubError && <p role="status">Проверяем доступ к филиалу…</p>}
-          <NavigationBoundary key={`${session.user.id}:${selectedId}:${roles}:${route.section}`} dirty={dirty}>
+          <NavigationBoundary key={`${session.user.id}:${session.user.isOwner}:${assignmentKey}:${selectedId}:${clubTimezone}:${route.section}`} dirty={dirty}>
             {route.section === 'home' && <section className="connection home-context"><p className="eyebrow">Рабочая панель PRIDE</p><h2>{available?.name ?? (session.user.isOwner ? 'Обзор сети' : 'Ваши назначения')}</h2><p>{session.user.isOwner ? 'Управляйте филиалами и сотрудниками, следите за статистикой сети.' : (canManage || (!selectedId && hasAdministration)) ? 'Откройте занятия, реестр или журналы выбранного филиала.' : 'Откройте назначенные занятия и журнал для отметок.'}</p>{!session.clubs.length && <p>{session.user.isOwner ? 'Филиалы пока не добавлены.' : 'Нет доступных филиалов. Обратитесь к владельцу клуба.'}</p>}<div className="home-links">{links()}</div></section>}
             {route.section === 'statistics' && session.user.isOwner && <OwnerDashboard />}
             {route.section === 'clubs' && session.user.isOwner && <OwnerManagement mode="clubs" onChanged={() => loadSession()} />}
