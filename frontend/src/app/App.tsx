@@ -163,7 +163,7 @@ export function App() {
   const permitted = session ? allowedSections(session.user.isOwner, available?.roles ?? [...new Set(session.clubs.flatMap((c) => c.roles))], session.clubs.some((c) => c.roles.includes('administrator'))) : [];
   const invalid = route.invalid || (!!selectedId && !available) || !permitted.includes(route.section) || (!!route.detail && route.section !== 'participants');
   const items = permitted.map((section) => ({ section, label: sections[section] }));
-  const assignmentKey = session?.clubs.map((c) => `${c.id}:${c.roles.join(',')}`).join(';');
+  const assignmentKey = session?.clubs.map((c) => `${c.id}:${c.roles.join(',')}`).sort().join(';');
   const hasAdministration = !!session?.clubs.some((c) => c.roles.includes('administrator'));
   const primary = session?.user.isOwner ? ['home', 'statistics', 'sessions'] : (canManage || (!selectedId && hasAdministration)) ? ['home', 'sessions', 'participants'] : ['home', 'sessions', 'journals'];
   const links = (mobile = false) => items.filter((item) => !mobile || primary.includes(item.section)).map(({ section, label }) => <a key={section} href={routePath({ clubId: selectedId, section })} aria-current={route.section === section ? 'page' : undefined} onClick={(event) => {
