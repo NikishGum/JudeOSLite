@@ -41,7 +41,7 @@ PWA_BROWSER=webkit python3 frontend/e2e/pwa_v1.py
 - Черновик не теряется при отмене ссылки, смены филиала и browser back;
   подтверждённый back убирает форму, forward не восстанавливает отвергнутый черновик.
   Beforeunload предотвращён; Escape и возврат focus, native dialog/Tab/Shift+Tab,
-  background overflow, reduced-motion. Никакого обхода серверных scope.
+  background overflow, reduced-motion; меню «Ещё» и подтверждение черновика одновременно закрываются без оставленного scroll lock. Никакого обхода серверных scope.
 - Отзыв admin с сохранением trainer убирает реестр/пункты и записи первого филиала;
   на экране истории без выбранного рабочего филиала убирается отозванный scope; второй admin-филиал работает, прямой API первого запрещён. Старые запросы не возвращают DOM.
 - 320/390/768/1280/1440: screenshot matrix owner/admin/trainer/multi/login и предметных форм,
@@ -76,7 +76,7 @@ PWA_BROWSER=webkit python3 frontend/e2e/pwa_v1.py
 
 ## Фактический итог локальной проверки
 
-14.10.2026, финальные запуски начались в 12:04:12 и 12:04:57 Europe/Minsk.
+14.10.2026, финальные запуски начались в 12:14:59 и 12:15:41 Europe/Minsk.
 Chromium154.0.8037.57 и WebKit26.5: exit0, весь описанный сценарий PASS;
 JS errors отсутствуют. Frontend build/typecheck, production Docker build,
 Python compile, ссылки новых документов и git diff --check PASS.

@@ -1,5 +1,8 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react';
 
+let modalCount = 0;
+let originalOverflow = '';
+
 export function Dialog({ title, children, busy = false, onCancel, cancelLabel = 'Отмена', className = '' }: {
   title: string; children: ReactNode; busy?: boolean; onCancel: () => void; cancelLabel?: string; className?: string;
 }) {
@@ -8,12 +11,13 @@ export function Dialog({ title, children, busy = false, onCancel, cancelLabel = 
   useEffect(() => {
     const element = dialog.current!;
     const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const overflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    if (modalCount === 0) originalOverflow = document.body.style.overflow;
+    modalCount += 1; document.body.style.overflow = 'hidden';
     element.showModal();
     element.querySelector<HTMLElement>('[data-initial-focus]')?.focus();
     return () => {
-      element.close(); document.body.style.overflow = overflow;
+      element.close(); modalCount -= 1;
+      document.body.style.overflow = modalCount ? 'hidden' : originalOverflow;
       if (previous?.isConnected) previous.focus();
     };
   }, []);

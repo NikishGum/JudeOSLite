@@ -84,7 +84,7 @@ build-time shell fallback для новых URL, **не кеширует нав�
   Согласовать изменения до параллельной работы RD-02–RD-04; не переписывать lifecycle/router.
 - `shared/ui/Dialog.tsx`: native modal, desktop справа до 480px, mobile снизу до 90dvh,
   safe-area, focus/Tab/Shift+Tab/Escape/возврат, inert фон и блокировка прокрутки.
-  `busy` запрещает закрытие; cancel type=button. Attendance ActionSheet использует тот же Dialog.
+  `busy` запрещает закрытие; scroll lock учитывает одновременно открытое меню и подтверждение ухода; cancel type=button. Attendance ActionSheet использует тот же Dialog.
 - `shared/ui/NavigationIcon.tsx`: только используемые inline SVG; декоративные, aria-hidden.
 - PRIDE source tokens/fonts/logo неизменны. Локальные рекомендации Working Panel:
   `--panel-success #24664e`, `--panel-success-bg #edf6f1`, `--panel-warning #86520e`,

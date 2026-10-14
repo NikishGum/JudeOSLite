@@ -79,6 +79,16 @@ def check_shell(browser, page, signin, api, owner, club, group, trainer, root, e
     value.keyboard.press('Escape')
     expect(more).to_be_focused()
     assert value.evaluate("document.body.style.overflow !== 'hidden'")
+    # More and the draft guard can coexist; closing both must unlock scrolling.
+    open_section(value, 'Участники')
+    value.get_by_role('button', name='Добавить участника', exact=True).click()
+    value.get_by_label('ФИО участника', exact=True).fill('Nested modal draft')
+    more.click()
+    value.get_by_role('dialog', name='Разделы PRIDE', exact=True).get_by_role('link', name='Группы', exact=True).click()
+    value.get_by_role('dialog', name='Есть несохранённые изменения', exact=True).get_by_role('button', name='Перейти без сохранения', exact=True).click()
+    expect(value.locator('main h1')).to_have_text('Группы')
+    expect(value.locator('dialog')).to_have_count(0)
+    assert value.evaluate("document.body.style.overflow !== 'hidden'")
     # Revoke only administrator; trainer remains, including the other admin club.
     value.goto(root+'/history')
     expect(value.get_by_label('Филиал истории', exact=True).locator('option[value="'+club['id']+'"]')).to_have_count(1)
