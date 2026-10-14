@@ -16,6 +16,8 @@
 
 React-оболочка редизайна RD-01: [навигация/карта функций](../redesign-navigation.md), [проверки](../redesign-shell-validation.md).
 
+Статистика/история RD-04: [контракт и адаптеры RD-05](../redesign-reports.md), [проверка](../redesign-reports-validation.md).
+
 Оформление: [DESIGN.md](../../DESIGN.md), [дизайн-система](../../design-system/README.md). Правила репозитория: [AGENTS.md](../../AGENTS.md).
 Устанавливаемая оболочка/кеш/сессия/обновление: [PWA V1-13](../pwa-v1.md); реальные устройства проверяет V1-16.
 Сквозной browser QA, синтетический пример 40% и протокол физических устройств: [V1-16](../testing-v1.md).

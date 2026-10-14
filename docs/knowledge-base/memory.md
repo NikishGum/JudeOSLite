@@ -390,3 +390,46 @@ Escape и действия320×480 выше навигации. Физическ
 в новом WebKit runner после замены тренера: перед действием тест теперь открывает
 только закрытый details и проверяет open. Продуктовые assertions не ослаблены;
 финальный результат/CI — live #185.
+
+## Статистика и история RD-04 — 14.10.2026
+
+По прямому поручению #186: StarMadeGalaxy/acquired=true,
+request d8f2d43ac78845db8a9bef5210e2258c,
+[run38555111624](https://github.com/NikishGum/JudeOSLite/actions/runs/38555111624).
+Перед кодом Todo/отсутствие другого исполнителя, #183 CLOSED/результат и зелёный
+main проверены. Отдельная codex/rd-04-reports; обновлена до535bacc после RD-02/RD-03.
+[Контракт](../redesign-reports.md), [протокол](../redesign-reports-validation.md).
+
+Working Panel отчёта: полоса4/2×2, полное сравнение таблицей/мобильным списком,
+все closed/planned/open/present/absent/три причины и архив. Процент остаётся
+серверным, UI только округляет; нулевой знаменатель«—». Быстрые даты Europe/Minsk:
+сегодня; неделя Пн–сегодня; месяц1–сегодня, включительно. API по-прежнему использует
+сохранённый timezone занятия. Последний ручной диапазон восстанавливается после
+быстрых кнопок в пределах монтирования; reload/новый раздел начинают текущий месяц.
+Фильтры отчёта независимы от шапки и будущей главной. Drilldown выбирает club/group
+UUID, переход через RD-03 sessionHref несёт филиал/группу/обе даты. Архивному
+филиалу рабочая ссылка не предлагается. Общие App/router/shared/API/токены не менялись.
+
+RD-05 переиспользует `useAttendanceReport(selection)`, `AttendanceReport`,
+`ReportComparison` и `reportPeriod` из owner-dashboard, со своей границей живой
+роли/назначений; не дублирует формулу/endpoint. Abort/key/current selection,
+attendance-changed/focus/visibility/30s, loading/error/retry без фиктивных нулей.
+История сохраняет server keyset50/newest-first/public envelope и owner network
+безclub_id/admin scope/trainer403; read-only фильтры не создают ложный dirty guard.
+Применённый scope подписан; ID записи раскрывается отдельно, private payload,
+контакты/логины/причины общего аудита не добавлены.
+
+Chromium154/WebKit26.5 новый browser→Go→PG контроль PASS:3/7=42,9%→UI-коррекция
+4/7=57,1%, два филиала/одинаковые группы/пустой closed/cancelled/open/planned,
+перевод/архив, сохранённый исторический timezone, quick Sunday/year/custom restore,
+контекстные IDs/даты календаря, failure/retry/late response, paging50+8, admin/owner
+live revoke, keyboard/overflow320/390/1280. Go vet/race/PG/access/training/миграции
+и production build/Docker PASS. Impeccable: контекст вручную (launcher/detector
+отсутствует), два визуальных пакета, независимый finish review ship.
+Первый полный PWA выявил неверный RD-02 fixture assertion: общая личность законно
+видима во втором филиале; тест теперь ждёт ответ B и проверяет другой локальный
+membershipId/foreign404, вместо отрицания общего имени. Product registry неизменён.
+Полный PWA Chromium154/WebKit26.5 после уточнения fixture PASS:2/4/2/1,40%,
+network/session/lifecycle/cache/two-build update. Независимый documenter без замечаний.
+Итоговый CI/main/закрытие — live issue; исходные failures/ограничения в протоколе.
+Физические устройства, установка PWA и пользовательская визуальная приёмка — RD-06.
