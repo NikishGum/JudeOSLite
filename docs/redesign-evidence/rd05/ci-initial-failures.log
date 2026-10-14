@@ -1,0 +1,37 @@
+SHA70d14611d81e68def6dfba7bf95418275d81120c; https://github.com/NikishGum/JudeOSLite/actions/runs/38627562890
+Traceback (most recent call last):
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7674844Z   File "/home/runner/work/JudeOSLite/JudeOSLite/frontend/e2e/redesign_dashboard.py", line 242, in <module>
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7675864Z     home(admin_page, a['id']); counter(admin_page, 'participants', 3)
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7676812Z                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7677353Z   File "/home/runner/work/JudeOSLite/JudeOSLite/frontend/e2e/redesign_dashboard.py", line 151, in counter
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7678024Z     expect(value.locator('[data-counter="'+key+'"]').first).to_have_text(str(number))
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7678703Z   File "/home/runner/.local/lib/python3.12/site-packages/playwright/sync_api/_generated.py", line 22839, in to_have_text
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7696023Z     self._sync(
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7696768Z   File "/home/runner/.local/lib/python3.12/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7697468Z     return task.result()
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7697831Z            ^^^^^^^^^^^^^
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7698626Z   File "/home/runner/.local/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 648, in to_have_text
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7699509Z     await self._expect_impl(
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7700119Z   File "/home/runner/.local/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 128, in _expect_impl
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7700562Z     _record_soft_or_raise(
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7701096Z   File "/home/runner/.local/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 60, in _record_soft_or_raise
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7701541Z     raise error
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7701814Z AssertionError: Locator expected to have text '3'
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7702066Z Actual value: 4 
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7702239Z Call log:
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7702474Z   - Expect "to_have_text" with timeout 5000ms
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7702839Z   - waiting for locator("[data-counter=\"participants\"]").first
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7703527Z     14 × locator resolved to <dd data-counter="participants">4</dd>
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7703886Z        - unexpected value "4"
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7704029Z 
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7704113Z Aria snapshot:
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7704302Z - definition: "4"
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:02.7960623Z ##[error]Process completed with exit code 1.
+
+SHA70d14611d81e68def6dfba7bf95418275d81120c; https://github.com/NikishGum/JudeOSLite/actions/runs/38627604735
+Traceback (most recent call last):
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:58.7523387Z   File "/home/runner/work/JudeOSLite/JudeOSLite/frontend/e2e/redesign_dashboard.py", line 294, in <module>
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:58.7525460Z     expect(owner_page.locator('.dashboard')).to_have_count(0); assert not errors, errors
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:58.7528420Z                                                                       ^^^^^^^^^^
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:58.7531897Z AssertionError: ['/127.0.0.1:18087/api/clubs/08f18486-287d-4c02-99a6-86c2a5b27e87/journals/5869be5d-16cb-4222-b770-2e9b58c2499a due to access control checks.', '/127.0.0.1:18087/api/clubs/08f18486-287d-4c02-99a6-86c2a5b27e87/participants/b56441c8-3a32-405d-9777-1977a5564d80/groups due to access control checks.', '/127.0.0.1:18087/api/clubs/08f18486-287d-4c02-99a6-86c2a5b27e87/participants?q=&state=active&page=0 due to access control checks.']
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-14T20:02:58.7830707Z ##[error]Process completed with exit code 1.

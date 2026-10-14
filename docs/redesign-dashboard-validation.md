@@ -148,6 +148,36 @@ Detector PASS не заявляется; глобальный DESIGN/sidecar н�
 `python3 -m py_compile frontend/e2e/redesign_dashboard.py`, `git diff --check`
 и проверка локальных ссылок документов задачи.
 
+## Уточнение browser-сценария после первого CI
+
+Первый опубликованный70d1461 получил два реальных CI FAIL:
+[push38627562890](https://github.com/NikishGum/JudeOSLite/actions/runs/38627562890)
+и [PR38627604735](https://github.com/NikishGum/JudeOSLite/actions/runs/38627604735).
+Во всех предыдущих PWA/RD-03/RD-04 сценариях обоих движков и dashboard Chromium
+был PASS. В первом WebKit тест уходил на home сразу после клика архивирования:
+показаны4 карточки вместо ожидаемых3. Во втором финальный сборщик pageerror
+зафиксировал WebKit access-control messages для journal/participant groups/list;
+сценарий делал reload/goto после проверки только видимого контейнера или закрытия
+формы. Такая навигация
+допускала гонку с незавершёнными чтениями; точный повтор CI проверяет устранение
+ошибок, локальный PASS сам по себе не доказывает причину каждого WebKit сообщения.
+[Выдержки обоих FAIL](redesign-evidence/rd05/ci-initial-failures.log).
+
+Исправлен только test harness: до reload подтверждаются3 записи журнала;
+после создания —4 строки списка и1 период истории группы. Архивирование ждёт
+именно POST200, подтверждение UI,3 строки списка,1 исторический период и
+независимый SQL count3, затем проверяет счётчик главной3. Это ожидание завершённой
+предметной операции и чтения, без fixed sleep, force click или фильтра pageerror.
+Существующие assertions UI/API/данных/геометрии не ослаблены; продуктовый
+frontend/backend и визуальные снимки предыдущего review остаются теми же.
+
+Полный повтор исправленного dashboard-сценария exit0:
+[Chromium154](redesign-evidence/rd05/dashboard-synchronized-chromium.log) и
+[WebKit26.5](redesign-evidence/rd05/dashboard-synchronized-webkit.log).
+[Независимый review узкой правки](redesign-evidence/rd05/ci-followup-review.md):
+ship; [независимая документационная сверка](redesign-evidence/rd05/ci-documentation-check.md)
+— PASS. Зелёный CI нового точного SHA ещё обязателен перед доставкой.
+
 ## Границы результата
 
 Потерянный результат прежних дополнительных Go-проверок не засчитан: полный

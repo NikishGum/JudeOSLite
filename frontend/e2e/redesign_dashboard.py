@@ -201,7 +201,8 @@ try:
         main_action.press('Enter')
         expect(admin_page).to_have_url(__import__('re').compile('session='+old))
         expect(admin_page.locator('.admin-journal')).to_be_visible()
-        admin_page.reload(); expect(admin_page.locator('.admin-journal')).to_be_visible()
+        expect(admin_page.locator('.admin-records > li')).to_have_count(3)
+        admin_page.reload(); expect(admin_page.locator('.admin-records > li')).to_have_count(3)
         home(admin_page, a['id'])
         admin_page.get_by_role('link', name='Добавить участника · '+a['name'], exact=True).click()
         expect(admin_page.get_by_role('dialog', name='Новый участник', exact=True)).to_be_visible()
@@ -212,7 +213,10 @@ try:
         form.get_by_label('Номер телефона', exact=True).fill('+375291234567')
         form.get_by_label('Начальная группа (необязательно)', exact=True).select_option(ga['id'])
         form.get_by_label('Дата включения в группу', exact=True).fill(dates[0]); form.get_by_role('button', name='Сохранить участника', exact=True).click()
-        expect(form).to_have_count(0); home(admin_page, a['id']); counter(admin_page, 'participants', 4)
+        expect(form).to_have_count(0)
+        expect(admin_page.locator('.participant-rows > li')).to_have_count(4)
+        expect(admin_page.locator('.membership-history .registry-list > li')).to_have_count(1)
+        home(admin_page, a['id']); counter(admin_page, 'participants', 4)
         assert sql(f"SELECT count(*) FROM pride.club_memberships WHERE club_id='{a['id']}' AND archived_at IS NULL") == '4'
         assert api(admin_page, 'GET', '/api/dashboard?clubId='+a['id'])['next']['roster'] == 3
         # A genuine correction refreshes the existing SQL report, without a second formula.
@@ -238,7 +242,16 @@ try:
         # Archive through UI; current counts change but the frozen ledger does not.
         admin_page.goto(ROOT+'/clubs/'+a['id']+'/participants?detail='+members[0][0]['id'])
         admin_page.get_by_role('button', name='В архив', exact=True).click()
-        admin_page.get_by_role('button', name='Подтвердить архивирование', exact=True).click()
+        # A click dispatches the mutation; navigation must wait for its commit
+        # and the UI acknowledgement, otherwise a fast reload can abort it.
+        archive_url = ROOT+'/api/clubs/'+a['id']+'/participants/'+members[0][0]['id']+'/archive'
+        with admin_page.expect_response(lambda response: response.url == archive_url and response.request.method == 'POST') as archive_response:
+            admin_page.get_by_role('button', name='Подтвердить архивирование', exact=True).click()
+        assert archive_response.value.status == 200
+        expect(admin_page.get_by_role('status').filter(has_text='Карточка в архиве. История сохранена.')).to_be_visible()
+        expect(admin_page.locator('.participant-rows > li')).to_have_count(3)
+        expect(admin_page.locator('.membership-history .registry-list > li')).to_have_count(1)
+        assert sql(f"SELECT count(*) FROM pride.club_memberships WHERE club_id='{a['id']}' AND archived_at IS NULL") == '3'
         home(admin_page, a['id']); counter(admin_page, 'participants', 3)
         owner_page.evaluate("window.dispatchEvent(new Event('attendance-changed'))"); metric('percentage', '62,5%')
         # Independent failures never fabricate zeros or leave stale block contents.
