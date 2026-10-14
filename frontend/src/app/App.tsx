@@ -18,6 +18,7 @@ import { TrainerSessions } from '../features/trainer-sessions/TrainerSessions';
 import { AdminJournals } from '../features/journals/AdminJournals';
 import { SessionCalendar } from '../features/sessions/SessionCalendar';
 import { OwnerDashboard } from '../features/owner-dashboard/OwnerDashboard';
+import { Dashboard } from '../features/dashboard/Dashboard';
 
 type Club = { id: string; name: string; timezone: string; archived: boolean; roles: string[] };
 type Session = { user: { id: string; displayName: string; isOwner: boolean }; clubs: Club[]; csrfToken: string };
@@ -192,7 +193,7 @@ export function App() {
           {clubError && <div role="alert"><p>{clubError}</p><button type="button" onClick={() => setClubAttempt((v) => v + 1)}>Попробовать снова</button></div>}
           {selectedId && !currentClub && !clubError && <p role="status">Проверяем доступ к филиалу…</p>}
           <NavigationBoundary key={`${session.user.id}:${session.user.isOwner}:${assignmentKey}:${selectedId}:${clubTimezone}:${route.section}`} dirty={dirty}>
-            {route.section === 'home' && <section className="connection home-context"><p className="eyebrow">Рабочая панель PRIDE</p><h2>{available?.name ?? (session.user.isOwner ? 'Обзор сети' : 'Ваши назначения')}</h2><p>{session.user.isOwner ? 'Управляйте филиалами и сотрудниками, следите за статистикой сети.' : (canManage || (!selectedId && hasAdministration)) ? 'Откройте занятия, реестр или журналы выбранного филиала.' : 'Откройте назначенные занятия и журнал для отметок.'}</p>{!session.clubs.length && <p>{session.user.isOwner ? 'Филиалы пока не добавлены.' : 'Нет доступных филиалов. Обратитесь к владельцу клуба.'}</p>}<div className="home-links">{links()}</div></section>}
+            {route.section === 'home' && (!selectedId || currentClub) && <Dashboard clubId={selectedId} mode={session.user.isOwner ? 'owner' : (canManage || (!selectedId && hasAdministration)) ? 'administrator' : 'trainer'} />}
             {route.section === 'statistics' && session.user.isOwner && <OwnerDashboard />}
             {route.section === 'clubs' && session.user.isOwner && <OwnerManagement beforeNavigate={requestLeave} mode="clubs" onChanged={() => loadSession()} />}
             {route.section === 'history' && <AuditHistory selectedClubId={canManage ? selectedId : ''} />}

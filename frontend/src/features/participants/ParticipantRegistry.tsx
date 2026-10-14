@@ -75,7 +75,7 @@ export function ParticipantRegistry({ clubId, clubName, timezone, onSessionRefre
   useEffect(() => () => { epoch.current += 1; }, []);
   useEffect(() => { if (selected) heading.current?.focus(); }, [selected, cardLoading, editing, confirmArchive]);
 
-  useEffect(() => { setSelected(detailId || null); setEditing(false); setConfirmArchive(false); setError(''); setConflict(false); }, [detailId]);
+  useEffect(() => { setSelected(detailId || null); setEditing(detailId === 'new'); setConfirmArchive(false); setError(''); setConflict(false); }, [detailId]);
   function openNow(id: string) { if (id !== 'new') onDetailChange?.(id); setSelected(id); setEditing(id === 'new'); setConfirmArchive(false); setError(''); setNotice(''); setConflict(false); setCardAttempt((value) => value + 1); }
   function closeNow() { onDetailChange?.(''); setSelected(null); setCard(null); setEditing(false); setConfirmArchive(false); setError(''); setConflict(false); }
   function open(id: string) { if (beforeNavigate) beforeNavigate(() => openNow(id)); else openNow(id); }
