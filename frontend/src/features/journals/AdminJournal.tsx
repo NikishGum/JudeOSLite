@@ -3,6 +3,7 @@ import { apiGet, apiPut, ApiError } from '../../shared/api';
 import type { Session } from '../sessions/types';
 import { stateNames } from '../trainer-sessions/types';
 import { type Journal, type Record, markLabel, originLabel } from './types';
+import { trainingChanged } from '../sessions/navigation';
 import { RecordHistory } from './RecordHistory';
 
 export function AdminJournal({ clubId, initial, onUnavailable }: { clubId: string; initial: Session; onUnavailable: () => void }) {
@@ -28,7 +29,7 @@ export function AdminJournal({ clubId, initial, onUnavailable }: { clubId: strin
       const result = await apiPut<Journal>(`${base}/records/${draft.record.id}`, { version: draft.record.version, state: draft.value === 'present' ? 'present' : 'absent', absenceReason: draft.value === 'present' ? null : draft.value, changeReason: draft.reason });
       if (!mounted.current) return;
       setJournal(result); setDraft(null); setHistoryId(draft.record.id); setNotice('Отметка подтверждена сервером.');
-      window.dispatchEvent(new Event('attendance-changed'));
+      trainingChanged();
     } catch (e) {
       if (!mounted.current) return;
       setError(e instanceof ApiError ? e.message : 'Нет соединения. Исправление не подтверждено. Ввод сохранён для повтора.');
@@ -39,7 +40,7 @@ export function AdminJournal({ clubId, initial, onUnavailable }: { clubId: strin
   function edit(record: Record) { setDraft({ record, value: record.state === 'present' ? 'present' : record.absenceReason ?? 'unknown', reason: '' }); setError(''); setNotice(''); }
   return <div className="admin-journal" aria-busy={busy || loading}>
     <h3>Журнал · {initial.groupName} · {initial.date}</h3>
-    <button disabled={busy} onClick={() => setAttempt((n) => n + 1)}>{conflict ? 'Перечитать журнал и сбросить ввод' : 'Обновить журнал'}</button>
+    <button className="secondary" disabled={busy} onClick={() => setAttempt((n) => n + 1)}>{conflict ? 'Перечитать журнал и сбросить ввод' : 'Обновить журнал'}</button>
     {error && <p className="error" role="alert">{error}</p>}{notice && <p role="status">{notice}</p>}{loading && <p role="status">Загружаем снимок состава…</p>}
     {journal && <>
       <p><strong>{stateNames[journal.session.status]}</strong> · Участников в снимке: {journal.records.length}</p>
@@ -48,7 +49,7 @@ export function AdminJournal({ clubId, initial, onUnavailable }: { clubId: strin
       {journal.records.length === 0 && <p>{journal.session.rosterFrozen ? 'Снимок состава пуст.' : 'Снимок состава ещё не создан.'}</p>}
       <ul className="admin-records">{journal.records.map((record) => <li key={record.id} data-record-id={record.id}>
         <h4>{record.fullName}{record.archived && ' · Карточка в архиве'}</h4>
-        <p>{markLabel(record)}</p>{record.origin && <p>{originLabel(record.origin)} · Версия {record.version}</p>}
+        <p><span className={`training-status status-${record.state ?? 'unmarked'}`}>{markLabel(record)}</span></p>{record.origin && <p>{originLabel(record.origin)} · Версия {record.version}</p>}
         {record.changeReason && <p className="change-reason">Причина последнего исправления: {record.changeReason}</p>}
         <div className="actions">
           {journal.session.status === 'closed' && <button disabled={busy || conflict || draft !== null} onClick={() => edit(record)}>Исправить отметку</button>}

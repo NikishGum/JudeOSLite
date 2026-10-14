@@ -13,3 +13,15 @@
 .record-history li { margin-bottom: 16px; }
 .change-reason { white-space: pre-wrap; }
 @media (max-width: 480px) { .admin-journal-filters > *, .admin-session-list button { width: 100%; } .admin-records > li { padding: 12px; } }
+.admin-session-list, .admin-records { gap: 0; }
+.admin-session-list > li, .admin-records > li { border: 0; border-radius: 0; border-bottom: 1px solid var(--panel-line); padding: 20px 0; }
+.admin-records h4 { font-size: 16px; font-weight: 500; margin: 0 0 8px; }
+.admin-records p { margin: 8px 0; }
+.correction-form { padding: 20px; background: var(--pride-surface-subtle); border-radius: 12px; max-width: 680px; }
+.correction-form .field { margin: 0; }
+.record-history { padding: 16px 0; }
+.record-history h4 { font-size: 16px; }
+@media (max-width: 760px) { .correction-form { padding: 16px 12px; } .admin-records .actions > button { width: 100%; } }
+
+.admin-journal .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-block: 12px; }
+.admin-journal h3 { font-size: 22px; margin-block: 0 16px; }

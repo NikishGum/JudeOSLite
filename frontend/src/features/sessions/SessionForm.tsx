@@ -15,8 +15,8 @@ export function SessionForm({ clubId, timezone, groups, trainers, selectedGroup,
   const [duration, setDuration] = useState(session ? (Date.parse(session.endsAt) - Date.parse(session.startsAt)) / 60_000 : 60);
   const [reason, setReason] = useState(''), [confirmed, setConfirmed] = useState(false);
   const [busy, setBusy] = useState(false), [error, setError] = useState(''), [stale, setStale] = useState(false);
-  const pending = useRef(false), mounted = useRef(true);
-  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
+  const pending = useRef(false), mounted = useRef(true), heading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => { mounted.current = true; heading.current?.focus(); heading.current?.scrollIntoView({ block: 'start' }); return () => { mounted.current = false; }; }, []);
   async function submit(event: FormEvent) {
     event.preventDefault(); if (pending.current || stale) return;
     pending.current = true; setBusy(true); setError('');
@@ -27,7 +27,7 @@ export function SessionForm({ clubId, timezone, groups, trainers, selectedGroup,
     catch (cause) { if (mounted.current) { setError(message(cause)); setStale(cause instanceof ApiError && ['version_conflict', 'session_state_conflict', 'open_confirmation_required'].includes(cause.code)); } }
     finally { if (mounted.current) { pending.current = false; setBusy(false); } }
   }
-  return <div className="registry-card session-form"><h3>{action ? actionNames[action] : 'Новое разовое занятие'}</h3>
+  return <div className="registry-card session-form"><h3 ref={heading} tabIndex={-1}>{action ? actionNames[action] : 'Новое разовое занятие'}</h3>
     {error && <p role="alert" className="error">{error}</p>}
     {stale && <p>Ввод сохранён. <button className="secondary" disabled={busy} onClick={onRefresh}>Загрузить актуальные занятия и сбросить форму</button></p>}
     <form onSubmit={(event) => void submit(event)} aria-busy={busy}><fieldset disabled={busy}>

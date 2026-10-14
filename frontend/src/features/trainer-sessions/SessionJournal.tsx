@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { ApiError, apiGet, apiPost, apiPut } from '../../shared/api';
 import type { Session } from '../sessions/types';
+import { localDate } from '../schedule/types';
+import { trainingChanged } from '../sessions/navigation';
 import { AttendanceCards } from '../attendance/AttendanceCards';
 import { ActionSheet } from '../attendance/ActionSheet';
 import { type AttendanceRecord, type Journal, reasonNames, stateNames } from './types';
@@ -22,7 +24,7 @@ export function SessionJournal({ clubId, initial, onChanged }: Props) {
   const changed = useRef(onChanged); changed.current = onChanged;
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   useEffect(() => {
-    if (loading) return;
+    if (loading || journal?.session.status !== 'planned') return;
     heading.current?.focus();
     heading.current?.scrollIntoView({ block: 'start' });
   }, [loading]);
@@ -45,7 +47,7 @@ export function SessionJournal({ clubId, initial, onChanged }: Props) {
     try {
       const result = await run();
       if (!mounted.current) return null;
-      setJournal(result); setConfirm(false); changed.current(result.session);
+      setJournal(result); setConfirm(false); changed.current(result.session); trainingChanged();
       return result;
     } catch (cause) {
       if (!mounted.current) return null;
@@ -66,7 +68,7 @@ export function SessionJournal({ clubId, initial, onChanged }: Props) {
   const canWrite = journal?.session.status === 'open' && !conflict && !unavailable;
   return <div className="session-journal" aria-busy={busy || loading}>
     <h3 ref={heading} tabIndex={-1}>Журнал · {initial.groupName}</h3>
-    <button disabled={busy} onClick={() => setAttempt((value) => value + 1)}>{conflict ? 'Загрузить актуальный журнал и сбросить ввод' : 'Обновить журнал'}</button>
+    <button className="secondary" disabled={busy} onClick={() => setAttempt((value) => value + 1)}>{conflict ? 'Загрузить актуальный журнал и сбросить ввод' : 'Обновить журнал'}</button>
     {error && <p className="error" role="alert">{error}</p>}
     {unavailable && <p>Доступ к журналу отозван или занятие больше вам не назначено. Обновите список занятий.</p>}
     {loading && <p role="status">Загружаем журнал…</p>}
@@ -74,7 +76,8 @@ export function SessionJournal({ clubId, initial, onChanged }: Props) {
       <p role="status">{stateNames[journal.session.status]} · Не отмечено: {unmarked} из {journal.records.length}</p>
       {journal.session.status === 'planned' ? <>
         <p>При открытии сохраняется состав группы на {journal.session.date}.</p>
-        <button disabled={busy || conflict || unavailable} onClick={() => void command(() => apiPost<Journal>(`${base}/open`, { version: journal.session.version }))}>Подтвердить открытие журнала</button>
+        {journal.session.date > localDate(journal.session.timezone) && <p>Открыть журнал можно в день занятия.</p>}
+        <button disabled={busy || conflict || unavailable || journal.session.date > localDate(journal.session.timezone)} onClick={() => void command(() => apiPost<Journal>(`${base}/open`, { version: journal.session.version }))}>Подтвердить открытие журнала</button>
       </> : <>
         {journal.session.status === 'cancelled' && <p>Занятие отменено. Отметки сохранены, автоматических отсутствий нет.</p>}
         {journal.session.status === 'closed' && <p>Журнал завершён. Для исправления обратитесь к администратору.</p>}
