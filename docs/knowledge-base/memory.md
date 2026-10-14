@@ -354,3 +354,35 @@ Group detail поддерживает reload/history; переход в заня
 RD-03–RD-06 не реализованы. CI/main/фактические результаты и Done — live #184;
 статусный workflow принимает только V1, как отмечено в #183, поэтому Done после закрытия RD
 проверяется отдельно. Физические устройства/визуальный signoff не подменяются Cloud QA.
+
+## Занятия и посещаемость RD-03 — 14.10.2026
+
+По поручению #185, StarMadeGalaxy/acquired=true, request e6a1d80a2ff24f768eb1809951d501ff,
+[run38549704417](https://github.com/NikishGum/JudeOSLite/actions/runs/38549704417).
+Отдельная codex/rd-03-sessions от fa1884a; #183/main/зелёные проверки подтверждены.
+#184 ведёт NikishGum, её app/App.tsx/navigation.ts не меняются; согласованный
+`?group=` сверён с live комментарием/опубликованной ветвью. Реализация ограничена
+занятиями/расписанием/журналами и проверками. [Контракт](../redesign-training.md),
+[датированный протокол](../redesign-training-validation.md).
+
+День/неделя Пн–Вс/ручной включительный период, группа по ID и явный сброс,
+статусы/исключения, конкретный журнал внутри занятий; все четыре режима и
+серверные v1-операции сохранены. `sessionHref(clubId,{groupId,sessionId,from,
+through,view,journal})` возвращает обычную ссылку; RD-05 использует её напрямую.
+`trainingChanged()` публикует существующее `attendance-changed` без payload
+после подтверждённого open/mark/close/correct/изменения занятия/правила.
+Тренер: последовательные карточки и состав справа на ПК, прежний pending guard,
+причины/Escape/сводка/close defaults; manager — одна closed-коррекция с причиной,
+версией/409/историей. Backend, shared/lifecycle/API, исходные токены неизменны.
+
+Build/production Docker/полные Go vet/race PostgreSQL tests PASS; существующий
+Chromium/WebKit UI/PWA 2/4/2/1 и40%, новый Chromium154/WebKit26.5 UI→API→PG сценарий
+с переносом/заменой/отменой/ID двух филиалов/deep link/back/reload/сбоем/double tap/
+close/correction conflict PASS. Парные снимки390/1280, overflow320, keyboard/
+Escape и действия320×480 выше навигации. Физические устройства/новая пользовательская
+визуальная приёмка — RD-06, не PASS этой задачи. Итоговые SHA/CI/main/закрытие —
+в live issue; датированная память не заменяет статус очереди.
+
+Перед доставкой RD-03 обновлён от main eabae80 (PR #191/RD-02); обе записи памяти
+сохранены, продуктовых конфликтов нет. Совместный переход «К занятиям группы»
+с применением UUID прошёл Chromium/WebKit вместе с полным новым сценарием RD-03.

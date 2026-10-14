@@ -12,6 +12,8 @@
 4. По теме: [клуб](club.md), [iPay](ipay.md), [старый протокол](ipay-protocol.md), [источники](site-inventory.md). Это не разрешение включить оплаты обратно в v1.
 5. Для прежних решений/плана — [история](../archive/README.md).
 
+Занятия/журналы RD-03: [контракт переходов](../redesign-training.md), [проверки](../redesign-training-validation.md).
+
 React-оболочка редизайна RD-01: [навигация/карта функций](../redesign-navigation.md), [проверки](../redesign-shell-validation.md).
 
 Оформление: [DESIGN.md](../../DESIGN.md), [дизайн-система](../../design-system/README.md). Правила репозитория: [AGENTS.md](../../AGENTS.md).

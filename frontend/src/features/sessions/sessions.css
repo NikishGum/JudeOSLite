@@ -1,10 +1,54 @@
-.session-calendar { overflow-wrap: anywhere; }
-.session-filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 24px 0; }
+.session-calendar, .session-detail { overflow-wrap: anywhere; }
+.session-calendar .section-heading p { margin: 6px 0 0; }
+.session-period-toolbar, .session-view, .session-step { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.session-period-toolbar { justify-content: space-between; margin: 24px 0 16px; }
+.session-view { padding: 4px; border: 1px solid var(--panel-line); border-radius: var(--pride-radius-field); background: var(--pride-surface-subtle); }
+.session-view button { border: 0; background: transparent; }
+.session-view button[aria-pressed="true"] { color: var(--pride-on-brand); background: var(--pride-brand); }
+.session-filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 16px 0; }
+.session-filters .field { margin: 0; }
+.session-list-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+.session-list-heading p { margin: 8px 0; }
+.session-day { margin-top: 24px; }
+.session-day-heading { font-size: 14px; font-weight: 500; margin: 0; padding-bottom: 12px; border-bottom: 1px solid var(--panel-line); text-transform: capitalize; }
+.session-calendar .session-list { margin: 0; gap: 0; }
+.session-calendar .session-list > li { display: grid; grid-template-columns: 76px minmax(0, 1fr) minmax(150px, auto); align-items: start; gap: 20px; padding: 20px 0; border: 0; border-bottom: 1px solid var(--panel-line); border-radius: 0; }
+.session-clock { display: grid; gap: 4px; font-variant-numeric: tabular-nums; }
+.session-clock strong { font-size: 20px; font-weight: 500; }
+.session-clock span { color: var(--pride-text-secondary); }
+.session-information h3 { font-size: 16px; font-weight: 500; margin: 0 0 8px; }
+.session-information p { margin: 6px 0; }
+.training-status { display: inline-block; font-size: 13px; font-weight: 500; padding: 4px 8px; border-radius: 4px; background: var(--pride-surface-subtle); color: var(--pride-text-secondary); }
+.training-status.status-open, .training-status.status-absent { color: var(--panel-warning); background: var(--panel-warning-bg); }
+.training-status.status-closed, .training-status.status-present { color: var(--panel-success); background: var(--panel-success-bg); }
+.session-row-actions { display: grid; gap: 8px; max-width: 240px; }
+.session-row-actions details summary { padding: 12px 4px; min-height: 44px; cursor: pointer; }
+.session-row-actions .actions { display: grid; gap: 8px; margin: 4px 0; }
+.session-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; color: var(--pride-text); background: var(--pride-surface); border: 1px solid var(--pride-border); border-radius: var(--pride-radius-button); font-weight: 500; text-decoration: none; text-align: center; }
+.session-primary { color: var(--pride-on-brand); background: var(--pride-brand); border-color: var(--pride-brand); }
+.session-link:hover { background: var(--pride-brand-hover); color: var(--pride-on-brand); }
+.session-empty { padding: 32px 0 8px; max-width: 65ch; }
+.session-empty h3 { font-size: 20px; }
 .session-time { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-.session-calendar .session-list li { display: block; }
-.session-list .actions { margin-top: 16px; }
-.session-warning { padding: 16px; background: var(--pride-surface-section); border-radius: 10px; margin: 16px 0; }
+.session-warning { padding: 16px; background: var(--panel-warning-bg); color: var(--panel-warning); border-radius: 12px; margin: 16px 0; }
 .session-warning label { display: flex; align-items: center; gap: 12px; min-height: 44px; }
 .session-warning input { width: 20px; height: 20px; flex: 0 0 20px; padding: 0; }
 .session-form textarea { width: 100%; min-width: 0; min-height: 100px; resize: vertical; border: 1px solid var(--pride-border); border-radius: var(--pride-radius-field); padding: 12px; background: var(--pride-surface); color: var(--pride-text); font: 400 16px/1.4 var(--pride-font); }
-@media (max-width: 600px) { .session-filters, .session-time { grid-template-columns: 1fr; } }
+.session-detail .session-journal, .session-detail .admin-journal { border-top: 0; padding-top: 0; margin-top: 16px; }
+@media (max-width: 1050px) { .session-calendar .session-list > li { grid-template-columns: 68px minmax(0, 1fr); gap: 12px; } .session-row-actions { grid-column: 2; max-width: none; } }
+@media (max-width: 760px) {
+  .session-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .session-filters > :last-child { grid-column: 1 / -1; }
+  .session-period-toolbar > button, .session-view button, .session-step button { width: auto; }
+  .session-period-toolbar { gap: 12px; }
+  .session-view { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .session-view button { padding-inline: 2px; white-space: nowrap; }
+  .session-view { gap: 4px; padding: 3px; }
+  .session-clock strong { font-size: 18px; }
+  .session-row-actions { grid-column: 1 / -1; }
+  .session-link { font-size: 16px; }
+}
+@media (max-width: 360px) { .session-filters, .session-time { grid-template-columns: 1fr; } }
+.session-detail + .schedule { display: none; }
+.session-form h3 { scroll-margin-top: 24px; }
+.session-calendar .session-form { border: 0; border-radius: 0; padding: 24px 0; border-block: 1px solid var(--panel-line); }
