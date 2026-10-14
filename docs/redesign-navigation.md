@@ -95,3 +95,11 @@ build-time shell fallback для новых URL, **не кеширует нав�
   RD-05 использует опубликованные ими read/navigation adapters.
 
 [Проверка RD-01](redesign-shell-validation.md) · [План](development-plan-redesign.md).
+
+## Адаптеры RD-02
+
+RD-02 добавляет group detail `/clubs/:clubId/groups?detail=:groupId` и транспорт
+`/clubs/:clubId/sessions?group=:groupId` в `Route.group`. Roster/detail реальный;
+применение и видимый календарный фильтр выполняет RD-03. Смена филиала/раздела
+сбрасывает оба ID; UUID — контекст запроса, не право. Редакторы RD-02 используют
+существующий Dialog и requestLeave. [Подробный контракт](redesign-registry.md).

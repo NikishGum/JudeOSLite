@@ -1,22 +1,22 @@
-.management .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 24px 0; }
+.management .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin: 24px 0; }
 .management .section-heading:first-child { margin-top: 0; }
-.management h3 { margin: 0; font-size: 20px; overflow-wrap: anywhere; }
-.management h4 { margin: 0; font-size: 18px; overflow-wrap: anywhere; }
+.management h3 { margin: 0; font-size: 18px; overflow-wrap: anywhere; }
+.management h4 { margin: 0; font-size: 16px; font-weight: 500; overflow-wrap: anywhere; }
 .management p { overflow-wrap: anywhere; }
-button.secondary { background: var(--pride-surface-subtle); border: 1px solid var(--pride-border); color: var(--pride-text); }
-button.secondary:hover:not(:disabled) { background: var(--pride-surface-section); }
+.management .context-name { margin: 8px 0 0; }
 .management .actions { display: flex; flex-wrap: wrap; gap: 12px; }
-.management .editor { padding: 24px; margin: 24px 0; background: var(--pride-surface-subtle); border: 1px solid var(--pride-border); border-radius: var(--pride-radius-field); }
+.management .editor { padding: 0; margin: 24px 0; }
 .management fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
-.management fieldset.assignments { border: 1px solid var(--pride-border); border-radius: var(--pride-radius-field); padding: 12px; margin: 24px 0; }
+.management fieldset.assignments { border-top: 1px solid var(--panel-line); padding: 16px 0 0; margin: 24px 0; }
+.management .assignments legend { font-weight: 600; }
 .management .check { display: flex; align-items: center; gap: 12px; min-height: 48px; font-weight: 400; overflow-wrap: anywhere; }
 .management .check input { width: 22px; height: 22px; min-height: 22px; flex: none; accent-color: var(--pride-brand); }
 .management-list { list-style: none; margin: 0; padding: 0; }
-.management-list li { display: flex; gap: 20px; align-items: center; justify-content: space-between; padding: 20px 0; border-bottom: 1px solid var(--pride-border); }
+.management-list li { display: flex; gap: 24px; align-items: center; justify-content: space-between; padding: 16px 0; border-top: 1px solid var(--panel-line); }
 .management-list li > div:first-child { min-width: 0; }
 .management-list li p { margin: 8px 0; }
-@media (max-width: 600px) {
+@media (max-width: 760px) {
   .management .section-heading, .management-list li { align-items: stretch; flex-direction: column; }
-  .management .editor { padding: 16px; }
   .management .actions { flex-direction: column; }
+  .management h4 { font-size: 17px; }
 }

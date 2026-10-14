@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ApiError, apiGet, apiPost, apiPut } from '../../shared/api';
+import { Dialog } from '../../shared/ui/Dialog';
 import './clubs.css';
 
 type Club = { id: string; name: string; address: string; timezone: string; archived: boolean; version: number };
@@ -10,7 +11,7 @@ const emptyClub: ClubDraft = { name: '', address: '', timezone: 'Europe/Minsk' }
 const emptyStaff: StaffDraft = { login: '', displayName: '', password: '', clubIds: [], disabled: false };
 const message = (cause: unknown) => cause instanceof ApiError ? cause.message : 'Нет соединения. Проверьте интернет и повторите действие.';
 
-export function OwnerManagement({ onChanged, mode = 'clubs' }: { mode?: 'clubs' | 'staff'; onChanged: () => Promise<void> }) {
+export function OwnerManagement({ onChanged, beforeNavigate, mode = 'clubs' }: { beforeNavigate: (action: () => void) => void; mode?: 'clubs' | 'staff'; onChanged: () => Promise<void> }) {
   const [clubs, setClubs] = useState<Club[]>([]);
   const [staff, setStaff] = useState<Staff[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,24 +31,28 @@ export function OwnerManagement({ onChanged, mode = 'clubs' }: { mode?: 'clubs' 
 
   useEffect(() => {
     const controller = new AbortController(); setLoading(true); setLoadError('');
-    Promise.all([apiGet<Club[]>('/api/clubs', controller.signal), apiGet<Staff[]>('/api/staff', controller.signal)])
+    Promise.all([apiGet<Club[]>('/api/clubs', controller.signal), mode === 'staff' ? apiGet<Staff[]>('/api/staff', controller.signal) : Promise.resolve([])])
       .then(([clubList, staffList]) => { if (!controller.signal.aborted) { setClubs(clubList); setStaff(staffList); } })
       .catch((cause: unknown) => { if (!controller.signal.aborted) setLoadError(message(cause)); })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
-  }, [attempt]);
+  }, [attempt, mode]);
   useEffect(() => () => { epoch.current += 1; }, []);
   useEffect(() => { if (clubEditor || staffEditor || archive) editorRef.current?.focus(); }, [clubEditor, staffEditor, archive]);
 
   function closeEditor() { setClubEditor(null); setStaffEditor(null); setArchive(null); setStaffDraft(emptyStaff); }
-  function editClub(value: Club | 'new') {
-    closeEditor(); setClubEditor(value); setError(''); setNotice('');
+  function editClubNow(value: Club | 'new') {
+    closeEditor();
+    setClubEditor(value); setError(''); setNotice('');
     setClubDraft(value === 'new' ? emptyClub : { name: value.name, address: value.address, timezone: value.timezone });
   }
-  function editStaff(value: Staff | 'new') {
-    closeEditor(); setStaffEditor(value); setError(''); setNotice('');
+  function editStaffNow(value: Staff | 'new') {
+    closeEditor();
+    setStaffEditor(value); setError(''); setNotice('');
     setStaffDraft(value === 'new' ? emptyStaff : { login: value.login, displayName: value.displayName, password: '', clubIds: value.clubIds, disabled: value.disabled });
   }
+  function editClub(value: Club | 'new') { beforeNavigate(() => editClubNow(value)); }
+  function editStaff(value: Staff | 'new') { beforeNavigate(() => editStaffNow(value)); }
   async function save(action: () => Promise<unknown>, success: string) {
     if (pending.current) return;
     pending.current = true; setBusy(true); setError(''); setNotice('');
@@ -77,15 +82,15 @@ export function OwnerManagement({ onChanged, mode = 'clubs' }: { mode?: 'clubs' 
   function toggleClub(id: string, checked: boolean) { setStaffDraft((value) => ({ ...value, clubIds: checked ? [...value.clubIds, id] : value.clubIds.filter((item) => item !== id) })); }
 
   return <section className="connection management" aria-labelledby="management-title">
-    <div className="section-heading"><div><p className="eyebrow">Управление сетью</p><h2 id="management-title">{mode === 'clubs' ? 'Филиалы' : 'Администраторы сети'}</h2></div>
-      <button className="secondary" disabled={busy || loading} onClick={() => setAttempt((value) => value + 1)}>Обновить список</button></div>
-    {error && <p className="error" role="alert">{error}</p>}
+    <div className="section-heading"><div><h2 id="management-title">{mode === 'clubs' ? 'Филиалы' : 'Администраторы сети'}</h2><p className="help context-name">Вся сеть · управление владельца</p></div>
+      <div className="actions">{mode === 'clubs' ? <button disabled={busy || loading || !!loadError} onClick={() => editClub('new')}>Добавить филиал</button> : <button disabled={busy || loading || !!loadError || !clubs.some((item) => !item.archived)} onClick={() => editStaff('new')}>Создать администратора</button>}<button className="secondary" disabled={busy || loading} onClick={() => setAttempt((value) => value + 1)}>Обновить список</button></div></div>
+    {!clubEditor && !staffEditor && error && <p className="error" role="alert">{error}</p>}
     {notice && <p role="status">{notice}</p>}
     {loading && <p role="status">Загружаем филиалы и сотрудников…</p>}
     {loadError && <div role="alert"><p>{loadError}</p><button className="secondary" disabled={busy} onClick={() => setAttempt((value) => value + 1)}>Попробовать снова</button></div>}
 
-    {clubEditor && <form className="editor" onSubmit={saveClub} aria-busy={busy}>
-      <h3 ref={editorRef} tabIndex={-1}>{clubEditor === 'new' ? 'Новый филиал' : 'Редактирование филиала'}</h3>
+    {clubEditor && <Dialog className="subject-panel" title={clubEditor === 'new' ? 'Новый филиал' : 'Редактирование филиала'} busy={busy} onCancel={() => beforeNavigate(closeEditor)} cancelLabel="Закрыть форму"><p className="help context-name">Вся сеть{clubEditor !== 'new' && ` · ${clubEditor.name}`}</p>{error && <p className="error" role="alert">{error}</p>}<form className="editor" onSubmit={saveClub} aria-busy={busy}>
+
       <fieldset disabled={busy}>
         <label className="field">Название филиала<input required maxLength={200} value={clubDraft.name} onChange={(event) => setClubDraft({ ...clubDraft, name: event.target.value })} /></label>
         <label className="field">Адрес зала<input maxLength={500} value={clubDraft.address} onChange={(event) => setClubDraft({ ...clubDraft, address: event.target.value })} /></label>
@@ -93,10 +98,10 @@ export function OwnerManagement({ onChanged, mode = 'clubs' }: { mode?: 'clubs' 
         <p id="timezone-help" className="help">Название зоны, например Europe/Minsk. Время занятий будет отображаться в этой зоне.</p>
         <div className="actions"><button type="submit">{busy ? 'Сохраняем…' : 'Сохранить филиал'}</button><button className="secondary" type="button" onClick={closeEditor}>Отмена</button></div>
       </fieldset>
-    </form>}
+    </form></Dialog>}
 
-    {staffEditor && <form className="editor" onSubmit={saveStaff} aria-busy={busy}>
-      <h3 ref={editorRef} tabIndex={-1}>{staffEditor === 'new' ? 'Новый администратор' : 'Аккаунт и назначения'}</h3>
+    {staffEditor && <Dialog className="subject-panel" title={staffEditor === 'new' ? 'Новый администратор' : 'Аккаунт и назначения'} busy={busy} onCancel={() => beforeNavigate(closeEditor)} cancelLabel="Закрыть форму"><p className="help context-name">Вся сеть · назначения администратора</p>{error && <p className="error" role="alert">{error}</p>}<form className="editor" onSubmit={saveStaff} aria-busy={busy}>
+
       <fieldset disabled={busy}>
         <label className="field">Имя сотрудника<input required maxLength={200} value={staffDraft.displayName} onChange={(event) => setStaffDraft({ ...staffDraft, displayName: event.target.value })} /></label>
         {staffEditor === 'new' ? <>
@@ -113,7 +118,7 @@ export function OwnerManagement({ onChanged, mode = 'clubs' }: { mode?: 'clubs' 
         <p className="help">Можно назначить несколько филиалов. Снятие назначения сразу закрывает права администратора в филиале; роль тренера, если есть, сохраняется.</p>
         <div className="actions"><button type="submit" disabled={staffEditor === 'new' && staffDraft.clubIds.length === 0}>{busy ? 'Сохраняем…' : 'Сохранить администратора'}</button><button className="secondary" type="button" onClick={closeEditor}>Отмена</button></div>
       </fieldset>
-    </form>}
+    </form></Dialog>}
 
     {archive && <div className="editor" role="region" aria-labelledby="archive-title">
       <h3 id="archive-title" ref={editorRef} tabIndex={-1}>Архивировать «{archive.name}»?</h3>
@@ -121,13 +126,13 @@ export function OwnerManagement({ onChanged, mode = 'clubs' }: { mode?: 'clubs' 
       <div className="actions"><button disabled={busy} onClick={() => void save(() => apiPost(`/api/clubs/${archive.id}/archive`, { version: archive.version }), 'Филиал перенесён в архив. История сохранена.')}>{busy ? 'Архивируем…' : 'Подтвердить архивирование'}</button><button className="secondary" disabled={busy} onClick={closeEditor}>Отмена</button></div>
     </div>}
 
-    {mode === 'clubs' && <><div className="section-heading"><h3>Филиалы</h3><button disabled={busy || loading || !!loadError} onClick={() => editClub('new')}>Добавить филиал</button></div>
+    {mode === 'clubs' && <>
     {!loading && !loadError && clubs.length === 0 && <p>Каждый зал добавляется как отдельный филиал.</p>}
     <ul className="management-list">{clubs.map((item) => <li key={item.id}><div><h4>{item.name}</h4><p>{item.address || 'Адрес не указан'}<br />{item.timezone} · {item.archived ? 'В архиве' : 'Действующий'}</p></div><div className="actions">
       <button className="secondary" disabled={busy || loading} onClick={() => editClub(item)} aria-label={`Редактировать филиал ${item.name}`}>Редактировать</button>
       {!item.archived && <button className="secondary" disabled={busy || loading} onClick={() => { closeEditor(); setError(''); setNotice(''); setArchive(item); }} aria-label={`Архивировать филиал ${item.name}`}>В архив</button>}</div></li>)}</ul>
     </>}
-    {mode === 'staff' && <><div className="section-heading"><h3>Сотрудники и назначения</h3><button disabled={busy || loading || !!loadError || !clubs.some((item) => !item.archived)} onClick={() => editStaff('new')}>Создать администратора</button></div>
+    {mode === 'staff' && <>
     {!loading && !loadError && staff.length === 0 && <p>Создайте отдельный аккаунт для каждого сотрудника.</p>}
     <ul className="management-list">{staff.map((item) => <li key={item.id}><div><h4>{item.displayName}</h4><p>{item.login} · {item.disabled ? 'Аккаунт отключён' : 'Аккаунт включён'}</p><p>Администратор: {item.clubIds.map((id) => { const club = clubs.find((value) => value.id === id); return `${club?.name ?? 'Филиал'}${club?.archived ? ' (архив)' : ''}`; }).join(', ') || 'нет назначений'}</p></div>
       <button className="secondary" disabled={busy || loading} onClick={() => editStaff(item)} aria-label={`Изменить назначения ${item.displayName}`}>Изменить назначения</button></li>)}</ul>
