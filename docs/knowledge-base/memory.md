@@ -433,3 +433,49 @@ membershipId/foreign404, вместо отрицания общего имени
 network/session/lifecycle/cache/two-build update. Независимый documenter без замечаний.
 Итоговый CI/main/закрытие — live issue; исходные failures/ограничения в протоколе.
 Физические устройства, установка PWA и пользовательская визуальная приёмка — RD-06.
+
+## Главные экраны RD-05 — 14.10.2026
+
+По поручению #187 и явной передаче незакоммиченной работы: StarMadeGalaxy,
+acquired=true, request9dd9ff8579884f3a8dfd0726f97f30c8,
+[run38582696362](https://github.com/NikishGum/JudeOSLite/actions/runs/38582696362).
+Claim не повторялся. В новом окружении патч проверен и восстановлен на893d213,
+ветка codex/rd-05-dashboard; live единственный исполнитель/In progress,
+отсутствие открытых PR и готовность #184/#185/#186 в main с успешными CI проверены.
+[Контракт](../redesign-dashboard.md), [протокол](../redesign-dashboard-validation.md).
+
+Три реальные главные в Working Panel, приоритет owner→administrator→trainer
+и актуальный выбранный филиал. Один GET /api/dashboard: живые роли/сессия,
+REPEATABLE READ, полные SQL-счётчики отдельно от ограниченных списков12/6/8,
+замороженные roster/marked без загрузки каждого журнала. Нет новых миграций,
+бизнес-сущностей или формулы посещаемости. Владелец переиспользует RD-04
+useAttendanceReport/reportPeriod/AttendanceSummary/ReportComparison и процент сервера.
+«Сегодня» — текущая зона каждого филиала, даты занятий — сохранённая зона;
+next сначала open, затем planned начиная с локального сегодня; closed/cancelled
+не текущая задача. Participant count — локальные карточки, не уникальные люди сети.
+
+RD-03 sessionHref несёт реальные club/group/session/date/journal IDs; manager
+группа ведёт в detail, trainer — в её занятия. detail=new разрешён только
+participants и открывает настоящую форму. История — прежний публичный audit
+owner/admin, без private payload и trainer-доступа. Независимые loading/error/retry,
+auth boundary/Abort/key, attendance-changed/focus/visibility/30s исключают старый scope.
+На телефоне занятие раньше метрик; DOM day/open раньше groups/history.
+После независимого fix-review устранены растянутая колонка768 и keyboard-order;
+оставшееся WebKit320 перекрытие исправлено переносом CTA перед вторичной строкой
+тренера, без ослабления проверки реальной нижней навигации и без force click.
+
+Новый Chromium154/WebKit26.5 browser→Go→PG сценарий PASS: два филиала с разницей
+локальных дат24ч, ledger40%→60%→62,5%, empty denominator«—», реальные
+create/mark/close/correction/archive, роли/multi-role/revoke/late replies/logout,
+независимые сбои и retry, 1440/1280/768/390/320 и keyboard/touch/main-action.
+Frontend и production Docker, полный Go format/vet/race/PostgreSQL/build,
+43 deployment unit tests и PWA/RD-03/RD-04 в обоих движках PASS.
+Независимый finish reviewer: ship по коду,30 свежим снимкам и PASS-логам.
+Независимая документационная сверка PASS; команды, логи и границы — в протоколе.
+Актуальные CI/SHA/main/Done — live issue, эта память не заменяет очередь.
+Первый CI70d1461 завершился WebKit FAIL; новый тест допускал уход до завершения
+архива и reload/goto до загрузки содержимого. Harness теперь ждёт POST200/UI-успех,
+реальные строки списка/истории/журнала и SQL3 перед переходом. Продуктовый код,
+строгий pageerror и проверка CTA не менялись; исходные FAIL сохранены в протоколе.
+Физические устройства, установка/standalone PWA и новая пользовательская приёмка
+здесь не проверялись; остаются RD-06. Следующую задачу автоматически не занимать.

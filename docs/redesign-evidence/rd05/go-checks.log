@@ -1,0 +1,29 @@
+go version go1.27.2 linux/amd64
+go: downloading github.com/jackc/pgx/v5 v5.11.0
+go: downloading golang.org/x/term v0.47.0
+go: downloading golang.org/x/crypto v0.58.0
+go: downloading golang.org/x/sys v0.49.0
+go: downloading github.com/jackc/pgpassfile v1.0.0
+go: downloading github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761
+go: downloading golang.org/x/text v0.43.0
+go: downloading github.com/jackc/puddle/v2 v2.2.2
+go: downloading golang.org/x/sync v0.24.0
+?   	github.com/NikishGum/JudeOSLite/backend/cmd/create-owner	[no test files]
+?   	github.com/NikishGum/JudeOSLite/backend/cmd/migrate	[no test files]
+?   	github.com/NikishGum/JudeOSLite/backend/cmd/server	[no test files]
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/audit	7.796s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/auth	40.767s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/clubs	12.248s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/dashboard	8.674s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/participants	7.083s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/platform	1.155s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/reports	10.494s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/attendance	19.357s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/corrections	24.596s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/groups	4.983s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/schedule	6.443s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/sessions	5.881s
+ok  	github.com/NikishGum/JudeOSLite/backend/migrations	1.895s
+ok  	github.com/NikishGum/JudeOSLite/backend/tests/integration/access	49.575s
+ok  	github.com/NikishGum/JudeOSLite/backend/tests/integration/training	40.780s
+PASS: format/vet/race/PostgreSQL/build

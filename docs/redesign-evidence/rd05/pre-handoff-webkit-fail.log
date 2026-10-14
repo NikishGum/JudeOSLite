@@ -1,0 +1,7 @@
+2026/10/14 18:48:06 migrations applied
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+Traceback (most recent call last):
+  File "/workspace/JudeOSLite/frontend/e2e/redesign_dashboard.py", line 192, in <module>
+    assert not visual_failures, visual_failures
+           ^^^^^^^^^^^^^^^^^^^
+AssertionError: [('administrator', 320, {'x': 33, 'y': 672.28125, 'width': 254, 'height': 48}, {'x': 0, 'y': 705, 'width': 320, 'height': 75}, 'main action covered by navigation'), ('trainer', 320, {'x': 33, 'y': 672.28125, 'width': 254, 'height': 48}, {'x': 0, 'y': 705, 'width': 320, 'height': 75}, 'main action covered by navigation')]

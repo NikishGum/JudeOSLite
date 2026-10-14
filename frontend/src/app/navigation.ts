@@ -13,7 +13,7 @@ export function readRoute(): Route {
   const group = new URLSearchParams(window.location.search).get('group') ?? '';
   const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
   return { clubId, group, section: known ? section as Section : 'home', detail,
-    invalid: (!known && section !== 'login') || parts.length > (clubId ? 3 : 1) || (!!detail && !uuid.test(detail)) || (!!group && (!uuid.test(group) || section !== 'sessions')) };
+    invalid: (!known && section !== 'login') || parts.length > (clubId ? 3 : 1) || (!!detail && !uuid.test(detail) && !(detail === 'new' && section === 'participants')) || (!!group && (!uuid.test(group) || section !== 'sessions')) };
 }
 export function routePath(route: Pick<Route, 'clubId' | 'section'> & { detail?: string; group?: string }) {
   const base = route.clubId ? `/clubs/${encodeURIComponent(route.clubId)}/${route.section}` : route.section === 'home' ? '/' : `/${route.section}`;
