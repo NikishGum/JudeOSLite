@@ -1,0 +1,86 @@
+{
+  "version": "1.0",
+  "date": "2026-10-14",
+  "repository": "NikishGum/JudeOSLite",
+  "source_main": "72460d8f7bf8fd58fd93eeb026099012033daabf",
+  "prototype_commit": "8016b746072e9334567de7fdbba2dcaf2a72fb45",
+  "task_count": 6,
+  "dependency_count": 8,
+  "issues": [
+    {
+      "id": "RD-01",
+      "number": 183,
+      "github_id": 5844350573,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/183",
+      "dependencies": [
+        "V1-18"
+      ],
+      "body_sha256": "e4d1c0c09558160e63d71684a791eacae13e977277518063d7f93d90173f97d2",
+      "title": "Оболочка PRIDE, навигация и общие компоненты ПК/телефона"
+    },
+    {
+      "id": "RD-02",
+      "number": 184,
+      "github_id": 5844350778,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/184",
+      "dependencies": [
+        "RD-01"
+      ],
+      "body_sha256": "33d698dae5f923d7698bb03b699c8a7688373c41f0526c979e467c60c8245103",
+      "title": "Реестр, группы, сотрудники и филиалы в новом рабочем пространстве"
+    },
+    {
+      "id": "RD-03",
+      "number": 185,
+      "github_id": 5844350999,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/185",
+      "dependencies": [
+        "RD-01"
+      ],
+      "body_sha256": "93361227b997e06a8ee60aa719f0ddae8b2a0ba437d03066318292b56ee00f5b",
+      "title": "Расписание, занятия и посещаемость по новому дизайну"
+    },
+    {
+      "id": "RD-04",
+      "number": 186,
+      "github_id": 5844351228,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/186",
+      "dependencies": [
+        "RD-01"
+      ],
+      "body_sha256": "b5f2a9d81ecb306921e7bc89ef15d279e1023f671fa2a0ba522efaba9ee23e22",
+      "title": "Статистика владельца и история изменений по новому дизайну"
+    },
+    {
+      "id": "RD-05",
+      "number": 187,
+      "github_id": 5844351460,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/187",
+      "dependencies": [
+        "RD-02",
+        "RD-03",
+        "RD-04"
+      ],
+      "body_sha256": "6235061cd602be864a373272e79b27bccfd8537ad08b62493e31684a1e68b2ea",
+      "title": "Главные экраны владельца, администратора и тренера на реальных данных"
+    },
+    {
+      "id": "RD-06",
+      "number": 188,
+      "github_id": 5844351687,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/188",
+      "dependencies": [
+        "RD-05"
+      ],
+      "body_sha256": "fd0132f8cdb9d710be70f7a5874450a736ee3596a5551ed42d90856cf53bbba0",
+      "title": "Сквозная проверка редизайна, PWA и передача сотрудникам"
+    }
+  ],
+  "verification": {
+    "date": "2026-10-14",
+    "body_readback": true,
+    "dependency_both_sides": true,
+    "initial_status": "Todo",
+    "assignees": []
+  }
+}

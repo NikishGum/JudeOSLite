@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       issue_number:
-        description: Existing V1 issue to claim
+        description: Existing registered V1 or redesign issue to claim
         required: true
         type: string
       request_id:

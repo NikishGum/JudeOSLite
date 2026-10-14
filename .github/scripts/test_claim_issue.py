@@ -1,7 +1,10 @@
 import copy
+import json
+from pathlib import Path
+import tempfile
 import unittest
 
-from claim_issue import claim, ClaimRejected
+from claim_issue import claim, load_plan_registry, ClaimRejected
 
 
 REGISTRY = {'issues': [
@@ -36,6 +39,51 @@ class FakeGitHub:
 
 
 class ClaimTests(unittest.TestCase):
+    def registry(self, redesign=None):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        (root / 'docs').mkdir()
+        v1 = {'repository': 'owner/repo', **REGISTRY}
+        rd = redesign or {'repository': 'owner/repo', 'issues': [
+            {'id': 'RD-01', 'number': 190, 'dependencies': ['V1-02']},
+        ]}
+        for name, content in [('github-issues-v1.json', v1), ('github-issues-redesign.json', rd)]:
+            (root / 'docs' / name).write_text(json.dumps(content))
+        return root
+
+    def test_redesign_cross_plan_dependency_uses_same_claim_guard(self):
+        root = self.registry()
+        registry = load_plan_registry(root)
+        api = FakeGitHub()
+        api.issue['title'] = '[RD-01] Shell'
+        api.blocked_by = [{'number': 150, 'state': 'open'}]
+        with self.assertRaisesRegex(ClaimRejected, 'Open prerequisites'):
+            claim(api, 190, 'developer', registry)
+        self.assertEqual(api.writes, [])
+        api.blocked_by[0]['state'] = 'closed'
+        self.assertTrue(claim(api, 190, 'developer', registry, dry_run=True)['eligible'])
+        self.assertEqual(api.writes, [])
+        self.assertTrue(claim(api, 190, 'developer', registry)['acquired'])
+        with self.assertRaisesRegex(ClaimRejected, 'already assigned'):
+            claim(api, 190, 'colleague', registry)
+        self.assertEqual(len(api.writes), 1)
+
+    def test_invalid_plan_merge_fails_closed(self):
+        for rd in [
+            {'repository': 'different/repo', 'issues': []},
+            {'repository': 'owner/repo', 'issues': [{'id': 'V1-01', 'number': 190, 'dependencies': []}]},
+            {'repository': 'owner/repo', 'issues': [{'id': 'RD-01', 'number': 149, 'dependencies': []}]},
+            {'repository': 'owner/repo', 'issues': [{'id': 'RD-01', 'number': 190, 'dependencies': ['MISSING']}]},
+        ]:
+            with self.subTest(rd=rd), self.assertRaises(ClaimRejected):
+                load_plan_registry(self.registry(rd))
+
+    def test_repository_registries_load_together(self):
+        registry = load_plan_registry(Path(__file__).resolve().parents[2])
+        self.assertEqual(registry['repository'], 'NikishGum/JudeOSLite')
+        self.assertTrue(any(item['id'] == 'RD-01' for item in registry['issues']))
+
     def test_two_people_and_two_chats_of_one_person_have_one_winner(self):
         for second_actor in ['colleague', 'developer']:
             with self.subTest(second_actor=second_actor):

@@ -2,9 +2,9 @@ name: Coordination checks
 on:
   push:
     branches: [main, 'codex/**']
-    paths: ['.github/**', 'scripts/claim_issue.py']
+    paths: ['.github/**', 'scripts/claim_issue.py', 'docs/github-issues-v1.json', 'docs/github-issues-redesign.json']
   pull_request:
-    paths: ['.github/**', 'scripts/claim_issue.py']
+    paths: ['.github/**', 'scripts/claim_issue.py', 'docs/github-issues-v1.json', 'docs/github-issues-redesign.json']
 permissions:
   contents: read
 jobs:
