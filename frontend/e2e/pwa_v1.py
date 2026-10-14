@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from playwright.sync_api import sync_playwright, expect
 from redesign_shell import check_shell
+from redesign_registry import check_registry
 
 REPO = Path(__file__).resolve().parents[2]
 ROOT = 'http://127.0.0.1:18081'
@@ -365,6 +366,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 assert [s['date'] for s in actual] == expected_dates, (mode, actual, expected_dates)
                 assert all((s['ruleId'] is None) == (mode == 'once') for s in actual)
                 schedule_counts[mode] = len(actual)
+            check_registry(browser, page, signin, api, owner, ROOT, ENGINE, open_section, sql)
             check_shell(browser, page, signin, api, owner, club, group, trainer, ROOT, ENGINE, sql, open_section, dimensions)
             # Historical synthetic session allows opening regardless of time of CI run.
             sid = sql(f"INSERT INTO pride.training_sessions(club_id,group_id,trainer_id,starts_on,timezone,starts_at,ends_at) VALUES('{club['id']}','{group['id']}','{trainer['id']}','{today}','Europe/Minsk','{today} 09:00+03','{today} 10:00+03') RETURNING id").splitlines()[0]
@@ -610,7 +612,8 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             groups.get_by_label('Название группы', exact=True).fill('Synthetic update group')
             groups.get_by_role('button', name='Сохранить группу', exact=True).click()
             wait_for_response(admin)
-            admin.get_by_role('navigation', name='Разделы филиала').get_by_role('link', name='Занятия', exact=True).click()
+            expect(admin.get_by_role('dialog').get_by_role('button', name='Закрыть форму', exact=True)).to_be_disabled()
+            admin.get_by_role('navigation', name='Разделы филиала').get_by_role('link', name='Занятия', exact=True).evaluate('(el)=>el.click()')
             expect(admin.locator('main h1')).to_have_text('Группы')
             expect(admin.locator('main')).to_contain_text('Дождитесь окончания сохранения')
             assert sql(f"SELECT count(*) FROM pride.training_groups WHERE club_id='{club['id']}' AND name='Synthetic update group'") == '1'
