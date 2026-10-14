@@ -216,9 +216,16 @@ def check_registry(browser, page, signin, api, owner, root, engine, open_section
     ui.get_by_role('button', name='Создать группу', exact=True).click(); shots('group-form')
     panel.get_by_role('button', name='Отменить правку', exact=True).click()
     # Scope change and trainer-only/foreign API never expose contacts.
-    ui.get_by_label('Филиал', exact=True).select_option(b['id'])
+    with ui.expect_response(lambda response: f"/api/clubs/{b['id']}/participants?" in response.url and response.status == 200) as changed_scope:
+        ui.get_by_label('Филиал', exact=True).select_option(b['id'])
     expect(ui.locator('.group-detail')).to_have_count(0)
-    expect(ui.locator('main')).not_to_contain_text('Synthetic однофамилец')
+    # The fixture deliberately shares this identity with B above. Its name is
+    # legitimate here; the local membership ID and contacts must belong to B.
+    b_cards = changed_scope.value.json()['items']
+    assert len(b_cards) == 1 and b_cards[0]['participantId'] == card['participantId']
+    assert b_cards[0]['id'] != card['id']
+    expect(ui.get_by_role('button', name='Группы участника Synthetic однофамилец', exact=True)).to_be_visible()
+    assert ui.evaluate("async p=>(await fetch(p)).status", f"/api/clubs/{b['id']}/participants/{card['id']}") == 404
     forbidden = admin.evaluate("async p=>(await fetch(p)).status", f"/api/clubs/{b['id']}/participants/{card['id']}")
     assert forbidden == 404
     trainer_ctx = browser.new_context(); t = page(trainer_ctx); signin(t, 'rdtrainer')

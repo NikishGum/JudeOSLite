@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ApiError, apiGet } from '../../shared/api';
 import './audit.css';
 type Club = { id: string; name: string; archived: boolean };
@@ -49,14 +49,13 @@ export function AuditHistory({ selectedClubId }: { selectedClubId: string }) {
  }, [selection, cursor, attempt]);
  useEffect(() => {
   const refresh = () => { if (document.visibilityState === 'visible') setAttempt((value) => value + 1); };
-  window.addEventListener('focus', refresh); document.addEventListener('visibilitychange', refresh);
+  window.addEventListener('focus', refresh); window.addEventListener('attendance-changed', refresh); document.addEventListener('visibilitychange', refresh);
   const timer = window.setInterval(refresh, 30_000);
-  return () => { window.clearInterval(timer); window.removeEventListener('focus', refresh); document.removeEventListener('visibilitychange', refresh); };
+  return () => { window.clearInterval(timer); window.removeEventListener('focus', refresh); window.removeEventListener('attendance-changed', refresh); document.removeEventListener('visibilitychange', refresh); };
  }, []);
  function clearPending() { active.current?.abort(); epoch.current += 1; setPage(null); setError(''); setLoading(true); }
  function apply(next: Selection) { clearPending(); setFormError(''); setDraft(next); setSelection({ ...next }); setCursors(['']); }
- function submit(event: FormEvent<HTMLFormElement>) {
-  event.preventDefault();
+ function submit() {
   if (draft.from && draft.until && draft.from > draft.until) { setFormError('Дата начала должна быть не позже даты окончания.'); return; }
   apply(draft);
  }
@@ -64,8 +63,8 @@ export function AuditHistory({ selectedClubId }: { selectedClubId: string }) {
  if (hidden) return null;
  return <section className="connection audit-history" aria-labelledby="audit-title" aria-busy={loading}>
   <div className="audit-heading"><h2 id="audit-title">История изменений</h2><button type="button" className="audit-secondary" disabled={loading} onClick={() => { clearPending(); setCursors(['']); setAttempt((value) => value + 1); }}>Обновить историю</button></div>
-  <p className="help">Кто и когда изменил записи. Время и границы дат — по Минску. Имена сотрудников и филиалов показаны на сегодня.</p>
-  {filters && <form className="audit-filters" onSubmit={submit}>
+  <p className="help">Кто и когда изменил записи. Время и границы дат — по Минску. Новые события сверху. Имена сотрудников и филиалов показаны на сегодня.</p>
+  {filters && <div className="audit-filters" role="group" aria-label="Фильтры истории" onKeyDown={(event) => { if (event.key === 'Enter' && (event.target as HTMLElement).tagName === 'INPUT') { event.preventDefault(); submit(); } }}>
    <label className="field"><span id="audit-club-label">Филиал истории</span><select aria-labelledby="audit-club-label" value={draft.clubId} onChange={(event) => setDraft({ ...draft, clubId: event.target.value })}>
     <option value="">{filters.isOwner ? 'Вся сеть' : 'Все мои филиалы'}</option>
     {filters.isOwner && <option value="network">Сеть · без филиала</option>}
@@ -74,18 +73,19 @@ export function AuditHistory({ selectedClubId }: { selectedClubId: string }) {
    <label className="field">С даты<input type="date" value={draft.from} onChange={(event) => setDraft({ ...draft, from: event.target.value })} /></label>
    <label className="field">По дату<input type="date" value={draft.until} onChange={(event) => setDraft({ ...draft, until: event.target.value })} /></label>
    <label className="field"><span id="audit-action-label">Действие</span><select aria-labelledby="audit-action-label" value={draft.action} onChange={(event) => setDraft({ ...draft, action: event.target.value })}><option value="">Все действия</option>{filters.actions.map((action) => <option key={action} value={action}>{actionName(action)}{actions[action] ? '' : ` (${action})`}</option>)}</select></label>
-   <div className="audit-buttons"><button type="submit">Показать историю</button><button type="button" className="audit-secondary" onClick={() => apply({ ...empty })}>Сбросить фильтры</button></div>
+   <div className="audit-buttons"><button type="button" onClick={submit}>Показать историю</button><button type="button" className="audit-secondary" onClick={() => apply({ ...empty })}>Сбросить фильтры</button></div>
    {formError && <p className="error" role="alert">{formError}</p>}
-  </form>}
+  </div>}
   {loading && <p role="status">Загружаем историю…</p>}
   {error && <div className="error" role="alert"><p>{error}</p><button type="button" onClick={() => setAttempt((value) => value + 1)}>Повторить загрузку истории</button></div>}
   {page && <>
+   <p className="audit-selection">{selection.clubId === 'network' ? 'Сеть · без филиала' : filters?.clubs.find((club) => club.id === selection.clubId)?.name ?? (filters?.isOwner ? 'Вся сеть' : 'Все мои филиалы')} · {selection.from || 'С начала истории'} — {selection.until || 'по сегодня'} · {selection.action ? actionName(selection.action) : 'Все действия'}</p>
    <p role="status">{page.items.length ? `Страница ${cursors.length} · событий: ${page.items.length}` : 'По выбранным фильтрам изменений нет.'}</p>
    <ol className="audit-events" aria-label="События истории">{page.items.map((event) => <li key={event.id} className="audit-event">
     <div className="audit-event-heading"><strong>{actionName(event.action)}</strong><time dateTime={event.createdAt}>{timestamp.format(new Date(event.createdAt))}</time></div>
     <dl><div><dt>Сотрудник</dt><dd>{event.actorName}{event.actorDisabled && ' · аккаунт отключён'}</dd></div>
      <div><dt>Филиал</dt><dd>{event.clubName ?? 'Сеть · без филиала'}{event.clubArchived && ' · в архиве'}</dd></div>
-     <div><dt>Запись</dt><dd>{entities[event.entityType] ?? 'Запись'} <span className="audit-record-id">№ {event.entityId}</span></dd></div></dl>
+     <div><dt>Запись</dt><dd>{entities[event.entityType] ?? 'Запись'} <details className="audit-record-id"><summary>ID записи</summary><span>{event.entityId}</span></details></dd></div></dl>
    </li>)}</ol>
    {(cursors.length > 1 || page.nextCursor) && <nav className="audit-buttons" aria-label="Страницы истории">
     <button type="button" className="audit-secondary" disabled={cursors.length === 1} onClick={() => move(cursors.slice(0, -1))}>Предыдущая страница</button>

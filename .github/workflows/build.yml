@@ -57,6 +57,8 @@ jobs:
           PWA_BROWSER=webkit python3 frontend/e2e/pwa_v1.py
           python3 frontend/e2e/redesign_training.py
           PWA_BROWSER=webkit python3 frontend/e2e/redesign_training.py
+          python3 frontend/e2e/redesign_reports.py
+          PWA_BROWSER=webkit python3 frontend/e2e/redesign_reports.py
       - name: Deployment policy, controller and server operation tests
         run: python3 -m unittest discover -s deploy/test -p 'test_*.py' -v
       - name: Compose clean startup, migration rerun and restart

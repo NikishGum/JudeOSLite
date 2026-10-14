@@ -7,6 +7,7 @@ export type Row = Totals & {
   groupId: string | null; groupName: string | null; groupArchived: boolean;
 };
 export type Report = { from: string; until: string; total: Totals; clubs: Row[]; groups: Row[] };
+export type ReportSelection = { from: string; until: string; clubId: string; groupId: string };
 export type Filters = {
   clubs: { id: string; name: string; archived: boolean }[];
   groups: { id: string; clubId: string; name: string; archived: boolean }[];
