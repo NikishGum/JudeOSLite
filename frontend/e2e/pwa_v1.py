@@ -13,6 +13,7 @@ import urllib.request
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from playwright.sync_api import sync_playwright, expect
+from redesign_shell import check_shell
 
 REPO = Path(__file__).resolve().parents[2]
 ROOT = 'http://127.0.0.1:18081'
@@ -151,8 +152,23 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 value.wait_for_function('window.pwaTestHeld.length === 1')
             def release_response(value):
                 value.evaluate('window.pwaTestRestore();window.pwaTestHeld.forEach(resolve=>resolve());delete window.pwaTestHeld;delete window.pwaTestRestore')
+            def open_section(value, name):
+                value.bring_to_front()
+                expect(value.get_by_role('button', name='Выйти', exact=True)).to_be_visible()
+                sidebar = value.get_by_role('navigation', name='Разделы филиала')
+                if sidebar.is_visible():
+                    sidebar.get_by_role('link', name=name, exact=True).click()
+                else:
+                    bottom = value.get_by_role('navigation', name='Основная навигация')
+                    link = bottom.get_by_role('link', name=name, exact=True)
+                    if link.count():
+                        link.click()
+                    else:
+                        bottom.get_by_role('button', name='Ещё', exact=True).click()
+                        value.get_by_role('dialog').get_by_role('link', name=name, exact=True).click()
+                expect(value.locator('main h1')).to_have_text(name)
             def dimensions(value, role):
-                for width in (320, 390, 1280):
+                for width in (320, 390, 768, 1280, 1440):
                     value.set_viewport_size({'width': width, 'height': 900})
                     assert value.evaluate('document.documentElement.scrollWidth <= innerWidth'), (role, width)
                     for control in value.locator('button:visible,input:visible,select:visible,summary:visible,.workspace-navigation a:visible').all():
@@ -231,18 +247,18 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             admin.on('response', lambda response: group_reads.append({'status': response.status}) if response.url == group_url else None)
             admin.on('requestfailed', lambda request: group_reads.append({'failure': request.failure}) if request.url == group_url else None)
             admin.get_by_label('Филиал', exact=True).select_option(club['id'])
-            navigation = admin.get_by_role('navigation', name='Разделы филиала')
-            expect(navigation.get_by_role('link', name='Участники', exact=True)).to_be_visible()
-            navigation.get_by_role('link', name='Расписание', exact=True).click()
-            expect(admin.locator('#schedule-title')).to_be_in_viewport(ratio=1)
-            navigation.get_by_role('link', name='Участники', exact=True).click()
-            expect(admin.locator('#registry-title')).to_be_in_viewport(ratio=1)
+            open_section(admin, 'Занятия')
+            expect(admin.locator('#schedule-title')).to_be_visible()
+            open_section(admin, 'Участники')
+            expect(admin.locator('#registry-title')).to_be_visible()
+            open_section(admin, 'Группы')
             groups = admin.locator('.groups')
             groups.get_by_role('button', name='Создать группу', exact=True).click()
             groups.get_by_label('Название группы', exact=True).fill('Synthetic PWA group')
             groups.get_by_role('button', name='Сохранить группу', exact=True).click()
             expect(groups).to_contain_text('Группа сохранена.')
             group = api(admin, 'GET', base+'/groups')[0]
+            open_section(admin, 'Сотрудники')
             staff = admin.locator('.staff-management')
             staff.get_by_role('button', name='Добавить тренера', exact=True).click()
             staff.get_by_label('Имя тренера', exact=True).fill('Synthetic Trainer')
@@ -252,6 +268,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             staff.get_by_role('button', name='Создать тренера', exact=True).click()
             expect(staff).to_contain_text('Тренер создан.')
             trainer = api(admin, 'GET', base+'/trainers?available=true')[0]
+            open_section(admin, 'Участники')
             registry = admin.locator('.registry').filter(has=admin.locator('#registry-title'))
             def select_initial_group():
                 try:
@@ -291,6 +308,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 registry.get_by_role('button', name='Сохранить участника', exact=True).click()
                 expect(registry).to_contain_text('Участник добавлен.')
                 registry.get_by_role('button', name='Закрыть карточку', exact=True).click()
+            open_section(admin, 'Занятия')
             schedule = admin.locator('.schedule')
             # Wait for the refresh initiated by this action before opening an
             # editor; the old enabled button can precede the loading effect.
@@ -347,6 +365,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 assert [s['date'] for s in actual] == expected_dates, (mode, actual, expected_dates)
                 assert all((s['ruleId'] is None) == (mode == 'once') for s in actual)
                 schedule_counts[mode] = len(actual)
+            check_shell(browser, page, signin, api, owner, club, group, trainer, ROOT, ENGINE, sql, open_section, dimensions)
             # Historical synthetic session allows opening regardless of time of CI run.
             sid = sql(f"INSERT INTO pride.training_sessions(club_id,group_id,trainer_id,starts_on,timezone,starts_at,ends_at) VALUES('{club['id']}','{group['id']}','{trainer['id']}','{today}','Europe/Minsk','{today} 09:00+03','{today} 10:00+03') RETURNING id").splitlines()[0]
             # Cancelled disposable fixtures create a genuine long daily list.
@@ -358,7 +377,8 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             trainer_context = browser.new_context(viewport={'width': 390, 'height': 844}, has_touch=True, service_workers='block' if ENGINE == 'webkit' else 'allow')
             tp = page(trainer_context); signin(tp, 'trainer')
             tp.get_by_label('Филиал', exact=True).select_option(club['id'])
-            expect(tp.get_by_role('navigation', name='Разделы филиала').get_by_role('link')).to_have_count(2)
+            assert tp.locator('.sidebar a').all_text_contents() == ['Главная', 'Занятия', 'Журналы']
+            open_section(tp, 'Журналы')
             expect(tp.locator('.trainer-session-list li')).to_have_count(13)
             tp.set_viewport_size({'width': 320, 'height': 480})
             tp.get_by_role('button', name='Открыть журнал', exact=True).click()
@@ -367,6 +387,8 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             expect(tp.locator('.session-journal h3')).to_be_focused()
             expect(tp.locator('.session-journal h3')).to_be_in_viewport(ratio=1)
             expect(confirmation).to_be_in_viewport(ratio=1)
+            assert confirmation.bounding_box()['y'] + confirmation.bounding_box()['height'] <= tp.locator('.bottom-navigation').bounding_box()['y']
+            tp.screenshot(path=f'/tmp/rd183-{ENGINE}-journal-confirm-320.png')
             assert sql(f"SELECT status FROM pride.training_sessions WHERE id='{sid}'") == 'planned'
             assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{sid}'") == '0'
             tp.get_by_role('button', name='Подтвердить открытие журнала', exact=True).click()
@@ -445,6 +467,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             assert sql(f"SELECT status FROM pride.training_sessions WHERE id='{sid}'") == 'closed'
             assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{sid}' AND origin='close_default' AND absence_reason='unknown'") == '1'
             expect(tp.locator('.attendance-card')).to_have_count(0)
+            open_section(admin, 'Журналы')
             journals = admin.locator('.admin-journals')
             journals.get_by_role('button', name='Обновить журналы', exact=True).click()
             journals.locator('[data-session-id="'+sid+'"]').get_by_role('button', name='Посмотреть журнал филиала', exact=True).click()
@@ -456,6 +479,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             journals.get_by_role('button', name='Сохранить исправление', exact=True).click()
             expect(journals.get_by_label('Причина исправления', exact=True)).to_have_count(0)
             owner.reload()
+            open_section(owner, 'Статистика')
             owner.get_by_label('Филиал отчёта', exact=True).select_option(club['id'])
             owner.get_by_role('button', name='Обновить статистику', exact=True).click()
             expect(owner.locator('[data-metric="closed"]')).to_have_text('1')
@@ -519,7 +543,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             owner.get_by_role('button', name='Проверить подключение и доступ', exact=True).click()
             expect(owner.locator('.owner-dashboard')).to_be_visible()
             # Two tabs share cookies: logout/login invalidates personal DOM immediately.
-            second = page(owner_context); second.goto(ROOT+'/clubs/'+club['id'])
+            second = page(owner_context); second.goto(ROOT+'/clubs/'+club['id']+'/statistics')
             expect(second.locator('.owner-dashboard')).to_be_visible()
             hold_response(owner, '/api/reports/attendance', 'GET')
             owner.get_by_role('button', name='Обновить статистику', exact=True).click()
@@ -539,6 +563,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             second.bring_to_front()
             second.wait_for_function("document.visibilityState === 'visible'")
             second.get_by_label('Филиал', exact=True).select_option(club['id'])
+            open_section(second, 'Участники')
             expect(second.locator('#registry-title')).to_be_visible()
             # Snapshot a settled page, rather than its initial heading while all
             # club reads are still starting. Keep the direct persisted-event
@@ -579,11 +604,15 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 trainer_anchor = page(trainer_context)
                 trainer_anchor.goto(ROOT)
                 trainer_anchor.wait_for_function('navigator.serviceWorker.controller !== null')
+            open_section(admin, 'Группы')
             hold_response(admin, base+'/groups', 'POST')
             groups.get_by_role('button', name='Создать группу', exact=True).click()
             groups.get_by_label('Название группы', exact=True).fill('Synthetic update group')
             groups.get_by_role('button', name='Сохранить группу', exact=True).click()
             wait_for_response(admin)
+            admin.get_by_role('navigation', name='Разделы филиала').get_by_role('link', name='Занятия', exact=True).click()
+            expect(admin.locator('main h1')).to_have_text('Группы')
+            expect(admin.locator('main')).to_contain_text('Дождитесь окончания сохранения')
             assert sql(f"SELECT count(*) FROM pride.training_groups WHERE club_id='{club['id']}' AND name='Synthetic update group'") == '1'
             for path in (source/'dist').rglob('*'):
                 if path.is_file():
@@ -599,6 +628,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             expect(groups.get_by_label('Название группы', exact=True)).to_have_count(0)
             expect(admin.get_by_role('button', name='Обновить приложение', exact=True)).to_be_enabled()
             # Another tab has an outstanding save: activating B must not reload it.
+            open_section(second, 'Группы')
             hold_response(second, base+'/groups', 'POST')
             second.locator('.groups').get_by_role('button', name='Создать группу', exact=True).click()
             second.get_by_label('Название группы', exact=True).fill('Synthetic other tab save')
@@ -642,6 +672,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             revoked_id = sql(f"INSERT INTO pride.training_sessions(club_id,group_id,trainer_id,starts_on,timezone,starts_at,ends_at) VALUES('{club['id']}','{group['id']}','{trainer['id']}','{today}','Europe/Minsk','{today} 13:00+03','{today} 14:00+03') RETURNING id").splitlines()[0]
             signin(tp, 'trainer')
             tp.get_by_label('Филиал', exact=True).select_option(club['id'])
+            open_section(tp, 'Журналы')
             tp.locator('.trainer-session-list li').filter(has_text='13:00').get_by_role('button', name='Открыть журнал', exact=True).click()
             tp.get_by_role('button', name='Подтвердить открытие журнала', exact=True).click()
             expect(tp.locator('.attendance-card')).to_contain_text('Synthetic Participant A')

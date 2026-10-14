@@ -10,7 +10,7 @@ type List = { items: Card[]; hasMore: boolean };
 const message = (cause: unknown) => cause instanceof ApiError ? cause.message : 'Нет соединения. Проверьте интернет и повторите действие.';
 const displayDate = (value: string) => value.split('-').reverse().join('.');
 
-export function ParticipantRegistry({ clubId, timezone, onSessionRefresh }: { clubId: string; timezone: string; onSessionRefresh: () => Promise<void> }) {
+export function ParticipantRegistry({ clubId, timezone, onSessionRefresh, detailId = '', onDetailChange, beforeNavigate }: { beforeNavigate?: (action: () => void) => void; detailId?: string; onDetailChange?: (id: string) => void; clubId: string; timezone: string; onSessionRefresh: () => Promise<void> }) {
   const [list, setList] = useState<List>({ items: [], hasMore: false });
   const [queryDraft, setQueryDraft] = useState('');
   const [query, setQuery] = useState('');
@@ -19,7 +19,7 @@ export function ParticipantRegistry({ clubId, timezone, onSessionRefresh }: { cl
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [attempt, setAttempt] = useState(0);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(detailId || null);
   const [card, setCard] = useState<Card | null>(null);
   const [cardLoading, setCardLoading] = useState(false);
   const [cardError, setCardError] = useState('');
@@ -72,8 +72,11 @@ export function ParticipantRegistry({ clubId, timezone, onSessionRefresh }: { cl
   useEffect(() => () => { epoch.current += 1; }, []);
   useEffect(() => { if (selected) heading.current?.focus(); }, [selected, cardLoading, editing, confirmArchive]);
 
-  function open(id: string) { setSelected(id); setEditing(id === 'new'); setConfirmArchive(false); setError(''); setNotice(''); setConflict(false); setCardAttempt((value) => value + 1); }
-  function close() { setSelected(null); setCard(null); setEditing(false); setConfirmArchive(false); setError(''); setConflict(false); }
+  useEffect(() => { setSelected(detailId || null); setEditing(false); setConfirmArchive(false); setError(''); setConflict(false); }, [detailId]);
+  function openNow(id: string) { if (id !== 'new') onDetailChange?.(id); setSelected(id); setEditing(id === 'new'); setConfirmArchive(false); setError(''); setNotice(''); setConflict(false); setCardAttempt((value) => value + 1); }
+  function closeNow() { onDetailChange?.(''); setSelected(null); setCard(null); setEditing(false); setConfirmArchive(false); setError(''); setConflict(false); }
+  function open(id: string) { if (beforeNavigate) beforeNavigate(() => openNow(id)); else openNow(id); }
+  function close() { if (beforeNavigate) beforeNavigate(closeNow); else closeNow(); }
   function refreshCard() { setEditing(false); setConfirmArchive(false); setError(''); setConflict(false); setCardAttempt((value) => value + 1); setAttempt((value) => value + 1); }
   async function mutate(action: () => Promise<Card>, success: string) {
     if (pending.current) return;
@@ -81,7 +84,7 @@ export function ParticipantRegistry({ clubId, timezone, onSessionRefresh }: { cl
     const generation = epoch.current;
     try {
       const result = await action(); if (generation !== epoch.current) return;
-      setCard(result); setSelected(result.id); setEditing(false); setConfirmArchive(false); setNotice(success); setAttempt((value) => value + 1);
+      setCard(result); setSelected(result.id); onDetailChange?.(result.id); setEditing(false); setConfirmArchive(false); setNotice(success); setAttempt((value) => value + 1);
     } catch (cause) {
       if (generation !== epoch.current) return;
       setError(message(cause));

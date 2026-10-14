@@ -22,9 +22,10 @@ export function SessionJournal({ clubId, initial, onChanged }: Props) {
   const changed = useRef(onChanged); changed.current = onChanged;
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   useEffect(() => {
+    if (loading) return;
     heading.current?.focus();
     heading.current?.scrollIntoView({ block: 'start' });
-  }, []);
+  }, [loading]);
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true); setError(''); setUnavailable(false); setConflict(false); setConfirm(false); setJournal(null);
