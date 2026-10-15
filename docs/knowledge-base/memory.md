@@ -504,8 +504,26 @@ iPhone13 подключался к Mirroring, затем был занят по�
 Safari версию не подтвердили. Android недоступен; отдельным ответом 15.10
 пользователь явно отложил Android/Chrome и его physical PWA на последующую
 проверку RD-06. Это DEFERRED/NOT RUN, не PASS; Chrome/Edge/iPhone и приёмка
-сотрудников остаются обязательными. Решения пользователя/приёмки сотрудников нет.
+сотрудников остаются обязательными. Визуального решения/приёмки сотрудников нет.
 Протоколы: docs/testing-redesign.md, acceptance-redesign.md, staff-guide-redesign.md,
 redesign-changes-v1.md и docs/redesign-evidence/rd06. QA164/v1 PASS/отложение Android
 не переносить. Следующую задачу не занимать; #188 остаётся открытой до критериев
 либо явного изменения объёма. Точный PR/main CI/deploy/release фиксировать при доставке.
+
+Доставка RD-06 и обратная передача из Workspace — 15.10.2026, Europe/Minsk:
+PR #195 в main75078069f315a3303b546b0905a0a634f1c471da;
+Build38708997849/Deploy38710232985 attempt2 SUCCESS. Первая попытка deploy
+заблокирована pending reboot VPS до pull/миграций; пользователь перезагрузил
+VPS, preflight прошёл, повторён тот же job/digest/generation131. В 12:19:49
+публичные release SHA/readyz совпали; Workspace в 12:25 дополнительно проверил
+health/readiness, API401/no-store, manifest/icons/SW/SPA. Источники — комментарии
+6188706676 и 6188898932 в #188; это не HTTPS role smoke/физическая установка.
+Пользователь подтвердил оставить #188 открытой до реальной приёмки сотрудников.
+При продолжении исходный claim/StarMadeGalaxy/OPEN/In progress/отсутствие
+параллельной работы проверены заново. В 12:34 после сообщения о снятии запрета
+Browser Use снова отказал createBrowserTab Chrome/test.judopride.tech:
+saved user permission / origin approval gate / managed policy deny.
+getApp Codex тоже запрещён. Пользователю указан штатный путь Settings →
+Computer Use → Manage у Chrome → Blocked websites; не обходить запрет через
+другой браузер, телефон, CDP или API. До восстановления доступа оставшиеся
+проверки NOT RUN; разрешение действий не означает приёмку или изменение объёма.

@@ -345,11 +345,45 @@
       "reason": "SW-controlled page bypassed route fault injection; the real request succeeded. Assertions correctly failed."
     }
   ],
-  "publicHttps": {
+  "initialPublicHttps": {
     "releaseSha": "d8be57452b3f079d7b02b2bd3a389cf8d0277adf",
     "readyz": 200,
     "cacheControl": "no-store",
     "roleSmoke": "NOT RUN"
+  },
+  "deliveryCheckpoint": {
+    "date": "2026-10-15",
+    "timezone": "Europe/Minsk",
+    "pullRequest": 195,
+    "mainSha": "75078069f315a3303b546b0905a0a634f1c471da",
+    "buildRun": 38708997849,
+    "buildResult": "success",
+    "deployRun": 38710232985,
+    "deployAttempt": 2,
+    "deployResult": "success",
+    "evidence": "https://github.com/NikishGum/JudeOSLite/issues/188#issuecomment-6188706676"
+  },
+  "publicHttps": {
+    "observedAt": "2026-10-15T12:25+03:00",
+    "observer": "Workspace executor; separate public HTTP check",
+    "evidence": "https://github.com/NikishGum/JudeOSLite/issues/188#issuecomment-6188898932",
+    "releaseSha": "75078069f315a3303b546b0905a0a634f1c471da",
+    "healthz": 200,
+    "readyz": 200,
+    "readyzCacheControl": "no-store",
+    "releaseCacheControl": "no-cache",
+    "protectedApiWithoutSession": 401,
+    "manifestIconsSwSpaHttp": "PASS",
+    "interfaceExecuted": false,
+    "roleSmoke": "NOT RUN"
+  },
+  "browserUseRetry": {
+    "observedAt": "2026-10-15T12:34:40+03:00",
+    "action": "createBrowserTab('chrome', 'https://test.judopride.tech', {sessionName:'🧪 RD-06'})",
+    "result": "BLOCKED",
+    "reason": "A saved user permission setting blocks this action. Browser use could not acquire authority to trigger network egress. The origin approval gate did not grant access for https://test.judopride.tech. A saved permission or managed policy denies access.",
+    "nativeSettingsInspection": "getApp('Codex') denied: com.openai.codex is not allowed for safety reasons",
+    "workaroundAttempted": false
   },
   "physicalPwa": {
     "chromeMac": "NOT RUN: browser permission deny",
