@@ -191,7 +191,10 @@ try:
         expect(tr.get_by_role('button', name='Присутствует', exact=True)).to_be_in_viewport(ratio=1)
         assert tr.get_by_role('button', name='Отсутствует', exact=True).bounding_box()['y'] + 56 <= tr.locator('.bottom-navigation').bounding_box()['y']
         tr.screenshot(path=f'/tmp/rd185-{ENGINE}-attendance-action-320.png')
-        tr.get_by_role('button', name='Отсутствует', exact=True).click()
+        # Escape must restore the keyboard opener. Pointer click in macOS
+        # WebKit does not focus native buttons; activate the focused control.
+        absence = tr.get_by_role('button', name='Отсутствует', exact=True)
+        absence.focus(); expect(absence).to_be_focused(); absence.press('Enter')
         dialog = tr.get_by_role('dialog')
         expect(dialog).to_be_visible(); tr.screenshot(path=f'/tmp/rd185-{ENGINE}-reasons-320.png'); tr.keyboard.press('Tab')
         expect(dialog.get_by_role('button', name='Неизвестна', exact=True)).to_be_focused()

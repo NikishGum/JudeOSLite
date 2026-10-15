@@ -13,6 +13,7 @@ import urllib.request
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from playwright.sync_api import sync_playwright, expect
+from redesign_accessibility import contrast_audit
 from redesign_shell import check_shell
 from redesign_registry import check_registry
 
@@ -106,6 +107,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             browser_type = getattr(p, ENGINE)
             browser = browser_type.launch(headless=True, executable_path=path)
             errors = []
+            contrast_floor = {4.5: float('inf'), 3: float('inf')}
             def page(context):
                 value = context.new_page()
                 value.on('pageerror', lambda error: errors.append(str(error)))
@@ -153,6 +155,36 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 value.wait_for_function('window.pwaTestHeld.length === 1')
             def release_response(value):
                 value.evaluate('window.pwaTestRestore();window.pwaTestHeld.forEach(resolve=>resolve());delete window.pwaTestHeld;delete window.pwaTestRestore')
+            def fault_fetch(value, target, after_commit=False):
+                # WebKit can bypass Playwright routes on SW-controlled pages.
+                # Intercept delivery at fetch, retaining the real server call
+                # in the after-commit case and proving the fault was exercised.
+                value.evaluate('''([target,afterCommit])=>{
+                  const original=window.fetch; window.pwaFaultCalls=0;
+                  window.pwaFaultAfterCommit=afterCommit; window.pwaFaultStatus=null;
+                  window.pwaFaultRestore=()=>{window.fetch=original};
+                  window.fetch=async(...args)=>{
+                    const url=new URL(typeof args[0]==='string'?args[0]:args[0].url,location.href);
+                    const match=url.pathname===target && ['POST','PUT'].includes(args[1]?.method);
+                    if(match) {
+                      window.pwaFaultCalls++;
+                      if(!afterCommit)throw new TypeError('Synthetic pre-send network failure');
+                    }
+                    const response=await original(...args);
+                    if(match) {
+                      window.pwaFaultStatus=response.status;
+                      if(!response.ok)throw new Error('Expected successful committed response');
+                      await response.clone().arrayBuffer();
+                      throw new TypeError('Synthetic committed response loss');
+                    }
+                    return response;
+                  };
+                }''', [target, after_commit])
+            def restore_fault(value):
+                assert value.evaluate('window.pwaFaultCalls') == 1, 'Network fault was not exercised exactly once'
+                after_commit, status = value.evaluate('[window.pwaFaultAfterCommit,window.pwaFaultStatus]')
+                assert status == (200 if after_commit else None), ('Unexpected response before synthetic loss', status)
+                value.evaluate('window.pwaFaultRestore();delete window.pwaFaultRestore')
             def open_section(value, name):
                 value.bring_to_front()
                 expect(value.get_by_role('button', name='Выйти', exact=True)).to_be_visible()
@@ -172,6 +204,11 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 for width in (320, 390, 768, 1280, 1440):
                     value.set_viewport_size({'width': width, 'height': 900})
                     assert value.evaluate('document.documentElement.scrollWidth <= innerWidth'), (role, width)
+                    contrast = contrast_audit(value)
+                    assert not contrast['failures'] and not contrast['unmeasured'], (role, width, contrast)
+                    for pair in contrast['pairs']:
+                        minimum = pair['minimum']
+                        contrast_floor[minimum] = min(contrast_floor[minimum], pair['ratio'])
                     for control in value.locator('button:visible,input:visible,select:visible,summary:visible,.workspace-navigation a:visible').all():
                         if control.get_attribute('type') not in ('checkbox', 'radio'):
                             rect = control.bounding_box()
@@ -464,7 +501,23 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             tp.get_by_role('button', name='К сводке и предыдущим отметкам', exact=True).click()
             expect(tp.get_by_role('heading', name='Сводка посещаемости')).to_be_visible()
             tp.get_by_role('button', name='Завершить журнал', exact=True).click()
+            # RD-06: transport failure before close leaves the server open;
+            # loss of the committed response must not claim success in the UI.
+            close_path = base+'/trainer-sessions/'+sid+'/journal/close'
+            fault_fetch(tp, close_path)
             tp.get_by_role('button', name='Подтвердить завершение', exact=True).click()
+            expect(tp.get_by_role('dialog').get_by_role('alert')).to_contain_text('Изменение не подтверждено')
+            assert sql(f"SELECT status FROM pride.training_sessions WHERE id='{sid}'") == 'open'
+            assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{sid}' AND origin='close_default'") == '0'
+            restore_fault(tp)
+            fault_fetch(tp, close_path, after_commit=True)
+            tp.get_by_role('button', name='Подтвердить завершение', exact=True).click()
+            expect(tp.get_by_role('dialog').get_by_role('alert')).to_contain_text('Изменение не подтверждено')
+            assert sql(f"SELECT status FROM pride.training_sessions WHERE id='{sid}'") == 'closed'
+            restore_fault(tp)
+            tp.get_by_role('button', name='Продолжить отметки', exact=True).click()
+            tp.reload()
+            tp.get_by_role('button', name='Посмотреть журнал', exact=True).click()
             expect(tp.locator('.session-journal')).to_contain_text('Завершено')
             assert sql(f"SELECT status FROM pride.training_sessions WHERE id='{sid}'") == 'closed'
             assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{sid}' AND origin='close_default' AND absence_reason='unknown'") == '1'
@@ -478,8 +531,32 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             journals.get_by_label('Новая отметка', exact=True).select_option('present')
             journals.get_by_label('Причина исправления', exact=True).fill('Synthetic PWA correction')
             dimensions(admin, 'admin-correction')
+            correction_id = sql(f"SELECT id FROM pride.attendance_records WHERE training_session_id='{sid}' AND absence_reason='illness'")
+            correction_path = base+'/journals/'+sid+'/records/'+correction_id
+            fault_fetch(admin, correction_path)
             journals.get_by_role('button', name='Сохранить исправление', exact=True).click()
+            expect(journals.get_by_role('alert')).to_contain_text('Исправление не подтверждено')
+            expect(journals.get_by_label('Причина исправления', exact=True)).to_have_value('Synthetic PWA correction')
+            assert sql(f"SELECT state FROM pride.attendance_records WHERE id='{correction_id}'") == 'absent'
+            assert sql(f"SELECT count(*) FROM pride.audit_events WHERE entity_id='{correction_id}' AND action='corrected'") == '0'
+            restore_fault(admin)
+            fault_fetch(admin, correction_path, after_commit=True)
+            journals.get_by_role('button', name='Сохранить исправление', exact=True).click()
+            expect(journals.get_by_role('alert')).to_contain_text('Исправление не подтверждено')
+            expect(journals.get_by_label('Причина исправления', exact=True)).to_have_value('Synthetic PWA correction')
+            expect(journals).not_to_contain_text('Отметка подтверждена сервером.')
+            assert sql(f"SELECT state FROM pride.attendance_records WHERE id='{correction_id}'") == 'present'
+            assert sql(f"SELECT count(*) FROM pride.audit_events WHERE entity_id='{correction_id}' AND action='corrected'") == '1'
+            restore_fault(admin)
+            # A stale correction retry must conflict, never append another event.
+            journals.get_by_role('button', name='Сохранить исправление', exact=True).click()
+            expect(journals.get_by_role('button', name='Перечитать журнал и сбросить ввод', exact=True)).to_be_visible()
+            assert sql(f"SELECT count(*) FROM pride.audit_events WHERE entity_id='{correction_id}' AND action='corrected'") == '1'
+            journals.get_by_role('button', name='Отмена исправления', exact=True).click()
+            admin.reload()
+            journals.locator('[data-session-id="'+sid+'"]').get_by_role('button', name='Посмотреть журнал филиала', exact=True).click()
             expect(journals.get_by_label('Причина исправления', exact=True)).to_have_count(0)
+            expect(journals.locator('.admin-records > li').nth(2)).to_contain_text('Присутствует')
             owner.reload()
             open_section(owner, 'Статистика')
             owner.get_by_label('Филиал отчёта', exact=True).select_option(club['id'])
@@ -687,7 +764,8 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             assert not errors, errors
             owner_context.close()
             browser.close()
-        print(json.dumps({'engine': ENGINE, 'version': browser.version, 'scheduleCounts': schedule_counts, 'report': {'conducted': 1, 'present': 2, 'absent': 3, 'unknown': 2, 'illness': 0, 'excused': 1, 'percentage': 40}, 'nativeHistoryReturn': 'fresh session and role verified; BFCache not measured', 'checks': 'manifest/icons; admin UI/five participants/four schedules; cards/three reasons/defaults/correction/report; 320/390/1280; double tap/delay/offline/precommit error/lost response/idempotent retry/reload/closed/cancelled/role revoke; static-only cache/logout/account swap/expiry/pagehide/native history return/fresh me; two builds/waiting/save guard/other-tab save', 'physicalInstallation': 'NOT TESTED'}, ensure_ascii=False))
+        print(json.dumps({'check': 'rendered-text-contrast', 'normalMinimum': contrast_floor[4.5], 'largeMinimum': contrast_floor[3]}, ensure_ascii=False))
+        print(json.dumps({'engine': ENGINE, 'version': browser.version, 'scheduleCounts': schedule_counts, 'report': {'conducted': 1, 'present': 2, 'absent': 3, 'unknown': 2, 'illness': 0, 'excused': 1, 'percentage': 40}, 'nativeHistoryReturn': 'fresh session and role verified; BFCache not measured', 'checks': 'manifest/icons; admin UI/five participants/four schedules; cards/three reasons/defaults/correction/report; 320/390/768/1280/1440; rendered text contrast 4.5/3; double tap/delay/offline; mark/close/correct precommit error/lost response/SQL/reload; mark idempotent retry/correction stale retry; closed/cancelled/role revoke; static-only cache/logout/account swap/expiry/pagehide/native history return/fresh me; two builds/waiting/save guard/other-tab save', 'physicalInstallation': 'NOT TESTED'}, ensure_ascii=False))
     finally:
         subprocess.run(['docker', 'rm', '-f', APP, DB], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         subprocess.run(['docker', 'network', 'rm', NETWORK], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

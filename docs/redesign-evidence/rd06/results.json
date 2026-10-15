@@ -1,0 +1,369 @@
+{
+  "date": "2026-10-15",
+  "timezone": "Europe/Minsk",
+  "issue": 188,
+  "overallStatus": "IN_PROGRESS",
+  "applicationSourceSha": "d8be57452b3f079d7b02b2bd3a389cf8d0277adf",
+  "productionSourceChanged": false,
+  "host": {
+    "model": "Mac17,9",
+    "os": "macOS 27.0.1",
+    "build": "26A434"
+  },
+  "runtime": {
+    "node": "24.19.0",
+    "go": "1.27.2",
+    "postgresql": "18.6",
+    "dockerServer": "29.8.2",
+    "playwright": "1.62.0"
+  },
+  "backend": {
+    "result": "PASS",
+    "topLevelTests": 44,
+    "testPackages": 15,
+    "skips": 0,
+    "race": true,
+    "logSha256": "1ce8c3bd8518907ec2bf0c83e6e73241c695ecdf8a4598debaed94157265f2a1"
+  },
+  "runs": [
+    {
+      "case": "pwa-chromium",
+      "result": "PASS",
+      "log": "pwa-chromium-rd06-fault-verified.log",
+      "logSha256": "a392e951dd272fb457e91754af4e1e384ca94ad73a670201c1b0a9290000e2fc",
+      "output": [
+        {
+          "check": "rendered-text-contrast",
+          "normalMinimum": 4.64,
+          "largeMinimum": 5.43
+        },
+        {
+          "engine": "chromium",
+          "version": "151.0.7922.34",
+          "scheduleCounts": {
+            "weekly": 2,
+            "day_parity": 4,
+            "date_list": 2,
+            "once": 1
+          },
+          "report": {
+            "conducted": 1,
+            "present": 2,
+            "absent": 3,
+            "unknown": 2,
+            "illness": 0,
+            "excused": 1,
+            "percentage": 40
+          },
+          "nativeHistoryReturn": "fresh session and role verified; BFCache not measured",
+          "checks": "manifest/icons; admin UI/five participants/four schedules; cards/three reasons/defaults/correction/report; 320/390/768/1280/1440; rendered text contrast 4.5/3; double tap/delay/offline; mark/close/correct precommit error/lost response/SQL/reload; mark idempotent retry/correction stale retry; closed/cancelled/role revoke; static-only cache/logout/account swap/expiry/pagehide/native history return/fresh me; two builds/waiting/save guard/other-tab save",
+          "physicalInstallation": "NOT TESTED"
+        }
+      ]
+    },
+    {
+      "case": "pwa-webkit",
+      "result": "PASS",
+      "log": "pwa-webkit-rd06-fault-verified.log",
+      "logSha256": "7500b491aaddadb7becde7c56317ed6b40bc20bb44e10ce2a74699f89ce135b6",
+      "output": [
+        {
+          "check": "rendered-text-contrast",
+          "normalMinimum": 4.64,
+          "largeMinimum": 5.43
+        },
+        {
+          "engine": "webkit",
+          "version": "26.5",
+          "scheduleCounts": {
+            "weekly": 2,
+            "day_parity": 4,
+            "date_list": 2,
+            "once": 1
+          },
+          "report": {
+            "conducted": 1,
+            "present": 2,
+            "absent": 3,
+            "unknown": 2,
+            "illness": 0,
+            "excused": 1,
+            "percentage": 40
+          },
+          "nativeHistoryReturn": "fresh session and role verified; BFCache not measured",
+          "checks": "manifest/icons; admin UI/five participants/four schedules; cards/three reasons/defaults/correction/report; 320/390/768/1280/1440; rendered text contrast 4.5/3; double tap/delay/offline; mark/close/correct precommit error/lost response/SQL/reload; mark idempotent retry/correction stale retry; closed/cancelled/role revoke; static-only cache/logout/account swap/expiry/pagehide/native history return/fresh me; two builds/waiting/save guard/other-tab save",
+          "physicalInstallation": "NOT TESTED"
+        }
+      ]
+    },
+    {
+      "case": "pwa-real-chrome",
+      "result": "PASS",
+      "log": "pwa_v1-chrome-rd06-fault-verified.log",
+      "logSha256": "ccfdb30efa50303696bfb537863687c244cbb093c42a6f2134b196a685053c50",
+      "output": [
+        {
+          "check": "rendered-text-contrast",
+          "normalMinimum": 4.64,
+          "largeMinimum": 5.43
+        },
+        {
+          "engine": "chromium",
+          "version": "155.0.8059.79",
+          "scheduleCounts": {
+            "weekly": 2,
+            "day_parity": 4,
+            "date_list": 2,
+            "once": 1
+          },
+          "report": {
+            "conducted": 1,
+            "present": 2,
+            "absent": 3,
+            "unknown": 2,
+            "illness": 0,
+            "excused": 1,
+            "percentage": 40
+          },
+          "nativeHistoryReturn": "fresh session and role verified; BFCache not measured",
+          "checks": "manifest/icons; admin UI/five participants/four schedules; cards/three reasons/defaults/correction/report; 320/390/768/1280/1440; rendered text contrast 4.5/3; double tap/delay/offline; mark/close/correct precommit error/lost response/SQL/reload; mark idempotent retry/correction stale retry; closed/cancelled/role revoke; static-only cache/logout/account swap/expiry/pagehide/native history return/fresh me; two builds/waiting/save guard/other-tab save",
+          "physicalInstallation": "NOT TESTED"
+        }
+      ]
+    },
+    {
+      "case": "pwa-real-edge",
+      "result": "PASS",
+      "log": "pwa_v1-edge-rd06-fault-verified.log",
+      "logSha256": "12a3bd221a602002657b4a94c25da57559c135d3d2291ae6f8dfd19062c8697b",
+      "output": [
+        {
+          "check": "rendered-text-contrast",
+          "normalMinimum": 4.64,
+          "largeMinimum": 5.43
+        },
+        {
+          "engine": "chromium",
+          "version": "155.0.4283.45",
+          "scheduleCounts": {
+            "weekly": 2,
+            "day_parity": 4,
+            "date_list": 2,
+            "once": 1
+          },
+          "report": {
+            "conducted": 1,
+            "present": 2,
+            "absent": 3,
+            "unknown": 2,
+            "illness": 0,
+            "excused": 1,
+            "percentage": 40
+          },
+          "nativeHistoryReturn": "fresh session and role verified; BFCache not measured",
+          "checks": "manifest/icons; admin UI/five participants/four schedules; cards/three reasons/defaults/correction/report; 320/390/768/1280/1440; rendered text contrast 4.5/3; double tap/delay/offline; mark/close/correct precommit error/lost response/SQL/reload; mark idempotent retry/correction stale retry; closed/cancelled/role revoke; static-only cache/logout/account swap/expiry/pagehide/native history return/fresh me; two builds/waiting/save guard/other-tab save",
+          "physicalInstallation": "NOT TESTED"
+        }
+      ]
+    },
+    {
+      "case": "training-chromium",
+      "result": "PASS",
+      "log": "redesign_training-chromium-rd06.log",
+      "logSha256": "2f7ac2c5438c82268e519ce06a673161636b9ebbe052260e5dacaae294f2bba8",
+      "output": [
+        {
+          "engine": "chromium",
+          "version": "151.0.7922.34",
+          "result": "PASS",
+          "checks": "day/week/period, ID scope/two clubs, create/reschedule/replace/cancel, direct journal/back/reload, Escape/focus, double tap/network/reload, correction conflict/history, 320/390/1280"
+        }
+      ]
+    },
+    {
+      "case": "training-webkit",
+      "result": "PASS",
+      "log": "training-webkit-keyboard.log",
+      "logSha256": "9b12a6e3440fbcf0c6362a3d2f97c98c799489e399d037021dc3b43580239527",
+      "output": [
+        {
+          "engine": "webkit",
+          "version": "26.5",
+          "result": "PASS",
+          "checks": "day/week/period, ID scope/two clubs, create/reschedule/replace/cancel, direct journal/back/reload, Escape/focus, double tap/network/reload, correction conflict/history, 320/390/1280"
+        }
+      ]
+    },
+    {
+      "case": "reports-chromium",
+      "result": "PASS",
+      "log": "redesign_reports-chromium-rd06.log",
+      "logSha256": "e480dcff37db87448c2d7ab18834a55ad6dab38641d23664fcf9ed096b413bee",
+      "output": [
+        {
+          "engine": "chromium",
+          "version": "151.0.7922.34",
+          "result": "PASS",
+          "ledger": "3/7=42.9%; corrected 4/7=57.1%; empty closed; planned/open/cancelled; archived/transfer; saved session timezone",
+          "checks": "quick Sunday/year/Minsk vs browser date; custom restore; same names/ID drilldown/session period; error/retry/stale responses; audit 50+8 paging/scope/public envelope; live admin+owner revoke; keyboard; 320/390/1280"
+        }
+      ]
+    },
+    {
+      "case": "reports-webkit",
+      "result": "PASS",
+      "log": "reports-webkit-keyboard.log",
+      "logSha256": "e62b390f6347e64386855e295a066d7ce99874d34397bd732e4788d53fb96e8d",
+      "output": [
+        {
+          "engine": "webkit",
+          "version": "26.5",
+          "result": "PASS",
+          "ledger": "3/7=42.9%; corrected 4/7=57.1%; empty closed; planned/open/cancelled; archived/transfer; saved session timezone",
+          "checks": "quick Sunday/year/Minsk vs browser date; custom restore; same names/ID drilldown/session period; error/retry/stale responses; audit 50+8 paging/scope/public envelope; live admin+owner revoke; keyboard; 320/390/1280"
+        }
+      ]
+    },
+    {
+      "case": "dashboard-chromium",
+      "result": "PASS",
+      "log": "redesign_dashboard-chromium.log",
+      "logSha256": "6dbbbd5f640e77838485da31d23d86cae103acb818726d56883e26920d6b09e7",
+      "output": [
+        {
+          "engine": "chromium",
+          "version": "151.0.7922.34",
+          "result": "PASS",
+          "ledger": "2/5=40%; correction3/5=60%; close5/8=62.5%; empty closed null",
+          "checks": "two 24-hour-separated local dates; role scopes/counters/frozen roster; exact group/journal/create links; real mark/close/correction/archive; independent failures+retry; multi-role actual trainer; revoke/late replies/logout; 1440/1280/768/390/320; touch targets/main action"
+        }
+      ]
+    },
+    {
+      "case": "dashboard-webkit",
+      "result": "PASS",
+      "log": "redesign_dashboard-webkit.log",
+      "logSha256": "663e48d624e79ca71229c2ef5070c0a8db4cc909a6b678e359a64ef98c64dfbf",
+      "output": [
+        {
+          "engine": "webkit",
+          "version": "26.5",
+          "result": "PASS",
+          "ledger": "2/5=40%; correction3/5=60%; close5/8=62.5%; empty closed null",
+          "checks": "two 24-hour-separated local dates; role scopes/counters/frozen roster; exact group/journal/create links; real mark/close/correction/archive; independent failures+retry; multi-role actual trainer; revoke/late replies/logout; 1440/1280/768/390/320; touch targets/main action"
+        }
+      ]
+    },
+    {
+      "case": "dashboard-real-chrome",
+      "result": "PASS",
+      "log": "redesign_dashboard-chrome.log",
+      "logSha256": "331ecb627a7070cd2cec7b9edaa7d20a5820cd88365d7e4bf527c16865631c44",
+      "output": [
+        {
+          "engine": "chromium",
+          "version": "155.0.8059.79",
+          "result": "PASS",
+          "ledger": "2/5=40%; correction3/5=60%; close5/8=62.5%; empty closed null",
+          "checks": "two 24-hour-separated local dates; role scopes/counters/frozen roster; exact group/journal/create links; real mark/close/correction/archive; independent failures+retry; multi-role actual trainer; revoke/late replies/logout; 1440/1280/768/390/320; touch targets/main action"
+        }
+      ]
+    },
+    {
+      "case": "dashboard-real-edge",
+      "result": "PASS",
+      "log": "redesign_dashboard-edge.log",
+      "logSha256": "fd3349cd5a8649b4032e9864fe88a056dc677d92a47847d13cd37f234bb3c6de",
+      "output": [
+        {
+          "engine": "chromium",
+          "version": "155.0.4283.45",
+          "result": "PASS",
+          "ledger": "2/5=40%; correction3/5=60%; close5/8=62.5%; empty closed null",
+          "checks": "two 24-hour-separated local dates; role scopes/counters/frozen roster; exact group/journal/create links; real mark/close/correction/archive; independent failures+retry; multi-role actual trainer; revoke/late replies/logout; 1440/1280/768/390/320; touch targets/main action"
+        }
+      ]
+    }
+  ],
+  "contrastCalibration": [
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "negativeControlsDetected": 2,
+      "unsupportedBackgroundsRejected": 2,
+      "result": "PASS"
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "negativeControlsDetected": 2,
+      "unsupportedBackgroundsRejected": 2,
+      "result": "PASS"
+    }
+  ],
+  "retainedFailures": [
+    {
+      "log": "backend-checks.log",
+      "logSha256": "47984c400301c4a7912710be8f73daf65392e4d309f076de9254d6096226e822",
+      "result": "FAIL",
+      "reason": "Setup race: database container had not finished creation; rerun only after readiness."
+    },
+    {
+      "log": "pwa-webkit.log",
+      "logSha256": "8a1c52ef6f0020d309c7808097d48d1df1e31a9eaf57f3d2cebb23e29b0c42dc",
+      "result": "FAIL",
+      "reason": "Keyboard-return setup used pointer activation; Cocoa did not focus the button."
+    },
+    {
+      "log": "redesign_training-webkit.log",
+      "logSha256": "6de6a6ce2aeab128d7861384dd54e89576cdb1c06e8b3b4268a08aa591ba3c2d",
+      "result": "FAIL",
+      "reason": "Same pointer/keyboard focus setup mismatch."
+    },
+    {
+      "log": "redesign_reports-webkit.log",
+      "logSha256": "1288ed87c5cf74ab042b3dd6136685c324ef3f9cab21b7cfc2a31059672d41b4",
+      "result": "FAIL",
+      "reason": "Cocoa native button traversal uses Option+Tab with this setting."
+    },
+    {
+      "log": "pwa-chromium-a11y.log",
+      "logSha256": "134091304f273afd0aad3fa884bcdda9d8665dc91427bad2f071f1bd1743fee4",
+      "result": "FAIL",
+      "reason": "New contrast meter initially rejected the authored select chevron outside text."
+    },
+    {
+      "log": "pwa-webkit-rd06.log",
+      "logSha256": "bfb80dea9adb1f9ef568f6f39f60f1b4940465ca8bca04483a7588f04270acd0",
+      "result": "FAIL",
+      "reason": "Equivalent CSS layer size serialized once by WebKit, twice by Chromium."
+    },
+    {
+      "log": "pwa-webkit-rd06-final.log",
+      "logSha256": "b16dbc23d624f7cc01746747f2cf4eca400191be2b5329e186415990222bb442",
+      "result": "FAIL",
+      "reason": "SW-controlled page bypassed route fault injection; the real request succeeded. Assertions correctly failed."
+    }
+  ],
+  "publicHttps": {
+    "releaseSha": "d8be57452b3f079d7b02b2bd3a389cf8d0277adf",
+    "readyz": 200,
+    "cacheControl": "no-store",
+    "roleSmoke": "NOT RUN"
+  },
+  "physicalPwa": {
+    "chromeMac": "NOT RUN: browser permission deny",
+    "edgeMac": "NOT RUN: browser permission deny",
+    "iPhone13": "NOT RUN: browser permission deny; Mirroring connected to home screen then interrupted",
+    "android": "DEFERRED / NOT RUN: unavailable; explicitly deferred for RD-06 by user 2026-10-15"
+  },
+  "employeeAcceptance": "NOT RUN",
+  "approvedScopeChanges": [
+    {
+      "date": "2026-10-15",
+      "scope": "Android/Chrome and physical PWA deferred to a separate later check",
+      "otherCriteriaRemainRequired": true
+    }
+  ],
+  "nativeBFCacheHit": "NOT MEASURED; real history return and fresh me verified"
+}

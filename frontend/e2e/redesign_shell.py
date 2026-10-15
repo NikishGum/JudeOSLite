@@ -37,7 +37,10 @@ def check_shell(browser, page, signin, api, owner, club, group, trainer, root, e
     value.get_by_role('button', name='Добавить участника', exact=True).click()
     value.get_by_label('ФИО участника', exact=True).fill('Unsaved synthetic draft')
     assert value.evaluate("(()=>{const e=new Event('beforeunload',{cancelable:true});window.dispatchEvent(e);return e.defaultPrevented})()")
-    value.get_by_role('button', name='Закрыть форму', exact=True).click()
+    # Test keyboard return from a focused trigger. macOS WebKit deliberately
+    # does not focus a button on pointer click, so click alone is not this setup.
+    close_form = value.get_by_role('button', name='Закрыть форму', exact=True)
+    close_form.focus(); expect(close_form).to_be_focused(); close_form.press('Enter')
     dialog = value.get_by_role('dialog', name='Есть несохранённые изменения', exact=True)
     expect(dialog).to_contain_text('Есть несохранённые изменения')
     value.keyboard.press('Escape')
@@ -67,7 +70,7 @@ def check_shell(browser, page, signin, api, owner, club, group, trainer, root, e
     dimensions(value, 'multi-shell')
     value.set_viewport_size({'width': 320, 'height': 480})
     more = value.get_by_role('button', name='Ещё', exact=True)
-    more.click()
+    more.focus(); expect(more).to_be_focused(); more.press('Enter')
     dialog = value.get_by_role('dialog', name='Разделы PRIDE', exact=True)
     expect(dialog).to_be_visible()
     assert value.evaluate("document.body.style.overflow === 'hidden'")
