@@ -501,8 +501,10 @@ assertions сохранены. Изменения приложения/схем�
 запрос отдельного loopback QA188 тоже отклонён. Новый HTTPS role smoke и
 физическая установка/standalone/close/relaunch PWA NOT RUN; обход не выполнялся.
 iPhone13 подключался к Mirroring, затем был занят пользователем; новую iOS/
-Safari версию не подтвердили. Android недоступен по ответу пользователя 15.10;
-RD-06-исключение не согласовано. Решения пользователя/приёмки сотрудников нет.
+Safari версию не подтвердили. Android недоступен; отдельным ответом 15.10
+пользователь явно отложил Android/Chrome и его physical PWA на последующую
+проверку RD-06. Это DEFERRED/NOT RUN, не PASS; Chrome/Edge/iPhone и приёмка
+сотрудников остаются обязательными. Решения пользователя/приёмки сотрудников нет.
 Протоколы: docs/testing-redesign.md, acceptance-redesign.md, staff-guide-redesign.md,
 redesign-changes-v1.md и docs/redesign-evidence/rd06. QA164/v1 PASS/отложение Android
 не переносить. Следующую задачу не занимать; #188 остаётся открытой до критериев

@@ -355,9 +355,15 @@
     "chromeMac": "NOT RUN: browser permission deny",
     "edgeMac": "NOT RUN: browser permission deny",
     "iPhone13": "NOT RUN: browser permission deny; Mirroring connected to home screen then interrupted",
-    "android": "NOT RUN: unavailable, user reply 2026-10-15"
+    "android": "DEFERRED / NOT RUN: unavailable; explicitly deferred for RD-06 by user 2026-10-15"
   },
   "employeeAcceptance": "NOT RUN",
-  "scopeChangeApproved": false,
+  "approvedScopeChanges": [
+    {
+      "date": "2026-10-15",
+      "scope": "Android/Chrome and physical PWA deferred to a separate later check",
+      "otherCriteriaRemainRequired": true
+    }
+  ],
   "nativeBFCacheHit": "NOT MEASURED; real history return and fresh me verified"
 }
