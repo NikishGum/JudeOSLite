@@ -383,6 +383,16 @@
     "result": "BLOCKED",
     "reason": "A saved user permission setting blocks this action. Browser use could not acquire authority to trigger network egress. The origin approval gate did not grant access for https://test.judopride.tech. A saved permission or managed policy denies access.",
     "nativeSettingsInspection": "getApp('Codex') denied: com.openai.codex is not allowed for safety reasons",
+    "settingsEvidenceRecordedAt": "2026-10-15T12:51:04+03:00",
+    "userSettingsScreenshots": {
+      "siteBrowsing": "Always allow",
+      "defaultBrowsing": "Always allow",
+      "chromeExtensionUi": "Not installed",
+      "separateBlocklistVisible": false
+    },
+    "browserInventory": "Chrome detected as type=extension",
+    "sameOriginRetryAfterConnectionReset": "BLOCKED by the same saved permission / managed policy gate",
+    "precisePolicySource": "UNKNOWN; UI settings and runtime refusal disagree",
     "workaroundAttempted": false
   },
   "physicalPwa": {
