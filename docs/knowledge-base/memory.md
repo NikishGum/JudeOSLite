@@ -504,8 +504,46 @@ iPhone13 подключался к Mirroring, затем был занят по�
 Safari версию не подтвердили. Android недоступен; отдельным ответом 15.10
 пользователь явно отложил Android/Chrome и его physical PWA на последующую
 проверку RD-06. Это DEFERRED/NOT RUN, не PASS; Chrome/Edge/iPhone и приёмка
-сотрудников остаются обязательными. Решения пользователя/приёмки сотрудников нет.
+сотрудников остаются обязательными. Визуального решения/приёмки сотрудников нет.
 Протоколы: docs/testing-redesign.md, acceptance-redesign.md, staff-guide-redesign.md,
 redesign-changes-v1.md и docs/redesign-evidence/rd06. QA164/v1 PASS/отложение Android
 не переносить. Следующую задачу не занимать; #188 остаётся открытой до критериев
 либо явного изменения объёма. Точный PR/main CI/deploy/release фиксировать при доставке.
+
+Доставка RD-06 и обратная передача из Workspace — 15.10.2026, Europe/Minsk:
+PR #195 в main75078069f315a3303b546b0905a0a634f1c471da;
+Build38708997849/Deploy38710232985 attempt2 SUCCESS. Первая попытка deploy
+заблокирована pending reboot VPS до pull/миграций; пользователь перезагрузил
+VPS, preflight прошёл, повторён тот же job/digest/generation131. В 12:19:49
+публичные release SHA/readyz совпали; Workspace в 12:25 дополнительно проверил
+health/readiness, API401/no-store, manifest/icons/SW/SPA. Источники — комментарии
+6188706676 и 6188898932 в #188; это не HTTPS role smoke/физическая установка.
+Пользователь подтвердил оставить #188 открытой до реальной приёмки сотрудников.
+При продолжении исходный claim/StarMadeGalaxy/OPEN/In progress/отсутствие
+параллельной работы проверены заново. В 12:34 после сообщения о снятии запрета
+Browser Use снова отказал createBrowserTab Chrome/test.judopride.tech:
+saved user permission / origin approval gate / managed policy deny.
+getApp Codex тоже запрещён. Пользователю указан штатный путь Settings →
+Computer Use → Manage у Chrome → Blocked websites; не обходить запрет через
+другой браузер, телефон, CDP или API. До восстановления доступа оставшиеся
+проверки NOT RUN; разрешение действий не означает приёмку или изменение объёма.
+
+Уточнение по снимкам пользователя, записано в 12:51: на его экране нет отдельного
+Blocked websites; Agent permissions уже показывает Browsing Always allow для
+test.judopride.tech и Default. Панель пишет Chrome Not installed, но Browser Use
+инвентарь видит Chrome type=extension. После обновления подключения инструмента
+тот же createBrowserTab снова отклонён policy gate. Причина точнее общего
+saved permission/managed policy не установлена. Не просить пользователя снова
+дать разрешение или искать отсутствующий блокирующий пункт; следующий штатный
+шаг — перезапуск Chrome/Codex, при сохранении проблемы feedback в поддержку.
+Пользователь готов лично пройти три роли позднее; фактической приёмки пока нет.
+После подтверждённого перезапуска Chrome/Codex policy deny сохранился;
+подготовлены сведения для /feedback. Не повторять запрос согласия или удаления
+уже разрешающей записи сайта.
+
+CI head3a0a92f: push38716127275 WebKit FAIL на pageerror истории групп,
+парный PR38716136572 PASS. В registry harness добавлены предметные ожидания
+начального периода/списка и истории после archive/restore/identity save перед
+закрытием карточки. Pageerror assertions сохранены; добавлена диагностика
+URL/stack/API events. Приложение не менялось. Два затронутых локальных полных
+PWA Chromium/WebKit повтора PASS; исходный failure и хеши логов — results.json.

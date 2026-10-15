@@ -120,6 +120,11 @@ def check_registry(browser, page, signin, api, owner, root, engine, open_section
             admin.get_by_label('Номер телефона', exact=True).fill('+375291234567')
         admin.get_by_role('button', name='Сохранить участника', exact=True).click()
         expect(admin.get_by_role('status').filter(has_text='Участник добавлен')).to_be_visible()
+        # Creation opens the real card and starts a separate history read.
+        # Verify the initial membership before closing its still-loading view.
+        expect(admin.locator('.membership-history .registry-list > li')).to_have_count(1)
+        expect(admin.locator('.membership-history')).to_contain_text('Synthetic младшая')
+        expect(admin.locator('.participant-rows > li')).to_have_count(_ + 1)
         admin.get_by_role('button', name='Закрыть карточку', exact=True).click()
     cards = api(admin, 'GET', f"/api/clubs/{a['id']}/participants")['items']
     assert len(cards) == 2 and len({c['participantId'] for c in cards}) == 2
@@ -172,8 +177,10 @@ def check_registry(browser, page, signin, api, owner, root, engine, open_section
     admin.get_by_role('button', name='В архив', exact=True).click()
     admin.get_by_role('button', name='Подтвердить архивирование', exact=True).click()
     expect(admin.get_by_role('button', name='Вернуть из архива', exact=True)).to_be_visible()
+    expect(history.locator('.registry-list > li')).to_have_count(3)
     admin.get_by_role('button', name='Вернуть из архива', exact=True).click()
     expect(admin.get_by_role('button', name='В архив', exact=True)).to_be_visible()
+    expect(history.locator('.registry-list > li')).to_have_count(3)
     # Owner identity can be edited, forms and card/list paired captures.
     ui.goto(root+f"/clubs/{a['id']}/participants?detail={card['id']}")
     expect(ui.locator('.registry-card')).to_contain_text(card['fullName'])
@@ -188,6 +195,7 @@ def check_registry(browser, page, signin, api, owner, root, engine, open_section
     panel.get_by_role('button', name='Сохранить участника', exact=True).click()
     expect(panel).to_have_count(0)
     assert api(ui, 'GET', f"/api/clubs/{a['id']}/participants/{card['id']}")['birthDate'] == '2014-03-01'
+    expect(ui.locator('.membership-history .registry-list > li')).to_have_count(3)
     ui.get_by_role('button', name='Закрыть карточку', exact=True).click()
     shots('participants-list')
     # Real group detail / history navigation, date boundaries, archive and ID adapter.

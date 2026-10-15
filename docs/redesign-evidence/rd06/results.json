@@ -285,6 +285,35 @@
       ]
     }
   ],
+  "registryHistoryReadFollowup": {
+    "date": "2026-10-15",
+    "timezone": "Europe/Minsk",
+    "failedCiRun": 38716127275,
+    "pairedSuccessfulPrRun": 38716136572,
+    "checks": "Initial membership and participant rows; three history periods after archive/restore/identity save before leaving the card; strict pageerror assertions retained with URL/stack/API diagnostics",
+    "sourceSha256": {
+      "pwa_v1.py": "6bd07bb1584190bd4438d42a93b812c06b922d32a9e5cf9ce148f52ef40e0000",
+      "redesign_registry.py": "586ee0aabd7c1f19a1761a8b7b3c6d2c1614e099699a74ba95082d4756754aef"
+    },
+    "runs": [
+      {
+        "engine": "chromium",
+        "version": "151.0.7922.34",
+        "result": "PASS",
+        "log": "pwa-chromium-registry-sync-20261015.log",
+        "logSha256": "8880ed1f2de4951eb623c1bce9e70da08fa80b583397325a88c32b17daa4dd34"
+      },
+      {
+        "engine": "webkit",
+        "version": "26.5",
+        "result": "PASS",
+        "log": "pwa-webkit-registry-sync-20261015.log",
+        "logSha256": "8cef6adb626f2d2e31a17d96fdcd3a25bb7502d36d7682b25e189913879a7961"
+      }
+    ],
+    "physicalInstallation": "NOT TESTED",
+    "httpsRoleSmoke": "NOT RUN"
+  },
   "contrastCalibration": [
     {
       "engine": "chromium",
@@ -343,13 +372,66 @@
       "logSha256": "b16dbc23d624f7cc01746747f2cf4eca400191be2b5329e186415990222bb442",
       "result": "FAIL",
       "reason": "SW-controlled page bypassed route fault injection; the real request succeeded. Assertions correctly failed."
+    },
+    {
+      "log": "ci-head-3a0a92f-push-first-failure.log",
+      "logSha256": "2bf8bd3d3cd46145470b2b758e9d89133cf19fde681ec02ce3859ec92d4bcee7",
+      "result": "FAIL",
+      "reason": "WebKit pageerror for participant group history; registry scenario left the card without awaiting its separate history read. Strict assertions retained; history checks added."
     }
   ],
-  "publicHttps": {
+  "initialPublicHttps": {
     "releaseSha": "d8be57452b3f079d7b02b2bd3a389cf8d0277adf",
     "readyz": 200,
     "cacheControl": "no-store",
     "roleSmoke": "NOT RUN"
+  },
+  "deliveryCheckpoint": {
+    "date": "2026-10-15",
+    "timezone": "Europe/Minsk",
+    "pullRequest": 195,
+    "mainSha": "75078069f315a3303b546b0905a0a634f1c471da",
+    "buildRun": 38708997849,
+    "buildResult": "success",
+    "deployRun": 38710232985,
+    "deployAttempt": 2,
+    "deployResult": "success",
+    "evidence": "https://github.com/NikishGum/JudeOSLite/issues/188#issuecomment-6188706676"
+  },
+  "publicHttps": {
+    "observedAt": "2026-10-15T12:25+03:00",
+    "observer": "Workspace executor; separate public HTTP check",
+    "evidence": "https://github.com/NikishGum/JudeOSLite/issues/188#issuecomment-6188898932",
+    "releaseSha": "75078069f315a3303b546b0905a0a634f1c471da",
+    "healthz": 200,
+    "readyz": 200,
+    "readyzCacheControl": "no-store",
+    "releaseCacheControl": "no-cache",
+    "protectedApiWithoutSession": 401,
+    "manifestIconsSwSpaHttp": "PASS",
+    "interfaceExecuted": false,
+    "roleSmoke": "NOT RUN"
+  },
+  "browserUseRetry": {
+    "observedAt": "2026-10-15T12:34:40+03:00",
+    "action": "createBrowserTab('chrome', 'https://test.judopride.tech', {sessionName:'🧪 RD-06'})",
+    "result": "BLOCKED",
+    "reason": "A saved user permission setting blocks this action. Browser use could not acquire authority to trigger network egress. The origin approval gate did not grant access for https://test.judopride.tech. A saved permission or managed policy denies access.",
+    "nativeSettingsInspection": "getApp('Codex') denied: com.openai.codex is not allowed for safety reasons",
+    "settingsEvidenceRecordedAt": "2026-10-15T12:51:04+03:00",
+    "userSettingsScreenshots": {
+      "siteBrowsing": "Always allow",
+      "defaultBrowsing": "Always allow",
+      "chromeExtensionUi": "Not installed",
+      "separateBlocklistVisible": false
+    },
+    "browserInventory": "Chrome detected as type=extension",
+    "sameOriginRetryAfterConnectionReset": "BLOCKED by the same saved permission / managed policy gate",
+    "precisePolicySource": "UNKNOWN; UI settings and runtime refusal disagree",
+    "fullChromeAndCodexRestartConfirmedByUser": true,
+    "retryAfterRestart": "BLOCKED by the same origin permission gate",
+    "nextRecoveryStep": "User /feedback with exact denial, permission screenshots and chat ID",
+    "workaroundAttempted": false
   },
   "physicalPwa": {
     "chromeMac": "NOT RUN: browser permission deny",

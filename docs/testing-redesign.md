@@ -59,6 +59,26 @@ PWA_BROWSER=webkit python3 frontend/e2e/redesign_dashboard.py
 Это запуск настоящего браузерного бинарника в автоматическом режиме;
 установку PWA он **не** подтверждает. `pwa_v1.py` уже вызывает shell/registry.
 
+## Доставка и публичный HTTPS — срез 15.10, Europe/Minsk
+
+[PR #195](https://github.com/NikishGum/JudeOSLite/pull/195) доставлен в main
+`75078069f315a3303b546b0905a0a634f1c471da`.
+[Build 38708997849](https://github.com/NikishGum/JudeOSLite/actions/runs/38708997849)
+и [Deploy 38710232985, attempt 2](https://github.com/NikishGum/JudeOSLite/actions/runs/38710232985/attempts/2)
+успешны на этом SHA. Первая попытка deploy остановлена root preflight до pull,
+остановки приложения и миграций: VPS требовал перезагрузки. Пользователь
+перезагрузил сервер, повторный preflight прошёл; повторён только неудачный job
+с прежними SHA/digest/generation 131. Контроллер и ограничения доступа не менялись.
+[Доказательства доставки](https://github.com/NikishGum/JudeOSLite/issues/188#issuecomment-6188706676).
+
+В 12:19:49 локальный исполнитель отдельно получил `/release.json` с этим SHA
+и `/api/readyz` 200/no-store. В 12:25
+[Workspace выполнил дополнительный публичный HTTP smoke](https://github.com/NikishGum/JudeOSLite/issues/188#issuecomment-6188898932):
+health/readiness 200, защищённые API без сессии 401/no-store, manifest/три PNG
+с совпавшими размерами, SW и выдача SPA-маршрутов. TLS проверялся.
+Это датированные публичные чтения; UI под ролями и физическая установка PWA
+ими не подтверждены. После следующего изменения main нужно сверить новый SHA.
+
 ## Браузеры и реальные устройства
 
 Mac17,9, macOS 27.0.1 (26A434), Docker 29.8.2, Playwright 1.62.0.
@@ -162,12 +182,55 @@ context launcher не запустился из-за отсутствующег�
 Использованы PRODUCT/DESIGN/Working Panel и ручная проверка desktop/mobile
 снимков. Автоматический детектор и полная пользовательская оценка не объявлены PASS.
 
+## Уточнение CI-сценария реестра — 15.10
+
+[Push CI на 3a0a92f](https://github.com/NikishGum/JudeOSLite/actions/runs/38716127275)
+остановился на строгом `assert not errors`: WebKit сообщил access-control error
+для GET истории групп участника. Парный PR run38716136572 и оба CI предыдущего
+head2107707 прошли. Сценарий после создания сразу закрывал карточку, не проверяя
+отдельно загружаемую историю; после archive/restore/identity save тоже переходил
+дальше по готовности основной карточки. Это оставляло неоднозначность отмены
+дочернего чтения при навигации; лог не доказывает причину всех сообщений WebKit.
+
+`redesign_registry.py` теперь проверяет начальный период, строки списка и три
+сохранённых периода после архива/возврата и правки личности перед уходом.
+`pwa_v1.py` при необработанной ошибке дополнительно печатает URL/stack/последние
+API events. Прежний список ошибок и все его assertions сохранены.
+Production-код не менялся. После правки повторены только затронутые полные
+PWA(shell/registry) сценарии: Chromium151.0.7922.34 и WebKit26.5 — PASS,
+ledger по-прежнему 2/5=40%. Исходный CI log и хеши новых локальных логов сохранены
+в results.json. Это автоматические disposable API/PG-проверки, без физической установки.
+
 ## Что ещё блокирует завершение
 
 - Browser Use отклонил test.judopride.tech, затем повтор после разрешения
   пользователя снова вернул saved permission/managed policy deny. Запрет
   сохранялся и после сообщения «доступ включён». Отдельный запрос для loopback
   QA188 также отклонён. Обход через иной браузер/CDP/телефон не выполнялся.
+- При явной обратной передаче из Workspace 15.10 исходный claim, аккаунт,
+  единственный StarMadeGalaxy, OPEN/In progress и отсутствие параллельного
+  PR/работающего Cloud-чата проверены заново; claim не запускался.
+  После сообщения пользователя о снятии запрета повтор в 12:34 Europe/Minsk
+  `createBrowserTab('chrome', 'https://test.judopride.tech')` снова отклонён:
+  `A saved user permission setting blocks this action`; `origin approval gate
+  did not grant access`; `A saved permission or managed policy denies access`.
+  Чтение панели настроек через `getApp('Codex')` также запрещено для
+  `com.openai.codex`. Пользователю передан штатный путь Settings → Computer Use
+  → Manage у Chrome → Blocked websites; управляемое правило меняет администратор.
+  Это технический блокер, а не отсутствие разрешения заказчика. Обхода нет.
+- Последующие снимки настроек пользователя показывают другой UI: Agent permissions,
+  `Browsing: Always allow` у `https://test.judopride.tech` и у Default;
+  отдельного списка Blocked websites на этом экране нет. Панель Chrome пишет
+  `Not installed`, однако `listBrowsers()` обнаруживает Chrome как `type=extension`.
+  Обновление подключения инструмента и повтор того же штатного запроса также
+  вернули saved permission/managed-policy deny (состояние записано в 12:51).
+  Снимки не подтверждают наличие блокирующей записи; точный источник отказа
+  не установлен. Пользователю предложен штатный перезапуск Chrome/Codex,
+  а не повторное согласие или обход gate.
+- Пользователь затем подтвердил полный перезапуск Chrome и Codex; повторный
+  штатный запрос снова отклонён той же политикой. Следующий способ восстановления
+  — `/feedback` с точным отказом, показанными разрешениями и ID локального чата;
+  дополнительные подтверждения заказчика не требуются.
 - Поэтому новый HTTPS QA188/role smoke и физическая установка/standalone/
   закрытие/relaunch/смена сотрудника в Chrome/Edge/iPhone не проверены.
 - Android недоступен и отдельно явно отложен пользователем 15.10.

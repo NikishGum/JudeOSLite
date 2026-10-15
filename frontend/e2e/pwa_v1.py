@@ -110,8 +110,13 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             contrast_floor = {4.5: float('inf'), 3: float('inf')}
             def page(context):
                 value = context.new_page()
-                value.on('pageerror', lambda error: errors.append(str(error)))
                 value.pwa_api_events = []
+                def page_error(error):
+                    errors.append(str(error))
+                    print(json.dumps({'engine': ENGINE, 'check': 'unexpected-page-error',
+                        'url': value.url, 'message': str(error), 'stack': error.stack,
+                        'api': value.pwa_api_events[-12:]}, ensure_ascii=False), flush=True)
+                value.on('pageerror', page_error)
                 value.on('request', lambda request: value.pwa_api_events.append({'event': 'request', 'time': time.monotonic(), 'method': request.method, 'path': request.url.removeprefix(ROOT)}) if request.url.startswith(ROOT+'/api/') else None)
                 value.on('response', lambda response: value.pwa_api_events.append({'event': 'response', 'time': time.monotonic(), 'status': response.status, 'path': response.url.removeprefix(ROOT)}) if response.url.startswith(ROOT+'/api/') else None)
                 value.on('requestfailed', lambda request: value.pwa_api_events.append({'event': 'failed', 'time': time.monotonic(), 'failure': request.failure, 'path': request.url.removeprefix(ROOT)}) if request.url.startswith(ROOT+'/api/') else None)

@@ -17,7 +17,20 @@
 Полные локальные логи сохранены вне Git в `rd06-artifacts-20261015` рядом с
 рабочим деревом; это не переносимый путь CI. Повторяемые команды и независимые
 контрольные числа — [testing-redesign](../../testing-redesign.md).
-Логи GitHub Actions точного PR/main SHA привязываются в #188 при доставке.
+Логи GitHub Actions точного PR/main SHA и успешного deploy привязаны в
+[#188, доказательства доставки](https://github.com/NikishGum/JudeOSLite/issues/188#issuecomment-6188706676).
+Дополнительный публичный HTTPS smoke Workspace от 15.10, 12:25 Europe/Minsk —
+[отдельный комментарий](https://github.com/NikishGum/JudeOSLite/issues/188#issuecomment-6188898932).
+Ни один из этих результатов не подтверждает HTTPS-действия под ролями или
+физическую установку. Повторный Browser Use deny от 12:34 записан в отчёте;
+проверки интерфейса остаются NOT RUN.
+
+Следующий CI push3a0a92f сохранил WebKit pageerror для дочернего чтения истории
+участника; парный PR был зелёным. Registry-сценарий усилен проверкой загруженных
+периодов до закрытия карточки. Строгие pageerror assertions сохранены,
+добавлена диагностика; два затронутых локальных PWA Chromium/WebKit повтора PASS.
+Исходный CI failure и хеши новых логов — `registryHistoryReadFollowup` и
+`retainedFailures` в results.json.
 
 Сохранены первоначальные ошибки macOS WebKit (focus setup), неготовой Go DB
 и сериализации CSS в новом измерителе. Исправлены начальные условия тестов
