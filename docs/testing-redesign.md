@@ -1,8 +1,10 @@
 # RD-06: сквозная проверка редизайна
 
 15.10.2026 · [#188](https://github.com/NikishGum/JudeOSLite/issues/188).
-**Проверка продолжается; это не разрешение рабочего запуска.** Физическая PWA,
-HTTPS role smoke и пользовательская приёмка пока не выполнены. Issue остаётся открытым.
+**Проверка продолжается; issue остаётся открытым.** HTTPS QA188 UI/API и
+физические desktop PWA проверены; iPhone пройден частично. Пользователь принял
+интерфейс и отложил оставшиеся ручные проверки iPhone. Самостоятельные проходы
+трёх ролей не подтверждены. [Текущий HTTPS-протокол](redesign-evidence/rd06/qa188-https-20261015.md).
 
 ## Основа и воспроизведение
 
@@ -79,6 +81,13 @@ health/readiness 200, защищённые API без сессии 401/no-store,
 Это датированные публичные чтения; UI под ролями и физическая установка PWA
 ими не подтверждены. После следующего изменения main нужно сверить новый SHA.
 
+PR #196 доставлен в main `4cba9307b8754cd8edbc90b18015e01b00356b9b`:
+[Build38719548847](https://github.com/NikishGum/JudeOSLite/actions/runs/38719548847)
+и [Deploy38720517949](https://github.com/NikishGum/JudeOSLite/actions/runs/38720517949)
+SUCCESS. В новом локальном чате 15.10 около17:38 обычное открытие Chrome
+штатно разрешено; `/release.json` показал этот SHA. Прежний отказ не обходили,
+его источник не установлен. Последующий QA188 UI/API проход относится к этому release.
+
 ## Браузеры и реальные устройства
 
 Mac17,9, macOS 27.0.1 (26A434), Docker 29.8.2, Playwright 1.62.0.
@@ -88,18 +97,57 @@ Mac17,9, macOS 27.0.1 (26A434), Docker 29.8.2, Playwright 1.62.0.
 | --- | --- | --- | --- | --- | --- |
 | Chromium 151.0.7922.34 | PASS | PASS | PASS | PASS | NOT RUN |
 | WebKit 26.5 на Mac | PASS | PASS | PASS | PASS | Не является физическим Safari |
-| Google Chrome 155.0.8059.79 на Mac | PASS | Включены основные операции PWA | Включён 40% ledger | PASS | NOT RUN / доступ инструмента заблокирован |
-| Microsoft Edge 155.0.4283.45 на Mac | PASS | Включены основные операции PWA | Включён 40% ledger | PASS | NOT RUN / доступ инструмента заблокирован |
-| iPhone 13 / Safari | NOT RUN для RD-06 | NOT RUN | NOT RUN | NOT RUN | NOT RUN |
+| Google Chrome 155.0.8059.79 на Mac | PASS | HTTPS QA188 PASS | HTTPS40% PASS | HTTPS PASS | Штатная установка/standalone/window close/relaunch/session/logout PASS |
+| Microsoft Edge 155.0.4283.45 на Mac | PASS | Substitute и прямой URL после замены PASS | API403 ожидаем | HTTPS PASS | Штатная установка/standalone/window close/relaunch/session/logout PASS |
+| iPhone13 / Safari и PWA | Частичный HTTPS PASS | Frozen X/причины/Отмена PASS в Safari | NOT RUN | Trainer PASS | Home Screen установка/standalone/login/full card close/relaunch/session PASS; остальное DEFERRED |
 | Android / Chrome | DEFERRED / NOT RUN | DEFERRED | DEFERRED | DEFERRED | Явно отложено пользователем 15.10 |
 
-Для iPhone Mirroring удалось подключиться и увидеть домашний экран, затем связь
-прервалась при использовании телефона. iOS 26.6.2 сообщалась пользователем
-в прежнем v1-проходе; версия и Safari в RD-06 заново не подтверждены.
+В17:38–18:21 настоящий Computer Use восстановлен. Версии Chrome/Edge заново
+прочитаны в native About; macOS27.0.1/MacBook Pro14/M5Pro — в System Settings.
+iPhone13 подключён через Mirroring; Safari пользователь открыл и вошёл лично,
+дальше действия выполнял агент. iOS26.6.2 сообщалась пользователем
+в прежнем v1-проходе; версия iOS/Safari в RD-06 заново не подтверждена.
 Результаты QA164/v1 и прежнее отложение Android не переносятся в RD-06.
 Отдельным новым решением 15.10 пользователь явно отложил Android/Chrome и его
 физическую PWA на последующую проверку. Это DEFERRED / NOT RUN, не PASS;
-Chrome/Edge/iPhone и приёмка сотрудников остаются обязательными.
+Этот первый перенос касался только Android; последующее решение об iPhone — ниже.
+
+Позднее15.10 пользователь принял интерфейс («Я принимаю интерфейс») и отдельно
+отложил оставшиеся ручные проверки iPhone: поворот/экранную клавиатуру/физическую
+потерю сети и ручной logout/relaunch. Это DEFERRED / NOT RUN, без переноса старого PASS.
+Технические границы и текущий остаток — в [приёмке](acceptance-redesign.md).
+
+## HTTPS QA188 — 15.10, около16:17–18:21 Europe/Minsk
+
+37 шагов человека под подсказками подготовили два QA188, администратора с двумя
+назначениями, Trainer/Substitute, A–E и проверили изменения контакта/даты после reload,
+состав, logout/Back/owner→admin. Это не самостоятельный поиск операций сотрудниками.
+После восстановления Browser Use агент создал once A–E и8 вспомогательных занятий:
+weekly2/day_parity4/date_list2, перенос17→23.10, замену Substitute→Trainer и отмену16.10.
+X переведён From→To с16.10 и архивирован после открытия weekly15.10: текущий
+состав без X, frozen roster с архивным X и одной неотмеченной записью.
+
+Основной журнал A–E: A present/Bunknown/Cillness/Dexcused/E unmarked;
+«Отмена» без записи, close заполнил E unknown/close_default. Администратор
+исправил C→present с отдельной причиной, история содержит одну corrected.
+Владелец Acceptance/A–E/15.10 получил1closed/2present/3absent,
+unknown2/illness0/excused1, **40,0%**, planned0/open0 во всех уровнях отчёта.
+
+Отдельный HTTPS-клиент с проверкой TLS сверил46 GET/no-store: текущие записи,
+версии/авторов/origin,6 исторических событий/одну коррекцию, два периода X,
+cancelled records[]/не frozen и вспомогательный отчёт closed0/planned6/open1/marks0.
+Независимый пересчёт JSON журнала совпал с итогом и обеими таблицами отчёта.
+Admin/trainer/Substitute owner APIs403; trainer registry/admin journal/Access404;
+новый actual Trainer moved journal200, прежний Substitute404; logout/anonymous401.
+Прямого SQL к БД HTTPS-стенда не было. Локальные SQL/expiry/revoke/archive/stale
+результаты выше остаются отдельными, не выдаются за новый live HTTPS проход.
+
+Первое ожидание расширенного API-теста ошибочно требовало moved404 и от нового
+actual Trainer. Исправлена только матрица ожидания согласно сценарию замены:
+actual200/прежний404. Полный проход затем PASS; числа/версии/история не ослаблены.
+Нативный ввод Mirroring терял быстрые символы: отдельные pressKey с кадром между
+ними дали точный логин; это ограничение harness, не доказанный дефект PRIDE.
+[Синтетические ID, ответы API и снимки](redesign-evidence/rd06/qa188-https-20261015.md).
 
 ## Предметный путь и независимые числа
 
@@ -201,7 +249,10 @@ PWA(shell/registry) сценарии: Chromium151.0.7922.34 и WebKit26.5 — PA
 ledger по-прежнему 2/5=40%. Исходный CI log и хеши новых локальных логов сохранены
 в results.json. Это автоматические disposable API/PG-проверки, без физической установки.
 
-## Что ещё блокирует завершение
+## История прежнего блокера Browser Use
+
+Ниже срез до восстановления доступа около17:38; это история отказов, а не
+текущее состояние. Точная причина отказа так и не установлена.
 
 - Browser Use отклонил test.judopride.tech, затем повтор после разрешения
   пользователя снова вернул saved permission/managed policy deny. Запрет
@@ -238,3 +289,16 @@ ledger по-прежнему 2/5=40%. Исходный CI log и хеши нов
 
 Порядок оставшихся действий — [протокол приёмки](acceptance-redesign.md).
 Доказательства — [RD-06 evidence](redesign-evidence/rd06/README.md).
+
+## Текущий остаток после HTTPS-продолжения
+
+- Визуальный Working Panel принят пользователем15.10; самостоятельные повторные
+  проходы трёх ролей/участие сотрудников не подтверждены.
+- Новые live HTTPS revoke/expiry/архив филиала, универсальные stale/BFCache/
+  несохранённые формы и pending-save/SW/cache checks этим проходом не выполнены.
+  Прежние автоматические локальные PASS сохраняются отдельно.
+- Физические network-loss mark/close/correct не проверены этим продолжением.
+  Оставшиеся ручные iPhone проверки пользователь отложил; Android также DEFERRED.
+  Повторно спрашивать их сейчас пользователь не просил.
+- После доставки документации нужны CI точного head/main, deploy и публичный
+  smoke с новым SHA. #188 остаётся OPEN/In progress; следующую задачу не занимать.

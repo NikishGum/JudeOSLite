@@ -496,7 +496,7 @@ close/correct с независимым SQL/reload/audit и измерение �
 ширинах. Mac/WebKit focus setup исправлен клавиатурной активацией/Option+Tab;
 assertions сохранены. Изменения приложения/схемы не потребовались.
 
-**Это не закрытие #188.** Browser Use сохраняет deny для test.judopride.tech
+**Срез до17:38, не закрытие #188.** Browser Use сохраняет deny для test.judopride.tech
 даже после явного разрешения пользователя/сообщения «доступ включён»;
 запрос отдельного loopback QA188 тоже отклонён. Новый HTTPS role smoke и
 физическая установка/standalone/close/relaunch PWA NOT RUN; обход не выполнялся.
@@ -547,3 +547,29 @@ CI head3a0a92f: push38716127275 WebKit FAIL на pageerror истории гру
 закрытием карточки. Pageerror assertions сохранены; добавлена диагностика
 URL/stack/API events. Приложение не менялось. Два затронутых локальных полных
 PWA Chromium/WebKit повтора PASS; исходный failure и хеши логов — results.json.
+
+Продолжение того же #188 в новом локальном чате15.10,17:38–18:21 Europe/Minsk:
+исходный claim/StarMadeGalaxy/единственный assignee/OPEN/In progress проверены,
+claim не повторён. PR196/main4cba9307b8754cd8edbc90b18015e01b00356b9b,
+Build38719548847/Deploy38720517949 SUCCESS. Обычный createBrowserTab Chrome
+штатно открыл HTTPS; источник прежнего permission deny неизвестен, обходов нет.
+Сопровождаемые37 действий человека создали отдельные QA188 Acceptance/Access,
+admin с двумя назначениями, Trainer/Substitute, A–E; это не самостоятельная приёмка.
+Агент прошёл поиск,4 режима/preview/save, перенос/замену/отмену, закрытие A–E,
+одну коррекцию C, перевод/архив X с сохранённым frozen roster. Owner UI и отдельный
+HTTPS-клиент дали1closed/2present/3absent,unknown2/illness0/excused1,40%.
+46 GET/no-store:6 событий/одна corrected,2 периода X, cancelled без records,
+actual Trainer200/прежний Substitute404, owner APIs403 для остальных, logout401.
+Это пересчёт JSON, не прямой SQL к БД стенда. Первая ошибка ожидания moved404
+для обоих тренеров исправлена на предусмотренные actual200/прежний404.
+Chrome155.0.8059.79/Edge155.0.4283.45 native install/standalone/window close/
+relaunch/session/logout PASS, macOS27.0.1/M5Pro прочитаны заново. iPhone13 Safari
+X/причины/Отмена; Home Screen install/standalone/отдельный login/full card close/
+relaunch/session PASS. Два одинаковых значка PRIDE не удаляли; новый/старый по
+manifest identity отдельно не различены. iOS/Safari версии не перечитаны.
+Пользователь15.10 ответил «Я принимаю интерфейс» и отложил оставшиеся ручные
+проверки iPhone (поворот/экранная клавиатура/физическая сеть/ручной logout-relaunch).
+Не спрашивать их повторно сейчас и не переносить прежний PASS. Самостоятельные
+повторные проходы трёх ролей/участие сотрудников не подтверждены; #188 не закрывать.
+Точные синтетические IDs/снимки/API — docs/redesign-evidence/rd06/qa188-https-20261015.md.
+Реальные данные и QA164 не менялись, секреты в файлы не включались.
