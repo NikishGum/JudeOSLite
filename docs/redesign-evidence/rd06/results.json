@@ -285,6 +285,35 @@
       ]
     }
   ],
+  "registryHistoryReadFollowup": {
+    "date": "2026-10-15",
+    "timezone": "Europe/Minsk",
+    "failedCiRun": 38716127275,
+    "pairedSuccessfulPrRun": 38716136572,
+    "checks": "Initial membership and participant rows; three history periods after archive/restore/identity save before leaving the card; strict pageerror assertions retained with URL/stack/API diagnostics",
+    "sourceSha256": {
+      "pwa_v1.py": "6bd07bb1584190bd4438d42a93b812c06b922d32a9e5cf9ce148f52ef40e0000",
+      "redesign_registry.py": "586ee0aabd7c1f19a1761a8b7b3c6d2c1614e099699a74ba95082d4756754aef"
+    },
+    "runs": [
+      {
+        "engine": "chromium",
+        "version": "151.0.7922.34",
+        "result": "PASS",
+        "log": "pwa-chromium-registry-sync-20261015.log",
+        "logSha256": "8880ed1f2de4951eb623c1bce9e70da08fa80b583397325a88c32b17daa4dd34"
+      },
+      {
+        "engine": "webkit",
+        "version": "26.5",
+        "result": "PASS",
+        "log": "pwa-webkit-registry-sync-20261015.log",
+        "logSha256": "8cef6adb626f2d2e31a17d96fdcd3a25bb7502d36d7682b25e189913879a7961"
+      }
+    ],
+    "physicalInstallation": "NOT TESTED",
+    "httpsRoleSmoke": "NOT RUN"
+  },
   "contrastCalibration": [
     {
       "engine": "chromium",
@@ -343,6 +372,12 @@
       "logSha256": "b16dbc23d624f7cc01746747f2cf4eca400191be2b5329e186415990222bb442",
       "result": "FAIL",
       "reason": "SW-controlled page bypassed route fault injection; the real request succeeded. Assertions correctly failed."
+    },
+    {
+      "log": "ci-head-3a0a92f-push-first-failure.log",
+      "logSha256": "2bf8bd3d3cd46145470b2b758e9d89133cf19fde681ec02ce3859ec92d4bcee7",
+      "result": "FAIL",
+      "reason": "WebKit pageerror for participant group history; registry scenario left the card without awaiting its separate history read. Strict assertions retained; history checks added."
     }
   ],
   "initialPublicHttps": {
@@ -393,6 +428,9 @@
     "browserInventory": "Chrome detected as type=extension",
     "sameOriginRetryAfterConnectionReset": "BLOCKED by the same saved permission / managed policy gate",
     "precisePolicySource": "UNKNOWN; UI settings and runtime refusal disagree",
+    "fullChromeAndCodexRestartConfirmedByUser": true,
+    "retryAfterRestart": "BLOCKED by the same origin permission gate",
+    "nextRecoveryStep": "User /feedback with exact denial, permission screenshots and chat ID",
     "workaroundAttempted": false
   },
   "physicalPwa": {
