@@ -479,3 +479,31 @@ Frontend и production Docker, полный Go format/vet/race/PostgreSQL/build,
 строгий pageerror и проверка CTA не менялись; исходные FAIL сохранены в протоколе.
 Физические устройства, установка/standalone PWA и новая пользовательская приёмка
 здесь не проверялись; остаются RD-06. Следующую задачу автоматически не занимать.
+## RD-06 — локальный контроль 15.10.2026, работа продолжается
+
+Пользователь передал #188 из остановленного Cloud-чата. Исходный claim
+StarMadeGalaxy/fc02eb61696d4543b4e75cc757b604e3/run38699613597 проверен успешным;
+повторять claim/назначение нельзя. Пользователь разрешил GitHub-коннектор вместо
+неавторизованного gh; connector подтвердил StarMadeGalaxy. Отдельное чистое
+дерево codex/rd-06-validation начато с main d8be574. #166/#183–#187 CLOSED/Done,
+CI Build38632181369/Coordination38632181415/Deploy38633667079 зелёные на нём.
+
+Локально production build/npm и Go1.27.2 vet/race/44 основных теста на реальном
+PG18.6 без SKIP прошли. Existing PWA(shell/registry), training, reports, dashboard
+пройдены Chromium151/WebKit26.5; реальные Mac Chrome155.0.8059.79/Edge155.0.4283.45
+прошли PWA и dashboard. RD-06 добавляет network loss before/after commit для
+close/correct с независимым SQL/reload/audit и измерение текста 4.5/3 на пяти
+ширинах. Mac/WebKit focus setup исправлен клавиатурной активацией/Option+Tab;
+assertions сохранены. Изменения приложения/схемы не потребовались.
+
+**Это не закрытие #188.** Browser Use сохраняет deny для test.judopride.tech
+даже после явного разрешения пользователя/сообщения «доступ включён»;
+запрос отдельного loopback QA188 тоже отклонён. Новый HTTPS role smoke и
+физическая установка/standalone/close/relaunch PWA NOT RUN; обход не выполнялся.
+iPhone13 подключался к Mirroring, затем был занят пользователем; новую iOS/
+Safari версию не подтвердили. Android недоступен по ответу пользователя 15.10;
+RD-06-исключение не согласовано. Решения пользователя/приёмки сотрудников нет.
+Протоколы: docs/testing-redesign.md, acceptance-redesign.md, staff-guide-redesign.md,
+redesign-changes-v1.md и docs/redesign-evidence/rd06. QA164/v1 PASS/отложение Android
+не переносить. Следующую задачу не занимать; #188 остаётся открытой до критериев
+либо явного изменения объёма. Точный PR/main CI/deploy/release фиксировать при доставке.

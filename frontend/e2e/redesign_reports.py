@@ -6,6 +6,7 @@ import pty
 import select
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 import uuid
@@ -229,9 +230,13 @@ try:
         expect(screen.get_by_label('Группа отчёта', exact=True)).to_have_value(ga['id'])
         screen.get_by_label('Филиал отчёта', exact=True).select_option(''); metric('percentage','57,1%')
         owner.set_viewport_size({'width':1280,'height':900})
-        screen.get_by_role('button', name='Сегодня', exact=True).focus(); owner.keyboard.press('Tab')
+        # Cocoa's default keyboard navigation uses Option+Tab for buttons.
+        # Keep the same forward/reverse focus assertions on each platform.
+        tab = 'Alt+Tab' if ENGINE == 'webkit' and sys.platform == 'darwin' else 'Tab'
+        back_tab = 'Alt+Shift+Tab' if ENGINE == 'webkit' and sys.platform == 'darwin' else 'Shift+Tab'
+        screen.get_by_role('button', name='Сегодня', exact=True).focus(); owner.keyboard.press(tab)
         expect(screen.get_by_role('button', name='Неделя', exact=True)).to_be_focused()
-        owner.keyboard.press('Shift+Tab'); expect(screen.get_by_role('button', name='Сегодня', exact=True)).to_be_focused()
+        owner.keyboard.press(back_tab); expect(screen.get_by_role('button', name='Сегодня', exact=True)).to_be_focused()
         # Stable audit pagination, public envelope only. Inserts are synthetic private fixtures.
         actor = api(owner, 'GET', '/api/auth/me')['user']['id']
         def events(club, count, action='created', stamp='2000-02-01 12:00Z'):
