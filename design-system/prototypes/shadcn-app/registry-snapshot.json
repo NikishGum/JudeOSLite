@@ -1,0 +1,76 @@
+{
+  "checkedOn": "2026-10-16",
+  "source": "https://ui.shadcn.com/r/registries.json",
+  "registries": [
+    {
+      "name": "@diceui",
+      "homepage": "https://www.diceui.com/",
+      "url": "https://diceui.com/r/{style}/{name}.json",
+      "description": "Accessible shadcn/ui components built with React, TypeScript, and Tailwind CSS. Copy-paste ready, and customizable.",
+      "health": {
+        "status": "degraded",
+        "statusReason": {
+          "code": "dry_run_failures",
+          "message": "The last two CLI dry-run checks failed"
+        },
+        "checkedAt": "2026-10-16T07:30:49.196Z"
+      }
+    },
+    {
+      "name": "@kibo-ui",
+      "homepage": "https://www.kibo-ui.com/",
+      "url": "https://www.kibo-ui.com/r/{name}.json",
+      "description": "Kibo UI is a custom registry of composable, accessible and open source components designed for use with shadcn/ui.",
+      "health": {
+        "status": "healthy",
+        "statusReason": {
+          "code": "healthy_thresholds",
+          "message": "Recent checks are within healthy thresholds"
+        },
+        "checkedAt": "2026-10-16T07:30:49.196Z"
+      }
+    },
+    {
+      "name": "@reui",
+      "homepage": "https://reui.io",
+      "url": "https://reui.io/r/{style}/{name}.json",
+      "description": "Free & open-source library of 1,000+ components and patterns to 10x your productivity in shadcn projects.",
+      "health": {
+        "status": "healthy",
+        "statusReason": {
+          "code": "healthy_thresholds",
+          "message": "Recent checks are within healthy thresholds"
+        },
+        "checkedAt": "2026-10-16T07:30:49.196Z"
+      }
+    },
+    {
+      "name": "@shadcnblocks",
+      "homepage": "https://shadcnblocks.com",
+      "url": "https://shadcnblocks.com/r/{name}.json",
+      "description": "A shadcn/ui registry with 1429 blocks, 1189 component variants, 14 templates, themes, and admin dashboard patterns.",
+      "health": {
+        "status": "degraded",
+        "statusReason": {
+          "code": "item_validation_failures",
+          "message": "Sampled registry items are failing validation"
+        },
+        "checkedAt": "2026-10-16T07:30:49.196Z"
+      }
+    },
+    {
+      "name": "@tablecn",
+      "homepage": "https://table-cn.vercel.app",
+      "url": "https://table-cn.vercel.app/r/{style}/{name}.json",
+      "description": "Data table and filter builder blocks with search, sorting, pagination and URL-synced filters. Built for Radix UI, Base UI and React Aria.",
+      "health": {
+        "status": "healthy",
+        "statusReason": {
+          "code": "healthy_thresholds",
+          "message": "Recent checks are within healthy thresholds"
+        },
+        "checkedAt": "2026-10-16T07:30:49.196Z"
+      }
+    }
+  ]
+}
