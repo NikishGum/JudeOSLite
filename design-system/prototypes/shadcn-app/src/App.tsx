@@ -66,7 +66,6 @@ import {
   SidebarInset,
   SidebarTrigger,
   SidebarRail,
-  useSidebar,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -96,10 +95,20 @@ import {
   clubName,
   type Section,
   type Role,
+  demoDate,
 } from "./data";
 import type { Session } from "../../../../frontend/src/features/dashboard/types";
 import type { Card as Participant } from "../../../../frontend/src/features/participants/ParticipantEditor";
 import logo from "../../../assets/logo-pride.png";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  ProfileMenu,
+  ProfileSettings,
+  MobileNavigation,
+  StatusDot,
+  DateNavigation,
+  dateLabel,
+} from "@/components/workspace-tools";
 
 type Page = Section | "registries";
 type ViewState = "ready" | "loading" | "empty" | "error";
@@ -199,17 +208,15 @@ function AppNav({
   navigate,
   allowed,
   role,
+  profile,
 }: {
   page: Page;
   navigate: (p: Page) => void;
   allowed: Section[];
   role: Role;
+  profile: ReactNode;
 }) {
-  const { setOpenMobile } = useSidebar();
-  const go = (p: Page) => {
-    navigate(p);
-    setOpenMobile(false);
-  };
+  const go = navigate;
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -227,15 +234,6 @@ function AppNav({
             <small>Клуб дзюдо</small>
           </span>
         </a>
-        <Button
-          className="mobile-menu-close"
-          variant="ghost"
-          size="icon"
-          aria-label="Закрыть меню"
-          onClick={() => setOpenMobile(false)}
-        >
-          <X />
-        </Button>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -295,21 +293,14 @@ function AppNav({
       </SidebarContent>
       <SidebarFooter>
         <Separator />
-        <div className="profile">
-          <Avatar>
-            <AvatarFallback>ДП</AvatarFallback>
-          </Avatar>
-          <span>
-            <strong>Демо-профиль</strong>
-            <small>{roleNames[role]}</small>
-          </span>
-        </div>
+        {profile}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );
 }
 export function App() {
+  const [active, setActive] = useState(true);
   return (
     <TooltipProvider>
       <SidebarProvider
@@ -320,12 +311,51 @@ export function App() {
           } as React.CSSProperties
         }
       >
-        <Workspace />
+        {active ? (
+          <Workspace
+            onSignOut={() => {
+              history.replaceState(null, "", "#signed-out");
+              setActive(false);
+            }}
+          />
+        ) : (
+          <main className="signed-out">
+            <img src={logo} width="72" height="72" alt="PRIDE" />
+            <Empty>
+              <EmptyHeader>
+                <EmptyTitle>Вы вышли из демо</EmptyTitle>
+                <EmptyDescription>
+                  Локальный сеанс завершён. Откройте шаблон снова, чтобы
+                  продолжить просмотр.
+                </EmptyDescription>
+              </EmptyHeader>
+              <EmptyContent>
+                <Button
+                  onClick={() => {
+                    history.replaceState(null, "", "#home");
+                    setActive(true);
+                  }}
+                >
+                  Открыть демо
+                </Button>
+              </EmptyContent>
+            </Empty>
+          </main>
+        )}
       </SidebarProvider>
     </TooltipProvider>
   );
 }
-function Workspace() {
+function Workspace({ onSignOut }: { onSignOut: () => void }) {
+  const isMobile = useIsMobile();
+  const [profileName, setProfileName] = useState("Демо-профиль");
+  const [settings, setSettings] = useState(false);
+  const [showDemo, setShowDemo] = useState(true);
+  const [date, setDate] = useState(demoDate);
+  const [staffDetail, setStaffDetail] = useState<{
+    name: string;
+    assignments: string[];
+  } | null>(null);
   const [role, setRole] = useState<Role>("owner");
   const [page, setPage] = useState<Page>(() => {
     const hash = location.hash.slice(1);
@@ -364,6 +394,7 @@ function Workspace() {
     setStatus("all");
     setState("ready");
     setDetail(null);
+    setStaffDetail(null);
     history.pushState(null, "", `#${p}`);
   }
   useEffect(() => {
@@ -390,6 +421,7 @@ function Workspace() {
   function switchRole(value: string) {
     const next = value as Role;
     setRole(next);
+    setDate(demoDate);
     setClub(next === "owner" ? "all" : clubs[0].id);
     navigate("home");
   }
@@ -403,6 +435,7 @@ function Workspace() {
   );
   const filteredSessions = visibleSessions.filter(
     (s) =>
+      s.date === date &&
       (status === "all" || status === s.status) &&
       (s.groupName + " " + s.trainerName)
         .toLocaleLowerCase("ru")
@@ -442,6 +475,7 @@ function Workspace() {
         reset={() => {
           setStatus("all");
           setQuery("");
+          setDate(demoDate);
         }}
       />
     );
@@ -518,11 +552,26 @@ function Workspace() {
       <a className="skip-link" href="#workspace">
         К содержимому
       </a>
-      <AppNav page={page} navigate={navigate} allowed={allowed} role={role} />
+      {!isMobile && (
+        <AppNav
+          page={page}
+          navigate={navigate}
+          allowed={allowed}
+          role={role}
+          profile={
+            <ProfileMenu
+              name={profileName}
+              role={role}
+              onSettings={() => setSettings(true)}
+              onSignOut={onSignOut}
+            />
+          }
+        />
+      )}
       <SidebarInset>
         <header className="topbar">
           <div className="context">
-            <SidebarTrigger aria-label="Переключить меню" />
+            {!isMobile && <SidebarTrigger aria-label="Переключить меню" />}
             <Separator orientation="vertical" />
             <Building2 aria-hidden="true" />
             <Picker
@@ -547,6 +596,15 @@ function Workspace() {
             16 октября 2026
           </div>
           <Badge variant="outline">Демо</Badge>
+          {isMobile && (
+            <ProfileMenu
+              compact
+              name={profileName}
+              role={role}
+              onSettings={() => setSettings(true)}
+              onSignOut={onSignOut}
+            />
+          )}
         </header>
         <main id="workspace" className="workspace">
           <div className="page-heading">
@@ -563,34 +621,36 @@ function Workspace() {
               </Button>
             )}
           </div>
-          <div className="demo-controls">
-            <div>
-              <CircleHelp />
-              <span>Шаблон на синтетических данных</span>
+          {showDemo && (
+            <div className="demo-controls">
+              <div>
+                <CircleHelp />
+                <span>Шаблон на синтетических данных</span>
+              </div>
+              <div className="demo-pickers">
+                <Picker
+                  label="Роль в демо"
+                  value={role}
+                  onChange={switchRole}
+                  options={Object.entries(roleNames).map(([value, label]) => ({
+                    value,
+                    label,
+                  }))}
+                />
+                <Picker
+                  label="Состояние экрана"
+                  value={state}
+                  onChange={(v) => setState(v as ViewState)}
+                  options={[
+                    { value: "ready", label: "Обычный экран" },
+                    { value: "loading", label: "Загрузка" },
+                    { value: "empty", label: "Нет данных" },
+                    { value: "error", label: "Ошибка" },
+                  ]}
+                />
+              </div>
             </div>
-            <div className="demo-pickers">
-              <Picker
-                label="Роль в демо"
-                value={role}
-                onChange={switchRole}
-                options={Object.entries(roleNames).map(([value, label]) => ({
-                  value,
-                  label,
-                }))}
-              />
-              <Picker
-                label="Состояние экрана"
-                value={state}
-                onChange={(v) => setState(v as ViewState)}
-                options={[
-                  { value: "ready", label: "Обычный экран" },
-                  { value: "loading", label: "Загрузка" },
-                  { value: "empty", label: "Нет данных" },
-                  { value: "error", label: "Ошибка" },
-                ]}
-              />
-            </div>
-          </div>
+          )}
           {!sectionAllowed ? (
             <Alert>
               <AlertTitle>Раздел недоступен для этой роли</AlertTitle>
@@ -773,10 +833,11 @@ function Workspace() {
                   title={
                     page === "journals"
                       ? "Журналы занятий"
-                      : "Расписание на 16 октября"
+                      : `Расписание на ${dateLabel(date)}`
                   }
-                  description="Демонстрационный день · Europe/Minsk"
+                  description="Демо-занятия доступны 16 октября · Europe/Minsk"
                 >
+                  <DateNavigation date={date} onChange={setDate} />
                   <div className="toolbar">
                     <div className="search-field">
                       <Search />
@@ -841,17 +902,24 @@ function Workspace() {
                           <TableHead>Участник</TableHead>
                           <TableHead>Дата рождения</TableHead>
                           <TableHead>Группа</TableHead>
-                          <TableHead>Статус</TableHead>
-                          <TableHead>
-                            <span className="sr-only">Карточка</span>
-                          </TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {filteredPeople.map((p) => (
                           <TableRow key={p.id}>
                             <TableCell>
-                              <strong>{p.fullName}</strong>
+                              <div className="person-heading">
+                                <StatusDot
+                                  active={!p.archived}
+                                  label={p.archived ? "В архиве" : "Действует"}
+                                />
+                                <Button
+                                  variant="name"
+                                  onClick={() => setDetail(p)}
+                                >
+                                  {p.fullName}
+                                </Button>
+                              </div>
                               <small className="cell-note">
                                 {clubName(p.clubId)}
                               </small>
@@ -861,22 +929,6 @@ function Workspace() {
                             </TableCell>
                             <TableCell data-label="Группа">
                               {p.archived ? "—" : memberGroup(p)?.name}
-                            </TableCell>
-                            <TableCell data-label="Статус">
-                              <Badge
-                                variant={p.archived ? "secondary" : "success"}
-                              >
-                                {p.archived ? "В архиве" : "Действует"}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Button
-                                variant="ghost"
-                                onClick={() => setDetail(p)}
-                              >
-                                Карточка
-                                <ChevronRight data-icon="inline-end" />
-                              </Button>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -917,6 +969,7 @@ function Workspace() {
                           variant="outline"
                           onClick={() => {
                             setClub(g.clubId);
+                            setDate(demoDate);
                             navigate("sessions");
                             setQuery(g.name);
                           }}
@@ -991,27 +1044,38 @@ function Workspace() {
                   description="Демонстрационные назначения"
                 >
                   <div className="group-list">
-                    {accessibleClubs
-                      .filter((c) => inClub(c.id))
-                      .flatMap((c) =>
-                        ["Елена Пример", "Александр Демо"].map((name) => (
-                          <div className="entity-row" key={c.id + name}>
-                            <Avatar>
-                              <AvatarFallback>
-                                {name
-                                  .split(" ")
-                                  .map((n) => n[0])
-                                  .join("")}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <strong>{name}</strong>
-                              <span>{c.name}</span>
+                    {["Елена Пример", "Александр Демо"].map((name) => {
+                      const assignments = accessibleClubs
+                        .filter((c) => inClub(c.id))
+                        .map((c) => c.name);
+                      return (
+                        <div className="entity-row staff-row" key={name}>
+                          <Avatar size="lg">
+                            <AvatarFallback>
+                              {name
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="entity-copy">
+                            <div className="person-heading">
+                              <StatusDot active label="Сотрудник активен" />
+                              <Button
+                                variant="name"
+                                onClick={() =>
+                                  setStaffDetail({ name, assignments })
+                                }
+                              >
+                                {name}
+                              </Button>
                             </div>
-                            <Badge variant="secondary">Тренер</Badge>
+                            <span>{assignments.join(" · ")}</span>
+                            <small>Тренер</small>
                           </div>
-                        )),
-                      )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </Panel>
               )}
@@ -1083,6 +1147,68 @@ function Workspace() {
           </footer>
         </main>
       </SidebarInset>
+      {isMobile && (
+        <MobileNavigation
+          page={page}
+          role={role}
+          allowed={allowed}
+          navigate={navigate}
+        />
+      )}
+      {settings && (
+        <ProfileSettings
+          open
+          onOpenChange={setSettings}
+          name={profileName}
+          onSave={setProfileName}
+          showDemo={showDemo}
+          onShowDemo={setShowDemo}
+        />
+      )}
+      <Sheet
+        open={!!staffDetail}
+        onOpenChange={(open) => {
+          if (!open) setStaffDetail(null);
+        }}
+      >
+        <SheetContent className="detail-sheet">
+          <SheetHeader>
+            <SheetTitle>{staffDetail?.name}</SheetTitle>
+            <SheetDescription>
+              Демонстрационная карточка сотрудника
+            </SheetDescription>
+          </SheetHeader>
+          {staffDetail && (
+            <div className="detail-body">
+              <Avatar className="size-16">
+                <AvatarFallback>
+                  {staffDetail.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </AvatarFallback>
+              </Avatar>
+              <div className="person-heading">
+                <StatusDot active label="Сотрудник активен" />
+                <span>Сотрудник активен</span>
+              </div>
+              <dl>
+                <dt>Роль</dt>
+                <dd>Тренер</dd>
+                <dt>Назначенные филиалы</dt>
+                <dd>{staffDetail.assignments.join(", ")}</dd>
+              </dl>
+              <Alert>
+                <AlertTitle>Назначения сотрудника</AlertTitle>
+                <AlertDescription>
+                  В приложении доступ ограничен назначенными филиалами и
+                  занятиями. Здесь показаны синтетические назначения.
+                </AlertDescription>
+              </Alert>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
       <Sheet
         open={!!detail}
         onOpenChange={(open) => {

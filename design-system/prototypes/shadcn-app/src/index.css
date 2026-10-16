@@ -238,7 +238,7 @@ h3 {
   font-size: 12px;
 }
 [data-collapsible="icon"] .brand span,
-[data-collapsible="icon"] .profile span {
+[data-collapsible="icon"] .profile-copy {
   display: none;
 }
 [data-collapsible="icon"] [data-slot="sidebar-header"] {
@@ -625,8 +625,9 @@ h1:focus {
   display: block;
   font-weight: 500;
 }
-.entity-row span:not([data-slot="badge"]),
-.entity-row small {
+.entity-copy > span,
+.entity-copy > small,
+.entity-row > div > small {
   display: block;
   color: var(--muted-foreground);
   font-size: 12px;
@@ -1011,5 +1012,279 @@ h1:focus {
   }
   .adaptive-table [data-slot="button"] {
     width: 100%;
+  }
+}
+
+/* Profile actions, compact person states, and task-first mobile navigation. */
+.profile-trigger[data-slot="button"] {
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 12px 4px;
+  height: auto;
+  min-height: 64px;
+}
+.profile-trigger [data-slot="avatar"] {
+  flex-shrink: 0;
+}
+.profile-copy {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+.profile-copy strong {
+  display: block;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+.profile-copy small {
+  display: block;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  margin-top: 3px;
+}
+[data-collapsible="icon"] .profile-copy,
+[data-collapsible="icon"] .profile-trigger > [data-icon] {
+  display: none;
+}
+[data-collapsible="icon"] .profile-trigger {
+  justify-content: center;
+}
+.profile-compact[data-slot="button"] {
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  justify-content: center;
+}
+.profile-menu {
+  min-width: 240px;
+  max-width: calc(100vw - 24px);
+}
+.menu-caption {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted-foreground);
+  margin-top: 4px;
+}
+[data-slot="dropdown-menu-item"] {
+  min-height: 44px;
+}
+.profile-menu strong {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.person-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.status-dot {
+  display: inline-block !important;
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin: 0 !important;
+  border-radius: 50%;
+}
+.status-dot-active {
+  background: var(--success);
+}
+.status-dot-muted {
+  background: var(--muted-foreground);
+}
+[data-slot="button"][data-variant="name"] {
+  padding: 0;
+  min-height: 44px;
+  height: auto;
+  white-space: normal;
+  line-height: 1.5;
+  text-align: left;
+}
+.entity-copy {
+  flex: 1;
+  min-width: 0;
+}
+.entity-row .entity-copy .person-heading {
+  min-width: 0;
+}
+.staff-row {
+  gap: 16px;
+}
+.staff-row [data-slot="avatar"] {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+}
+.staff-row [data-slot="avatar-fallback"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  font-size: 14px;
+}
+.field-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+}
+.settings-saved {
+  font-size: 14px;
+  color: var(--success);
+}
+.signed-out {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.date-navigation {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.date-picker-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.calendar-popover {
+  width: auto;
+  padding: 8px;
+  max-width: calc(100vw - 24px);
+}
+.calendar-popover .group\/calendar {
+  --cell-size: 36px;
+  background: var(--popover);
+}
+.calendar-popover [data-slot="button"] {
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0;
+}
+.bottom-navigation {
+  display: none;
+}
+.more-sheet {
+  max-height: 85dvh;
+  overflow: auto;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  border-radius: 20px 20px 0 0;
+}
+.more-sheet [data-slot="sheet-header"] {
+  padding: 24px 24px 8px;
+}
+.more-navigation {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 16px;
+}
+.more-navigation [data-slot="button"] {
+  justify-content: flex-start;
+  white-space: normal;
+  text-align: left;
+  min-height: 52px;
+}
+@media (max-width: 767px) {
+  [data-slot="sidebar"],
+  [data-slot="sidebar-gap"],
+  [data-slot="sidebar-container"] {
+    display: none !important;
+  }
+  .workspace {
+    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+  }
+  .topbar {
+    gap: 8px;
+  }
+  .context {
+    flex: 1;
+    min-width: 0;
+  }
+  .context [data-slot="select-trigger"] {
+    max-width: 100%;
+    width: 100%;
+  }
+  .bottom-navigation {
+    position: fixed;
+    bottom: 0;
+    inset-inline: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    background: var(--card);
+    border-top: 1px solid var(--sidebar-border);
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  }
+  .bottom-navigation button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 56px;
+    border-radius: 8px;
+    color: var(--muted-foreground);
+    font-size: 11px;
+    background: transparent;
+  }
+  .bottom-navigation button[aria-current="page"] {
+    color: var(--primary);
+    background: var(--sidebar-accent);
+    font-weight: 500;
+  }
+  .bottom-navigation svg {
+    width: 21px;
+    height: 21px;
+  }
+  .bottom-navigation button:hover {
+    background: var(--muted);
+  }
+  .entity-row .person-heading {
+    min-width: 0;
+  }
+  .entity-row > .entity-copy {
+    min-width: 0;
+  }
+  .person-heading [data-variant="name"] {
+    font-size: 16px;
+  }
+  .staff-row {
+    flex-wrap: nowrap;
+  }
+  .staff-row .entity-copy > span {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .date-navigation {
+    gap: 8px;
+  }
+  .date-picker-group {
+    width: 100%;
+    justify-content: space-between;
+    gap: 4px;
+  }
+  .date-picker-group > [data-slot="button"]:not([data-size="icon"]) {
+    flex: 1;
+    font-size: 13px;
+    padding-inline: 8px;
+  }
+  .calendar-popover .group\/calendar {
+    --cell-size: 40px;
+  }
+  .calendar-popover [data-slot="button"] {
+    min-width: 40px;
+    min-height: 40px;
   }
 }

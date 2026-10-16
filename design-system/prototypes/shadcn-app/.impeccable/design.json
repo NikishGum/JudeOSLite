@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-16T12:37:42.627779+00:00",
+  "generatedAt": "2026-10-16T13:05:43.572982+00:00",
   "title": "Design System: PRIDE — локальный shadcn-шаблон",
   "extensions": {
     "colorMeta": {
@@ -291,13 +291,6 @@
       "css": ".ds-btn-outline{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border:1px solid transparent;border-radius:5px;font:500 14px Rubik,sans-serif;cursor:pointer;background:var(--background,#f5f7fa);color:var(--foreground,#212529);border-color:var(--border,#dedede);}.ds-btn-outline:hover{background:var(--muted,#f5f7fa);}.ds-btn-outline:focus-visible{outline:2px solid var(--ring,#db0c0c);outline-offset:3px}.ds-btn-outline:active{transform:translateY(1px)}.ds-btn-outline:disabled{opacity:.5;pointer-events:none}"
     },
     {
-      "name": "Тихая кнопка",
-      "kind": "button",
-      "description": "Рабочее действие с видимым клавиатурным фокусом.",
-      "html": "<button class=\"ds-btn-ghost\">Участники</button>",
-      "css": ".ds-btn-ghost{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border:1px solid transparent;border-radius:5px;font:500 14px Rubik,sans-serif;cursor:pointer;background:transparent;color:var(--foreground,#212529);}.ds-btn-ghost:hover{background:var(--muted,#f5f7fa);}.ds-btn-ghost:focus-visible{outline:2px solid var(--ring,#db0c0c);outline-offset:3px}.ds-btn-ghost:active{transform:translateY(1px)}.ds-btn-ghost:disabled{opacity:.5;pointer-events:none}"
-    },
-    {
       "name": "Поле поиска",
       "kind": "input",
       "refersTo": "field",
@@ -327,20 +320,48 @@
       "description": "Плоская поверхность с единым отступом содержимого.",
       "html": "<section class=\"ds-panel\"><h2>Филиалы сети</h2><p>Срез демонстрационных данных</p></section>",
       "css": ".ds-panel{padding:24px;border-radius:20px;background:var(--card,#fff);color:var(--card-foreground,#212529);box-shadow:none;border:0;font-family:Rubik,sans-serif}.ds-panel h2{margin:0;font-size:17px;font-weight:600;line-height:1.4}.ds-panel p{margin:2px 0 0;color:var(--muted-foreground,#626b72);font-size:12px}@media(max-width:767px){.ds-panel{padding:20px 16px}}"
+    },
+    {
+      "name": "Мобильные вкладки",
+      "kind": "nav",
+      "description": "Три частые вкладки владельца и Ещё; остальные роли используют свой набор.",
+      "html": "<nav class=\"ds-bottom\" aria-label=\"Основная навигация\"><button aria-current=\"page\">Главная</button><button>Занятия</button><button>Статистика</button><button aria-haspopup=\"dialog\" aria-expanded=\"false\">Ещё</button></nav>",
+      "css": ".ds-bottom{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;padding:6px 8px calc(6px + env(safe-area-inset-bottom));background:var(--card,#fff);border-top:1px solid var(--sidebar-border,#e5e8ec)}.ds-bottom button{min-height:56px;padding:5px;border:0;border-radius:8px;font:400 11px Rubik,sans-serif;background:transparent;color:var(--muted-foreground,#626b72)}.ds-bottom button[aria-current=\"page\"]{background:var(--sidebar-accent,#fcecec);color:var(--primary,#db0c0c);font-weight:500}.ds-bottom button:hover{background:var(--muted,#f5f7fa)}.ds-bottom button:focus-visible{outline:2px solid var(--ring,#db0c0c);outline-offset:3px}"
+    },
+    {
+      "name": "Состояние человека",
+      "kind": "custom",
+      "description": "Компактная точка с доступным именем; Badge используется для занятий.",
+      "html": "<span class=\"ds-person-dot ds-person-active\" role=\"img\" aria-label=\"Действует\" title=\"Действует\"></span> <span class=\"ds-person-dot ds-person-archived\" role=\"img\" aria-label=\"В архиве\" title=\"В архиве\"></span>",
+      "css": ".ds-person-dot{display:inline-block;width:8px;height:8px;border-radius:50%;flex:none}.ds-person-active{background:var(--success,#24664e)}.ds-person-archived{background:var(--muted-foreground,#626b72)}"
+    },
+    {
+      "name": "Имя открывает карточку",
+      "kind": "button",
+      "description": "Действие строки участника или сотрудника вместо отдельной кнопки Карточка.",
+      "html": "<button class=\"ds-person-name\">Елена Пример</button>",
+      "css": ".ds-person-name{padding:0;border:1px solid transparent;border-radius:5px;min-height:44px;height:auto;white-space:normal;text-align:left;line-height:1.5;font:500 14px/1.5 Rubik,sans-serif;color:var(--foreground,#212529);background:transparent;cursor:pointer}.ds-person-name:hover{color:var(--primary,#db0c0c);text-decoration:underline;text-underline-offset:4px}.ds-person-name:focus-visible{outline:2px solid var(--ring,#db0c0c);outline-offset:3px}@media(max-width:767px){.ds-person-name{font-size:16px}}"
+    },
+    {
+      "name": "Профиль",
+      "kind": "button",
+      "description": "Меню профиля в настольной Sidebar; на телефоне остаётся компактный аватар в шапке.",
+      "html": "<button class=\"ds-profile\" aria-label=\"Меню профиля\" aria-haspopup=\"menu\"><span class=\"ds-profile-avatar\">ДП</span><span class=\"ds-profile-copy\"><strong>Демо-профиль</strong><small>Владелец</small></span></button>",
+      "css": ".ds-profile{display:flex;align-items:center;gap:10px;width:100%;min-height:64px;height:auto;padding:12px 4px;border:1px solid transparent;border-radius:5px;background:transparent;color:var(--foreground,#212529);font-family:Rubik,sans-serif;cursor:pointer}.ds-profile-avatar{display:flex;align-items:center;justify-content:center;width:32px;height:32px;flex-shrink:0;border-radius:50%;background:var(--muted,#f5f7fa);color:var(--muted-foreground,#626b72);font-size:12px}.ds-profile-copy{min-width:0;text-align:left}.ds-profile strong{display:block;font-size:13px;white-space:normal;overflow-wrap:anywhere}.ds-profile small{display:block;font-size:12px;color:var(--muted-foreground,#626b72);margin-top:3px}.ds-profile:hover{background:var(--muted,#f5f7fa)}.ds-profile:focus-visible{outline:2px solid var(--ring,#db0c0c);outline-offset:3px}@media(max-width:767px){.ds-profile{width:44px;min-height:44px;padding:0;justify-content:center}.ds-profile-copy{display:none}}"
     }
   ],
   "narrative": {
     "northStar": "Рабочая панель PRIDE / Working Panel",
-    "overview": "Срез готового [React-интерфейса](src/App.tsx) и [стилей](src/index.css) от 16.10.2026, сверенный с настольным, мобильным экраном, меню и карточкой записи из независимого review. Контракт в первом комментарии `body` [index.html](index.html), seed `pride-shadcn-template`, закрепляет левую Sidebar. Режим поверхности — Operate: контекст филиала, просмотр занятий, переход к записи. Это отдельный локальный шаблон на синтетических данных, без API; он не является утверждённой заменой production.\n\n**Унаследовано из PRIDE:** оригинальная эмблема, локальный Rubik, красный акцент и тёмный hover, холодные поверхности, радиусы кнопок, полей и панелей. Источники — [корневой DESIGN.md](../../../DESIGN.md), [спецификация](../../README.md), [общие токены](../../tokens.css). Более тёмный вторичный текст, фокус и touch targets уже являются проектными рекомендациями, а не значениями исходного сайта. Эмблема импортируется из [оригинального PNG](../../assets/logo-pride.png) без перекраски и растяжения; происхождение и ограничения прав — [manifest.json](../../manifest.json), лицензия Rubik — [OFL-Rubik.txt](../../fonts/OFL-Rubik.txt).\n\n**Локальные реализованные рекомендации:** shadcn/Radix-компоненты, левая сворачиваемая навигация, мобильное Sheet-меню, плотность рабочего интерфейса, адаптивная таблица и оттенки активной навигации. Цвета успеха, предупреждения и разделителя переиспользуют рекомендации [предыдущего прототипа](../dashboard/DESIGN.md). Frontmatter фиксирует фактически применённые значения этого шаблона; общие PRIDE-токены и глобальная документация остаются источником происхождения.",
+    "overview": "Срез готового [React-интерфейса](src/App.tsx) и [стилей](src/index.css) от 16.10.2026, обновлённый по текущему коду оболочки, [workspace-tools.tsx](src/components/workspace-tools.tsx), [date-calendar.tsx](src/components/date-calendar.tsx) и актуальному независимому review. Контракт в первом комментарии `body` [index.html](index.html), seed `pride-shadcn-template`, фиксирует исходный seed. Последующее прямое требование пользователя сохраняет Sidebar на ПК и вводит на телефоне три частые вкладки и «Ещё» снизу. Режим поверхности — Operate: контекст филиала, просмотр занятий, переход к записи. Это отдельный локальный шаблон на синтетических данных, без API; он не является утверждённой заменой production.\n\n**Унаследовано из PRIDE:** оригинальная эмблема, локальный Rubik, красный акцент и тёмный hover, холодные поверхности, радиусы кнопок, полей и панелей. Источники — [корневой DESIGN.md](../../../DESIGN.md), [спецификация](../../README.md), [общие токены](../../tokens.css). Более тёмный вторичный текст, фокус и touch targets уже являются проектными рекомендациями, а не значениями исходного сайта. Эмблема импортируется из [оригинального PNG](../../assets/logo-pride.png) без перекраски и растяжения; происхождение и ограничения прав — [manifest.json](../../manifest.json), лицензия Rubik — [OFL-Rubik.txt](../../fonts/OFL-Rubik.txt).\n\n**Локальные реализованные рекомендации:** shadcn/Radix-компоненты, левая сворачиваемая навигация на ПК, мобильные вкладки и нижний Sheet «Ещё», профиль с настройками локального сеанса, календарь, плотность рабочего интерфейса, адаптивная таблица и оттенки активной навигации. Цвета успеха, предупреждения и разделителя переиспользуют рекомендации [предыдущего прототипа](../dashboard/DESIGN.md). Frontmatter фиксирует фактически применённые значения этого шаблона; общие PRIDE-токены и глобальная документация остаются источником происхождения.",
     "keyCharacteristics": [
       "Светлые плоские панели, читаемые строки и один красный акцент действия.",
       "Постоянный контекст филиала; доступные разделы демонстрируются для трёх ролей.",
-      "Левая Sidebar на ПК, выдвижное меню и подписанные данные на телефоне."
+      "Левая Sidebar на ПК; три частые вкладки и «Ещё», подписанные данные и профиль в шапке на телефоне."
     ],
     "rules": [
       {
-        "name": "Textual Status",
-        "body": "Цвет сопровождает русскую подпись; он не заменяет название состояния.",
+        "name": "Accessible Status",
+        "body": "Состояние занятия имеет текстовую подпись; компактная точка человека имеет русское доступное имя и title, поэтому цвет не остаётся единственным носителем смысла.",
         "section": "colors"
       },
       {
@@ -363,6 +384,8 @@
   "notes": [
     "Локальный sidecar прототипа; глобальные файлы оформления не заменяет.",
     "Тональные полосы автоматически синтезированы только для панели просмотра, не являются внедрёнными PRIDE-токенами.",
-    "Компоненты — самодостаточные снимки применённых стилей; поведение Radix в статический preview не переносится."
+    "Компоненты — самодостаточные снимки применённых стилей; поведение Radix в статический preview не переносится.",
+    "Мобильная Sidebar заменена вкладками и нижним Sheet по прямому требованию пользователя; настольная Sidebar сохранена.",
+    "Настройки и выход завершают только локальный демосеанс; календарные fixtures есть только на 16.10.2026."
   ]
 }

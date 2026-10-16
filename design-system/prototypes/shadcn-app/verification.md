@@ -44,3 +44,19 @@ Codex in-app browser. Desktop 1280×720/800, mobile 390×844. На desktop/mobil
 Доказательства: [desktop](evidence/desktop.png), [mobile](evidence/mobile.png), [карточка](evidence/detail.png), [меню](evidence/menu.png). Рабочие копии reviewer расположены в `.impeccable/review/shadcn-app/` и не входят в task-коммит. Шаблон документирован отдельным DESIGN.md; глобальный PRIDE не переопределён.
 
 Физические браузеры/устройства, скринридер и реальные API в этой задаче не проверялись. Production frontend и backend не изменялись; существующие проектные E2E/Go tests не запускались, поскольку изолированный шаблон не входит в их runtime.
+
+## Уточнение по снимкам заказчика — 16.10.2026
+
+Этот раздел заменяет прежний результат про мобильный Sidebar: навигационного Sidebar на телефоне больше нет. Первые desktop/mobile/menu/detail captures выше — доказательства первоначального коммита `4245b9b`; текущие изменения показаны в новых файлах ниже.
+
+- ProfileMenu: настройки открываются на desktop и mobile; изменение имени на «Анна Демо» сохраняется в памяти и обновляет меню; видимость демоинструментов меняется после «Сохранить настройки», восстанавливается тем же меню. PASS.
+- «Выйти из демо» показывает отдельный экран и размонтирует Workspace; «Открыть демо» начинает чистое состояние с исходным именем/ролью/контекстом. Это локальный демовыход, не API logout. PASS.
+- Карточки участника/сотрудника открываются кнопкой с именем. Отдельная кнопка «Карточка» и колонка больших статусов убраны; точка имеет title/aria-label и не кодирует состояние только цветом. PASS.
+- Staff AvatarFallback: вычислено display:flex, 44×44px, инициалы центрированы. Селектор подписей больше не затрагивает span аватара. Одна строка личности со списком её синтетических назначений. PASS.
+- Mobile 390×844: sidebar DOM 0, document scrollWidth 390. Основные вкладки owner: Главная/Занятия/Статистика; admin: Главная/Занятия/Участники; trainer: Главная/Занятия/Журналы. Остальные разрешённые разделы в нижнем Sheet «Ещё», выбор закрывает его. PASS.
+- shadcn Calendar/DayPicker: открывается по дате, русский месяц/неделя, Europe/Minsk; выбор 17 октября показывает пустоту и выбранную дату, «Демодень» возвращает 16 октября. Календарь загружается отдельным chunk; сетка планирования/правила расписания не имитируются. PASS.
+- TypeScript/production build PASS; npm audit 0. Detector в этом проходе выполнен один раз: 43 advisory (42 про размеры вне неполного frontmatter ramp, 1 про радиус), 0 nonadvisory. Это не полный аудит браузера/скринридера.
+
+Текущие captures: [desktop participants](evidence/desktop-participants.png), [desktop staff](evidence/desktop-staff.png), [mobile participants](evidence/mobile-participants.png), [mobile staff](evidence/mobile-staff.png), [More](evidence/mobile-more.png), [calendar](evidence/mobile-calendar.png), [settings](evidence/profile-settings.png). Все 7 открыты независимым reviewer и признаны валидными; визуальных material fixes нет. Единственный fix — синхронизировать локальные DESIGN.md/sidecar с обновлённым UI. Это уточнение локального шаблона, не изменение/приёмка production приложения.
+
+Итоговый Verdict Pass: **persistence fix resolved, ship**; относится к синхронизации двух локальных документов. UI review отдельно подтвердил отсутствие материальных дефектов в изменённом scope. Итоговый production browser: русская «Навигация календаря», console error/warn `[]`; временный viewport override сброшен. Сборка разделена: основной JS ~459kB, календарный chunk ~86kB, оба до порога предупреждения Vite.
