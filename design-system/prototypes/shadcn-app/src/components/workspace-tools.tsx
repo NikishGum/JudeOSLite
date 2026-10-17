@@ -134,6 +134,8 @@ export function ProfileMenu({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
+        sideOffset={8}
+        collisionPadding={12}
         side={compact ? "bottom" : "right"}
         className="profile-menu"
       >
@@ -147,9 +149,6 @@ export function ProfileMenu({
             <Settings />
             Настройки профиля
           </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
           <DropdownMenuItem onSelect={onSignOut}>
             <LogOut />
             Выйти из демо
@@ -361,8 +360,9 @@ export function DateNavigation({
     <div className="date-navigation">
       <div className="date-picker-group">
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
+          className="date-step"
           aria-label="Предыдущий день"
           onClick={() => move(-1)}
         >
@@ -370,13 +370,25 @@ export function DateNavigation({
         </Button>
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline" aria-label="Открыть календарь">
+            <Button
+              variant="ghost"
+              className="date-select-trigger"
+              aria-label="Открыть календарь"
+            >
               <CalendarDays data-icon="inline-start" />
-              {dateLabel(date)}
+              {new Intl.DateTimeFormat("ru-BY", {
+                day: "numeric",
+                month: "long",
+                timeZone: "Europe/Minsk",
+              }).format(new Date(`${date}T12:00:00+03:00`))}
               <ChevronDown data-icon="inline-end" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent align="start" className="calendar-popover">
+          <PopoverContent
+            align="start"
+            className="calendar-popover"
+            collisionPadding={12}
+          >
             <Suspense fallback={<p role="status">Загрузка календаря…</p>}>
               <DateCalendar
                 mode="single"
@@ -400,21 +412,24 @@ export function DateNavigation({
           </PopoverContent>
         </Popover>
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
+          className="date-step"
           aria-label="Следующий день"
           onClick={() => move(1)}
         >
           <ChevronRight />
         </Button>
       </div>
-      <Button
-        variant="ghost"
-        disabled={date === demoDate}
-        onClick={() => onChange(demoDate)}
-      >
-        Демодень
-      </Button>
+      {date !== demoDate && (
+        <Button
+          className="date-reset"
+          variant="link"
+          onClick={() => onChange(demoDate)}
+        >
+          К демодню
+        </Button>
+      )}
     </div>
   );
 }

@@ -60,3 +60,19 @@ Codex in-app browser. Desktop 1280×720/800, mobile 390×844. На desktop/mobil
 Текущие captures: [desktop participants](evidence/desktop-participants.png), [desktop staff](evidence/desktop-staff.png), [mobile participants](evidence/mobile-participants.png), [mobile staff](evidence/mobile-staff.png), [More](evidence/mobile-more.png), [calendar](evidence/mobile-calendar.png), [settings](evidence/profile-settings.png). Все 7 открыты независимым reviewer и признаны валидными; визуальных material fixes нет. Единственный fix — синхронизировать локальные DESIGN.md/sidecar с обновлённым UI. Это уточнение локального шаблона, не изменение/приёмка production приложения.
 
 Итоговый Verdict Pass: **persistence fix resolved, ship**; относится к синхронизации двух локальных документов. UI review отдельно подтвердил отсутствие материальных дефектов в изменённом scope. Итоговый production browser: русская «Навигация календаря», console error/warn `[]`; временный viewport override сброшен. Сборка разделена: основной JS ~459kB, календарный chunk ~86kB, оба до порога предупреждения Vite.
+
+## Компоновка по замечаниям заказчика — 17.10.2026
+
+Область: профиль desktop/mobile, ось context bar, сотрудники, шапка расписания. Независимая layout assessment и два механических layout scan до/после выполнены раздельно; оба scan вернули `[]`, что не заменяет полный аудит доступности.
+
+- До исправления реальный ProfileMenu Trigger имел 32px вместо 64px; Popover Trigger даты 32px рядом со стрелками 44px. Причина подтверждена DOM: `asChild` меняет `data-slot`, поэтому прежние button-only selectors не применялись.
+- После исправления профиль 64px desktop, mobile 44×44px, collapsed sidebar 44×44px; аватар целиком внутри hover/open/focus. Только одна focus outline. Настольный menu width 256px, мобильный не выходит за viewport.
+- Элементы context bar имеют общую вертикальную середину 39.5px: toggle 36px, separator 24px с align-self:center, branch selector 44px. PASS.
+- Staff row открывает карточку по клику; имя/роль/филиалы идут плотной вертикальной группой, avatar 44px выровнен с первым смысловым блоком. Полные назначения проверены в открытой карточке Елены Пример. PASS.
+- Дата/стрелки стоят одной группой: 32px desktop, 44px mobile; заголовок не повторяет дату. «Следующий день» дал 17 октября, «К демодню» вернул 16 октября. PASS.
+- На 390px поиск/статус рядом; на 320px оба 256px по ширине контента, на отдельных строках. Document width/scrollWidth 320/320. Нижняя навигация и профиль доступны, горизонтального overflow нет.
+- Production TypeScript/Vite build PASS. Source palettes/fonts/lifecycle/API неизменны. Проверка выполнена в in-app browser; физические устройства и скринридер не заявлены.
+
+Новые снимки: [desktop schedule](evidence/layout-desktop-sessions.png), [desktop profile](evidence/layout-desktop-profile.png), [desktop staff](evidence/layout-desktop-staff.png), [mobile schedule](evidence/layout-mobile-sessions.png), [mobile profile](evidence/layout-mobile-profile.png), [mobile staff](evidence/layout-mobile-staff.png), [320px](evidence/layout-mobile-320.png). Переходные captures с закрывающимся Sheet были заменены стабильными до передачи reviewer. Локальные DESIGN.md/sidecar синхронизированы; глобальная дизайн-система не переопределялась.
+
+Итог независимого finish-review: **ship**, материальных дефектов в указанном объёме нет. Проверены все семь стабильных снимков и согласованность локальной документации. Оценка относится к уточнению существующей компоновки PRIDE; полный поведенческий аудит и аудит доступности в неё не входят.

@@ -23,6 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardHeader,
+  CardAction,
   CardTitle,
   CardDescription,
   CardContent,
@@ -186,17 +187,20 @@ function Panel({
   description,
   children,
   footer,
+  action,
 }: {
   title: string;
   description?: string;
   children: ReactNode;
   footer?: ReactNode;
+  action?: ReactNode;
 }) {
   return (
     <Card>
-      <CardHeader>
+      <CardHeader data-has-action={!!action}>
         <CardTitle>{title}</CardTitle>
         {description && <CardDescription>{description}</CardDescription>}
+        {action && <CardAction>{action}</CardAction>}
       </CardHeader>
       <CardContent>{children}</CardContent>
       {footer && <CardFooter>{footer}</CardFooter>}
@@ -833,12 +837,12 @@ function Workspace({ onSignOut }: { onSignOut: () => void }) {
                   title={
                     page === "journals"
                       ? "Журналы занятий"
-                      : `Расписание на ${dateLabel(date)}`
+                      : "Расписание занятий"
                   }
-                  description="Демо-занятия доступны 16 октября · Europe/Minsk"
+                  description="Europe/Minsk · демоданные за 16 октября"
+                  action={<DateNavigation date={date} onChange={setDate} />}
                 >
-                  <DateNavigation date={date} onChange={setDate} />
-                  <div className="toolbar">
+                  <div className="toolbar schedule-toolbar">
                     <div className="search-field">
                       <Search />
                       <Input
@@ -1049,31 +1053,36 @@ function Workspace({ onSignOut }: { onSignOut: () => void }) {
                         .filter((c) => inClub(c.id))
                         .map((c) => c.name);
                       return (
-                        <div className="entity-row staff-row" key={name}>
-                          <Avatar size="lg">
-                            <AvatarFallback>
-                              {name
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="entity-copy">
-                            <div className="person-heading">
-                              <StatusDot active label="Сотрудник активен" />
-                              <Button
-                                variant="name"
-                                onClick={() =>
-                                  setStaffDetail({ name, assignments })
-                                }
-                              >
-                                {name}
-                              </Button>
-                            </div>
-                            <span>{assignments.join(" · ")}</span>
-                            <small>Тренер</small>
-                          </div>
-                        </div>
+                        <Button
+                          variant="staff"
+                          key={name}
+                          aria-label={name}
+                          onClick={() => setStaffDetail({ name, assignments })}
+                        >
+                          <span className="staff-avatar">
+                            <Avatar size="lg">
+                              <AvatarFallback>
+                                {name
+                                  .split(" ")
+                                  .map((n) => n[0])
+                                  .join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                            <StatusDot active label="Сотрудник активен" />
+                          </span>
+                          <span className="staff-copy">
+                            <strong>{name}</strong>
+                            <span className="staff-role">Тренер</span>
+                            <span
+                              className="staff-assignments"
+                              title={assignments.join(", ")}
+                            >
+                              {assignments
+                                .map((n) => n.replace(/^PRIDE · /, ""))
+                                .join(" · ")}
+                            </span>
+                          </span>
+                        </Button>
                       );
                     })}
                   </div>
