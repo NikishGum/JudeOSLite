@@ -80,3 +80,13 @@ Codex in-app browser. Desktop 1280×720/800, mobile 390×844. На desktop/mobil
 ### Внутренние отступы сотрудника — уточнение 17.10.2026
 
 Новый снимок заказчика выявил отсутствие горизонтального inset в hover и разный вертикальный padding первой/последней строки. У всех записей теперь одинаковый padding 16px 12px; исключения по положению в списке удалены. На desktop вычисленный отступ аватара от края строки 12px, обе строки имеют padding 16px 12px. На 320px ширина строки 256px, document width/scrollWidth 320/320; филиалы переносятся. Production build, JSON и diff checks PASS; browser error/warn `[]`. Layout scan до изменения и автоматический hook после изменения без deterministic findings; это не полный аудит. Независимый finish-review двух снимков: **resolved / clear / ship** для отступов и переносов. Снимки: [desktop](evidence/staff-insets-desktop.png), [320px](evidence/staff-insets-mobile.png).
+
+### Линия чисел и края таблицы — уточнение 17.10.2026
+
+- До исправления число под двухстрочной подписью сводки имело y223.5, остальные y205.5. `margin-top:auto` выравнивает числа по нижнему краю grid-строки без фиксирования высоты подписей; минимальный gap 8px сохранён.
+- На desktop 900px: подписи имеют высоту 36/18/18/18px, все числа в одном измерении y328. На mobile 320px числа совпадают попарно: y364.3/364.3 и445.49/445.49.
+- У первой ячейки удалён padding-left:0; все th/td имеют одинаковые горизонтальные отступы 12px. Мобильный padding задан строке 16px 12px, ячейки остаются без padding. Вычисленный inset индикатора 12px на desktop/mobile; document width/scrollWidth 320/320.
+- Production build, JSON и diff checks PASS; browser error/warn `[]`. Layout scan до/после `[]`; полный аудит доступности не заявлен. В проверке среды viewport/click возникло несовпадение координат; переходы выполнены прямой навигацией по известным href. Обычные captures обрезались средой, заменены explicit clip целевых областей.
+- Независимый reviewer открыл все четыре снимка: **resolved / clear / ship** для линии чисел и отступов таблицы в default state. Это не визуальная проверка hover; внутренняя геометрия hover та же, CSS поведения не менялся. Временный viewport сброшен.
+
+Снимки: [сводка desktop](evidence/summary-alignment-desktop.png), [сводка mobile](evidence/summary-alignment-mobile.png), [таблица desktop](evidence/participants-insets-desktop.png), [таблица mobile](evidence/participants-insets-mobile.png).
