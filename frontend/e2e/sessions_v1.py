@@ -24,7 +24,7 @@ with sync_playwright() as p:
         target.get_by_label('Логин', exact=True).fill(login)
         target.get_by_label('Пароль', exact=True).fill(password)
         target.get_by_role('button', name='Войти', exact=True).click()
-        expect(target.get_by_role('button', name='Выйти', exact=True)).to_be_visible()
+        expect(target.get_by_role('button', name='Меню профиля', exact=True)).to_be_visible()
 
     signin(page, 'owner', 'synthetic-browser-password')
 

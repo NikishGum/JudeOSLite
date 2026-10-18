@@ -1,3 +1,4 @@
+from runtime_ui import signout
 """Synthetic loopback server + disposable reports160-* database only; reports-v1.md."""
 import os
 import subprocess
@@ -20,7 +21,7 @@ with sync_playwright() as p:
         page.get_by_label('Логин', exact=True).fill(login)
         page.get_by_label('Пароль', exact=True).fill(password)
         page.get_by_role('button', name='Войти', exact=True).click()
-        expect(page.get_by_role('button', name='Выйти', exact=True)).to_be_visible()
+        expect(page.get_by_role('button', name='Меню профиля', exact=True)).to_be_visible()
     def api(page, method, path, data=None, status=200):
         result = page.evaluate('''async ([method,path,data])=>{
           const me=await (await fetch('/api/auth/me')).json();
@@ -137,7 +138,7 @@ with sync_playwright() as p:
     ap = browser.new_page(); signin(ap, admin['login'], 'synthetic-admin-password')
     expect(ap.locator('.owner-dashboard')).to_have_count(0)
     api(ap, 'GET', report_path, status=403); api(ta, 'GET', '/api/reports/filters', status=403)
-    owner.get_by_role('button', name='Выйти', exact=True).click()
+    signout(owner)
     expect(owner.locator('.owner-dashboard')).to_have_count(0)
     signin(owner, admin['login'], 'synthetic-admin-password')
     expect(owner.locator('.owner-dashboard')).to_have_count(0)

@@ -1,3 +1,5 @@
+from runtime_ui import settle_shell, assert_page_targets
+from runtime_ui import signout
 """Disposable UI -> Go -> PostgreSQL PWA/browser QA; docs/testing-v1.md."""
 import json
 import os
@@ -16,6 +18,7 @@ from playwright.sync_api import sync_playwright, expect
 from redesign_accessibility import contrast_audit
 from redesign_shell import check_shell
 from redesign_registry import check_registry
+from shadcn_runtime import check_runtime
 
 REPO = Path(__file__).resolve().parents[2]
 ROOT = 'http://127.0.0.1:18081'
@@ -127,7 +130,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 value.get_by_label('Логин', exact=True).fill(login)
                 value.get_by_label('Пароль', exact=True).fill(PASSWORD)
                 value.get_by_role('button', name='Войти', exact=True).click()
-                expect(value.get_by_role('button', name='Выйти', exact=True)).to_be_visible()
+                expect(value.get_by_role('button', name='Меню профиля', exact=True)).to_be_visible()
             def api(value, method, path, data=None):
                 result = value.evaluate('''async ([method,path,data]) => {
                   const me = await (await fetch('/api/auth/me', {cache:'no-store'})).json();
@@ -192,9 +195,10 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 value.evaluate('window.pwaFaultRestore();delete window.pwaFaultRestore')
             def open_section(value, name):
                 value.bring_to_front()
-                expect(value.get_by_role('button', name='Выйти', exact=True)).to_be_visible()
+                expect(value.get_by_role('button', name='Меню профиля', exact=True)).to_be_visible()
                 sidebar = value.get_by_role('navigation', name='Разделы филиала')
-                if sidebar.is_visible():
+                if value.viewport_size['width'] >= 768:
+                    expect(sidebar).to_be_visible()
                     sidebar.get_by_role('link', name=name, exact=True).click()
                 else:
                     bottom = value.get_by_role('navigation', name='Основная навигация')
@@ -206,18 +210,16 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                         value.get_by_role('dialog').get_by_role('link', name=name, exact=True).click()
                 expect(value.locator('main h1')).to_have_text(name)
             def dimensions(value, role):
-                for width in (320, 390, 768, 1280, 1440):
+                for width in (320, 390, 768, 900, 1280, 1440):
                     value.set_viewport_size({'width': width, 'height': 900})
+                    settle_shell(value, width)
                     assert value.evaluate('document.documentElement.scrollWidth <= innerWidth'), (role, width)
                     contrast = contrast_audit(value)
                     assert not contrast['failures'] and not contrast['unmeasured'], (role, width, contrast)
                     for pair in contrast['pairs']:
                         minimum = pair['minimum']
                         contrast_floor[minimum] = min(contrast_floor[minimum], pair['ratio'])
-                    for control in value.locator('button:visible,input:visible,select:visible,summary:visible,.workspace-navigation a:visible').all():
-                        if control.get_attribute('type') not in ('checkbox', 'radio'):
-                            rect = control.bounding_box()
-                            assert rect['height'] >= 44 and rect['width'] >= 44, (role, width, control.outer_html() if hasattr(control, 'outer_html') else control.get_attribute('class'), rect)
+                    assert_page_targets(value, width)
                     value.screenshot(path=f'/tmp/pwa161-{ENGINE}-{role}-{width}.png')
             def cache_check(value, expected_names=None):
                 caches = value.evaluate('''async () => {
@@ -409,6 +411,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 assert all((s['ruleId'] is None) == (mode == 'once') for s in actual)
                 schedule_counts[mode] = len(actual)
             check_registry(browser, page, signin, api, owner, ROOT, ENGINE, open_section, sql)
+            check_runtime(browser, page, signin, api, ROOT, club, ENGINE, open_section)
             check_shell(browser, page, signin, api, owner, club, group, trainer, ROOT, ENGINE, sql, open_section, dimensions)
             # Historical synthetic session allows opening regardless of time of CI run.
             sid = sql(f"INSERT INTO pride.training_sessions(club_id,group_id,trainer_id,starts_on,timezone,starts_at,ends_at) VALUES('{club['id']}','{group['id']}','{trainer['id']}','{today}','Europe/Minsk','{today} 09:00+03','{today} 10:00+03') RETURNING id").splitlines()[0]
@@ -421,7 +424,8 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             trainer_context = browser.new_context(viewport={'width': 390, 'height': 844}, has_touch=True, service_workers='block' if ENGINE == 'webkit' else 'allow')
             tp = page(trainer_context); signin(tp, 'trainer')
             tp.get_by_label('Филиал', exact=True).select_option(club['id'])
-            assert tp.locator('.sidebar a').all_text_contents() == ['Главная', 'Занятия', 'Журналы']
+            assert tp.locator('.sidebar').count() == 0
+            assert tp.locator('.bottom-navigation a').all_text_contents() == ['Главная', 'Занятия', 'Журналы']
             open_section(tp, 'Журналы')
             expect(tp.locator('.trainer-session-list li')).to_have_count(13)
             tp.set_viewport_size({'width': 320, 'height': 480})
@@ -445,16 +449,18 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             assert tp.get_by_role('button', name='Болезнь', exact=True).evaluate('el=>el===document.activeElement')
             assert tp.evaluate('document.documentElement.scrollWidth <= innerWidth')
             # Every intermediate Tab must work even when macOS skips native buttons.
-            for name in ('Уважительная', 'Отмена', 'Неизвестна', 'Болезнь') * 2:
+            for target in ([tp.get_by_role('dialog').get_by_role('button', name=name, exact=True) for name in ('Уважительная', 'Отмена')] + [tp.get_by_role('dialog').locator('.dialog-top-close')] + [tp.get_by_role('dialog').get_by_role('button', name=name, exact=True) for name in ('Неизвестна', 'Болезнь')]) * 2:
                 tp.keyboard.press('Tab')
-                expect(tp.get_by_role('dialog').get_by_role('button', name=name, exact=True)).to_be_focused()
+                expect(target).to_be_focused()
             tp.get_by_role('dialog').locator('[data-initial-focus]').focus()
+            tp.keyboard.press('Tab')
+            expect(tp.get_by_role('dialog').locator('.dialog-top-close')).to_be_focused()
             tp.keyboard.press('Tab')
             expect(tp.get_by_role('button', name='Неизвестна', exact=True)).to_be_focused()
             tp.get_by_role('dialog').locator('[data-initial-focus]').focus()
-            for name in ('Отмена', 'Уважительная', 'Болезнь', 'Неизвестна', 'Отмена'):
+            for target in ([tp.get_by_role('dialog').get_by_role('button', name=name, exact=True) for name in ('Отмена', 'Уважительная', 'Болезнь', 'Неизвестна')] + [tp.get_by_role('dialog').locator('.dialog-top-close'), tp.get_by_role('dialog').get_by_role('button', name='Отмена', exact=True)]):
                 tp.keyboard.press('Shift+Tab')
-                expect(tp.get_by_role('dialog').get_by_role('button', name=name, exact=True)).to_be_focused()
+                expect(target).to_be_focused()
             tp.get_by_role('dialog').screenshot(path=f'/tmp/pwa161-{ENGINE}-sheet-320x480.png')
             tp.keyboard.press('Escape')
             expect(tp.get_by_role('dialog')).to_have_count(0)
@@ -632,7 +638,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             hold_response(owner, '/api/reports/attendance', 'GET')
             owner.get_by_role('button', name='Обновить статистику', exact=True).click()
             wait_for_response(owner)
-            owner.get_by_role('button', name='Выйти', exact=True).click()
+            signout(owner)
             expect(second.get_by_label('Логин', exact=True)).to_be_visible()
             expect(second.locator('.owner-dashboard')).to_have_count(0)
             signin(owner, 'admin', navigate=False)
@@ -753,7 +759,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 trainer_anchor.close()
             assert not errors, errors
             # Live role withdrawal rejects a save and removes the displayed snapshot.
-            tp.get_by_role('button', name='Выйти', exact=True).click()
+            signout(tp)
             revoked_id = sql(f"INSERT INTO pride.training_sessions(club_id,group_id,trainer_id,starts_on,timezone,starts_at,ends_at) VALUES('{club['id']}','{group['id']}','{trainer['id']}','{today}','Europe/Minsk','{today} 13:00+03','{today} 14:00+03') RETURNING id").splitlines()[0]
             signin(tp, 'trainer')
             tp.get_by_label('Филиал', exact=True).select_option(club['id'])
@@ -770,7 +776,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             owner_context.close()
             browser.close()
         print(json.dumps({'check': 'rendered-text-contrast', 'normalMinimum': contrast_floor[4.5], 'largeMinimum': contrast_floor[3]}, ensure_ascii=False))
-        print(json.dumps({'engine': ENGINE, 'version': browser.version, 'scheduleCounts': schedule_counts, 'report': {'conducted': 1, 'present': 2, 'absent': 3, 'unknown': 2, 'illness': 0, 'excused': 1, 'percentage': 40}, 'nativeHistoryReturn': 'fresh session and role verified; BFCache not measured', 'checks': 'manifest/icons; admin UI/five participants/four schedules; cards/three reasons/defaults/correction/report; 320/390/768/1280/1440; rendered text contrast 4.5/3; double tap/delay/offline; mark/close/correct precommit error/lost response/SQL/reload; mark idempotent retry/correction stale retry; closed/cancelled/role revoke; static-only cache/logout/account swap/expiry/pagehide/native history return/fresh me; two builds/waiting/save guard/other-tab save', 'physicalInstallation': 'NOT TESTED'}, ensure_ascii=False))
+        print(json.dumps({'engine': ENGINE, 'version': browser.version, 'scheduleCounts': schedule_counts, 'report': {'conducted': 1, 'present': 2, 'absent': 3, 'unknown': 2, 'illness': 0, 'excused': 1, 'percentage': 40}, 'nativeHistoryReturn': 'fresh session and role verified; BFCache not measured', 'checks': 'manifest/icons; admin UI/five participants/four schedules; cards/three reasons/defaults/correction/report; 320/390/768/900/1280/1440; rendered text contrast 4.5/3; double tap/delay/offline; mark/close/correct precommit error/lost response/SQL/reload; mark idempotent retry/correction stale retry; closed/cancelled/role revoke; static-only cache/logout/account swap/expiry/pagehide/native history return/fresh me; two builds/waiting/save guard/other-tab save', 'physicalInstallation': 'NOT TESTED'}, ensure_ascii=False))
     finally:
         subprocess.run(['docker', 'rm', '-f', APP, DB], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         subprocess.run(['docker', 'network', 'rm', NETWORK], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

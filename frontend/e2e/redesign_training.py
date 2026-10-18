@@ -1,3 +1,4 @@
+from runtime_ui import assert_control_target
 """RD-03: real browser -> Go -> disposable PostgreSQL. No external club data."""
 import json
 import os
@@ -87,7 +88,7 @@ try:
             value.get_by_label('Логин', exact=True).fill(login)
             value.get_by_label('Пароль', exact=True).fill(PASSWORD)
             value.get_by_role('button', name='Войти', exact=True).click()
-            expect(value.get_by_role('button', name='Выйти', exact=True)).to_be_visible()
+            expect(value.get_by_role('button', name='Меню профиля', exact=True)).to_be_visible()
             return value
         def api(value, method, path, data=None, status=None):
             result = value.evaluate('''async ([method,path,data])=>{
@@ -104,8 +105,7 @@ try:
                 assert value.evaluate('document.documentElement.scrollWidth <= innerWidth'), (name, width)
                 for control in value.locator('button:visible,input:visible,select:visible,summary:visible,.session-link:visible').all():
                     if control.get_attribute('type') not in ('checkbox', 'radio'):
-                        rect = control.bounding_box()
-                        assert rect['height'] >= 44 and rect['width'] >= 44, (name, width, rect, control.text_content())
+                        assert_control_target(control, width)
                 value.evaluate('window.scrollTo(0,0)')
                 value.screenshot(path=f'/tmp/rd185-{ENGINE}-{name}-{width}.png', full_page=True)
         own = page('owner')
@@ -197,6 +197,8 @@ try:
         absence.focus(); expect(absence).to_be_focused(); absence.press('Enter')
         dialog = tr.get_by_role('dialog')
         expect(dialog).to_be_visible(); tr.screenshot(path=f'/tmp/rd185-{ENGINE}-reasons-320.png'); tr.keyboard.press('Tab')
+        expect(dialog.locator('.dialog-top-close')).to_be_focused()
+        tr.keyboard.press('Tab')
         expect(dialog.get_by_role('button', name='Неизвестна', exact=True)).to_be_focused()
         tr.keyboard.press('Escape'); expect(dialog).to_have_count(0)
         expect(tr.get_by_role('button', name='Отсутствует', exact=True)).to_be_focused()

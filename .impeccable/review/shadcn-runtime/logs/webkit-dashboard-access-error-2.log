@@ -1,0 +1,7 @@
+2026/10/18 10:46:57 migrations applied
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+Traceback (most recent call last):
+  File "/workspace/shadcn-runtime/frontend/e2e/redesign_dashboard.py", line 308, in <module>
+    expect(owner_page.locator('.dashboard')).to_have_count(0); assert not errors, errors
+                                                                      ^^^^^^^^^^
+AssertionError: ['/127.0.0.1:18087/api/clubs/730421db-c869-47de-b325-54a5270631d1/sessions/groups due to access control checks.', '/127.0.0.1:18087/api/auth/me due to access control checks.', '/127.0.0.1:18087/api/clubs/730421db-c869-47de-b325-54a5270631d1/sessions?from=2026-10-18&until=2026-10-19&groupId=6839f667-7901-42ba-b507-11182521bb39 due to access control checks.']

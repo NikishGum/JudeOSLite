@@ -1,3 +1,4 @@
+from runtime_ui import signout
 """V1-09/V1-10 browser -> real API -> disposable PostgreSQL; see attendance-mobile-v1.md."""
 import json
 import os
@@ -25,7 +26,7 @@ with sync_playwright() as p:
         page.get_by_label('Логин', exact=True).fill(login)
         page.get_by_label('Пароль', exact=True).fill(password)
         page.get_by_role('button', name='Войти', exact=True).click()
-        expect(page.get_by_role('button', name='Выйти', exact=True)).to_be_visible()
+        expect(page.get_by_role('button', name='Меню профиля', exact=True)).to_be_visible()
 
     def api(page, method, path, data=None):
         return page.evaluate('''async ([method,path,data])=>{
@@ -258,7 +259,7 @@ with sync_playwright() as p:
     expect(journal.get_by_role('alert')).to_contain_text('недоступны')
     expect(journal).to_contain_text('Доступ к журналу отозван')
     expect(journal.locator('.attendance-cards')).to_have_count(0)
-    page.get_by_role('button', name='Выйти', exact=True).click()
+    signout(page)
     expect(page.get_by_label('Логин', exact=True)).to_be_visible()
     # Actual session revocation returns 401 and removes the journal/account entirely.
     signin(page, trainer['login'], 'synthetic-trainer-password')
@@ -283,7 +284,7 @@ with sync_playwright() as p:
     card.get_by_role('button', name='Присутствует', exact=True).click()
     expect(journal.get_by_role('alert')).to_contain_text('недоступны')
     expect(journal.locator('.attendance-cards')).to_have_count(0)
-    page.get_by_role('button', name='Выйти', exact=True).click()
+    signout(page)
     expect(page.get_by_label('Логин', exact=True)).to_be_visible()
     assert not errors, errors
     print(json.dumps({'browser': browser.version, 'widths': [320,390,1280], 'flow': 'cards/present/three-reasons/keyboard/touch/cancel/double-click/delayed-response/lost-response/retry/correction/reload/conflict/close/empty/cancelled/replacement/role-revoke/session-revoke/logout', 'database': 'PostgreSQL 18.6'}, ensure_ascii=False))

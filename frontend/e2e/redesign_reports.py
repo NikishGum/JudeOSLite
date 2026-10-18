@@ -1,3 +1,4 @@
+from runtime_ui import signout
 """RD-04: real browser -> Go -> disposable PostgreSQL. No external club data."""
 import json
 import os
@@ -88,7 +89,7 @@ try:
             value.get_by_label('Логин', exact=True).fill(login)
             value.get_by_label('Пароль', exact=True).fill(PASSWORD)
             value.get_by_role('button', name='Войти', exact=True).click()
-            expect(value.get_by_role('button', name='Выйти', exact=True)).to_be_visible()
+            expect(value.get_by_role('button', name='Меню профиля', exact=True)).to_be_visible()
             return value
         def api(value, method, path, data=None, status=None):
             result = value.evaluate('''async ([method,path,data])=>{
@@ -298,7 +299,7 @@ try:
         sql(f"UPDATE pride.staff_users SET is_owner=false WHERE id='{actor}'")
         owner.evaluate("window.dispatchEvent(new Event('focus'))")
         expect(screen).to_have_count(0); release(owner); expect(screen).to_have_count(0)
-        owner.get_by_role('button', name='Выйти', exact=True).click(); expect(owner.get_by_label('Логин', exact=True)).to_be_visible()
+        signout(owner); expect(owner.get_by_label('Логин', exact=True)).to_be_visible()
         assert not errors, errors
         print(json.dumps({'engine':ENGINE,'version':browser.version,'result':'PASS','ledger':'3/7=42.9%; corrected 4/7=57.1%; empty closed; planned/open/cancelled; archived/transfer; saved session timezone','checks':'quick Sunday/year/Minsk vs browser date; custom restore; same names/ID drilldown/session period; error/retry/stale responses; audit 50+8 paging/scope/public envelope; live admin+owner revoke; keyboard; 320/390/1280'},ensure_ascii=False))
         browser.close()

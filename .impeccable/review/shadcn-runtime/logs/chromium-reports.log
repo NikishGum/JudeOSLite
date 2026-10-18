@@ -1,0 +1,2 @@
+2026/10/18 10:52:37 migrations applied
+{"engine": "chromium", "version": "154.0.8037.57", "result": "PASS", "ledger": "3/7=42.9%; corrected 4/7=57.1%; empty closed; planned/open/cancelled; archived/transfer; saved session timezone", "checks": "quick Sunday/year/Minsk vs browser date; custom restore; same names/ID drilldown/session period; error/retry/stale responses; audit 50+8 paging/scope/public envelope; live admin+owner revoke; keyboard; 320/390/1280"}

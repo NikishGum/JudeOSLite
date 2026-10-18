@@ -1,0 +1,139 @@
+{
+  "date": "2026-10-18",
+  "base": "a0ca5093d3a0ac906c1e3b2e8176021a2ec8c0e3",
+  "sourceDesign": "17ecd57068cff17e4eaf055e0ac503b61cab0399",
+  "tests": {
+    "chromium-pwa": {
+      "result": "PASS",
+      "summary": {
+        "engine": "chromium",
+        "version": "154.0.8037.57",
+        "scheduleCounts": {
+          "weekly": 2,
+          "day_parity": 4,
+          "date_list": 2,
+          "once": 1
+        },
+        "report": {
+          "conducted": 1,
+          "present": 2,
+          "absent": 3,
+          "unknown": 2,
+          "illness": 0,
+          "excused": 1,
+          "percentage": 40
+        },
+        "nativeHistoryReturn": "fresh session and role verified; BFCache not measured",
+        "checks": "manifest/icons; admin UI/five participants/four schedules; cards/three reasons/defaults/correction/report; 320/390/768/900/1280/1440; rendered text contrast 4.5/3; double tap/delay/offline; mark/close/correct precommit error/lost response/SQL/reload; mark idempotent retry/correction stale retry; closed/cancelled/role revoke; static-only cache/logout/account swap/expiry/pagehide/native history return/fresh me; two builds/waiting/save guard/other-tab save",
+        "physicalInstallation": "NOT TESTED"
+      },
+      "logSha256": "2498fcfa8abcb8535e0c517cbd8b685f3d8445c73394f207b1589cf1fc45aeef",
+      "rawLogSha256": "2498fcfa8abcb8535e0c517cbd8b685f3d8445c73394f207b1589cf1fc45aeef"
+    },
+    "webkit-pwa": {
+      "result": "PASS",
+      "summary": {
+        "engine": "webkit",
+        "version": "26.5",
+        "scheduleCounts": {
+          "weekly": 2,
+          "day_parity": 4,
+          "date_list": 2,
+          "once": 1
+        },
+        "report": {
+          "conducted": 1,
+          "present": 2,
+          "absent": 3,
+          "unknown": 2,
+          "illness": 0,
+          "excused": 1,
+          "percentage": 40
+        },
+        "nativeHistoryReturn": "fresh session and role verified; BFCache not measured",
+        "checks": "manifest/icons; admin UI/five participants/four schedules; cards/three reasons/defaults/correction/report; 320/390/768/900/1280/1440; rendered text contrast 4.5/3; double tap/delay/offline; mark/close/correct precommit error/lost response/SQL/reload; mark idempotent retry/correction stale retry; closed/cancelled/role revoke; static-only cache/logout/account swap/expiry/pagehide/native history return/fresh me; two builds/waiting/save guard/other-tab save",
+        "physicalInstallation": "NOT TESTED"
+      },
+      "logSha256": "89ec603c9efa56b3ef6e5486065d7a5e5c4dde72da7e9db9e319d444faba5341",
+      "rawLogSha256": "89ec603c9efa56b3ef6e5486065d7a5e5c4dde72da7e9db9e319d444faba5341"
+    },
+    "chromium-training": {
+      "result": "PASS",
+      "summary": {
+        "engine": "chromium",
+        "version": "154.0.8037.57",
+        "result": "PASS",
+        "checks": "day/week/period, ID scope/two clubs, create/reschedule/replace/cancel, direct journal/back/reload, Escape/focus, double tap/network/reload, correction conflict/history, 320/390/1280"
+      },
+      "logSha256": "e9099d5f5e793b81456a491cdae0866e8bdb809f43020d940f2b4836262957ea",
+      "rawLogSha256": "e9099d5f5e793b81456a491cdae0866e8bdb809f43020d940f2b4836262957ea"
+    },
+    "webkit-training": {
+      "result": "PASS",
+      "summary": {
+        "engine": "webkit",
+        "version": "26.5",
+        "result": "PASS",
+        "checks": "day/week/period, ID scope/two clubs, create/reschedule/replace/cancel, direct journal/back/reload, Escape/focus, double tap/network/reload, correction conflict/history, 320/390/1280"
+      },
+      "logSha256": "79d602a554eb93de44c241f945715ccc011b66d325ac397e30e31614259db92d",
+      "rawLogSha256": "79d602a554eb93de44c241f945715ccc011b66d325ac397e30e31614259db92d"
+    },
+    "chromium-reports": {
+      "result": "PASS",
+      "summary": {
+        "engine": "chromium",
+        "version": "154.0.8037.57",
+        "result": "PASS",
+        "ledger": "3/7=42.9%; corrected 4/7=57.1%; empty closed; planned/open/cancelled; archived/transfer; saved session timezone",
+        "checks": "quick Sunday/year/Minsk vs browser date; custom restore; same names/ID drilldown/session period; error/retry/stale responses; audit 50+8 paging/scope/public envelope; live admin+owner revoke; keyboard; 320/390/1280"
+      },
+      "logSha256": "0eef1d73a6376d5d0f024ff806f72d858d2e7b0c43ccd4d9845b05e0950233bf",
+      "rawLogSha256": "0eef1d73a6376d5d0f024ff806f72d858d2e7b0c43ccd4d9845b05e0950233bf"
+    },
+    "webkit-reports": {
+      "result": "PASS",
+      "summary": {
+        "engine": "webkit",
+        "version": "26.5",
+        "result": "PASS",
+        "ledger": "3/7=42.9%; corrected 4/7=57.1%; empty closed; planned/open/cancelled; archived/transfer; saved session timezone",
+        "checks": "quick Sunday/year/Minsk vs browser date; custom restore; same names/ID drilldown/session period; error/retry/stale responses; audit 50+8 paging/scope/public envelope; live admin+owner revoke; keyboard; 320/390/1280"
+      },
+      "logSha256": "339d237c531c39a1e9bd0954a3d82eb306c4f02b1ef8ac4c1794d44ad2e0af91",
+      "rawLogSha256": "339d237c531c39a1e9bd0954a3d82eb306c4f02b1ef8ac4c1794d44ad2e0af91"
+    },
+    "chromium-dashboard": {
+      "result": "PASS",
+      "summary": {
+        "engine": "chromium",
+        "version": "154.0.8037.57",
+        "result": "PASS",
+        "ledger": "2/5=40%; correction3/5=60%; close5/8=62.5%; empty closed null",
+        "checks": "two 24-hour-separated local dates; role scopes/counters/frozen roster; exact group/journal/create links; real mark/close/correction/archive; independent failures+retry; multi-role actual trainer; revoke/late replies/logout; 1440/1280/768/390/320; touch targets/main action"
+      },
+      "logSha256": "ee5cbee25d61d01c59fb706602b2b2c4bc9164b1cef359936b44318e60a42175",
+      "rawLogSha256": "ee5cbee25d61d01c59fb706602b2b2c4bc9164b1cef359936b44318e60a42175"
+    },
+    "webkit-dashboard": {
+      "result": "PASS",
+      "summary": {
+        "engine": "webkit",
+        "version": "26.5",
+        "result": "PASS",
+        "ledger": "2/5=40%; correction3/5=60%; close5/8=62.5%; empty closed null",
+        "checks": "two 24-hour-separated local dates; role scopes/counters/frozen roster; exact group/journal/create links; real mark/close/correction/archive; independent failures+retry; multi-role actual trainer; revoke/late replies/logout; 1440/1280/768/390/320; touch targets/main action"
+      },
+      "logSha256": "cc8f997e5e7d60d69884664bedc8b4d4da8e4f48199fd761a8d58193784fc49d",
+      "rawLogSha256": "834aae63f5f083c959dbac9abd106eff9845d25bdaa22fef723f0195a2dff768"
+    }
+  },
+  "physicalDevices": "NOT RUN",
+  "newPublicHTTPS": "NOT RUN",
+  "nativeBFCache": "NOT MEASURED",
+  "assetHashes": {
+    "index-CNfthSGr.js": "36ca7deb886c374adc73d02904fdfc909f09e1403dee6e48f78a0c2a6d7633c8",
+    "index-CkAe0Djm.css": "cc617a926b2108c9527bcc6503a32326fc5d14dcd828fabbb2d47a36253b9b7d"
+  },
+  "logNormalization": "Stored stdout/stderr strips trailing spaces/blank EOF only. rawLogSha256 preserves original capture digest; logSha256 hashes stored log."
+}

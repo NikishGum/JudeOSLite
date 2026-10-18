@@ -1,3 +1,5 @@
+import { X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useEffect, useId, useRef, type ReactNode } from 'react';
 
 let modalCount = 0;
@@ -21,7 +23,7 @@ export function Dialog({ title, children, busy = false, onCancel, cancelLabel = 
       if (previous?.isConnected) previous.focus();
     };
   }, []);
-  return <dialog ref={dialog} className={`pride-dialog ${className}`} aria-labelledby={titleId} aria-busy={busy}
+  return <dialog ref={dialog} className={cn('pride-dialog', className)} aria-labelledby={titleId} aria-busy={busy}
     onCancel={(event) => { event.preventDefault(); if (!busy) onCancel(); }}
     onKeyDown={(event) => {
       if (event.key !== 'Tab') return;
@@ -31,7 +33,7 @@ export function Dialog({ title, children, busy = false, onCancel, cancelLabel = 
       const current = targets.indexOf(document.activeElement as HTMLElement);
       targets[current < 0 ? (event.shiftKey ? targets.length - 1 : 0) : (current + (event.shiftKey ? -1 : 1) + targets.length) % targets.length].focus();
     }}>
-    <h4 id={titleId} tabIndex={-1} data-initial-focus>{title}</h4>
+    <header className="dialog-header"><h4 id={titleId} tabIndex={-1} data-initial-focus>{title}</h4><button type="button" className="secondary dialog-top-close" aria-label={`Закрыть панель «${title}»`} title={cancelLabel} disabled={busy} onClick={onCancel}><X aria-hidden="true" /></button></header>
     {children}
     <button type="button" className="secondary attendance-secondary" disabled={busy} onClick={onCancel}>{cancelLabel}</button>
   </dialog>;

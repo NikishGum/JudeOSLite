@@ -1,0 +1,2 @@
+2026/10/18 10:52:59 migrations applied
+{"engine": "chromium", "version": "154.0.8037.57", "result": "PASS", "ledger": "2/5=40%; correction3/5=60%; close5/8=62.5%; empty closed null", "checks": "two 24-hour-separated local dates; role scopes/counters/frozen roster; exact group/journal/create links; real mark/close/correction/archive; independent failures+retry; multi-role actual trainer; revoke/late replies/logout; 1440/1280/768/390/320; touch targets/main action"}
