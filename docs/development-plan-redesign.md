@@ -184,3 +184,22 @@ flowchart LR
 ## Источники и исполнение
 
 [Прототип](../design-system/prototypes/dashboard/README.md) · [Визуальный контракт](../design-system/prototypes/dashboard/DESIGN.md) · [Полные карточки JSON](implementation-tasks-redesign.json) · [Реестр GitHub](github-issues-redesign.json) · [Правила совместной работы](collaboration.md) · [Промпт исполнителя](task-agent-prompt.md).
+
+## Новый выбранный shadcn-runtime — RD-07, 18.10.2026
+
+Прямое поручение заказчика: [#198](https://github.com/NikishGum/JudeOSLite/issues/198),
+ветвь `codex/shadcn-runtime`. Эталон — `origin/codex/shadcn-app-template` на
+`17ecd57068cff17e4eaf055e0ac503b61cab0399`, `design-system/prototypes/shadcn-app/`.
+Отдельный перенос всех рабочих экранов с существующими данными/API, ролями, полными
+операциями, URL, lifecycle/CSRF/PWA/черновиками; обязательны Impeccable и shadcn.
+Проверки1280/900/390/320, реальные Go/PG и synthetic роли, browser/PWA regression,
+документы, commit/push/PR. Главная/реестр/группы/сотрудники/филиалы/занятия/расписание/
+журналы/коррекции/отчёт/история входят целиком; демоинструменты не переносятся.
+
+Прямая зависимость RD-05/#187: функциональная основа всех областей уже в main.
+RD-06/#188 остаётся у прежнего исполнителя с отдельной приёмкой сотрудников;
+она не закрывается этим поручением и не является технической зависимостью нового
+визуального переноса. Сохранить её историю PASS/DEFERRED/NOT RUN. Прежние RD-01–06
+и их выбранная Working Panel описывают предыдущий этап, не новый эталон.
+Задача добавлена в существующий реестр для штатной очереди, без изменения claim,
+назначения вручную, обхода зависимостей или начала product-кода до acquired=true.

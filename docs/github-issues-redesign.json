@@ -4,8 +4,8 @@
   "repository": "NikishGum/JudeOSLite",
   "source_main": "72460d8f7bf8fd58fd93eeb026099012033daabf",
   "prototype_commit": "8016b746072e9334567de7fdbba2dcaf2a72fb45",
-  "task_count": 6,
-  "dependency_count": 8,
+  "task_count": 7,
+  "dependency_count": 9,
   "issues": [
     {
       "id": "RD-01",
@@ -74,6 +74,17 @@
       ],
       "body_sha256": "fd0132f8cdb9d710be70f7a5874450a736ee3596a5551ed42d90856cf53bbba0",
       "title": "Сквозная проверка редизайна, PWA и передача сотрудникам"
+    },
+    {
+      "id": "RD-07",
+      "number": 198,
+      "github_id": 5908437450,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/198",
+      "dependencies": [
+        "RD-05"
+      ],
+      "body_sha256": "608af67fbaafeef756e2f7059de4f1fb2420d10524978fbce4c94c3a656d6c6d",
+      "title": "Перенос shadcn-дизайна в работающее приложение PRIDE"
     }
   ],
   "verification": {
@@ -82,5 +93,11 @@
     "dependency_both_sides": true,
     "initial_status": "Todo",
     "assignees": []
+  },
+  "runtime_design_source": {
+    "date": "2026-10-18",
+    "commit": "17ecd57068cff17e4eaf055e0ac503b61cab0399",
+    "branch": "codex/shadcn-app-template",
+    "issue": 198
   }
 }
