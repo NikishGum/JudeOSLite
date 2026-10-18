@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ApiError, apiGet, apiPost, apiPut } from '../../shared/api';
 import { TrainerEditor, type Draft, type Mode, type Trainer } from './TrainerEditor';
 import { Dialog } from '../../shared/ui/Dialog';
+import { PersonAvatar } from '../../app/RuntimeShell';
 import './staff.css';
 
 const message = (cause: unknown) => cause instanceof ApiError ? cause.message : 'Нет соединения. Проверьте интернет и повторите действие.';
@@ -78,8 +79,8 @@ export function TrainerManagement({ clubId, clubName, isOwner, onSessionRefresh,
     {loadError && <div role="alert"><p>{loadError}</p><button className="secondary" onClick={() => setAttempt((value) => value + 1)}>Попробовать снова</button></div>}
     {!loading && !loadError && <>
       {trainers.length === 0 && <p>Тренеры ещё не назначены. Добавьте аккаунт для занятий этого филиала{isOwner ? ' или выберите существующего сотрудника ниже' : ''}.</p>}
-      <ul className="staff-list">{trainers.map((trainer) => <li key={trainer.id}><div><h3>{trainer.displayName}</h3><p>{trainer.login} · {trainer.disabled ? 'Аккаунт отключён' : 'Доступен для занятий'}</p>
-        {!trainer.canManageAccount && <p className="help">Аккаунт меняет владелец. Вы управляете назначением этого филиала.</p>}</div>
+      <ul className="staff-list">{trainers.map((trainer) => <li key={trainer.id}><div className="staff-identity"><PersonAvatar name={trainer.displayName} active={!trainer.disabled} label={trainer.disabled ? 'Аккаунт отключён' : 'Доступен для занятий'} /><div className="staff-copy"><h3>{trainer.displayName}</h3><p className="staff-role">Тренер · {trainer.login}</p><p className="staff-assignments">{clubName}</p>
+        {!trainer.canManageAccount && <p className="help">Аккаунт меняет владелец. Вы управляете назначением этого филиала.</p>}</div></div>
         <div className="actions">{trainer.canManageAccount && <><button className="secondary" disabled={busy} onClick={() => open(trainer, 'account')}>Изменить аккаунт</button><button className="secondary" disabled={busy} onClick={() => open(trainer, 'password')}>Сменить пароль</button></>}
           <button className="secondary" disabled={busy} onClick={() => beforeNavigate(() => { close(); setRevoke(trainer); setNotice(''); })}>Отозвать назначение</button></div>
       </li>)}</ul>

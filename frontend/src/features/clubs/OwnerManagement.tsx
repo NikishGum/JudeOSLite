@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ApiError, apiGet, apiPost, apiPut } from '../../shared/api';
 import { Dialog } from '../../shared/ui/Dialog';
+import { PersonAvatar } from '../../app/RuntimeShell';
 import './clubs.css';
 
 type Club = { id: string; name: string; address: string; timezone: string; archived: boolean; version: number };
-type Staff = { id: string; login: string; displayName: string; disabled: boolean; clubIds: string[]; version: number };
+type Staff = { id: string; login: string; displayName: string; disabled: boolean; clubIds: string[]; trainerClubIds?: string[]; version: number };
 type ClubDraft = { name: string; address: string; timezone: string };
 type StaffDraft = { login: string; displayName: string; password: string; clubIds: string[]; disabled: boolean };
 const emptyClub: ClubDraft = { name: '', address: '', timezone: 'Europe/Minsk' };
@@ -31,8 +32,8 @@ export function OwnerManagement({ onChanged, beforeNavigate, mode = 'clubs' }: {
 
   useEffect(() => {
     const controller = new AbortController(); setLoading(true); setLoadError('');
-    Promise.all([apiGet<Club[]>('/api/clubs', controller.signal), mode === 'staff' ? apiGet<Staff[]>('/api/staff', controller.signal) : Promise.resolve([])])
-      .then(([clubList, staffList]) => { if (!controller.signal.aborted) { setClubs(clubList); setStaff(staffList); } })
+    Promise.all([apiGet<Club[]>('/api/clubs', controller.signal), mode === 'staff' ? apiGet<Staff[]>('/api/staff', controller.signal) : Promise.resolve([]), mode === 'staff' ? apiGet<{id: string; trainerClubIds?: string[]}[]>('/api/trainer-accounts', controller.signal) : Promise.resolve([])])
+      .then(([clubList, staffList, roster]) => { if (!controller.signal.aborted) { setClubs(clubList); setStaff(staffList.map((staff) => ({ ...staff, trainerClubIds: roster.find((person) => person.id === staff.id)?.trainerClubIds ?? [] }))); } })
       .catch((cause: unknown) => { if (!controller.signal.aborted) setLoadError(message(cause)); })
       .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
@@ -82,7 +83,7 @@ export function OwnerManagement({ onChanged, beforeNavigate, mode = 'clubs' }: {
   function toggleClub(id: string, checked: boolean) { setStaffDraft((value) => ({ ...value, clubIds: checked ? [...value.clubIds, id] : value.clubIds.filter((item) => item !== id) })); }
 
   return <section className="connection management" aria-labelledby="management-title">
-    <div className="section-heading"><div><h2 id="management-title">{mode === 'clubs' ? 'Филиалы' : 'Администраторы сети'}</h2><p className="help context-name">Вся сеть · управление владельца</p></div>
+    <div className="section-heading"><div><h2 id="management-title">{mode === 'clubs' ? 'Филиалы' : 'Сотрудники сети'}</h2><p className="help context-name">Вся сеть · управление владельца</p></div>
       <div className="actions">{mode === 'clubs' ? <button disabled={busy || loading || !!loadError} onClick={() => editClub('new')}>Добавить филиал</button> : <button disabled={busy || loading || !!loadError || !clubs.some((item) => !item.archived)} onClick={() => editStaff('new')}>Создать администратора</button>}<button className="secondary" disabled={busy || loading} onClick={() => setAttempt((value) => value + 1)}>Обновить список</button></div></div>
     {!clubEditor && !staffEditor && error && <p className="error" role="alert">{error}</p>}
     {notice && <p role="status">{notice}</p>}
@@ -134,7 +135,7 @@ export function OwnerManagement({ onChanged, beforeNavigate, mode = 'clubs' }: {
     </>}
     {mode === 'staff' && <>
     {!loading && !loadError && staff.length === 0 && <p>Создайте отдельный аккаунт для каждого сотрудника.</p>}
-    <ul className="management-list">{staff.map((item) => <li key={item.id}><div><h4>{item.displayName}</h4><p>{item.login} · {item.disabled ? 'Аккаунт отключён' : 'Аккаунт включён'}</p><p>Администратор: {item.clubIds.map((id) => { const club = clubs.find((value) => value.id === id); return `${club?.name ?? 'Филиал'}${club?.archived ? ' (архив)' : ''}`; }).join(', ') || 'нет назначений'}</p></div>
+    <ul className="management-list">{staff.map((item) => <li key={item.id}><div className="staff-identity"><PersonAvatar name={item.displayName} active={!item.disabled} label={item.disabled ? 'Аккаунт отключён' : 'Аккаунт включён'} /><div className="staff-copy"><h4>{item.displayName}</h4><p className="staff-role">{[item.clubIds.length ? 'Администратор' : '', item.trainerClubIds?.length ? 'Тренер' : ''].filter(Boolean).join(' · ') || 'Нет назначений'} · {item.login}</p><p className="staff-assignments">{[...new Set([...item.clubIds, ...(item.trainerClubIds ?? [])])].map((id) => { const club = clubs.find((value) => value.id === id); return `${club?.name ?? 'Филиал'}${club?.archived ? ' (архив)' : ''}`; }).join(', ') || 'нет назначений'}</p></div></div>
       <button className="secondary" disabled={busy || loading} onClick={() => editStaff(item)} aria-label={`Изменить назначения ${item.displayName}`}>Изменить назначения</button></li>)}</ul>
     </>}
   </section>;

@@ -573,3 +573,22 @@ manifest identity отдельно не различены. iOS/Safari верс�
 повторные проходы трёх ролей/участие сотрудников не подтверждены; #188 не закрывать.
 Точные синтетические IDs/снимки/API — docs/redesign-evidence/rd06/qa188-https-20261015.md.
 Реальные данные и QA164 не менялись, секреты в файлы не включались.
+
+
+18.10.2026, прямое поручение заказчика: перенести выбранный shadcn-app17ecd57
+в настоящий frontend со всеми Go/API/ролями/операциями, без demo. Отдельная
+RD-07/#198, зависимость RD-05/#187 уже в main; claim6db666ff52d7470e8b4e67e1e3d9fcd8,
+run39118216590 acquired=true, единственный NikishGum/In progress. Ветка
+codex/shadcn-runtime от main78c1b69 + регистрацияa0ca509. Карта функций и решения:
+docs/shadcn-runtime.md. Impeccable и официальный shadcn skill установлены/прочитаны
+в cloud. Профиль использует реальные данные/logout и только живое сворачивание
+Sidebar, без fake save; на mobile Sidebar отсутствует в DOM. Предыдущие результаты
+RD-06 и принятие прежнего интерфейса15.10 не являются приёмкой нового оформления.
+#188 остаётся у StarMadeGalaxy; не менять её статус и не переносить device PASS.
+
+RD-07 cloud verification18.10: production build/image, Go vet/race+PG,14 claim tests,
+все8 browser suites Chromium154/WebKit26.5 PASS. Контраст минимум4.88/5.43;40% ledger
+и4 режима2/4/2/1 сохранены. Полные source/failures/rawlogs/hash/NOT RUN:
+docs/shadcn-runtime-validation.md и .impeccable/review/shadcn-runtime/results.json.
+Impeccable detector один раз[], review solefix sticky44px topclose resolved/ship;
+DESIGN/sidecar обновлены. Это не physical/HTTPS/сотрудники PASS и не закрытие #188.

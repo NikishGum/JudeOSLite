@@ -1,3 +1,4 @@
+from runtime_ui import signout
 # Read-only UI regression against a disposable loopback app and synthetic audit fixture.
 # Fixture: owner/admin/trainer/archived-admin; synthetic-browser-password; Audit A/B/Archive;
 # 55 A created, 3 A updated, 2 B b_only, 1 archived, 1 network_only at 2026-10-12T12:00Z.
@@ -16,9 +17,9 @@ with sync_playwright() as p:
   page.get_by_label('Логин',exact=True).fill(name)
   page.get_by_label('Пароль',exact=True).fill('synthetic-browser-password')
   page.get_by_role('button',name='Войти',exact=True).click()
-  expect(page.get_by_role('button',name='Выйти',exact=True)).to_be_visible()
+  expect(page.get_by_role('button', name='Меню профиля', exact=True)).to_be_visible()
  def logout():
-  page.get_by_role('button',name='Выйти',exact=True).click()
+  signout(page)
   expect(page.get_by_label('Логин',exact=True)).to_be_visible()
   expect(page.locator('.audit-event')).to_have_count(0)
  login('owner')

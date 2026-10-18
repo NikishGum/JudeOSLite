@@ -7,6 +7,7 @@ import { SessionDetail } from './SessionDetail';
 import { sessionHref, sessionLocation, trainingChanged, validSessionIds, weekStart, type SessionLocation } from './navigation';
 import { actionNames, nextDate, type Action, type Session } from './types';
 import './sessions.css';
+import { DateNavigation } from '../../shared/ui/DateNavigation';
 
 type Viewer = { user: { id: string }; clubs: { id: string; roles: string[] }[] };
 export function SessionCalendar({ clubId, timezone, canManage }: { clubId: string; timezone: string; canManage: boolean }) {
@@ -58,12 +59,13 @@ export function SessionCalendar({ clubId, timezone, canManage }: { clubId: strin
   if (location.sessionId && validSessionIds(location)) return <SessionDetail clubId={clubId} location={location} canManage={canManage} />;
   return <section className="connection registry session-calendar" aria-labelledby="sessions-title">
     <div className="section-heading"><div><h2 id="sessions-title">Календарь занятий</h2><p className="help">{canManage ? 'Занятия филиала' : 'Мои назначенные занятия'} · {timezone}</p></div>
+      <DateNavigation date={from} timezone={timezone} disabled={!!editor} step={view === 'week' ? 7 : 1} onChange={(date) => period(view === 'period' ? 'day' : view, date)} />
       {canManage && <button disabled={!ready || !!editor} onClick={() => { setNotice(''); setEditor('new'); }}>Добавить разовое занятие</button>}
     </div>
     <div className="session-period-toolbar">
       <div className="session-view" role="group" aria-label="Вид календаря">{([['day', 'День'], ['week', 'Неделя'], ['period', 'Период']] as const).map(([mode, label]) => <button key={mode} className="secondary" aria-pressed={view === mode} disabled={!!editor} onClick={() => period(mode)}>{label}</button>)}</div>
       <button className="secondary" disabled={!!editor} onClick={() => period(view === 'period' ? 'day' : view, today)}>Сегодня</button>
-      {view !== 'period' && <div className="session-step" role="group" aria-label="Смена периода"><button className="secondary" disabled={!!editor} onClick={() => period(view, nextDate(from || today, view === 'week' ? -7 : -1))}>Назад</button><button className="secondary" disabled={!!editor} onClick={() => period(view, nextDate(from || today, view === 'week' ? 7 : 1))}>Вперёд</button></div>}
+
     </div>
     <div className="session-filters"><label className="field">С даты<input type="date" value={from} disabled={!!editor} onChange={(e) => filters({ from: e.target.value, view: 'period' })} /></label><label className="field">По дату включительно<input type="date" value={through} disabled={!!editor} onChange={(e) => filters({ through: e.target.value, view: 'period' })} /></label>
       <div className="field"><label htmlFor="session-group-filter">Группа календаря</label><select id="session-group-filter" value={groupId} disabled={!!editor || optionsLoading} onChange={(e) => filters({ groupId: e.target.value })}><option value="">Все доступные группы</option>{groupId && !selectedGroup && <option value={groupId}>Группа из ссылки недоступна</option>}{groups.map((g) => <option key={g.id} value={g.id}>{g.name}{groups.filter((other) => other.name === g.name).length > 1 ? ` · ${g.id.slice(-8)}` : ''}{g.archived ? ' · в архиве' : ''}</option>)}</select></div>

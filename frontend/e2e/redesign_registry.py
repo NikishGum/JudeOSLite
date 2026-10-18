@@ -56,6 +56,8 @@ def check_registry(browser, page, signin, api, owner, root, engine, open_section
     expect(panel).to_have_count(0)
     employee = next(s for s in api(ui, 'GET', '/api/staff') if s['login'] == 'rdadmin')
     assert set(employee['clubIds']) == {a['id'], b['id']}
+    if ui.get_by_role('radio', name='Сотрудники сети', exact=True).count():
+        ui.get_by_role('radio', name='Сотрудники сети', exact=True).click()
     ui.get_by_role('button', name='Изменить назначения Synthetic RD Admin', exact=True).click()
     panel.get_by_label('Имя сотрудника', exact=True).fill('Synthetic stale admin draft')
     api(ui, 'PUT', '/api/staff/'+employee['id'], {'displayName': employee['displayName'], 'clubIds': employee['clubIds'], 'disabled': False, 'version': employee['version']})
@@ -92,6 +94,7 @@ def check_registry(browser, page, signin, api, owner, root, engine, open_section
     expect(admin.get_by_role('dialog')).to_have_count(0)
     trainer = api(admin, 'GET', f"/api/clubs/{a['id']}/trainers")[0]
     ui.get_by_label('Филиал', exact=True).select_option(b['id'])
+    ui.get_by_role('radio', name='Тренеры филиала', exact=True).click()
     expect(ui.locator('#trainers-title')).to_be_visible()
     ui.get_by_label('Аккаунт сотрудника', exact=True).select_option(trainer['id'])
     ui.get_by_role('button', name='Назначить тренером', exact=True).click()
@@ -145,7 +148,8 @@ def check_registry(browser, page, signin, api, owner, root, engine, open_section
     expect(admin.get_by_role('dialog').get_by_role('alert')).to_contain_text('уже изменена')
     expect(admin.get_by_label('Номер телефона', exact=True)).to_have_value('+375291234568')
     admin.get_by_role('button', name='Загрузить актуальную карточку', exact=True).click()
-    expect(admin.get_by_role('dialog')).to_have_count(0)
+    expect(admin.get_by_role('dialog', name='Редактирование участника', exact=True)).to_have_count(0)
+    expect(admin.locator('dialog.participant-detail')).to_be_visible()
     # Membership: transfer, exclude, add, interval conflict, archive/restore.
     history = admin.locator('.membership-history')
     history.get_by_role('button', name='Перевести с даты', exact=True).click()
@@ -190,10 +194,12 @@ def check_registry(browser, page, signin, api, owner, root, engine, open_section
     shots('participant-form')
     panel.locator('[data-initial-focus]').focus(); ui.keyboard.press('Shift+Tab')
     expect(panel.get_by_role('button', name='Закрыть форму', exact=True)).to_be_focused()
+    ui.keyboard.press('Tab'); expect(panel.locator('.dialog-top-close')).to_be_focused()
     ui.keyboard.press('Tab'); expect(panel.get_by_label('ФИО участника', exact=True)).to_be_focused()
     panel.get_by_label('Дата рождения', exact=True).fill('2014-03-01')
     panel.get_by_role('button', name='Сохранить участника', exact=True).click()
-    expect(panel).to_have_count(0)
+    expect(ui.get_by_role('dialog', name='Редактирование участника', exact=True)).to_have_count(0)
+    expect(ui.locator('dialog.participant-detail')).to_be_visible()
     assert api(ui, 'GET', f"/api/clubs/{a['id']}/participants/{card['id']}")['birthDate'] == '2014-03-01'
     expect(ui.locator('.membership-history .registry-list > li')).to_have_count(3)
     ui.get_by_role('button', name='Закрыть карточку', exact=True).click()
@@ -240,6 +246,8 @@ def check_registry(browser, page, signin, api, owner, root, engine, open_section
     t.goto(root+f"/clubs/{a['id']}/participants?detail={card['id']}")
     expect(t.locator('main')).to_contain_text('Раздел или филиал недоступен')
     assert t.evaluate("async p=>(await fetch(p)).status", f"/api/clubs/{a['id']}/participants/{card['id']}") == 404
+    # Close the new modal card before navigating to another section.
+    admin.get_by_role('button', name='Закрыть карточку', exact=True).click()
     # Revocation preserves the second assignment; disabling is a separate global operation.
     open_section(admin, 'Сотрудники')
     admin.get_by_role('button', name='Отозвать назначение', exact=True).click()
@@ -255,12 +263,16 @@ def check_registry(browser, page, signin, api, owner, root, engine, open_section
     trainer_ctx.close()
     # Owner UI global disable/re-enable and admin revocation preserve remaining assignment.
     open_section(ui, 'Сотрудники')
+    if ui.get_by_role('radio', name='Сотрудники сети', exact=True).count():
+        ui.get_by_role('radio', name='Сотрудники сети', exact=True).click()
     ui.get_by_role('button', name='Изменить назначения Synthetic RD Admin', exact=True).click()
     panel.get_by_label('Отключить аккаунт во всех филиалах', exact=True).check()
     panel.get_by_role('button', name='Сохранить администратора', exact=True).click()
     expect(panel).to_have_count(0)
     admin.evaluate("window.dispatchEvent(new Event('focus'))")
     expect(admin.get_by_label('Логин', exact=True)).to_be_visible()
+    if ui.get_by_role('radio', name='Сотрудники сети', exact=True).count():
+        ui.get_by_role('radio', name='Сотрудники сети', exact=True).click()
     ui.get_by_role('button', name='Изменить назначения Synthetic RD Admin', exact=True).click()
     panel.get_by_label('Отключить аккаунт во всех филиалах', exact=True).uncheck()
     panel.get_by_label(a['name'], exact=True).uncheck()

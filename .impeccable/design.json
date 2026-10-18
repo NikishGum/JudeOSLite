@@ -1,0 +1,405 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-18T10:51:41.642320+00:00",
+  "title": "Design System: PRIDE — JudeOSLite runtime",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Красный PRIDE",
+        "canonical": "#db0c0c",
+        "tonalRamp": [
+          "oklch(15.00% 0.22664 28.82)",
+          "oklch(26.43% 0.22664 28.82)",
+          "oklch(37.86% 0.22664 28.82)",
+          "oklch(49.29% 0.22664 28.82)",
+          "oklch(60.71% 0.22664 28.82)",
+          "oklch(72.14% 0.22664 28.82)",
+          "oklch(83.57% 0.22664 28.82)",
+          "oklch(95.00% 0.22664 28.82)"
+        ]
+      },
+      "primary-hover": {
+        "role": "primary",
+        "displayName": "Тёмный hover PRIDE",
+        "canonical": "#323232",
+        "tonalRamp": [
+          "oklch(15.00% 0.00000 89.88)",
+          "oklch(26.43% 0.00000 89.88)",
+          "oklch(37.86% 0.00000 89.88)",
+          "oklch(49.29% 0.00000 89.88)",
+          "oklch(60.71% 0.00000 89.88)",
+          "oklch(72.14% 0.00000 89.88)",
+          "oklch(83.57% 0.00000 89.88)",
+          "oklch(95.00% 0.00000 89.88)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Белая поверхность",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "oklch(15.00% 0.00000 89.88)",
+          "oklch(26.43% 0.00000 89.88)",
+          "oklch(37.86% 0.00000 89.88)",
+          "oklch(49.29% 0.00000 89.88)",
+          "oklch(60.71% 0.00000 89.88)",
+          "oklch(72.14% 0.00000 89.88)",
+          "oklch(83.57% 0.00000 89.88)",
+          "oklch(95.00% 0.00000 89.88)"
+        ]
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Холодный рабочий фон",
+        "canonical": "#f5f7fa",
+        "tonalRamp": [
+          "oklch(15.00% 0.00453 258.32)",
+          "oklch(26.43% 0.00453 258.32)",
+          "oklch(37.86% 0.00453 258.32)",
+          "oklch(49.29% 0.00453 258.32)",
+          "oklch(60.71% 0.00453 258.32)",
+          "oklch(72.14% 0.00453 258.32)",
+          "oklch(83.57% 0.00453 258.32)",
+          "oklch(95.00% 0.00453 258.32)"
+        ]
+      },
+      "secondary": {
+        "role": "neutral",
+        "displayName": "Холодная вторичная поверхность",
+        "canonical": "#eff3f9",
+        "tonalRamp": [
+          "oklch(15.00% 0.00911 258.34)",
+          "oklch(26.43% 0.00911 258.34)",
+          "oklch(37.86% 0.00911 258.34)",
+          "oklch(49.29% 0.00911 258.34)",
+          "oklch(60.71% 0.00911 258.34)",
+          "oklch(72.14% 0.00911 258.34)",
+          "oklch(83.57% 0.00911 258.34)",
+          "oklch(95.00% 0.00911 258.34)"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Основной текст",
+        "canonical": "#212529",
+        "tonalRamp": [
+          "oklch(15.00% 0.00949 248.19)",
+          "oklch(26.43% 0.00949 248.19)",
+          "oklch(37.86% 0.00949 248.19)",
+          "oklch(49.29% 0.00949 248.19)",
+          "oklch(60.71% 0.00949 248.19)",
+          "oklch(72.14% 0.00949 248.19)",
+          "oklch(83.57% 0.00949 248.19)",
+          "oklch(95.00% 0.00949 248.19)"
+        ]
+      },
+      "field-text": {
+        "role": "neutral",
+        "displayName": "Холодный текст меню",
+        "canonical": "#444862",
+        "tonalRamp": [
+          "oklch(15.00% 0.04390 277.49)",
+          "oklch(26.43% 0.04390 277.49)",
+          "oklch(37.86% 0.04390 277.49)",
+          "oklch(49.29% 0.04390 277.49)",
+          "oklch(60.71% 0.04390 277.49)",
+          "oklch(72.14% 0.04390 277.49)",
+          "oklch(83.57% 0.04390 277.49)",
+          "oklch(95.00% 0.04390 277.49)"
+        ]
+      },
+      "muted-text": {
+        "role": "neutral",
+        "displayName": "Контрастный вторичный текст",
+        "canonical": "#626b72",
+        "tonalRamp": [
+          "oklch(15.00% 0.01561 241.18)",
+          "oklch(26.43% 0.01561 241.18)",
+          "oklch(37.86% 0.01561 241.18)",
+          "oklch(49.29% 0.01561 241.18)",
+          "oklch(60.71% 0.01561 241.18)",
+          "oklch(72.14% 0.01561 241.18)",
+          "oklch(83.57% 0.01561 241.18)",
+          "oklch(95.00% 0.01561 241.18)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Граница поля",
+        "canonical": "#dedede",
+        "tonalRamp": [
+          "oklch(15.00% 0.00000 89.88)",
+          "oklch(26.43% 0.00000 89.88)",
+          "oklch(37.86% 0.00000 89.88)",
+          "oklch(49.29% 0.00000 89.88)",
+          "oklch(60.71% 0.00000 89.88)",
+          "oklch(72.14% 0.00000 89.88)",
+          "oklch(83.57% 0.00000 89.88)",
+          "oklch(95.00% 0.00000 89.88)"
+        ]
+      },
+      "divider": {
+        "role": "neutral",
+        "displayName": "Разделитель строк",
+        "canonical": "#e5e8ec",
+        "tonalRamp": [
+          "oklch(15.00% 0.00630 255.48)",
+          "oklch(26.43% 0.00630 255.48)",
+          "oklch(37.86% 0.00630 255.48)",
+          "oklch(49.29% 0.00630 255.48)",
+          "oklch(60.71% 0.00630 255.48)",
+          "oklch(72.14% 0.00630 255.48)",
+          "oklch(83.57% 0.00630 255.48)",
+          "oklch(95.00% 0.00630 255.48)"
+        ]
+      },
+      "nav-active": {
+        "role": "primary",
+        "displayName": "Бледно-красный выбор",
+        "canonical": "#fcecec",
+        "tonalRamp": [
+          "oklch(15.00% 0.01739 17.46)",
+          "oklch(26.43% 0.01739 17.46)",
+          "oklch(37.86% 0.01739 17.46)",
+          "oklch(49.29% 0.01739 17.46)",
+          "oklch(60.71% 0.01739 17.46)",
+          "oklch(72.14% 0.01739 17.46)",
+          "oklch(83.57% 0.01739 17.46)",
+          "oklch(95.00% 0.01739 17.46)"
+        ]
+      },
+      "nav-active-text": {
+        "role": "primary",
+        "displayName": "Тёмно-красный выбранный текст",
+        "canonical": "#b50909",
+        "tonalRamp": [
+          "oklch(15.00% 0.19619 28.76)",
+          "oklch(26.43% 0.19619 28.76)",
+          "oklch(37.86% 0.19619 28.76)",
+          "oklch(49.29% 0.19619 28.76)",
+          "oklch(60.71% 0.19619 28.76)",
+          "oklch(72.14% 0.19619 28.76)",
+          "oklch(83.57% 0.19619 28.76)",
+          "oklch(95.00% 0.19619 28.76)"
+        ]
+      },
+      "success": {
+        "role": "secondary",
+        "displayName": "Зелёный статус",
+        "canonical": "#24664e",
+        "tonalRamp": [
+          "oklch(15.00% 0.07789 165.78)",
+          "oklch(26.43% 0.07789 165.78)",
+          "oklch(37.86% 0.07789 165.78)",
+          "oklch(49.29% 0.07789 165.78)",
+          "oklch(60.71% 0.07789 165.78)",
+          "oklch(72.14% 0.07789 165.78)",
+          "oklch(83.57% 0.07789 165.78)",
+          "oklch(95.00% 0.07789 165.78)"
+        ]
+      },
+      "success-surface": {
+        "role": "secondary",
+        "displayName": "Светлый зелёный статус",
+        "canonical": "#edf6f1",
+        "tonalRamp": [
+          "oklch(15.00% 0.01157 162.05)",
+          "oklch(26.43% 0.01157 162.05)",
+          "oklch(37.86% 0.01157 162.05)",
+          "oklch(49.29% 0.01157 162.05)",
+          "oklch(60.71% 0.01157 162.05)",
+          "oklch(72.14% 0.01157 162.05)",
+          "oklch(83.57% 0.01157 162.05)",
+          "oklch(95.00% 0.01157 162.05)"
+        ]
+      },
+      "warning": {
+        "role": "secondary",
+        "displayName": "Янтарный статус",
+        "canonical": "#86520e",
+        "tonalRamp": [
+          "oklch(15.00% 0.10251 66.18)",
+          "oklch(26.43% 0.10251 66.18)",
+          "oklch(37.86% 0.10251 66.18)",
+          "oklch(49.29% 0.10251 66.18)",
+          "oklch(60.71% 0.10251 66.18)",
+          "oklch(72.14% 0.10251 66.18)",
+          "oklch(83.57% 0.10251 66.18)",
+          "oklch(95.00% 0.10251 66.18)"
+        ]
+      },
+      "warning-surface": {
+        "role": "secondary",
+        "displayName": "Светлый янтарный статус",
+        "canonical": "#fff5e5",
+        "tonalRamp": [
+          "oklch(15.00% 0.02367 79.75)",
+          "oklch(26.43% 0.02367 79.75)",
+          "oklch(37.86% 0.02367 79.75)",
+          "oklch(49.29% 0.02367 79.75)",
+          "oklch(60.71% 0.02367 79.75)",
+          "oklch(72.14% 0.02367 79.75)",
+          "oklch(83.57% 0.02367 79.75)",
+          "oklch(95.00% 0.02367 79.75)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Заголовок страницы",
+        "purpose": "Desktop page heading."
+      },
+      "headline-mobile": {
+        "displayName": "Мобильный заголовок",
+        "purpose": "Page heading below768px."
+      },
+      "title": {
+        "displayName": "Заголовок панели",
+        "purpose": "Reusable working panel title."
+      },
+      "body": {
+        "displayName": "Основной текст desktop",
+        "purpose": "Dense working interface."
+      },
+      "body-mobile": {
+        "displayName": "Основной текст mobile",
+        "purpose": "Readable mobile body below768px."
+      },
+      "label": {
+        "displayName": "Рабочая подпись",
+        "purpose": "Controls and field labels."
+      }
+    },
+    "breakpoints": [
+      {
+        "name": "mobile",
+        "value": "767px"
+      },
+      {
+        "name": "desktop",
+        "value": "768px"
+      },
+      {
+        "name": "single-column-dashboard",
+        "value": "1200px"
+      }
+    ],
+    "rampProvenance": "Tonal ramps are synthesized OKLCH previews, dark to light; they are not additional approved runtime tokens. canonical values come from the final PRIDE overrides in app.css/shadcn.css.",
+    "reducedMotion": "@media (prefers-reduced-motion:reduce) { *, *::before, *::after { animation:none !important; transition:none !important; scroll-behavior:auto !important; } }",
+    "dialogBackdrop": {
+      "background": "rgb(0 0 0 / 10%)",
+      "backdropFilter": "blur(4px)"
+    },
+    "source": {
+      "brand": "judopride.by; extracted2026-10-11; design-system/README.md and manifest.json",
+      "approvedTemplate": "17ecd57068cff17e4eaf055e0ac503b61cab0399; design-system/prototypes/shadcn-app",
+      "runtime": [
+        "frontend/src/app/app.css",
+        "frontend/src/app/shadcn.css",
+        "frontend/src/app/RuntimeShell.tsx",
+        "frontend/src/shared/ui/Dialog.tsx",
+        "frontend/src/shared/ui/DateNavigation.tsx"
+      ]
+    }
+  },
+  "components": [
+    {
+      "name": "Основная кнопка",
+      "kind": "button",
+      "description": "Реальное главное действие; пример native-варианта в общей теме.",
+      "html": "<button class=\"ds-primary\" type=\"button\">Сохранить</button>",
+      "css": ".ds-primary{font-family:var(--font-sans, 'Rubik', sans-serif);min-height:44px;padding:10px 16px;border:1px solid transparent;border-radius:5px;font-size:14px;font-weight:500;line-height:1.4;cursor:pointer;background:var(--primary,#db0c0c);color:var(--primary-foreground,#fff)}.ds-primary:hover:not(:disabled){background:var(--pride-brand-hover,#323232)}.ds-primary:focus-visible{outline:2px solid var(--ring,#db0c0c);outline-offset:3px;}.ds-primary:disabled{opacity:.6;cursor:default}@media(max-width:767px){.ds-primary{font-size:16px}}",
+      "refersTo": "button-primary"
+    },
+    {
+      "name": "Вторичная кнопка",
+      "kind": "button",
+      "description": "Нейтральное действие, включая нижнюю отмену панели.",
+      "html": "<button class=\"ds-secondary\" type=\"button\">Отмена</button>",
+      "css": ".ds-secondary{font-family:var(--font-sans, 'Rubik', sans-serif);min-height:44px;padding:10px 16px;border:1px solid transparent;border-radius:5px;font-size:14px;font-weight:500;line-height:1.4;cursor:pointer;background:var(--card,#fff);color:var(--foreground,#212529);border-color:var(--border,#dedede)}.ds-secondary:hover:not(:disabled){background:var(--muted,#f5f7fa)}.ds-secondary:focus-visible{outline:2px solid var(--ring,#db0c0c);outline-offset:3px;}.ds-secondary:disabled{opacity:.6;cursor:default}@media(max-width:767px){.ds-secondary{font-size:16px}}",
+      "refersTo": "button-secondary"
+    },
+    {
+      "name": "Кнопка имени",
+      "kind": "button",
+      "description": "Участник открывается по имени; статус имеет собственную доступную подпись.",
+      "html": "<span class=\"ds-person\"><span class=\"ds-dot\" role=\"img\" aria-label=\"Действующий участник\" title=\"Действующий участник\"></span><button class=\"ds-name\" type=\"button\">Имя участника</button></span>",
+      "css": ".ds-person{display:flex;align-items:center;gap:12px}.ds-dot{display:inline-block;width:8px;height:8px;flex:none;border-radius:50%;background:var(--success,#24664e)}.ds-name{font-family:var(--font-sans, 'Rubik', sans-serif);min-height:44px;padding:8px 0;border:0;background:transparent;color:var(--foreground,#212529);font-size:14px;font-weight:500;text-align:left;overflow-wrap:anywhere;cursor:pointer}.ds-name:hover:not(:disabled){color:var(--primary,#db0c0c);text-decoration:underline}.ds-name:focus-visible{outline:2px solid var(--ring,#db0c0c);outline-offset:3px;}.ds-name:disabled{opacity:.6;cursor:default}@media(max-width:767px){.ds-name{font-size:16px}}"
+    },
+    {
+      "name": "Поле с подписью",
+      "kind": "input",
+      "description": "Native поле повторяет общие поверхность, границу и фокус.",
+      "html": "<label class=\"ds-field\">ФИО участника<input class=\"ds-input\" type=\"text\" autocomplete=\"off\" placeholder=\"Имя участника\"></label>",
+      "css": ".ds-field{font-family:var(--font-sans, 'Rubik', sans-serif);display:grid;gap:8px;color:var(--foreground,#212529);font-size:14px;font-weight:500}.ds-input{font-family:var(--font-sans, 'Rubik', sans-serif);min-width:0;min-height:44px;padding:12px;border:1px solid var(--input,#dedede);border-radius:10px;background:var(--card,#fff);color:var(--foreground,#212529);font-size:14px;line-height:1.4;caret-color:var(--primary,#db0c0c)}.ds-input:focus-visible{outline:2px solid var(--ring,#db0c0c);outline-offset:3px;}.ds-input:disabled{opacity:.65}@media(max-width:767px){.ds-field,.ds-input{font-size:16px}}",
+      "refersTo": "field"
+    },
+    {
+      "name": "Активная навигация",
+      "kind": "nav",
+      "description": "Доступное название раздела, SVG и явное выбранное состояние.",
+      "html": "<nav aria-label=\"Разделы\"><a class=\"ds-nav\" href=\"#participants\" aria-current=\"page\"><svg aria-hidden=\"true\" width=\"19\" height=\"19\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"></path><circle cx=\"9\" cy=\"7\" r=\"4\"></circle><path d=\"M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75\"></path></svg><span>Участники</span></a></nav>",
+      "css": ".ds-nav{font-family:var(--font-sans, 'Rubik', sans-serif);display:flex;align-items:center;gap:12px;min-height:44px;padding:12px;border-radius:8px;color:var(--sidebar-foreground,#444862);font-size:14px;text-decoration:none}.ds-nav:hover{background:var(--muted,#f5f7fa)}.ds-nav[aria-current]{background:var(--sidebar-accent,#fcecec);color:var(--sidebar-accent-foreground,#b50909);font-weight:500}.ds-nav:focus-visible{outline:2px solid var(--ring,#db0c0c);outline-offset:3px;}",
+      "refersTo": "navigation-active"
+    },
+    {
+      "name": "Рабочая панель",
+      "kind": "card",
+      "description": "Белая плоская поверхность с заголовком панели и адаптивным отступом.",
+      "html": "<section class=\"ds-panel\"><h2>Участники</h2><p>Состав выбранного филиала</p></section>",
+      "css": ".ds-panel{font-family:var(--font-sans, 'Rubik', sans-serif);min-width:0;background:var(--card,#fff);color:var(--foreground,#212529);border:0;border-radius:20px;padding:24px}.ds-panel h2{margin:0;font-size:17px;line-height:1.4;font-weight:600}.ds-panel p{margin:12px 0 0;color:var(--muted-foreground,#626b72);font-size:13px;line-height:1.6}@media(max-width:767px){.ds-panel{padding:20px 16px}}",
+      "refersTo": "panel"
+    },
+    {
+      "name": "Строка сотрудника",
+      "kind": "custom",
+      "description": "Не сжимающийся fallback-аватар и единые отступы16×12px.",
+      "html": "<div class=\"ds-staff\"><span class=\"ds-avatar\"><span aria-hidden=\"true\">ИС</span><span class=\"ds-staff-dot\" role=\"img\" aria-label=\"Действующий аккаунт\" title=\"Действующий аккаунт\"></span></span><div class=\"ds-staff-copy\"><h3>Имя сотрудника</h3><p>Тренер</p><p class=\"ds-assignment\">Назначенный филиал</p></div></div>",
+      "css": ".ds-staff{font-family:var(--font-sans, 'Rubik', sans-serif);display:flex;align-items:start;gap:16px;padding:16px 12px;color:var(--foreground,#212529)}.ds-staff:hover{background:var(--muted,#f5f7fa)}.ds-avatar{position:relative;display:grid;place-items:center;flex:none;width:44px;height:44px;border:1px solid var(--border,#dedede);border-radius:50%;background:var(--muted,#f5f7fa);color:var(--muted-foreground,#626b72);font-size:14px}.ds-staff-dot{position:absolute;bottom:1px;right:0;width:8px;height:8px;border-radius:50%;background:var(--success,#24664e);box-shadow:0 0 0 2px var(--card,#fff)}.ds-staff-copy{min-width:0;display:flex;flex-direction:column;gap:2px}.ds-staff-copy h3{margin:0;font-size:15px;line-height:22px;font-weight:500;overflow-wrap:anywhere}.ds-staff-copy p{margin:0;color:var(--muted-foreground,#626b72);font-size:12px;line-height:18px}.ds-staff-copy .ds-assignment{margin-top:4px;font-size:13px;line-height:20px}@media(max-width:767px){.ds-staff{gap:12px}.ds-staff-copy h3{font-size:16px}}"
+    },
+    {
+      "name": "Объединённая дата",
+      "kind": "custom",
+      "description": "Настольная компактная группа; на телефоне области44px.",
+      "html": "<div class=\"ds-date-group\"><button class=\"ds-date-step\" type=\"button\" aria-label=\"Предыдущий день\"><svg aria-hidden=\"true\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m15 18-6-6 6-6\"></path></svg></button><button class=\"ds-date-value\" type=\"button\">18 октября 2026 г.</button><button class=\"ds-date-step\" type=\"button\" aria-label=\"Следующий день\"><svg aria-hidden=\"true\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"m9 18 6-6-6-6\"></path></svg></button></div>",
+      "css": ".ds-date-group{display:inline-flex;align-items:center;gap:0;padding:2px;border:1px solid var(--border,#dedede);border-radius:10px;background:var(--card,#fff)}.ds-date-group button{font-family:var(--font-sans, 'Rubik', sans-serif);display:inline-flex;align-items:center;justify-content:center;min-height:32px;height:32px;border:0;border-radius:6px;background:transparent;color:var(--foreground,#212529);cursor:pointer}.ds-date-step{width:32px;min-width:32px;padding:0}.ds-date-value{padding:0 10px;font-size:13px}.ds-date-group button:hover:not(:disabled){background:var(--muted,#f5f7fa)}.ds-date-group button:focus-visible{outline:2px solid var(--ring,#db0c0c);outline-offset:3px;}.ds-date-group button:disabled{opacity:.6;cursor:default}@media(max-width:767px){.ds-date-group button{height:44px;min-height:44px}.ds-date-step{width:44px;min-width:44px}.ds-date-value{font-size:16px}}"
+    },
+    {
+      "name": "Заголовок native sheet",
+      "kind": "custom",
+      "description": "Верхний видимый выход длинной панели; runtime связывает его с guarded cancel.",
+      "html": "<section class=\"ds-sheet\" aria-label=\"Карточка участника\"><header class=\"ds-sheet-header\"><h4>Карточка участника</h4><button type=\"button\" class=\"ds-sheet-close\" aria-label=\"Закрыть панель «Карточка участника»\"><svg aria-hidden=\"true\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M18 6 6 18M6 6l12 12\"></path></svg></button></header><p>Содержимое рабочей панели</p></section>",
+      "css": ".ds-sheet{font-family:var(--font-sans, 'Rubik', sans-serif);padding:24px;background:var(--card,#fff);color:var(--foreground,#212529)}.ds-sheet-header{position:sticky;top:env(safe-area-inset-top);display:flex;align-items:flex-start;gap:12px;padding-block:8px 16px;margin-bottom:20px;background:var(--card,#fff)}.ds-sheet-header h4{flex:1;min-width:0;margin:0;font-size:23px;font-weight:600;overflow-wrap:anywhere}.ds-sheet-close{display:grid;place-items:center;flex:none;width:44px;height:44px;min-width:44px;padding:0;margin:0;border:0;background:var(--card,#fff);color:var(--foreground,#212529);cursor:pointer}.ds-sheet-close:hover:not(:disabled){background:var(--muted,#f5f7fa)}.ds-sheet-close:focus-visible{outline:2px solid var(--ring,#db0c0c);outline-offset:3px;}.ds-sheet-close:disabled{opacity:.6;cursor:default}@media(max-width:767px){.ds-sheet{padding-inline:16px}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Рабочая панель PRIDE / Working Panel",
+    "overview": "Существующая идентичность спортивного клуба: оригинальная эмблема, локальный Rubik, красный акцент, белые и холодные серые поверхности. Источник бренда — [judopride.by](https://judopride.by/), извлечение 11.10.2026; происхождение ресурсов, исходные значения и рекомендации сохранены в [design-system/README.md](design-system/README.md), [tokens.json](design-system/tokens.json) и [manifest.json](design-system/manifest.json).\n\nЭтот срез от 18.10.2026 описывает фактически перенесённое оформление рабочего frontend по прямому поручению заказчика: эталон `design-system/prototypes/shadcn-app/` на `17ecd57068cff17e4eaf055e0ac503b61cab0399`. Frontmatter фиксирует runtime; источники его значений — `frontend/src/app/app.css` и итоговые PRIDE-переопределения `shadcn.css`, общие токены и переиспользуемые компоненты. Плотность, shell, навигационные оттенки и семантические состояния являются проектной адаптацией выбранного шаблона, а не извлечённым брендбуком сайта. Новая визуальная идентичность не вводится. Карта сохранения рабочих операций — [docs/shadcn-runtime.md](docs/shadcn-runtime.md).",
+    "keyCharacteristics": [
+      "Плоские белые панели и читаемые строки на холодном фоне.",
+      "Rubik, фирменная эмблема и красный акцент действий и выбора.",
+      "Сворачиваемая Sidebar на ПК; три частых раздела и «Ещё» на телефоне.",
+      "Полные рабочие формы в общей семантической теме, с видимыми выходом и фокусом."
+    ],
+    "rules": [
+      {
+        "name": "Accessible Status",
+        "body": "Состояние имеет текстовую подпись; компактная точка человека — русское доступное имя и title. Цвет не является единственным носителем смысла.",
+        "section": "colors"
+      }
+    ],
+    "dos": [
+      "**Do** сохранять Rubik, оригинальную эмблему и происхождение PRIDE-ресурсов.",
+      "**Do** применять общую семантическую тему к shadcn-компонентам и полноценным существующим формам.",
+      "**Do** сохранять мобильный основной текст и native-поля (16px), доступные имена, видимый фокус и выход из длинных панелей.",
+      "**Do** сохранять боковые отступы строк (12px) и вертикальные отступы сотрудников (16px)."
+    ],
+    "donts": [
+      "**Don't** принимать значения исходного маркетингового сайта за размеры рабочей оболочки.",
+      "**Don't** переносить демороли, синтетические данные, фиксированный день и служебные registries в рабочий интерфейс.",
+      "**Don't** имитировать сохранение настроек или упрощать реальные операции ради вида прототипа.",
+      "**Don't** растягивать или перекрашивать эмблему, отключать клавиатурный фокус или обозначать статус только цветом."
+    ]
+  }
+}

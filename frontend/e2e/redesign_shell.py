@@ -78,7 +78,9 @@ def check_shell(browser, page, signin, api, owner, club, group, trainer, root, e
     value.keyboard.press('Shift+Tab')
     expect(dialog.get_by_role('button', name='Закрыть меню', exact=True)).to_be_focused()
     value.keyboard.press('Tab')
-    expect(dialog.get_by_role('link', name='Главная', exact=True)).to_be_focused()
+    expect(dialog.locator('.dialog-top-close')).to_be_focused()
+    value.keyboard.press('Tab')
+    expect(dialog.get_by_role('link', name='Группы', exact=True)).to_be_focused()
     value.screenshot(path=f'/tmp/rd183-{engine}-more-320.png')
     value.keyboard.press('Escape')
     expect(more).to_be_focused()
@@ -104,7 +106,11 @@ def check_shell(browser, page, signin, api, owner, club, group, trainer, root, e
     value.goto(root+'/clubs/'+club['id']+'/participants')
     expect(value.locator('#registry-title')).to_have_count(0)
     expect(value.locator('main')).to_contain_text('Раздел или филиал недоступен')
-    assert value.locator('.sidebar a').all_text_contents() == ['Главная', 'Занятия', 'Журналы', 'История']
+    assert value.locator('.sidebar').count() == 0
+    assert value.locator('.bottom-navigation a').all_text_contents() == ['Главная', 'Занятия', 'Журналы']
+    value.get_by_role('button', name='Ещё', exact=True).click()
+    assert value.locator('.more-navigation a').all_text_contents() == ['История']
+    value.keyboard.press('Escape')
     denied = value.evaluate("async path => {const r=await fetch(path);return {status:r.status,type:r.headers.get('content-type')}}", '/api/clubs/'+club['id']+'/participants')
     assert denied['status'] == 404 and 'json' in denied['type'], denied
     value.get_by_label('Филиал', exact=True).select_option(other['id'])

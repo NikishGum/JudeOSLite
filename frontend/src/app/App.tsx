@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { flushSync } from 'react-dom';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { RuntimeProfile, RuntimeSidebar } from './RuntimeShell';
+import { Separator } from '@/components/ui/separator';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { pendingMutations, notifySessionChanged } from '../shared/app-lifecycle';
 import { PwaStatus } from './PwaStatus';
 import { Dialog } from '../shared/ui/Dialog';
@@ -34,6 +41,9 @@ export function App() {
   const [route, setRoute] = useState(readRoute);
   const selectedId = route.clubId;
   const [more, setMore] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [staffView, setStaffView] = useState<'network' | 'trainers'>('network');
+  const mobile = useIsMobile();
   const [leave, setLeave] = useState<(() => void) | null>(null);
   const [navigationNotice, setNavigationNotice] = useState('');
   const dirty = useRef<() => boolean>(() => false);
@@ -67,7 +77,7 @@ export function App() {
   function forgetSession() {
     epoch.current += 1;
     authenticated.current = false;
-    setCsrfToken(null); setSession(null); setClub(null); setMore(false); setLeave(null);
+    setCsrfToken(null); setSession(null); setClub(null); setMore(false); setLeave(null); setSidebarOpen(true);
     setLogin(''); setPassword(''); setClubError(''); setLoading(false);
   }
   async function loadSession(signal?: AbortSignal) {
@@ -167,24 +177,26 @@ export function App() {
   const assignmentKey = session?.clubs.map((c) => `${c.id}:${c.roles.join(',')}`).sort().join(';');
   const hasAdministration = !!session?.clubs.some((c) => c.roles.includes('administrator'));
   const primary = session?.user.isOwner ? ['home', 'statistics', 'sessions'] : (canManage || (!selectedId && hasAdministration)) ? ['home', 'sessions', 'participants'] : ['home', 'sessions', 'journals'];
-  const links = (mobile = false) => items.filter((item) => !mobile || primary.includes(item.section)).map(({ section, label }) => <a key={section} href={routePath({ clubId: selectedId, section })} aria-current={route.section === section ? 'page' : undefined} onClick={(event) => {
+  const links = (mobile = false, secondary = false) => items.filter((item) => (!mobile || primary.includes(item.section)) && (!secondary || !primary.includes(item.section))).map(({ section, label }) => <a key={section} aria-label={label} href={routePath({ clubId: selectedId, section })} aria-current={route.section === section ? 'page' : undefined} onClick={(event) => {
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault(); openSection(section);
   }}><NavigationIcon section={section} /><span>{label}</span></a>);
-  return <div className={session ? 'app-shell' : 'public-shell'}>
+  const profile = session && <RuntimeProfile key={`${session.user.id}:${assignmentKey}`} name={session.user.displayName} role={session.user.isOwner ? 'Владелец сети' : available?.roles.map((r) => roleNames[r] ?? r).join(' · ') || 'Сотрудник клуба'} clubs={session.clubs} compact={mobile || !sidebarOpen} busy={busy} collapsed={!sidebarOpen} onCollapsed={(collapsed) => setSidebarOpen(!collapsed)} onSignOut={() => requestLeave(() => void signOut())} />;
+  return <TooltipProvider><SidebarProvider style={{ '--sidebar-width': '248px', '--sidebar-width-icon': '76px' } as React.CSSProperties} open={sidebarOpen} onOpenChange={setSidebarOpen}><div className={cn(session ? 'app-shell' : 'public-shell', { 'sidebar-collapsed': !sidebarOpen })}>
     <a className="skip-link" href="#workspace">К основному содержимому</a>
     <header className="header"><div className="header-inner">
       <a className="brand" href="/" aria-label="PRIDE — главная" onClick={(event) => { if (session && !event.ctrlKey && !event.metaKey) { event.preventDefault(); openSection('home'); } }}><img src={logo} width="56" height="56" alt="" /><span>Клуб дзюдо <strong>PRIDE</strong></span></a>
-      {session ? <><label className="club-context">Филиал<select aria-label="Филиал" value={available ? selectedId : ''} onChange={(event) => {
+      {session ? <>{!mobile && <><SidebarTrigger aria-label="Переключить боковое меню" /><Separator orientation="vertical" /></>}<label className="club-context"><span className="sr-only">Филиал</span><select aria-label="Филиал" value={available ? selectedId : ''} onChange={(event) => {
         const id = event.target.value; requestLeave(() => navigate({ clubId: id, section: route.section, detail: '', group: '', invalid: false }));
       }}><option value="">{session.user.isOwner ? 'Вся сеть' : 'Выберите филиал'}</option>{session.clubs.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
-        <div className="account"><div><strong>{session.user.displayName}</strong><span>{session.user.isOwner ? 'Владелец сети' : available?.roles.map((r) => roleNames[r] ?? r).join(' · ') || 'Сотрудник клуба'}</span></div><button type="button" className="secondary" disabled={busy} onClick={() => requestLeave(() => void signOut())}>{busy ? 'Выходим…' : 'Выйти'}</button></div>
+        {mobile && profile}
+
       </> : <span className="header-label">Для сотрудников клуба</span>}
     </div></header>
-    {session && <><nav className="sidebar workspace-navigation" aria-label="Разделы филиала">{links()}<p className="sidebar-caption">PRIDE · Рабочая панель</p></nav>
+    {session && <>{!mobile && <RuntimeSidebar links={links()} profile={profile} onHome={(event) => { if (!event.ctrlKey && !event.metaKey) { event.preventDefault(); openSection('home'); } }} />}
       <nav className="bottom-navigation" aria-label="Основная навигация">{links(true)}<button type="button" className="secondary" aria-current={!primary.includes(route.section) ? 'page' : undefined} aria-haspopup="dialog" aria-expanded={more} onClick={() => setMore(true)}><NavigationIcon section="more" /><span>Ещё</span></button></nav></>}
     <main id="workspace" className="workspace" tabIndex={-1}>
-      <PwaStatus beforeUpdate={requestLeave} />
+      <div id="app-pwa"><PwaStatus beforeUpdate={requestLeave} /></div>
       <h1 ref={pageTitle} tabIndex={-1}>{session ? sections[route.section] : 'Вход для сотрудников'}</h1>
       {error && <div className="error" role="alert"><p>{error}</p>{!session && !loading && <button type="button" onClick={() => { setLoading(true); void loadSession(); }}>Проверить подключение и доступ</button>}</div>}
       {navigationNotice && <p className="error" role="status">{navigationNotice}</p>}
@@ -197,18 +209,20 @@ export function App() {
             {route.section === 'statistics' && session.user.isOwner && <OwnerDashboard />}
             {route.section === 'clubs' && session.user.isOwner && <OwnerManagement beforeNavigate={requestLeave} mode="clubs" onChanged={() => loadSession()} />}
             {route.section === 'history' && <AuditHistory selectedClubId={canManage ? selectedId : ''} />}
-            {['sessions', 'participants', 'groups', 'journals', 'staff'].includes(route.section) && !selectedId && <section className="connection"><h2>Выберите филиал</h2><p>Используйте выбор филиала в верхней панели.</p></section>}
+            {['sessions', 'participants', 'groups', 'journals', ...(session.user.isOwner && staffView === 'network' ? [] : ['staff'])].includes(route.section) && !selectedId && <section className="connection"><h2>Выберите филиал</h2><p>Используйте выбор филиала в верхней панели.</p></section>}
+            {route.section === 'staff' && session.user.isOwner && <ToggleGroup type="single" className="staff-scopes" aria-label="Область сотрудников" orientation={mobile ? 'vertical' : 'horizontal'} value={staffView} onValueChange={(view) => { if (view === 'network' || view === 'trainers') requestLeave(() => setStaffView(view)); }}><ToggleGroupItem value="network">Сотрудники сети</ToggleGroupItem><ToggleGroupItem value="trainers">Тренеры филиала</ToggleGroupItem></ToggleGroup>}
             {currentClub && <>
               {route.section === 'participants' && canManage && <ParticipantRegistry clubName={currentClub.name} clubId={currentClub.id} timezone={currentClub.timezone} onSessionRefresh={() => loadSession()} detailId={route.detail} beforeNavigate={requestLeave} onDetailChange={(detail) => navigate({ ...routeRef.current, detail })} />}
               {route.section === 'groups' && canManage && <GroupManagement clubId={currentClub.id} clubName={currentClub.name} timezone={currentClub.timezone} detailId={route.detail} beforeNavigate={requestLeave} onDetailChange={(detail) => navigate({ ...routeRef.current, detail })} onOpenSessions={(group) => requestLeave(() => navigate({ ...routeRef.current, section: 'sessions', detail: '', group }))} />}
               {route.section === 'sessions' && <><SessionCalendar clubId={currentClub.id} timezone={currentClub.timezone} canManage={canManage} />{canManage && <ScheduleManagement clubId={currentClub.id} timezone={currentClub.timezone} />}</>}
               {route.section === 'journals' && <>{canTrain && <TrainerSessions clubId={currentClub.id} timezone={currentClub.timezone} />}{canManage && <AdminJournals clubId={currentClub.id} timezone={currentClub.timezone} />}</>}
-              {route.section === 'staff' && canManage && <TrainerManagement beforeNavigate={requestLeave} clubName={currentClub.name} clubId={currentClub.id} isOwner={session.user.isOwner} onSessionRefresh={() => loadSession()} />}
+              {route.section === 'staff' && canManage && (!session.user.isOwner || staffView === 'trainers') && <TrainerManagement beforeNavigate={requestLeave} clubName={currentClub.name} clubId={currentClub.id} isOwner={session.user.isOwner} onSessionRefresh={() => loadSession()} />}
             </>}
-            {route.section === 'staff' && session.user.isOwner && <OwnerManagement beforeNavigate={requestLeave} mode="staff" onChanged={() => loadSession()} />}
+
+            {route.section === 'staff' && session.user.isOwner && staffView === 'network' && <OwnerManagement beforeNavigate={requestLeave} mode="staff" onChanged={() => loadSession()} />}
           </NavigationBoundary>
         </>}
-      </> : <section className="connection login-panel" aria-labelledby="login-title"><p className="eyebrow">Каждая тренировка имеет значение</p><h2 id="login-title">Ваш аккаунт PRIDE</h2>
+      </> : <section className="connection login-panel" aria-labelledby="login-title"><h2 id="login-title">Ваш аккаунт PRIDE</h2>
         <form onSubmit={(event) => void signIn(event)} aria-busy={busy}>
           <label className="field">Логин<input name="username" autoComplete="username" autoCapitalize="none" spellCheck={false} required maxLength={100} value={login} onChange={(event) => setLogin(event.target.value)} disabled={busy} /></label>
           <label className="field">Пароль<input name="password" type="password" autoComplete="current-password" required maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} disabled={busy} /></label>
@@ -216,8 +230,8 @@ export function App() {
         </form><p className="help">Для получения доступа обратитесь к владельцу клуба.</p>
       </section>}
     </main>
-    {more && session && <Dialog title="Разделы PRIDE" onCancel={() => setMore(false)} cancelLabel="Закрыть меню"><nav className="more-navigation" aria-label="Все разделы">{links()}</nav></Dialog>}
+    {more && session && <Dialog className="more-sheet" title="Разделы PRIDE" onCancel={() => setMore(false)} cancelLabel="Закрыть меню"><nav className="more-navigation" aria-label="Другие разделы">{links(false, true)}{!items.some((item) => !primary.includes(item.section)) && <p>Все доступные разделы находятся в нижней навигации.</p>}</nav></Dialog>}
     {leave && session && <Dialog title="Есть несохранённые изменения" onCancel={() => setLeave(null)} cancelLabel="Продолжить редактирование"><p>При переходе введённые данные будут потеряны.</p><button type="button" onClick={() => { const action = leave; setLeave(null); if (!pendingMutations()) action(); else setNavigationNotice('Дождитесь окончания сохранения.'); }}>Перейти без сохранения</button></Dialog>}
     {!session && <footer>Клуб дзюдо PRIDE</footer>}
-  </div>;
+  </div></SidebarProvider></TooltipProvider>;
 }

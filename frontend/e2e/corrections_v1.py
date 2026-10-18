@@ -1,3 +1,4 @@
+from runtime_ui import signout
 """Synthetic loopback server + disposable corrections159-* database only; corrections-v1.md."""
 import json
 import os
@@ -21,7 +22,7 @@ with sync_playwright() as p:
         page.get_by_label('Логин', exact=True).fill(login)
         page.get_by_label('Пароль', exact=True).fill(password)
         page.get_by_role('button', name='Войти', exact=True).click()
-        expect(page.get_by_role('button', name='Выйти', exact=True)).to_be_visible()
+        expect(page.get_by_role('button', name='Меню профиля', exact=True)).to_be_visible()
     def api(page, method, path, data=None, status=200):
         result = page.evaluate('''async ([method,path,data])=>{
           const me=await (await fetch('/api/auth/me')).json();
@@ -144,7 +145,7 @@ with sync_playwright() as p:
     sql(f"DELETE FROM pride.staff_club_roles WHERE staff_user_id='{admin['id']}' AND role='administrator'")
     journal.get_by_role('button', name='Обновить журнал', exact=True).click()
     expect(page.locator('[data-record-id="'+rid+'"]')).to_have_count(0)
-    page.get_by_role('button', name='Выйти', exact=True).click()
+    signout(page)
     expect(page.get_by_label('Логин', exact=True)).to_be_visible()
     expect(page.locator('.admin-journals')).to_have_count(0)
     assert not errors, errors

@@ -1,3 +1,4 @@
+from runtime_ui import signout
 """RD-05: real browser -> Go -> disposable PostgreSQL. No external club data."""
 import json
 import os
@@ -82,12 +83,17 @@ try:
         def page(login):
             context = browser.new_context(viewport={'width': 1280, 'height': 900}, timezone_id='Pacific/Honolulu', service_workers='block', reduced_motion='reduce')
             value = context.new_page()
-            value.on('pageerror', lambda error: errors.append(str(error)))
+            recent = []
+            value.on('requestfailed', lambda request: recent.append({'url':request.url,'failure':request.failure}))
+            def page_error(error):
+                errors.append(str(error))
+                print(json.dumps({'engine':ENGINE,'check':'unexpected-page-error','url':value.url,'message':str(error),'stack':error.stack,'failedRequests':recent[-12:]},ensure_ascii=False),flush=True)
+            value.on('pageerror', page_error)
             value.goto(ROOT)
             value.get_by_label('Логин', exact=True).fill(login)
             value.get_by_label('Пароль', exact=True).fill(PASSWORD)
             value.get_by_role('button', name='Войти', exact=True).click()
-            expect(value.get_by_role('button', name='Выйти', exact=True)).to_be_visible()
+            expect(value.get_by_role('button', name='Меню профиля', exact=True)).to_be_visible()
             return value
         def api(value, method, path, data=None, status=None):
             result = value.evaluate('''async ([method,path,data])=>{
@@ -207,7 +213,7 @@ try:
         admin_page.get_by_role('link', name='Добавить участника · '+a['name'], exact=True).click()
         expect(admin_page.get_by_role('dialog', name='Новый участник', exact=True)).to_be_visible()
         assert 'detail=new' in admin_page.url
-        form = admin_page.get_by_role('dialog')
+        form = admin_page.get_by_role('dialog', name='Новый участник', exact=True)
         form.get_by_label('ФИО участника', exact=True).fill('Added Synthetic '+suffix)
         form.get_by_label('Дата рождения', exact=True).fill('1990-01-01'); form.get_by_label('Дата вступления', exact=True).fill(dates[0])
         form.get_by_label('Номер телефона', exact=True).fill('+375291234567')
@@ -303,7 +309,7 @@ try:
         ta.goto(ROOT); expect(ta.get_by_role('heading', name='Нет доступных назначений', exact=True)).to_be_visible()
         home(owner_page); report_dates(); metric('percentage', '62,5%')
         hold(owner_page, '/api/reports/attendance?'); owner_page.get_by_role('button', name='Обновить главную', exact=True).click(); owner_page.wait_for_function('window.held.length > 0')
-        owner_page.get_by_role('button', name='Выйти', exact=True).click(); expect(owner_page.get_by_label('Логин', exact=True)).to_be_visible(); release(owner_page)
+        signout(owner_page); expect(owner_page.get_by_label('Логин', exact=True)).to_be_visible(); release(owner_page)
         expect(owner_page.locator('.dashboard')).to_have_count(0); assert not errors, errors
         print(json.dumps({'engine': ENGINE, 'version': browser.version, 'result': 'PASS', 'ledger': '2/5=40%; correction3/5=60%; close5/8=62.5%; empty closed null', 'checks': 'two 24-hour-separated local dates; role scopes/counters/frozen roster; exact group/journal/create links; real mark/close/correction/archive; independent failures+retry; multi-role actual trainer; revoke/late replies/logout; 1440/1280/768/390/320; touch targets/main action'}, ensure_ascii=False))
         browser.close()

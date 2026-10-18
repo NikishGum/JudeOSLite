@@ -1,0 +1,2 @@
+2026/10/18 10:52:17 migrations applied
+{"engine": "chromium", "version": "154.0.8037.57", "result": "PASS", "checks": "day/week/period, ID scope/two clubs, create/reschedule/replace/cancel, direct journal/back/reload, Escape/focus, double tap/network/reload, correction conflict/history, 320/390/1280"}
