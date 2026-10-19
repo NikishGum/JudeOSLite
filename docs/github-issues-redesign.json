@@ -4,8 +4,8 @@
   "repository": "NikishGum/JudeOSLite",
   "source_main": "72460d8f7bf8fd58fd93eeb026099012033daabf",
   "prototype_commit": "8016b746072e9334567de7fdbba2dcaf2a72fb45",
-  "task_count": 7,
-  "dependency_count": 9,
+  "task_count": 12,
+  "dependency_count": 14,
   "issues": [
     {
       "id": "RD-01",
@@ -85,6 +85,61 @@
       ],
       "body_sha256": "608af67fbaafeef756e2f7059de4f1fb2420d10524978fbce4c94c3a656d6c6d",
       "title": "Перенос shadcn-дизайна в работающее приложение PRIDE"
+    },
+    {
+      "id": "RD-08",
+      "number": 200,
+      "github_id": 5922674297,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/200",
+      "dependencies": [
+        "RD-07"
+      ],
+      "body_sha256": "4700971fd56b07b12fc2d474017031c85712259e7edb42c29eaf10036424d983",
+      "title": "Дизайн PRIDE по макетам и исправления восьми замечаний интерфейса"
+    },
+    {
+      "id": "RD-09",
+      "number": 201,
+      "github_id": 5922687528,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/201",
+      "dependencies": [
+        "RD-08"
+      ],
+      "body_sha256": "c38c33e5fd352ba95fd5c485a8fecb059f5fb7e21aa76e1783abc1a966ff60bd",
+      "title": "Семьи, карточка ребёнка и кабинет родителя"
+    },
+    {
+      "id": "RD-10",
+      "number": 202,
+      "github_id": 5922687679,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/202",
+      "dependencies": [
+        "RD-08"
+      ],
+      "body_sha256": "a96149fcf6f9537df028ab34969f45cfdacc72f24e32b193af213d40df6aa870",
+      "title": "Платежи, тарифы и абонементы на реальных данных"
+    },
+    {
+      "id": "RD-11",
+      "number": 203,
+      "github_id": 5922687836,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/203",
+      "dependencies": [
+        "RD-08"
+      ],
+      "body_sha256": "72a4ae3f450f2ed74cfd55e2d49120fd016c1704d9adbc5046df211a75a16b61",
+      "title": "Документы семьи и ребёнка с защищённым доступом"
+    },
+    {
+      "id": "RD-12",
+      "number": 204,
+      "github_id": 5922687994,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/204",
+      "dependencies": [
+        "RD-08"
+      ],
+      "body_sha256": "e76c6286b372600c64ce21efdb36abde518b9a2595effced8c6a9b2d671e7849",
+      "title": "Уведомления, профиль тренера и настройки клуба по макетам"
     }
   ],
   "verification": {
@@ -99,5 +154,16 @@
     "commit": "17ecd57068cff17e4eaf055e0ac503b61cab0399",
     "branch": "codex/shadcn-app-template",
     "issue": 198
+  },
+  "screenshot_scope": {
+    "date": "2026-10-19",
+    "parent_issue": 200,
+    "acceptance_issues": [
+      201,
+      202,
+      203,
+      204
+    ],
+    "authorization": "Заказчик: Реализовать также новые модули с макетов. Одна текущая работа #200; дочерние issues фиксируют приёмку, не параллельную реализацию."
   }
 }
