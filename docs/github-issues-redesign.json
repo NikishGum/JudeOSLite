@@ -142,6 +142,18 @@
       ],
       "body_sha256": "385a32fbae03b8a9aa61d357452f90235c082ea9dc695ba7e9dd6e0f0460b53f",
       "title": "Backend: персональная лента уведомлений и события модулей"
+    },
+    {
+      "id": "RD-13",
+      "number": 210,
+      "github_id": 5925810408,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/210",
+      "dependencies": [
+        "RD-09",
+        "RD-10"
+      ],
+      "body_sha256": "66a0ef2b127ec60f446d79d210eafc562ffda6eaa0586a4f985c60a85268b87b",
+      "title": "Реалистичное демо-наполнение CRM для Беларуси"
     }
   ],
   "verification": {
