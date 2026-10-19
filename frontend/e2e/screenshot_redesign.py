@@ -106,7 +106,13 @@ def main():
         def setup(role='owner',motion='reduce'):
             fixture=Fixture(role);context=browser.new_context(viewport={'width':1440,'height':1000},reduced_motion=motion,service_workers='block',accept_downloads=True);context.add_init_script('delete Navigator.prototype.serviceWorker');context.route('**/api/**',fixture.route);page=context.new_page();page.on('pageerror',lambda error:errors.append(str(error)));return context,page,fixture
         ctx,ui,fixture=setup()
-        def go(section):ui.goto(f'{ROOT}/clubs/{CLUB}/{section}');expect(ui.locator('main h1')).to_be_visible();ui.wait_for_load_state('networkidle')
+        def go(section):
+            # Commands can close their editor before their refresh requests finish.
+            # Settle those reads before replacing the document (WebKit reports
+            # cancelled intercepted requests as access-control page errors).
+            ui.wait_for_load_state('networkidle');ui.goto(f'{ROOT}/clubs/{CLUB}/{section}');expect(ui.locator('main h1')).to_be_visible();ui.wait_for_load_state('networkidle')
+        def close_context():
+            ui.wait_for_load_state('networkidle');ctx.close()
         def capture(name,widths=(1440,390,320)):
             for width in widths:
                 ui.set_viewport_size({'width':width,'height':1000 if width>767 else 844});ui.wait_for_load_state('networkidle');ui.evaluate('document.fonts.ready');ui.mouse.move(0,0)
@@ -116,7 +122,7 @@ def main():
                 if os.environ.get('RD08_CAPTURE')=='1':ui.screenshot(path=str(OUT/f'{name}-{width}.png'),full_page=False)
                 assert ui.evaluate('document.documentElement.scrollWidth<=innerWidth'),(name,width,overflow)
                 audit=contrast_audit(ui);assert not audit['failures'],(name,width,audit['failures'])
-            results.append(name);ui.set_viewport_size({'width':1440,'height':1000})
+            results.append(name);ui.set_viewport_size({'width':1440,'height':1000});ui.wait_for_load_state('networkidle')
         def pointer_tab(label):
             trigger=ui.get_by_role('tab',name=label,exact=True);trigger.click()
             assert trigger.evaluate('e=>getComputedStyle(e).outlineStyle')=='none',(label,'pointer focus rectangle')
@@ -142,16 +148,16 @@ def main():
         # Background refresh retains nested editor state; keyboard tabs retain a ring.
         pointer_tab('Доступ родителей');ui.keyboard.press('ArrowLeft');focused=ui.locator(':focus');assert focused.get_attribute('role')=='tab';assert focused.evaluate('e=>getComputedStyle(e).outlineStyle')!='none'
         pointer_tab('Доступ родителей');ui.get_by_role('button',name='Создать аккаунт',exact=True).click();ui.get_by_label('Логин',exact=False).fill('parent.draft');before=len(fixture.reads);ui.evaluate('window.dispatchEvent(new Event("focus"))');ui.wait_for_load_state('networkidle');assert len(fixture.reads)>before;expect(ui.get_by_label('Логин',exact=False)).to_have_value('parent.draft')
-        ctx.close()
+        close_context()
         ctx,ui,fixture=setup('parent');go('families');capture('parent-family');assert ui.get_by_label('Филиал',exact=True).count()==0;assert ui.get_by_role('button',name='Добавить семью',exact=True).count()==0;go('payments');capture('parent-payments');expect(ui.get_by_role('button',name='Оплатить онлайн',exact=True)).to_be_disabled()
         # Same-club access keys stay unchanged: remove A while family B remains.
-        fixture.parent_two=True;go('families');expect(ui.get_by_role('heading',name='Семья Орловых',exact=True)).to_be_visible();ui.get_by_role('button',name='Иванов Максим',exact=False).click();expect(ui.locator('.member-profile')).to_contain_text('Иванов Максим');fixture.revoked={FAMILY,MEMBER};ui.evaluate('window.dispatchEvent(new Event("focus"))');expect(ui.locator('.member-profile')).to_have_count(0);expect(ui.get_by_role('heading',name='Семья Ивановых',exact=True)).to_have_count(0);expect(ui.get_by_role('heading',name='Семья Орловых',exact=True)).to_be_visible();ctx.close()
+        fixture.parent_two=True;go('families');expect(ui.get_by_role('heading',name='Семья Орловых',exact=True)).to_be_visible();ui.get_by_role('button',name='Иванов Максим',exact=False).click();expect(ui.locator('.member-profile')).to_contain_text('Иванов Максим');fixture.revoked={FAMILY,MEMBER};ui.evaluate('window.dispatchEvent(new Event("focus"))');expect(ui.locator('.member-profile')).to_have_count(0);expect(ui.get_by_role('heading',name='Семья Ивановых',exact=True)).to_have_count(0);expect(ui.get_by_role('heading',name='Семья Орловых',exact=True)).to_be_visible();close_context()
         ctx,ui,fixture=setup('trainer');go('journals');expect(ui.get_by_label('Филиал',exact=True)).to_have_count(0);ui.get_by_role('button',name='Посмотреть журнал',exact=True).click();expect(ui.get_by_role('button',name='Присутствует',exact=True)).to_be_visible();capture('attendance')
         for i in range(2):
             button=ui.get_by_role('button',name='Присутствует',exact=True);button.click()
             if i==0:
                 expect(ui.locator('.attendance-card h4')).to_have_text('Иванова София');expect(button).to_be_enabled();assert button.evaluate('e=>getComputedStyle(e).backgroundColor') in ('rgb(36, 102, 78)','rgb(28, 80, 61)')
-        ui.get_by_role('button',name='Завершить журнал',exact=True).click();expect(ui.get_by_role('dialog')).to_contain_text('Все участники отмечены');expect(ui.get_by_role('dialog')).not_to_contain_text('эти участники получат');capture('journal-complete');ctx.close()
+        ui.get_by_role('button',name='Завершить журнал',exact=True).click();expect(ui.get_by_role('dialog')).to_contain_text('Все участники отмечены');expect(ui.get_by_role('dialog')).not_to_contain_text('эти участники получат');capture('journal-complete');close_context()
         # Motion is a geometry check across the transition, and labels stay on one line.
         ctx,ui,fixture=setup(motion='no-preference');go('home')
         # Sample collapsing in the renderer task. The expanding endpoint is
@@ -175,7 +181,7 @@ def main():
         ui.get_by_role('button',name='Переключить боковое меню',exact=True).click()
         ui.wait_for_function('document.querySelector("[data-slot=sidebar-container]").getBoundingClientRect().width===248')
         assert ui.locator('main').evaluate('e=>parseFloat(getComputedStyle(e).marginLeft)')==248
-        ctx.close()
+        close_context()
         assert not errors,errors
         (OUT/'results.json').write_text(json.dumps({'engine':ENGINE,'source':'synthetic contract fixtures; not backend acceptance','screens':results,'mutationsChecked':['moneyMinor','requestId retry','document upload/download URL (binary backend deferred)' ,'read-all','attendance next/complete'],'pageErrors':errors},ensure_ascii=False,indent=2))
         browser.close();print('RD-08 frontend contract PASS:',ENGINE,len(results),'screen/state groups; synthetic responses; NOT backend acceptance',flush=True)
