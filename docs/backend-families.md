@@ -154,3 +154,28 @@ PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1 отключает только п�
 сохранены. CI использует стандартный playwright install --with-deps без этого флага.
 Физические устройства/родительский frontend/приёмка сотрудников не проверялись
 в backend issue и не объявляются готовыми. #188 остаётся отдельной задачей.
+
+## Стабилизация обязательных CI fixtures
+
+Исходный f64aacf: PR run39246544367 полностью PASS, push run39246534626 attempt1
+FAIL в WebKit dashboard при полном переходе со страницы с незавершёнными запросами;
+attempt2 FAIL в Chromium reports: ожидались4 присутствия, отображались3. Эти
+failures сохранены в issue, не заменены успешным результатом парного прогона.
+
+Обнаружена конкретная гонка reports fixture: проверка строки на «Присутствует»
+срабатывала уже по option открытого редактора до PUT commit. Теперь тест ждёт
+настоящий PUT200, закрытие correction-form, status-span и SQL present; только затем
+возвращает наблюдающий отчёт на передний план, проверяет visibility и отправляет
+attendance-changed. Прежние4/3/57.1% и строгие pageerror assertions сохранены.
+Dashboard fixture перед полным goto дожидается networkidle предыдущей страницы,
+включая запросы journal/options, чтобы переход не обрывал их на старом документе.
+
+Это только два существующих e2e fixtures; frontend/src/UX/API client не меняются.
+Область опубликована до изменения в #200:
+https://github.com/NikishGum/JudeOSLite/issues/200#issuecomment-6266739093.
+Локальные Chromium/WebKit прогоны обоих сценариев и новый CI фиксируются в issue.
+
+После синхронизации локально PASS все четыре затронутых сценария:
+Chromium154/WebKit26.5 dashboard (40%→60%→62.5%, роли/отзыв/late replies) и
+Chromium154/WebKit26.5 reports (3/7→4/7,57.1%, настоящий PUT200/закрытый редактор/
+SQL present перед refresh). Strict pageerror/числа/права/ошибки не ослаблены.

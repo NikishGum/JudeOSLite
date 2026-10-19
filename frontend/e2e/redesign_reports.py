@@ -193,8 +193,20 @@ try:
         row.get_by_role('button', name='Исправить отметку', exact=True).click()
         edit.get_by_label('Новая отметка', exact=True).select_option('present')
         edit.get_by_label('Причина исправления', exact=True).fill('PRIVATE correction marker')
-        edit.get_by_role('button', name='Сохранить исправление', exact=True).click()
-        expect(row).to_contain_text('Присутствует')
+        correction_url = ROOT+f"/api/clubs/{a['id']}/journals/{sa}/records/{ja['records'][2]['id']}"
+        with edit.expect_response(lambda response: response.url == correction_url and response.request.method == 'PUT') as corrected:
+            edit.get_by_role('button', name='Сохранить исправление', exact=True).click()
+        assert corrected.value.status == 200
+        # The open select already contains the word 'Присутствует'. Await the
+        # real commit and closed editor before refreshing the observing report.
+        expect(row.locator('.correction-form')).to_have_count(0)
+        expect(row.locator('.training-status')).to_have_text('Присутствует')
+        assert sql(f"SELECT state FROM pride.attendance_records WHERE id='{ja['records'][2]['id']}'") == 'present'
+        # The report deliberately refreshes only while visible. The correction
+        # page is a separate browser context; make the observing page visible
+        # before asking it to re-read the committed totals.
+        owner.bring_to_front()
+        owner.wait_for_function("document.visibilityState === 'visible'")
         owner.evaluate("window.dispatchEvent(new Event('attendance-changed'))")
         metric('present','4'); metric('absent','3'); metric('percentage','57,1%')
         assert sql(f"SELECT count(*) FROM pride.audit_events WHERE entity_id='{ja['records'][2]['id']}' AND action='corrected'") == '1'

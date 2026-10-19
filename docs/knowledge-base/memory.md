@@ -609,3 +609,10 @@ Revoke не снимает staff-роли. Общий staff/owner/межклуб
 личность. Family audit содержит только IDs/version, без PII/password.
 Frontend #200 принадлежит параллельному исполнителю, не меняется в #201.
 Точные результаты/main/CI/Done проверять по live issue, не по этой записи.
+
+CI f64aacf: PR run39246544367 PASS; два push failures старых fixtures сохранены
+в #201. Reports fixture проверял «Присутствует» по option до PUT commit, затем
+слишком рано обновлял отчёт. Добавлены PUT200/editor closed/status-span/SQL present
+и видимость наблюдающей страницы перед событием; dashboard перед полным goto
+дожидается запросов предыдущей страницы. Это только e2e harness, все прежние
+assertions сохранены; область опубликована в #200 до изменения, frontend/src не менялся.
