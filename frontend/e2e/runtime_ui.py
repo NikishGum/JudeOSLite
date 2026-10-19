@@ -16,9 +16,10 @@ def assert_control_target(control, width):
     assert rect and rect['height'] >= minimum and rect['width'] >= minimum, (width, minimum, control.text_content(), control.get_attribute('class'), control.get_attribute('aria-label'), rect)
 
 
-def assert_page_targets(page, width):
+def assert_page_targets(page, width, extra_selector=''):
+    settle_shell(page, width)
     # Read one DOM snapshot: responsive React mounts can invalidate nth locators.
-    controls = page.locator('button:visible,input:visible,select:visible,summary:visible,.workspace-navigation a:visible').evaluate_all('''nodes => nodes.filter(n=>!['checkbox','radio'].includes(n.type)).map(n=>({
+    controls = page.locator('button:visible,input:visible,select:visible,summary:visible,.workspace-navigation a:visible'+extra_selector).evaluate_all('''nodes => nodes.filter(n=>n.isConnected && n.getClientRects().length && n.getBoundingClientRect().width>0 && n.getBoundingClientRect().height>0 && !['checkbox','radio'].includes(n.type)).map(n=>({
       label:n.getAttribute('aria-label')||n.textContent, classes:[...n.classList], slot:n.dataset.slot,
       width:n.getBoundingClientRect().width,height:n.getBoundingClientRect().height
     }))''')

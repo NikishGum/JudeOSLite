@@ -4,7 +4,9 @@
 .session-period-toolbar { justify-content: space-between; margin: 24px 0 16px; }
 .session-view { padding: 4px; border: 1px solid var(--panel-line); border-radius: var(--pride-radius-field); background: var(--pride-surface-subtle); }
 .session-view button { border: 0; background: transparent; }
-.session-view button[aria-pressed="true"] { color: var(--pride-on-brand); background: var(--pride-brand); }
+.session-view button { min-width: 44px; min-height: 44px; padding: 10px 18px; color: var(--pride-text-secondary); transition: background-color 160ms ease-out, color 160ms ease-out; }
+.session-view button:hover:not(:disabled) { background: var(--muted); color: var(--foreground); }
+.session-view button[data-state="on"], .session-view button[data-state="on"]:hover:not(:disabled) { color: var(--primary-foreground); background: var(--primary); }
 .session-filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 16px 0; }
 .session-filters .field { margin: 0; }
 .session-list-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }

@@ -1,4 +1,4 @@
-from runtime_ui import assert_control_target
+from runtime_ui import assert_page_targets, settle_shell
 """RD-03: real browser -> Go -> disposable PostgreSQL. No external club data."""
 import json
 import os
@@ -89,6 +89,7 @@ try:
             value.get_by_label('Пароль', exact=True).fill(PASSWORD)
             value.get_by_role('button', name='Войти', exact=True).click()
             expect(value.get_by_role('button', name='Меню профиля', exact=True)).to_be_visible()
+            value.wait_for_load_state('networkidle')
             return value
         def api(value, method, path, data=None, status=None):
             result = value.evaluate('''async ([method,path,data])=>{
@@ -101,11 +102,10 @@ try:
         def shots(value, name):
             for width in (320, 390, 1280):
                 value.set_viewport_size({'width': width, 'height': 900})
+                settle_shell(value, width)
                 value.wait_for_load_state('networkidle')
                 assert value.evaluate('document.documentElement.scrollWidth <= innerWidth'), (name, width)
-                for control in value.locator('button:visible,input:visible,select:visible,summary:visible,.session-link:visible').all():
-                    if control.get_attribute('type') not in ('checkbox', 'radio'):
-                        assert_control_target(control, width)
+                assert_page_targets(value, width, extra_selector=',.session-link:visible')
                 value.evaluate('window.scrollTo(0,0)')
                 value.screenshot(path=f'/tmp/rd185-{ENGINE}-{name}-{width}.png', full_page=True)
         own = page('owner')
@@ -129,11 +129,11 @@ try:
         expect(admin).to_have_url(calendar)
         expect(admin.get_by_label('Группа календаря', exact=True)).to_have_value(group['id'])
         expect(admin.locator('.session-list > li')).to_have_count(1)
-        admin.get_by_role('button', name='Неделя', exact=True).click()
+        admin.get_by_role('radio', name='Неделя', exact=True).click()
         start = today-timedelta(days=today.weekday())
         expect(admin.get_by_label('С даты', exact=True)).to_have_value(str(start))
         expect(admin.get_by_label('По дату включительно', exact=True)).to_have_value(str(start+timedelta(days=6)))
-        admin.get_by_role('button', name='День', exact=True).click()
+        admin.get_by_role('radio', name='День', exact=True).click()
         admin.get_by_role('button', name='Сегодня', exact=True).click()
         admin.get_by_role('button', name='Все группы · сбросить фильтр', exact=True).click()
         expect(admin.get_by_label('Группа календаря', exact=True)).to_have_value('')
@@ -225,7 +225,7 @@ try:
         dialog.get_by_role('button', name='Болезнь', exact=True).click()
         expect(tr.locator('.attendance-card')).to_contain_text('Борис')
         tr.get_by_role('button', name='Завершить журнал', exact=True).click()
-        expect(dialog).to_contain_text('Не отмечено: 2')
+        expect(dialog).to_contain_text('Осталось отметить: 2')
         tr.keyboard.press('Escape')
         tr.get_by_role('button', name='Завершить журнал', exact=True).click()
         dialog.get_by_role('button', name='Подтвердить завершение', exact=True).evaluate('(b)=>{b.click();b.click()}')

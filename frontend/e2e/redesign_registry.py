@@ -13,7 +13,10 @@ def check_registry(browser, page, signin, api, owner, root, engine, open_section
         for width in (1280, 390, 320):
             ui.set_viewport_size({'width': width, 'height': 900})
             ui.evaluate('window.scrollTo(0,0)')
-            assert ui.evaluate('document.documentElement.scrollWidth <= innerWidth'), (name, width)
+            if not ui.evaluate('document.documentElement.scrollWidth <= innerWidth'):
+                ui.screenshot(path=f'/tmp/rd08-registry-overflow-{name}-{width}.png')
+                overflow=ui.evaluate('''()=>[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>innerWidth+1&&!e.closest('[data-slot="sidebar"]')}).slice(0,12).map(e=>({tag:e.tagName,cls:e.className,text:e.textContent.slice(0,60),rect:e.getBoundingClientRect().toJSON()}))''')
+                raise AssertionError((name,width,overflow))
             for control in ui.locator('dialog[open] button,dialog[open] input:not([type=checkbox]),dialog[open] select' if ui.locator('dialog[open]').count() else 'main button:visible,main input:visible,main select:visible').all():
                 r = control.bounding_box()
                 if r and control.is_visible():

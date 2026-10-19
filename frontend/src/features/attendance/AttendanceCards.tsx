@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { type AttendanceRecord, type Journal, reasonNames } from '../trainer-sessions/types';
 import { ActionSheet } from './ActionSheet';
 import './attendance.css';
+import { Button } from '@/components/ui/button';
 
 type Reason = keyof typeof reasonNames;
 type Props = {
@@ -53,8 +54,8 @@ export function AttendanceCards({ journal, busy, blocked, error, onMark }: Props
       <p className="help">Карточка {current.membershipId.slice(-8)}{current.archived && ' · В архиве'}</p>
       <p>{recordLabel(current)}</p>
       <div className="attendance-actions">
-        <button className="attendance-present" disabled={busy} onClick={() => void save('present')}>{busy && !sheet ? 'Сохраняем…' : 'Присутствует'}</button>
-        <button className="attendance-secondary" disabled={busy} onClick={() => { setRetryReason(null); setSheet(true); }}>Отсутствует</button>
+        <Button type="button" className="attendance-present" disabled={busy} aria-busy={busy && !sheet} onClick={() => void save('present')}>{busy && !sheet ? 'Сохраняем…' : 'Присутствует'}</Button>
+        <Button type="button" variant="outline" className="attendance-secondary" disabled={busy} onClick={() => { setRetryReason(null); setSheet(true); }}>Отсутствует</Button>
       </div>
       {error && retryPresent && !busy && <button onClick={() => void save('present')}>Повторить сохранение присутствия</button>}
       <button className="attendance-secondary" disabled={busy} onClick={() => select(null)}>К сводке и предыдущим отметкам</button>

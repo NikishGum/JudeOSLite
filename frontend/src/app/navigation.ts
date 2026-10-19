@@ -1,6 +1,7 @@
 export const sections = {
-  home: 'Главная', sessions: 'Занятия', participants: 'Участники', groups: 'Группы',
-  journals: 'Журналы', statistics: 'Статистика', staff: 'Сотрудники', clubs: 'Филиалы', history: 'История',
+  home: 'Главная', families: 'Клиенты', participants: 'Участники', groups: 'Группы', sessions: 'Занятия',
+  journals: 'Журналы', payments: 'Платежи', staff: 'Сотрудники', statistics: 'Статистика',
+  notifications: 'Уведомления', clubs: 'Филиалы', history: 'История', profile: 'Профиль', settings: 'Настройки',
 };
 export type Section = keyof typeof sections;
 export type Route = { clubId: string; section: Section; detail: string; group?: string; invalid: boolean };
@@ -22,11 +23,14 @@ export function routePath(route: Pick<Route, 'clubId' | 'section'> & { detail?: 
   if (route.group && route.section === 'sessions') params.set('group', route.group);
   return base + (params.size ? `?${params}` : '');
 }
-export function allowedSections(owner: boolean, roles: string[], hasAdministration: boolean): Section[] {
+export function allowedSections(owner: boolean, roles: string[], hasAdministration: boolean, parent = false): Section[] {
   const managing = owner || roles.includes('administrator');
+  const parentOnly = parent && !owner && !hasAdministration && !roles.includes('trainer');
   return (Object.keys(sections) as Section[]).filter((s) => {
+    if (parentOnly) return ['home', 'families', 'payments', 'notifications', 'profile', 'settings'].includes(s);
     if (s === 'statistics' || s === 'clubs') return owner;
     if (s === 'history') return owner || hasAdministration;
+    if (s === 'families' || s === 'payments') return managing || parent;
     if (s === 'participants' || s === 'groups' || s === 'staff') return managing;
     return true;
   });

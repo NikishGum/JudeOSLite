@@ -86,7 +86,8 @@ export function SessionJournal({ clubId, initial, onChanged }: Props) {
       {canWrite && <div className="journal-completion">
         <button disabled={busy} onClick={() => setConfirm(true)}>Завершить журнал</button>
         {confirm && <ActionSheet title="Завершить журнал?" busy={busy} onCancel={() => setConfirm(false)} cancelLabel="Продолжить отметки">
-          <p>Не отмечено: {unmarked}. При завершении эти участники получат «Отсутствует — причина неизвестна». После завершения вы не сможете менять отметки.</p>
+          <p>{journal.records.length === 0 ? 'В журнале нет участников. Закрыть пустой журнал?' : unmarked === 0 ? 'Все участники отмечены. Вы уверены, что хотите закрыть журнал?' : `Осталось отметить: ${unmarked}. При закрытии они будут отмечены как отсутствующие с неизвестной причиной.`}</p>
+          <p className="help">После закрытия исправить отметки сможет администратор или владелец.</p>
           {error && <p className="error" role="alert">{error}</p>}
           <button disabled={busy} onClick={() => void command(() => apiPost<Journal>(`${base}/close`, { version: journal.session.version }))}>{busy ? 'Завершаем…' : 'Подтвердить завершение'}</button>
         </ActionSheet>}
