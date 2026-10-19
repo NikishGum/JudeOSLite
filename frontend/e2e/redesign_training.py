@@ -1,4 +1,4 @@
-from runtime_ui import assert_page_targets, settle_shell
+from runtime_ui import observe_api, wait_for_api_idle, assert_page_targets, settle_shell
 """RD-03: real browser -> Go -> disposable PostgreSQL. No external club data."""
 import json
 import os
@@ -77,19 +77,25 @@ try:
     else:
         raise AssertionError('App not ready')
     with sync_playwright() as p:
-        chromium_path = os.environ.get('CHROMIUM_PATH') or ('/usr/bin/chromium' if Path('/usr/bin/chromium').exists() else None)
+        chromium_path = os.environ.get('CHROMIUM_PATH')
         browser = getattr(p, ENGINE).launch(headless=True, executable_path=chromium_path if ENGINE == 'chromium' else None)
         errors = []
         def page(login):
             context = browser.new_context(viewport={'width': 1280, 'height': 900}, service_workers='block', reduced_motion='reduce')
             value = context.new_page()
+            observe_api(value)
             value.on('pageerror', lambda error: errors.append(str(error)))
             value.goto(ROOT)
+            # Settle the initial session read before filling controlled inputs.
+            value.wait_for_load_state('networkidle')
+            wait_for_api_idle(value)
             value.get_by_label('Логин', exact=True).fill(login)
             value.get_by_label('Пароль', exact=True).fill(PASSWORD)
+            expect(value.get_by_label('Логин', exact=True)).to_have_value(login)
             value.get_by_role('button', name='Войти', exact=True).click()
             expect(value.get_by_role('button', name='Меню профиля', exact=True)).to_be_visible()
             value.wait_for_load_state('networkidle')
+            wait_for_api_idle(value)
             return value
         def api(value, method, path, data=None, status=None):
             result = value.evaluate('''async ([method,path,data])=>{

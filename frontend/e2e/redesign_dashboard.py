@@ -1,4 +1,4 @@
-from runtime_ui import signout
+from runtime_ui import observe_api, wait_for_api_idle, signout
 """RD-05: real browser -> Go -> disposable PostgreSQL. No external club data."""
 import json
 import os
@@ -77,12 +77,13 @@ try:
     else:
         raise AssertionError('App not ready')
     with sync_playwright() as p:
-        chromium_path = os.environ.get('CHROMIUM_PATH') or ('/usr/bin/chromium' if Path('/usr/bin/chromium').exists() else None)
+        chromium_path = os.environ.get('CHROMIUM_PATH')
         browser = getattr(p, ENGINE).launch(headless=True, executable_path=chromium_path if ENGINE == 'chromium' else None)
         errors = []
         def page(login):
             context = browser.new_context(viewport={'width': 1280, 'height': 900}, timezone_id='Pacific/Honolulu', service_workers='block', reduced_motion='reduce')
             value = context.new_page()
+            observe_api(value)
             recent = []
             value.on('requestfailed', lambda request: recent.append({'url':request.url,'failure':request.failure}))
             def page_error(error):
@@ -90,10 +91,15 @@ try:
                 print(json.dumps({'engine':ENGINE,'check':'unexpected-page-error','url':value.url,'message':str(error),'stack':error.stack,'failedRequests':recent[-12:]},ensure_ascii=False),flush=True)
             value.on('pageerror', page_error)
             value.goto(ROOT)
+            # Settle the initial session read before filling controlled inputs.
+            value.wait_for_load_state('networkidle')
+            wait_for_api_idle(value)
             value.get_by_label('Логин', exact=True).fill(login)
             value.get_by_label('Пароль', exact=True).fill(PASSWORD)
+            expect(value.get_by_label('Логин', exact=True)).to_have_value(login)
             value.get_by_role('button', name='Войти', exact=True).click()
             expect(value.get_by_role('button', name='Меню профиля', exact=True)).to_be_visible()
+            wait_for_api_idle(value)
             return value
         def api(value, method, path, data=None, status=None):
             result = value.evaluate('''async ([method,path,data])=>{
