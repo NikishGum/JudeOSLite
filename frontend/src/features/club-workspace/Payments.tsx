@@ -107,7 +107,7 @@ export function Payments({
                   <span className="sr-only">Поиск платежа</span>
                   <input
                     type="search"
-                    placeholder="Клиент или назначение платежа"
+                    placeholder="Участник или назначение платежа"
                     maxLength={200}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
@@ -326,7 +326,7 @@ function PaymentRows({
             <thead>
               <tr>
                 <th>Дата</th>
-                <th>Клиент</th>
+                <th>Участник</th>
                 <th>Сумма</th>
                 <th>Способ</th>
                 <th>Статус</th>
@@ -907,7 +907,7 @@ function PaymentEditor({
           <legend className="sr-only">Данные платежа</legend>
           {!membershipId && (
             <label className="field">
-              Найти клиента
+              Найти участника
               <input
                 type="search"
                 value={query}
@@ -918,14 +918,14 @@ function PaymentEditor({
             </label>
           )}
           <label className="field">
-            Клиент
+            Участник
             <select
               required
               value={member}
               onChange={(e) => setMember(e.target.value)}
               disabled={!!membershipId || people.loading}
             >
-              <option value="">Выберите клиента</option>
+              <option value="">Выберите участника</option>
               {people.data?.items.map((person) => (
                 <option key={person.id} value={person.id}>
                   {person.fullName}
