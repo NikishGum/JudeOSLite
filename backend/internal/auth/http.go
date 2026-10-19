@@ -46,6 +46,7 @@ type User struct {
 	Login       string `json:"login"`
 	DisplayName string `json:"displayName"`
 	IsOwner     bool   `json:"isOwner"`
+	IsParent    bool   `json:"isParent"`
 }
 type Club struct {
 	ID       string   `json:"id"`
@@ -162,9 +163,9 @@ func (s *Service) Require(next http.Handler) http.Handler {
 			return
 		}
 		p := principal{tokenHash: digest(cookie.Value)}
-		err = s.pool.QueryRow(r.Context(), `SELECT u.id::text,u.login,u.display_name,u.is_owner,ss.csrf_token_hash
+		err = s.pool.QueryRow(r.Context(), `SELECT u.id::text,u.login,u.display_name,u.is_owner,EXISTS(SELECT 1 FROM pride.family_access fa JOIN pride.families f ON f.id=fa.family_id JOIN pride.clubs c ON c.id=f.club_id WHERE fa.user_id=u.id AND c.archived_at IS NULL),ss.csrf_token_hash
             FROM pride.staff_sessions ss JOIN pride.staff_users u ON u.id=ss.staff_user_id
-            WHERE ss.token_hash=$1 AND ss.revoked_at IS NULL AND ss.expires_at>now() AND u.disabled_at IS NULL`, p.tokenHash).Scan(&p.User.ID, &p.User.Login, &p.User.DisplayName, &p.User.IsOwner, &p.csrfHash)
+            WHERE ss.token_hash=$1 AND ss.revoked_at IS NULL AND ss.expires_at>now() AND u.disabled_at IS NULL`, p.tokenHash).Scan(&p.User.ID, &p.User.Login, &p.User.DisplayName, &p.User.IsOwner, &p.User.IsParent, &p.csrfHash)
 		if errors.Is(err, pgx.ErrNoRows) {
 			unauthorized(w)
 			return
@@ -197,13 +198,20 @@ func (s *Service) RequireClub(ctx context.Context, userID, clubID string, roles 
             (SELECT 1 FROM pride.staff_club_roles r WHERE r.staff_user_id=u.id AND r.club_id=c.id AND r.role=ANY($3::text[])))`, userID, clubID, roles).Scan(&c.ID, &c.Name, &c.Timezone, &c.Archived, &c.Roles)
 	return c, err
 }
+
+// Discovery includes parent metadata; RequireClub deliberately remains staff-only.
+const discoveredRoles = `ARRAY(SELECT role FROM (
+ SELECT 'owner'::text AS role WHERE u.is_owner
+ UNION SELECT r.role FROM pride.staff_club_roles r WHERE r.staff_user_id=u.id AND r.club_id=c.id AND NOT u.is_owner
+ UNION SELECT 'parent' WHERE c.archived_at IS NULL AND EXISTS(SELECT 1 FROM pride.family_access fa JOIN pride.families f ON f.id=fa.family_id WHERE fa.user_id=u.id AND f.club_id=c.id)
+ ) roles ORDER BY role)`
+
 func (s *Service) clubs(ctx context.Context, userID string) ([]Club, error) {
-	rows, err := s.pool.Query(ctx, `SELECT c.id::text,c.name,c.timezone,false,
-        CASE WHEN u.is_owner THEN ARRAY['owner']::text[] ELSE
-            ARRAY(SELECT r.role FROM pride.staff_club_roles r WHERE r.staff_user_id=u.id AND r.club_id=c.id ORDER BY r.role) END
-        FROM pride.clubs c JOIN pride.staff_users u ON u.id=$1
-        WHERE c.archived_at IS NULL AND u.disabled_at IS NULL AND (u.is_owner OR EXISTS
-            (SELECT 1 FROM pride.staff_club_roles r WHERE r.staff_user_id=u.id AND r.club_id=c.id)) ORDER BY c.name,c.id`, userID)
+	rows, err := s.pool.Query(ctx, `SELECT c.id::text,c.name,c.timezone,false,`+discoveredRoles+`
+ FROM pride.clubs c JOIN pride.staff_users u ON u.id=$1
+ WHERE c.archived_at IS NULL AND u.disabled_at IS NULL AND (u.is_owner OR EXISTS
+ (SELECT 1 FROM pride.staff_club_roles r WHERE r.staff_user_id=u.id AND r.club_id=c.id) OR EXISTS
+ (SELECT 1 FROM pride.family_access fa JOIN pride.families f ON f.id=fa.family_id WHERE fa.user_id=u.id AND f.club_id=c.id)) ORDER BY c.name,c.id`, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -337,7 +345,11 @@ func (s *Service) logout(w http.ResponseWriter, r *http.Request) {
 	jsonResponse(w, 200, map[string]string{"status": "ok"})
 }
 func (s *Service) club(w http.ResponseWriter, r *http.Request) {
-	c, err := s.RequireClub(r.Context(), CurrentUser(r.Context()).ID, r.PathValue("clubID"), "administrator", "trainer")
+	var c Club
+	err := s.pool.QueryRow(r.Context(), `SELECT c.id::text,c.name,c.timezone,c.archived_at IS NOT NULL,`+discoveredRoles+`
+ FROM pride.clubs c JOIN pride.staff_users u ON u.id=$1 WHERE c.id::text=$2 AND u.disabled_at IS NULL AND
+ (u.is_owner OR EXISTS(SELECT 1 FROM pride.staff_club_roles r WHERE r.staff_user_id=u.id AND r.club_id=c.id) OR
+ (c.archived_at IS NULL AND EXISTS(SELECT 1 FROM pride.family_access fa JOIN pride.families f ON f.id=fa.family_id WHERE fa.user_id=u.id AND f.club_id=c.id)))`, CurrentUser(r.Context()).ID, r.PathValue("clubID")).Scan(&c.ID, &c.Name, &c.Timezone, &c.Archived, &c.Roles)
 	if errors.Is(err, pgx.ErrNoRows) {
 		platform.WriteError(w, 404, "not_found", "Филиал не найден.")
 		return

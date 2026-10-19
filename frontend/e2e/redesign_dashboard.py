@@ -142,6 +142,11 @@ try:
         sb = new_session(1, gb, '09:00'); journal(1, sb, [(0, 'present', None), (1, 'absent', 'illness')], True)
         start, until = min(dates), max(dates)
         def home(value, club=''):
+            # A full navigation must not tear down journal/options fetches that
+            # the previous action just scheduled. WebKit can report their
+            # document teardown as access-control pageerrors even when caught.
+            # Drain the real requests; keep the strict pageerror assertion.
+            value.wait_for_load_state('networkidle')
             value.goto(ROOT+('/clubs/'+club+'/home' if club else '/'))
             expect(value.locator('.dashboard-agenda').first).to_be_visible()
         def report_dates(value=owner_page):
