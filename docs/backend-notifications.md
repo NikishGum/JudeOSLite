@@ -134,3 +134,14 @@ viewport: scroll1304 при inner1280, затем нормальная раск�
 Конечный harness ждёт измеряемую ширину до5s, при отказе сохраняет геометрию/снимок;
 проверка отсутствия overflow сохранена. Оба конечных browser прохода PASS.
 Физические устройства/установка PWA и приёмка сотрудников не объявляются PASS.
+
+CI66cbf88: push39284943098 и PR39285003931 остановились в новом WebKit harness
+на строгом pageerror assertion: `/api/dashboard?... due to access control checks`.
+Go/PG/image и Chromium notification smoke до этого PASS; WebKit предметные
+inbox assertions также прошли. Исходные failures сохранены в live issue.
+В собственном notifications.py применён существующий runtime_ui observe_api /
+wait_for_api_idle перед/после полных goto/reload и после login: старые dashboard
+чтения завершаются до смены документа. Добавлена диагностика URL/stack/failed
+requests. Pageerror/SQL/отзыв/geometry assertions сохранены, retry и увеличение
+таймаутов не добавлены; product source и общий runtime_ui не менялись.
+Окончательные результаты исправленного harness проверяются отдельно по SHA/CI.

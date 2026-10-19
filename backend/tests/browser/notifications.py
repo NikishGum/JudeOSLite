@@ -16,6 +16,8 @@ from playwright.sync_api import sync_playwright, expect
 
 ROOT = 'http://127.0.0.1:18104'
 REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO/'frontend/e2e'))
+from runtime_ui import observe_api, wait_for_api_idle
 ENGINE = os.environ.get('PWA_BROWSER', 'chromium')
 IMAGE = os.environ.get('PWA_TEST_IMAGE', 'judeoslite:ci')
 assert ENGINE in ('chromium', 'webkit') and IMAGE.startswith('judeoslite:')
@@ -81,16 +83,33 @@ try:
         context = browser.new_context(service_workers='block')
         page = context.new_page()
         errors = []
-        page.on('pageerror', lambda error: errors.append(str(error)))
+        def observe(value):
+            observe_api(value)
+            recent=[]
+            value.on('requestfailed',lambda request:recent.append({'url':request.url,'failure':request.failure}))
+            def failed(error):
+                diagnostic={'engine':ENGINE,'url':value.url,'message':str(error),'stack':error.stack,'failedRequests':recent[-12:]}
+                errors.append(diagnostic)
+                print(json.dumps(diagnostic,ensure_ascii=False),flush=True)
+            value.on('pageerror',failed)
+        observe(page)
+        def navigate(value,path):
+            # A forced document navigation must not abandon reads from the
+            # previous SPA view; use the same observer as the existing suites.
+            wait_for_api_idle(value)
+            value.goto(ROOT+path)
+            wait_for_api_idle(value)
         def login(value, name):
             with value.expect_response(lambda r:r.url==ROOT+'/api/auth/me' and r.request.method=='GET'):
                 value.goto(ROOT)
+            wait_for_api_idle(value)
             value.get_by_label('Логин',exact=True).fill(name)
             value.get_by_label('Пароль',exact=True).fill(PASSWORD)
             expect(value.get_by_label('Логин',exact=True)).to_have_value(name)
             with value.expect_response(lambda r:r.url==ROOT+'/api/auth/login' and r.status==200):
                 value.get_by_role('button',name='Войти',exact=True).click()
             expect(value.get_by_role('button',name='Меню профиля',exact=True)).to_be_visible()
+            wait_for_api_idle(value)
 
         def api(value, method, path, data=None, expected=200, csrf=True):
             result=value.evaluate('''async ([method,path,data,csrf])=>{
@@ -116,7 +135,7 @@ try:
         def person(name,width=390):
             context=browser.new_context(service_workers='block',viewport={'width':width,'height':844})
             contexts.append(context)
-            value=context.new_page();value.on('pageerror',lambda e:errors.append(str(e)))
+            value=context.new_page();observe(value)
             login(value,name)
             return value
 
@@ -135,19 +154,21 @@ try:
         api(parent,'POST',f'/api/notifications/{owner_note}/read',{},404)
         api(parent,'POST',f"/api/notifications/{inbox['items'][0]['id']}/read",{},403,csrf=False)
 
-        parent.goto(ROOT+'/notifications')
+        navigate(parent,'/notifications')
         expect(parent.get_by_role('button',name='Уведомления, непрочитанных: 1',exact=True)).to_be_visible()
         expect(parent.get_by_text('Выставлен новый счёт',exact=True)).to_be_visible()
         # The existing UI follows the parent-safe route, without staff endpoints.
         parent.locator('.notification-list').get_by_role('button',name='Перейти',exact=True).first.click()
         expect(parent).to_have_url(ROOT+'/payments')
         expect(parent.get_by_text('Private invoice',exact=True)).to_be_visible()
-        parent.goto(ROOT+'/notifications')
+        navigate(parent,'/notifications')
         with parent.expect_response(lambda r:r.url.endswith('/read') and r.request.method=='POST' and r.status==200):
             parent.get_by_role('button',name='Прочитано: Выставлен новый счёт',exact=True).click()
         expect(parent.get_by_role('button',name='Прочитано: Выставлен новый счёт',exact=True)).to_have_count(0)
         assert api(parent,'GET','/api/notifications?status=unread')['unreadCount']==0
+        wait_for_api_idle(parent)
         parent.reload()
+        wait_for_api_idle(parent)
         expect(parent.get_by_text('Выставлен новый счёт',exact=True)).to_be_visible()
         assert sql(f"SELECT count(*) FROM pride.notifications WHERE id='{inbox['items'][0]['id']}' AND read_at IS NOT NULL")=='1'
         print('PASS personal bell/UI read/reload/parent route/SQL/idempotency/IDOR/CSRF',flush=True)
@@ -156,7 +177,7 @@ try:
         docbase=base+f'/participants/{members[0]}/documents'
         api(page,'POST',docbase,{'name':'Private medical title','kind':'medical','filename':'private.pdf','contentBase64':base64.b64encode(b'%PDF-1.7\n%%EOF').decode(),'expiresOn':None},201)
         assert api(parent,'GET','/api/notifications?status=unread')['unreadCount']==2
-        parent.goto(ROOT+'/notifications')
+        navigate(parent,'/notifications')
         with parent.expect_response(lambda r:r.url.endswith('/read-all') and r.status==200):
             parent.get_by_role('button',name='Прочитать все',exact=True).click()
         expect(parent.get_by_role('button',name='Прочитать все',exact=True)).to_be_disabled()
@@ -169,7 +190,7 @@ try:
         before=api(parent,'GET','/api/notifications')['total']
         for i in range(26):
             family=api(page,'PUT',base+f"/families/{family['id']}",{'name':f'Private Family revision {i}','contactName':'Private Parent','phone':'private','email':'','membershipIds':[members[0]],'version':family['version']})
-        parent.goto(ROOT+'/notifications')
+        navigate(parent,'/notifications')
         pager=parent.get_by_role('navigation',name='Страницы списка',exact=True)
         expect(pager).to_contain_text(f'Страница 1 · всего {before+26}')
         expect(parent.locator('.notification-list > li')).to_have_count(25)
@@ -188,13 +209,14 @@ try:
         group=api(page,'POST',base+'/groups',{'name':'Synthetic Inbox Group'},201)
         session=api(page,'POST',base+'/sessions',{'groupId':group['id'],'trainerId':trainer['id'],'date':'2030-02-10','startsTime':'10:00','durationMinutes':60},201)
         coach=person('trainer')
-        coach.goto(ROOT+'/notifications')
+        navigate(coach,'/notifications')
         expect(coach.get_by_text('Назначено занятие',exact=True)).to_be_visible()
         notes=api(coach,'GET','/api/notifications')
         assert notes['total']==1 and notes['items'][0]['kind']=='training_session'
         coach.locator('.notification-list').get_by_role('button',name='Перейти',exact=True).click()
         expect(coach).to_have_url(ROOT+notes['items'][0]['href'])
         expect(coach.get_by_role('heading',name='Synthetic Inbox Group',exact=False).first).to_be_visible()
+        wait_for_api_idle(coach)
         api(page,'POST',base+f"/sessions/{session['id']}/replace-trainer",{'version':1,'trainerId':replacement['id']})
         assert api(coach,'GET','/api/notifications')['total']==0
         api(coach,'POST',f"/api/notifications/{notes['items'][0]['id']}/read",{},404)
@@ -213,7 +235,7 @@ try:
         account=next(a for a in family['accounts'] if a['login']=='parent0')
         api(page,'POST',base+f"/families/{family['id']}/accounts/{account['id']}/revoke",{'version':family['version']})
         assert api(parent,'GET','/api/notifications')['total']==api(parent,'GET','/api/notifications')['unreadCount']==0
-        page.goto(ROOT+f'/clubs/{club}/notifications')
+        navigate(page,f'/clubs/{club}/notifications')
         expect(page.locator('.notification-list > li').first).to_be_visible()
         page.set_viewport_size({'width':1280,'height':900})
         try:
