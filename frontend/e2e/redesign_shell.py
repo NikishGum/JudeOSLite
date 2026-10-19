@@ -13,7 +13,7 @@ def check_shell(browser, page, signin, api, owner, club, group, trainer, root, e
     signin(value, 'multi')
     value.goto(root+'/clubs/'+club['id'])
     expect(value.locator('main h1')).to_have_text('Главная')
-    expected = ['Главная', 'Клиенты', 'Участники', 'Группы', 'Занятия', 'Журналы', 'Платежи', 'Сотрудники', 'Уведомления', 'История', 'Профиль', 'Настройки']
+    expected = ['Главная', 'Семьи и родители', 'Участники', 'Группы', 'Занятия', 'Журналы', 'Платежи', 'Сотрудники', 'Уведомления', 'История', 'Профиль', 'Настройки']
     assert value.locator('.sidebar a').all_text_contents() == expected
     expect(value.locator('.account')).to_contain_text('Администратор · Тренер')
     open_section(value, 'Журналы')
@@ -80,7 +80,7 @@ def check_shell(browser, page, signin, api, owner, club, group, trainer, root, e
     value.keyboard.press('Tab')
     expect(dialog.locator('.dialog-top-close')).to_be_focused()
     value.keyboard.press('Tab')
-    expect(dialog.get_by_role('link', name='Клиенты', exact=True)).to_be_focused()
+    expect(dialog.get_by_role('link', name='Семьи и родители', exact=True)).to_be_focused()
     value.screenshot(path=f'/tmp/rd183-{engine}-more-320.png')
     value.keyboard.press('Escape')
     expect(more).to_be_focused()

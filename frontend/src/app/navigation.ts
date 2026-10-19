@@ -1,5 +1,5 @@
 export const sections = {
-  home: 'Главная', families: 'Клиенты', participants: 'Участники', groups: 'Группы', sessions: 'Занятия',
+  home: 'Главная', families: 'Семьи и родители', participants: 'Участники', groups: 'Группы', sessions: 'Занятия',
   journals: 'Журналы', payments: 'Платежи', staff: 'Сотрудники', statistics: 'Статистика',
   notifications: 'Уведомления', clubs: 'Филиалы', history: 'История', profile: 'Профиль', settings: 'Настройки',
 };
