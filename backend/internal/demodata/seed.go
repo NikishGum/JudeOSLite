@@ -48,6 +48,7 @@ type Result struct {
 	ClosedSessions int       `json:"closedSessions,omitempty"`
 	Payments       int       `json:"payments"`
 	Subscriptions  int       `json:"subscriptions"`
+	Documents      int       `json:"documents"`
 	Examples       []Account `json:"exampleAccounts"`
 }
 
@@ -102,7 +103,7 @@ func Preview(date string) (Result, error) {
 	if err != nil || d.Year() < 2000 || d.Year() > 2100 {
 		return Result{}, errors.New("date must be YYYY-MM-DD between 2000 and 2100")
 	}
-	r := Result{Date: date, From: day(d.AddDate(0, 0, -42)), Until: day(d.AddDate(0, 0, 28)), Clubs: 3, Trainers: 15, Administrators: 6, Groups: 30, Children: 600, Families: 450, Parents: 900, Payments: 1800, Subscriptions: 1800}
+	r := Result{Date: date, From: day(d.AddDate(0, 0, -42)), Until: day(d.AddDate(0, 0, 28)), Clubs: 3, Trainers: 15, Administrators: 6, Groups: 30, Children: 600, Families: 450, Parents: 900, Payments: 1800, Subscriptions: 1800, Documents: 480}
 	a := Accounts()
 	r.Examples = []Account{a[0], a[1], a[6], a[8], a[9]}
 	return r, nil
@@ -222,12 +223,15 @@ func Seed(ctx context.Context, pool *pgxpool.Pool, date, password string) (Resul
 					if g/2 == 2 || g/2 == 3 {
 						minAge = 12 + (g%2)*2
 					}
-					birth := anchor.AddDate(-(minAge + (f % 3) + sibling), -(fi % 10), -(fi % 20))
+					birth := anchor.AddDate(-(minAge + (f % 3) + sibling), -(fi%10 + sibling*2), -(fi%20 + sibling*7))
 					l.exec(`INSERT INTO pride.participants(id,full_name,birth_date) VALUES($1,$2,$3::date)`, id("child", ci), childName(fi, sibling), day(birth))
 					l.exec(`INSERT INTO pride.club_memberships(id,participant_id,club_id,joined_on,contact_kind,contact_value,contact_name) VALUES($1,$2,$3,$4::date,'phone',$5,$6)`, mid, id("child", ci), cid, day(from), phone, mother.name)
 					l.exec(`INSERT INTO pride.family_children(family_id,club_id,membership_id) VALUES($1,$2,$3)`, fid, cid, mid)
 					l.exec(`INSERT INTO pride.group_memberships(id,club_id,group_id,club_membership_id,valid_from) VALUES($1,$2,$3,$4,$5::date)`, id("group_member", ci), cid, gid, mid, day(from))
 					l.billing(ci, c, anchor)
+					if ci%5 == 0 {
+						l.documents(ci, c, anchor)
+					}
 					child++
 				}
 			}
@@ -241,7 +245,7 @@ func Seed(ctx context.Context, pool *pgxpool.Pool, date, password string) (Resul
  pride.participants, pride.club_memberships, pride.families, pride.family_children,
  pride.family_access, pride.training_groups, pride.group_memberships,
  pride.schedule_rules, pride.training_sessions, pride.attendance_records,
- pride.billing_plans, pride.payments, pride.subscriptions`)
+ pride.billing_plans, pride.payments, pride.subscriptions, pride.member_documents`)
 	if l.err != nil {
 		return result, l.err
 	}

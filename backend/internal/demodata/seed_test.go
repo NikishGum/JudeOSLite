@@ -16,6 +16,7 @@ import (
 	"github.com/NikishGum/JudeOSLite/backend/internal/auth"
 	"github.com/NikishGum/JudeOSLite/backend/internal/billing"
 	clubapi "github.com/NikishGum/JudeOSLite/backend/internal/clubs"
+	"github.com/NikishGum/JudeOSLite/backend/internal/documents"
 	"github.com/NikishGum/JudeOSLite/backend/internal/families"
 	"github.com/NikishGum/JudeOSLite/backend/internal/reports"
 	"github.com/NikishGum/JudeOSLite/backend/internal/training/attendance"
@@ -158,7 +159,7 @@ func TestSeedIntegration(t *testing.T) {
 		t.Fatalf("alreadyLoaded: %d", loaded)
 	}
 	t.Logf("dataset: sessions=%d closed=%d", seeded.Sessions, seeded.ClosedSessions)
-	for table, want := range map[string]int{"clubs": 4, "staff_users": 922, "staff_club_roles": 21, "participants": 600, "club_memberships": 600, "families": 450, "family_children": 600, "family_access": 900, "training_groups": 30, "group_memberships": 600, "schedule_rules": 30, "billing_plans": 9, "payments": 1800, "subscriptions": 1800} {
+	for table, want := range map[string]int{"clubs": 4, "staff_users": 922, "staff_club_roles": 21, "participants": 600, "club_memberships": 600, "families": 450, "family_children": 600, "family_access": 900, "training_groups": 30, "group_memberships": 600, "schedule_rules": 30, "billing_plans": 9, "payments": 1800, "subscriptions": 1800, "member_documents": 480} {
 		count(t, pool, "SELECT count(*) FROM pride."+table, want)
 	}
 	for c := 0; c < 3; c++ {
@@ -180,6 +181,8 @@ func TestSeedIntegration(t *testing.T) {
 	count(t, pool, `SELECT count(*) FROM (SELECT s.id FROM pride.training_sessions s LEFT JOIN pride.attendance_records a ON a.training_session_id=s.id WHERE s.status IN ('open','closed') GROUP BY s.id HAVING count(a.id)<>20) x`, 0)
 	count(t, pool, `SELECT count(DISTINCT absence_reason) FROM pride.attendance_records`, 3)
 	count(t, pool, `SELECT count(*) FROM pride.attendance_records WHERE state IS NULL`, 36)
+	count(t, pool, `SELECT count(DISTINCT kind) FROM pride.member_documents`, 4)
+	count(t, pool, `SELECT count(*) FROM pride.member_documents WHERE kind='medical' AND expires_on<'2026-10-19'`, 40)
 	count(t, pool, `SELECT count(DISTINCT status) FROM pride.payments`, 3)
 	count(t, pool, `SELECT count(DISTINCT method) FROM pride.payments`, 4)
 	count(t, pool, `SELECT count(*) FROM pride.payments WHERE currency<>'BYN' OR amount_minor NOT IN (8000,11000,14000)`, 0)
@@ -210,7 +213,14 @@ func verifyAPI(t *testing.T, pool *pgxpool.Pool, password string, result Result)
 		t.Fatal(err)
 	}
 	fallback := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { http.NotFound(w, r) })
-	handler := access.Handler(families.New(pool, access).Handler(billing.New(pool, access).Handler(attendance.New(pool, access).Handler(reports.New(pool, access).Handler(clubapi.New(pool, access).Handler(fallback))))))
+	var handler http.Handler = fallback
+	handler = clubapi.New(pool, access).Handler(handler)
+	handler = reports.New(pool, access).Handler(handler)
+	handler = attendance.New(pool, access).Handler(handler)
+	handler = billing.New(pool, access).Handler(handler)
+	handler = families.New(pool, access).Handler(handler)
+	handler = documents.New(pool, access).Handler(handler)
+	handler = access.Handler(handler)
 	call := func(b browser, method, path string, body any, want int) *httptest.ResponseRecorder {
 		t.Helper()
 		raw, _ := json.Marshal(body)
@@ -270,6 +280,22 @@ func verifyAPI(t *testing.T, pool *pgxpool.Pool, password string, result Result)
 	}
 	call(parent, "GET", base+"/member-profiles/"+id("member", 0), nil, 200)
 	call(parent, "GET", base+"/member-profiles/"+id("member", 2), nil, 404)
+	docBase := base + "/participants/" + id("member", 0) + "/documents"
+	w = call(parent, "GET", docBase, nil, 200)
+	var docs struct {
+		Items []documents.MemberDocument `json:"items"`
+	}
+	if e := json.Unmarshal(w.Body.Bytes(), &docs); e != nil || len(docs.Items) != 4 {
+		t.Fatalf("demo documents: %s %v", w.Body.String(), e)
+	}
+	for _, document := range docs.Items {
+		w = call(parent, "GET", docBase+"/"+document.ID+"/download", nil, 200)
+		if w.Header().Get("Content-Type") != "application/pdf" || !bytes.Equal(w.Body.Bytes(), samplePDF()) {
+			t.Fatal("sample PDF differs after download")
+		}
+	}
+	call(trainer, "GET", docBase, nil, 404)
+	call(parent, "GET", base+"/participants/"+id("member", 2)+"/documents", nil, 404)
 	call(parent, "GET", "/api/portal/payments", nil, 200)
 	call(parent, "GET", "/api/portal/subscriptions", nil, 200)
 	call(trainer, "GET", base+"/payments", nil, 404)
