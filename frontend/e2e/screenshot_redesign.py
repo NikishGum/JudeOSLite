@@ -148,7 +148,18 @@ def main():
         go('families');ui.get_by_role('button',name='Семья Ивановых',exact=True).click();heading=ui.get_by_role('dialog').locator('[data-initial-focus]');assert heading.evaluate('e=>getComputedStyle(e).outlineStyle')=='none';ui.keyboard.press('Tab');focused=ui.locator(':focus');assert focused.evaluate('e=>getComputedStyle(e).outlineStyle')!='none' or focused.evaluate('e=>getComputedStyle(e).boxShadow')!='none'
         # Background refresh retains nested editor state; keyboard tabs retain a ring.
         pointer_tab('Доступ родителей');ui.keyboard.press('ArrowLeft');focused=ui.locator(':focus');assert focused.get_attribute('role')=='tab';assert focused.evaluate('e=>getComputedStyle(e).outlineStyle')!='none'
-        pointer_tab('Доступ родителей');ui.get_by_role('button',name='Создать аккаунт',exact=True).click();ui.get_by_label('Логин',exact=False).fill('parent.draft');before=len(fixture.reads);ui.evaluate('window.dispatchEvent(new Event("focus"))');ui.wait_for_load_state('networkidle');assert len(fixture.reads)>before;expect(ui.get_by_label('Логин',exact=False)).to_have_value('parent.draft')
+        pointer_tab('Доступ родителей');ui.get_by_role('button',name='Создать аккаунт',exact=True).click();ui.get_by_label('Логин',exact=False).fill('parent.draft')
+        # A pre-existing networkidle does not establish that focus started a read.
+        # Foreground the page, then await this family's new response explicitly.
+        ui.bring_to_front()
+        ui.wait_for_function('document.visibilityState === "visible"')
+        wait_for_api_idle(ui)
+        before=len(fixture.reads)
+        with ui.expect_response(lambda response: response.request.method=='GET' and urlparse(response.url).path==f'/api/clubs/{CLUB}/families/{FAMILY}' and response.status==200):
+            ui.evaluate('window.dispatchEvent(new Event("focus"))')
+        wait_for_api_idle(ui)
+        assert len(fixture.reads)>before
+        expect(ui.get_by_label('Логин',exact=False)).to_have_value('parent.draft')
         close_context()
         ctx,ui,fixture=setup('parent');go('families');capture('parent-family');assert ui.get_by_label('Филиал',exact=True).count()==0;assert ui.get_by_role('button',name='Добавить семью',exact=True).count()==0;go('payments');capture('parent-payments');expect(ui.get_by_role('button',name='Оплатить онлайн',exact=True)).to_be_disabled()
         # Same-club access keys stay unchanged: remove A while family B remains.
