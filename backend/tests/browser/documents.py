@@ -76,7 +76,7 @@ try:
     else:
         raise AssertionError(cmd('docker','logs',APP))
     with sync_playwright() as p:
-        chromium_path = os.environ.get('CHROMIUM_PATH') or ('/usr/bin/chromium' if Path('/usr/bin/chromium').exists() else None)
+        chromium_path = os.environ.get('CHROMIUM_PATH')
         browser = getattr(p, ENGINE).launch(headless=True, executable_path=chromium_path if ENGINE == 'chromium' else None)
         context = browser.new_context(service_workers='block')
         page = context.new_page()
