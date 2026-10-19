@@ -55,14 +55,14 @@
 #16 DONE 1.0s
 
 #17 [frontend 7/7] RUN npm run build
-#17 1.546 
+#17 1.546
 #17 1.546 > judeoslite-frontend@0.1.0 build
 #17 1.546 > npm run typecheck && vite build
-#17 1.546 
-#17 1.675 
+#17 1.546
+#17 1.675
 #17 1.675 > judeoslite-frontend@0.1.0 typecheck
 #17 1.675 > tsc --noEmit
-#17 1.675 
+#17 1.675
 #17 3.903 vite v8.3.4 building client environment for production...
 #17 3.913 transforming...
 #17 5.098 ✓ 2460 modules transformed.
@@ -81,7 +81,7 @@
 #17 5.424 dist/assets/calendar-Di5AVyIh.js                70.33 kB │ gzip:  20.62 kB
 #17 5.424 dist/assets/ui-vendor-CNKO1Slx.js              158.57 kB │ gzip:  53.68 kB
 #17 5.424 dist/assets/index-XWciH2D4.js                  493.13 kB │ gzip: 133.74 kB
-#17 5.424 
+#17 5.424
 #17 5.434 ✓ built in 1.53s
 #17 DONE 5.5s
 
