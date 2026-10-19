@@ -21,6 +21,7 @@ import (
 	"github.com/NikishGum/JudeOSLite/backend/internal/dashboard"
 	"github.com/NikishGum/JudeOSLite/backend/internal/documents"
 	"github.com/NikishGum/JudeOSLite/backend/internal/families"
+	"github.com/NikishGum/JudeOSLite/backend/internal/notifications"
 	"github.com/NikishGum/JudeOSLite/backend/internal/participants"
 	"github.com/NikishGum/JudeOSLite/backend/internal/platform"
 	"github.com/NikishGum/JudeOSLite/backend/internal/reports"
@@ -79,6 +80,7 @@ func run() error {
 	handler = billing.New(pool, authService).Handler(handler)
 	handler = families.New(pool, authService).Handler(handler)
 	handler = documents.New(pool, authService).Handler(handler)
+	handler = notifications.New(pool, authService).Handler(handler)
 	handler = corrections.New(pool, authService).Handler(handler)
 	handler = audit.New(pool, authService).Handler(handler)
 	handler = reports.New(pool, authService).Handler(handler)
