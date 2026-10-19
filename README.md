@@ -36,6 +36,8 @@ docker compose --env-file deploy/.env -f deploy/compose.yml down
 
 `down` сохраняет БД. Не добавляйте `--volumes` к остановке рабочей системы. Пример пароля предназначен только для локальной разработки. На VPS задайте отдельные секреты вне Git; приложение слушает localhost, HTTPS-прокси и реальное развёртывание входят в V1-17.
 
+Реалистичное демо-наполнение: [3 филиала, сотрудники,600 детей, семьи, расписание и оплаты](docs/demo-data.md). Загрузка отдельной командой `seed-demo --apply`, с защитой от повторов.
+
 ## Разработка с Go и Vite на хосте
 
 Нужны Go 1.27.2 и Node 24.19.0 (`.nvmrc`). Команды из корня:
@@ -68,7 +70,7 @@ cd frontend && npm ci && npm run build
 cd ../backend
 go vet ./...
 go test -race ./...
-go build ./cmd/server ./cmd/migrate ./cmd/create-owner
+go build ./cmd/server ./cmd/migrate ./cmd/create-owner ./cmd/seed-demo
 ```
 
 Origin, защищённые cookie, bootstrap и API — [auth-v1.md](docs/auth-v1.md). Для Go-статики на :8080 задайте APP_ORIGIN=http://localhost:8080. На HTTPS используйте рабочий origin и AUTH_INSECURE_LOCAL=false.

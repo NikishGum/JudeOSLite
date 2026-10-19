@@ -19,7 +19,8 @@ RUN --mount=type=secret,id=proxy_ca \
 COPY backend/ ./
 RUN CGO_ENABLED=0 go build -trimpath -o /out/server ./cmd/server && \
     CGO_ENABLED=0 go build -trimpath -o /out/migrate ./cmd/migrate && \
-    CGO_ENABLED=0 go build -trimpath -o /out/create-owner ./cmd/create-owner
+    CGO_ENABLED=0 go build -trimpath -o /out/create-owner ./cmd/create-owner && \
+    CGO_ENABLED=0 go build -trimpath -o /out/seed-demo ./cmd/seed-demo
 
 FROM debian:bookworm-slim
 ARG APP_REVISION=development
@@ -27,7 +28,7 @@ LABEL org.opencontainers.image.source="https://github.com/NikishGum/JudeOSLite" 
       org.opencontainers.image.revision="$APP_REVISION"
 COPY --from=backend /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=frontend /src/frontend/dist /app/static
-COPY --from=backend /out/server /out/migrate /out/create-owner /app/
+COPY --from=backend /out/server /out/migrate /out/create-owner /out/seed-demo /app/
 RUN printf '{"sha":"%s"}\n' "$APP_REVISION" > /app/static/release.json
 WORKDIR /app
 ENV HTTP_ADDR=:8080 STATIC_DIR=/app/static
