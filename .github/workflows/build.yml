@@ -55,6 +55,8 @@ jobs:
           python3 -m playwright install --with-deps chromium webkit
           python3 backend/tests/browser/billing.py
           PWA_BROWSER=webkit python3 backend/tests/browser/billing.py
+          python3 backend/tests/browser/documents.py
+          PWA_BROWSER=webkit python3 backend/tests/browser/documents.py
           python3 backend/tests/browser/families.py
           PWA_BROWSER=webkit python3 backend/tests/browser/families.py
           python3 frontend/e2e/pwa_v1.py

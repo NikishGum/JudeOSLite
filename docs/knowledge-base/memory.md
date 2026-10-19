@@ -674,3 +674,35 @@ families.LockMemberReader с живыми семейными блокировк�
 семья даже для parent+staff. События audit готовы для #204, его уведомления здесь
 не создаются. Frontend #200 и области #203/#204 не меняются. Точные CI/main/
 Deploy/Done проверять в live issue; датированная память не резервирует #203.
+
+## Приватные документы RD-11 —19.10.2026
+
+По поручению #203, StarMadeGalaxy, acquired=true/request0e8fdd96e70d423eaee814e26e532f9a,
+[run39257914661](https://github.com/NikishGum/JudeOSLite/actions/runs/39257914661).
+[Контракт/проверки](../backend-documents.md). Одна bytea-таблица0013, FK по club/membership;
+только private JSON metadata и отдельный binary attachment, без static/uploads
+или публичной ссылки.
+Magic PDF/PNG/JPEG, файл5МиБ/JSON7МиБ; инженерные квоты20 файлов/25МиБ на карточку,
+проверка под membership lock. Owner/admin пишут, явная семья читает; каждый download
+повторяет families.LockMemberReader с живыми session/role/links. CSRF/версии,
+физическое delete и минимальный audit атомарны; без title/kind/filename/expiry/content
+в истории. Родитель/тренер не получают writer права. Посещаемость не меняется.
+
+#202 подтвердил разделение main.go/build.yml; его настоящая0012 и billing сохранены
+при обновлении от mainf55b086 (PR207). Runner требует непрерывность0012→0013;
+фиктивные миграции/ослабление Check не применялись. Предварительный совместный
+Go/vet/race/PG18.6 и docs Chromium154/WebKit26.5, полный PWA обоих движков PASS.
+Штатный source после mainf55b086 также прошёл полный Go/vet/race/PG и docs
+Chromium151.0.7922.34/WebKit26.5, production Docker build. Новый harness использует
+закреплённый Playwright browser; CHROMIUM_PATH только явный override.
+Окончательные SHA/CI/main/Deploy/Done — live #203, эта запись не заменяет очередь.
+#188/физические устройства и пользовательская приёмка не закрываются по этим тестам.
+
+CI RD-11: d57b1ae PR39264454781 PASS, push39264328305 FAIL в synthetic
+screenshot_redesign.py:151 (counter после focus/networkidle). Тот же FAIL
+воспроизведён локально. В рамках проверки исправлен только e2e harness:
+foreground/visible и новый GET200 выбранной семьи перед прежними counter/draft
+assertions; без retries/новых timeout и product frontend/src изменений.
+Область/patch заранее опубликованы в #202; перед правкой #200/#202 CLOSED,
+конкурирующих PR нет. Точная исправленная копия прошла22 groups Chromium151/
+WebKit26.5. Исходный FAIL сохранён; новые CI/SHA — live #203/PR209.
