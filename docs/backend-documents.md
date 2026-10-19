@@ -138,3 +138,24 @@ browser cache; PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1 пропускает
 проверку пакетов хоста. CI использует штатный install --with-deps. Реальные
 устройства, физическая установка, приёмка сотрудников #188 и персональные данные
 стенда здесь не проверялись/не менялись.
+
+### Стабилизация focus-refresh проверки
+
+Push CI39264328305 attempt1/d57b1ae прошёл весь настоящий browser→Go→PG блок и
+остановился в старом synthetic screenshot_redesign.py:151: reads counter после
+focus/networkidle не увеличился. Парный PR CI39264454781 того же d57b1ae прошёл
+полностью. Исходный synthetic harness локально воспроизвёл тот же FAIL.
+
+Исправлена только подготовка и ожидание в frontend/e2e/screenshot_redesign.py:
+страница foreground/visible, затем явное ожидание нового GET200 выбранной семьи,
+после него прежние assertions роста counter и сохранённого parent.draft. Нынешний
+networkidle не доказывал нового чтения. Таймауты/retry не добавлялись, прежние
+проверки не снимались. Внешняя точная копия нового harness прошла все22 screen/state
+groups в Chromium151/WebKit26.5 до изменения tracked файла. Это synthetic
+frontend-контроль, не замена реальных серверных тестов документов.
+
+Область и точный patch опубликованы в #202 до изменения (комментарии6269247294,
+6269277257,6269359277); product frontend/src, auth и billing не менялись. Перед
+применением #200/#202 CLOSED, единственный открытый PR —#209, новых параллельных
+правок этого файла не заявлено. Окно доставки #202 завершено с mainf55b086,
+Build39263741407 attempt2/Deploy39267207286 SUCCESS и точным HTTPS release SHA.

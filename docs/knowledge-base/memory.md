@@ -684,3 +684,12 @@ Chromium151.0.7922.34/WebKit26.5, production Docker build. Новый harness и
 закреплённый Playwright browser; CHROMIUM_PATH только явный override.
 Окончательные SHA/CI/main/Deploy/Done — live #203, эта запись не заменяет очередь.
 #188/физические устройства и пользовательская приёмка не закрываются по этим тестам.
+
+CI RD-11: d57b1ae PR39264454781 PASS, push39264328305 FAIL в synthetic
+screenshot_redesign.py:151 (counter после focus/networkidle). Тот же FAIL
+воспроизведён локально. В рамках проверки исправлен только e2e harness:
+foreground/visible и новый GET200 выбранной семьи перед прежними counter/draft
+assertions; без retries/новых timeout и product frontend/src изменений.
+Область/patch заранее опубликованы в #202; перед правкой #200/#202 CLOSED,
+конкурирующих PR нет. Точная исправленная копия прошла22 groups Chromium151/
+WebKit26.5. Исходный FAIL сохранён; новые CI/SHA — live #203/PR209.
