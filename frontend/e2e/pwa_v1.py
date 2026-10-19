@@ -106,7 +106,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
         else:
             raise AssertionError(command('docker', 'logs', APP))
         with sync_playwright() as p:
-            path = (os.environ.get('CHROMIUM_PATH') or ('/usr/bin/chromium' if Path('/usr/bin/chromium').exists() else None)) if ENGINE == 'chromium' else None
+            path = os.environ.get('CHROMIUM_PATH') if ENGINE == 'chromium' else None
             browser_type = getattr(p, ENGINE)
             browser = browser_type.launch(headless=True, executable_path=path)
             errors = []

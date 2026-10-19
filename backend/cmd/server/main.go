@@ -16,6 +16,7 @@ import (
 
 	"github.com/NikishGum/JudeOSLite/backend/internal/audit"
 	"github.com/NikishGum/JudeOSLite/backend/internal/auth"
+	"github.com/NikishGum/JudeOSLite/backend/internal/billing"
 	"github.com/NikishGum/JudeOSLite/backend/internal/clubs"
 	"github.com/NikishGum/JudeOSLite/backend/internal/dashboard"
 	"github.com/NikishGum/JudeOSLite/backend/internal/families"
@@ -74,6 +75,7 @@ func run() error {
 		return err
 	}
 	scheduleService := schedule.New(pool, authService)
+	handler = billing.New(pool, authService).Handler(handler)
 	handler = families.New(pool, authService).Handler(handler)
 	handler = corrections.New(pool, authService).Handler(handler)
 	handler = audit.New(pool, authService).Handler(handler)

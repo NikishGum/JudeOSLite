@@ -1,5 +1,19 @@
 # Краткая память PRIDE CRM
 
+## Воспроизводимость UI CI — 19.10.2026
+
+По скриншоту заказчика проверен красный main30577ff: run39256443467 attempt1
+остановился на screenshot календаря; attempt2 прошёл календарь/оба PWA, но поймал
+WebKit training login с пустым логином. Причина первого screenshot timeout не
+установлена. [Протокол](../ci-browser-checks.md) сохраняет оба исходных результата.
+Текущие четыре UI suites используют Chromium установленного Playwright по
+умолчанию (runner иначе подставлял155 вместо151); явный CHROMIUM_PATH сохранён.
+Training/reports/dashboard ожидают начальное чтение сессии и API idle до ввода,
+проверяют значение логина перед submit и завершение запросов после входа.
+Продуктовые auth/UI/backend и assertions не ослаблены; retry/новых таймаутов нет.
+#202 остаётся отдельной занятой задачей; iPay не подключается. Итог CI/main
+проверять live, локальные PWA/браузерные fixtures не заменяют приёмку #188.
+
 ## Скриншоты PRIDE CLUB OS и параллельный backend — 19.10.2026
 
 Во время завершения frontend коллега доставил backend семей через PR #205,
@@ -628,3 +642,22 @@ CI f64aacf: PR run39246544367 PASS; два push failures старых fixtures �
 и видимость наблюдающей страницы перед событием; dashboard перед полным goto
 дожидается запросов предыдущей страницы. Это только e2e harness, все прежние
 assertions сохранены; область опубликована в #200 до изменения, frontend/src не менялся.
+
+
+## Ручные финансы RD-10 —19.10.2026
+
+Прямое поручение #202 разрешает ручные финансы после #201; прежний запрет
+финансов/родителей относится к первоначальному v1, не к этому этапу. iPay
+не подключать. NikishGum, claim722c3b23f6e64ae9b564923c9103ae40,
+run39257237627 acquired=true; основа30577ff, codex/rd-10-billing.
+[Поведение/приёмка](../backend-billing.md), [контракт](../backend-contracts/README.md).
+0012: целые копейки BYN, pending/paid/void, requestId+JSONB/конкурентная
+идемпотентность, version/audit, snapshot name/visits/days, исключающие интервалы
+с PostgreSQL exclusion; pending также резервирует даты до void. Used вычисляется
+по closed present и сохранённому timezone занятия, коррекции видны при чтении.
+Summary/фильтры from/until включительно; paid по paidOn, pending по локальной
+createdAt, void исключён. Чтения REPEATABLE READ, существующий auth и
+families.LockMemberReader с живыми семейными блокировками; portal только явная
+семья даже для parent+staff. События audit готовы для #204, его уведомления здесь
+не создаются. Frontend #200 и области #203/#204 не меняются. Точные CI/main/
+Deploy/Done проверять в live issue; датированная память не резервирует #203.
