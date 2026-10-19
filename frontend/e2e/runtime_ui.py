@@ -9,6 +9,12 @@ def observe_api(page):
     state = {'pending': set(), 'changed': time.monotonic()}
     page.pride_api_state = state
     def started(request):
+        # Requests abandoned with the old document may never emit a terminal
+        # event. A real navigation starts a new observation generation.
+        # SPA history changes do not issue a navigation request.
+        if request.is_navigation_request() and request.frame == page.main_frame:
+            state['pending'].clear()
+            state['changed'] = time.monotonic()
         if '/api/' in request.url and request.resource_type in ('fetch', 'xhr'):
             state['pending'].add(request)
             state['changed'] = time.monotonic()
