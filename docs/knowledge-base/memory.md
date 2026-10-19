@@ -592,3 +592,20 @@ RD-07 cloud verification18.10: production build/image, Go vet/race+PG,14 claim t
 docs/shadcn-runtime-validation.md и .impeccable/review/shadcn-runtime/results.json.
 Impeccable detector один раз[], review solefix sticky44px topclose resolved/ship;
 DESIGN/sidecar обновлены. Это не physical/HTTPS/сотрудники PASS и не закрытие #188.
+
+## Семьи и родители RD-09 —19.10.2026
+
+По поручению #201: NikishGum, claim e99062df12724daea11fc2d400868310,
+run39244310462 acquired=true; основа cf0948f, codex/rd-09-families.
+[Реализация/приёмка](../backend-families.md), [общий контракт](../backend-contracts/README.md).
+0011 —только явные семьи/дети/family_access, без слияния по телефону/ФИО.
+Один staff_users/staff_sessions, user.isParent и parent discovery; RequireClub
+сохраняет staff-only права. Новый families.LockMemberReader проверяет конкретный
+membership и живую сессию/роль/семейную связь в транзакции; использовать в #202/#203.
+Unlink/revoke немедленно закрывают будущие чтения, reset отзывает сессии.
+Revoke не снимает staff-роли. Общий staff/owner/межклубный parent аккаунт
+сбрасывает только owner; старый trainer identity API также защищён от захвата
+родительского доступа локальным admin. Занятый login409 не связывает существующую
+личность. Family audit содержит только IDs/version, без PII/password.
+Frontend #200 принадлежит параллельному исполнителю, не меняется в #201.
+Точные результаты/main/CI/Done проверять по live issue, не по этой записи.

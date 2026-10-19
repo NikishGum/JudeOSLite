@@ -122,7 +122,7 @@ func (s *Service) listTrainers(w http.ResponseWriter, r *http.Request) {
 		jsonResponse(w, 200, result)
 		return
 	}
-	rows, err := s.pool.Query(r.Context(), `SELECT `+trainerColumns+`, $2 OR (NOT u.is_owner AND (SELECT count(*) FROM pride.staff_club_roles x WHERE x.staff_user_id=u.id)=1) FROM pride.staff_users u WHERE EXISTS(SELECT 1 FROM pride.staff_club_roles r WHERE r.staff_user_id=u.id AND r.club_id::text=$1 AND r.role='trainer') AND NOT u.is_owner ORDER BY u.display_name,u.id`, clubID, owner)
+	rows, err := s.pool.Query(r.Context(), `SELECT `+trainerColumns+`, $2 OR (NOT u.is_owner AND (SELECT count(*) FROM pride.staff_club_roles x WHERE x.staff_user_id=u.id)=1 AND NOT EXISTS(SELECT 1 FROM pride.family_access a WHERE a.user_id=u.id)) FROM pride.staff_users u WHERE EXISTS(SELECT 1 FROM pride.staff_club_roles r WHERE r.staff_user_id=u.id AND r.club_id::text=$1 AND r.role='trainer') AND NOT u.is_owner ORDER BY u.display_name,u.id`, clubID, owner)
 	if err != nil {
 		trainerFail(w, err)
 		return
@@ -304,7 +304,11 @@ func lockTrainer(ctx context.Context, tx pgx.Tx, id, clubID string, owner bool, 
 	if err = tx.QueryRow(ctx, `SELECT count(*) FROM pride.staff_club_roles WHERE staff_user_id=$1`, u.ID).Scan(&count); err != nil {
 		return u, err
 	}
-	u.CanManageAccount = owner || (clubID != "" && count == 1)
+	var parent bool
+	if err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM pride.family_access WHERE user_id=$1)`, u.ID).Scan(&parent); err != nil {
+		return u, err
+	}
+	u.CanManageAccount = owner || (clubID != "" && count == 1 && !parent)
 	if account && !u.CanManageAccount {
 		return u, errTrainerOwner
 	}
