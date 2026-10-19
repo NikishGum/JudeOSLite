@@ -1,4 +1,4 @@
-from runtime_ui import settle_shell, assert_page_targets
+from runtime_ui import settle_shell, assert_page_targets, observe_api, wait_for_api_idle
 from runtime_ui import signout
 """Disposable UI -> Go -> PostgreSQL PWA/browser QA; docs/testing-v1.md."""
 import json
@@ -113,6 +113,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             contrast_floor = {4.5: float('inf'), 3: float('inf')}
             def page(context):
                 value = context.new_page()
+                observe_api(value)
                 value.pwa_api_events = []
                 def page_error(error):
                     errors.append(str(error))
@@ -129,12 +130,14 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                     value.goto(ROOT)
                 # Settle the initial auth read before typing into controlled fields.
                 value.wait_for_load_state('networkidle')
+                wait_for_api_idle(value)
                 value.get_by_label('Логин', exact=True).fill(login)
                 value.get_by_label('Пароль', exact=True).fill(PASSWORD)
                 expect(value.get_by_label('Логин', exact=True)).to_have_value(login)
                 value.get_by_role('button', name='Войти', exact=True).click()
                 expect(value.get_by_role('button', name='Меню профиля', exact=True)).to_be_visible()
                 value.wait_for_load_state('networkidle')
+                wait_for_api_idle(value)
             def api(value, method, path, data=None):
                 result = value.evaluate('''async ([method,path,data]) => {
                   const me = await (await fetch('/api/auth/me', {cache:'no-store'})).json();
@@ -748,6 +751,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             expect(tp.locator('.session-journal')).to_have_count(0)
             signin(tp, 'admin')
             expect(tp.locator('.trainer-sessions')).to_have_count(0)
+            wait_for_api_idle(tp)
             tp.reload(); expect(tp.locator('.trainer-sessions')).to_have_count(0)
             if ENGINE == 'chromium':
                 expect(tp.locator('.account')).to_contain_text('Synthetic Admin')

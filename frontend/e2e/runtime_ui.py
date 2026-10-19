@@ -1,4 +1,38 @@
 """Actions moved into the real profile menu by the approved shadcn shell."""
+import time
+
+
+def observe_api(page):
+    """Track SPA reads as well as initial-document network activity."""
+    if hasattr(page, 'pride_api_state'):
+        return
+    state = {'pending': set(), 'changed': time.monotonic()}
+    page.pride_api_state = state
+    def started(request):
+        if '/api/' in request.url and request.resource_type in ('fetch', 'xhr'):
+            state['pending'].add(request)
+            state['changed'] = time.monotonic()
+    def finished(request):
+        if request in state['pending']:
+            state['pending'].discard(request)
+            state['changed'] = time.monotonic()
+    page.on('request', started)
+    page.on('requestfinished', finished)
+    page.on('requestfailed', finished)
+
+
+def wait_for_api_idle(page, timeout=15):
+    # load_state('networkidle') may already have fired before a later SPA fetch.
+    # Require observed requests to finish and a quiet renderer turn before teardown.
+    state = page.pride_api_state
+    start = time.monotonic()
+    while time.monotonic() - start < timeout:
+        if not state['pending'] and time.monotonic() - max(start, state['changed']) >= .2:
+            return
+        page.wait_for_timeout(25)
+    raise AssertionError(('API did not settle', [r.url.split('?')[0] for r in state['pending']]))
+
+
 def signout(page):
     page.get_by_role('button', name='Меню профиля', exact=True).click()
     page.get_by_role('menuitem', name='Выйти', exact=True).click()

@@ -9,6 +9,7 @@ from urllib.parse import urlparse, parse_qs
 from zoneinfo import ZoneInfo
 from playwright.sync_api import sync_playwright, expect
 from redesign_accessibility import contrast_audit
+from runtime_ui import observe_api, wait_for_api_idle
 
 ROOT = os.environ.get('RD08_ROOT', 'http://127.0.0.1:4173')
 ENGINE = os.environ.get('PWA_BROWSER', 'chromium')
@@ -104,15 +105,15 @@ def main():
     with sync_playwright() as p:
         browser=getattr(p,ENGINE).launch()
         def setup(role='owner',motion='reduce'):
-            fixture=Fixture(role);context=browser.new_context(viewport={'width':1440,'height':1000},reduced_motion=motion,service_workers='block',accept_downloads=True);context.add_init_script('delete Navigator.prototype.serviceWorker');context.route('**/api/**',fixture.route);page=context.new_page();page.on('pageerror',lambda error:errors.append(str(error)));return context,page,fixture
+            fixture=Fixture(role);context=browser.new_context(viewport={'width':1440,'height':1000},reduced_motion=motion,service_workers='block',accept_downloads=True);context.add_init_script('delete Navigator.prototype.serviceWorker');context.route('**/api/**',fixture.route);page=context.new_page();observe_api(page);page.on('pageerror',lambda error:errors.append(str(error)));return context,page,fixture
         ctx,ui,fixture=setup()
         def go(section):
             # Commands can close their editor before their refresh requests finish.
             # Settle those reads before replacing the document (WebKit reports
             # cancelled intercepted requests as access-control page errors).
-            ui.wait_for_load_state('networkidle');ui.goto(f'{ROOT}/clubs/{CLUB}/{section}');expect(ui.locator('main h1')).to_be_visible();ui.wait_for_load_state('networkidle')
+            wait_for_api_idle(ui);ui.goto(f'{ROOT}/clubs/{CLUB}/{section}');expect(ui.locator('main h1')).to_be_visible();ui.wait_for_load_state('networkidle');wait_for_api_idle(ui)
         def close_context():
-            ui.wait_for_load_state('networkidle');ctx.close()
+            wait_for_api_idle(ui);ctx.close()
         def capture(name,widths=(1440,390,320)):
             for width in widths:
                 ui.set_viewport_size({'width':width,'height':1000 if width>767 else 844});ui.wait_for_load_state('networkidle');ui.evaluate('document.fonts.ready');ui.mouse.move(0,0)
@@ -122,7 +123,7 @@ def main():
                 if os.environ.get('RD08_CAPTURE')=='1':ui.screenshot(path=str(OUT/f'{name}-{width}.png'),full_page=False)
                 assert ui.evaluate('document.documentElement.scrollWidth<=innerWidth'),(name,width,overflow)
                 audit=contrast_audit(ui);assert not audit['failures'],(name,width,audit['failures'])
-            results.append(name);ui.set_viewport_size({'width':1440,'height':1000});ui.wait_for_load_state('networkidle')
+            results.append(name);ui.set_viewport_size({'width':1440,'height':1000});wait_for_api_idle(ui)
         def pointer_tab(label):
             trigger=ui.get_by_role('tab',name=label,exact=True);trigger.click()
             assert trigger.evaluate('e=>getComputedStyle(e).outlineStyle')=='none',(label,'pointer focus rectangle')
