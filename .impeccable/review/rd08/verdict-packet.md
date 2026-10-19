@@ -1,0 +1,10 @@
+# RD-08 verdict packet — only the three findings
+
+One correction batch applied to the three findings in review.md.
+1. useResource revalidates on focus/visibility/30s visible timer, aborts older reads, preserves same-scope data/forms during background requests, clears denied/gone data. Families stops rendering an open parent member if it disappears from accessible families. Contract test gives parent two families in same club, opens A, removes A plus denies A member endpoint without altering auth/me role keys, dispatches focus: A card and dialog disappear, B stays. Nested account form draft survives successful background fetch.
+2. TabsTrigger records pointer activation, suppresses outline only while that pointer focus remains; blur/key events restore keyboard focus. Both engines assert no outline immediately after mouse activation on document/payment/finance tabs, and visible outline after ArrowLeft on tabs.
+3. TabsList reveals its active trigger with local horizontal scroll after selection and ResizeObserver events; no document scroll. Both engines assert selected Documents fits inside tablist at1440,390,320.
+
+Inspect affected plans-1440.png, finance-report-1440.png, member-Документы-390.png and member-Документы-320.png; hashes in screenshots.json. Other required captures are refreshed from same Chromium contract run. chromium-contracts.json / webkit-contracts.json and logs/*contract-verdict.log both PASS22 groups zero pageerrors. Test source frontend/e2e/screenshot_redesign.py. No other defect hunt or second detector.
+
+WebKit training real Go/Postgres now PASS (logs/webkit-training-final.log). WebKit PWA full suite is still running, not asserted PASS. Detector unavailable127 and original attachment/pixel-comparison limits remain. Documenter updating DESIGN.md/.impeccable/design.json in parallel under authorized screenshot adaptation. Return a verdict table scoring only the three findings, exact scope, no whole-app recertification. Write verdict.md here; do not edit code.

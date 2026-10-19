@@ -1,0 +1,89 @@
+{
+  "provenance": "Synthetic API responses in frontend/e2e/screenshot_redesign.py; not production club data, not backend acceptance. User reference images are chat attachments, not locally available.",
+  "files": [
+    {
+      "path": "home-1440.png",
+      "sha256": "c8270f24575296d12da341d28cd58b9be77bf691db066d3e55923445ec0c6836"
+    },
+    {
+      "path": "home-390.png",
+      "sha256": "06e915bbeb67f6251137a3da07035571a074706937d394aa604b861e61eee285"
+    },
+    {
+      "path": "families-1440.png",
+      "sha256": "a46c2eb3faeb1202e74b936448086556bdb96a7b99d24f5f63b6dce7d121f223"
+    },
+    {
+      "path": "families-390.png",
+      "sha256": "f7c713df1146ba0dbcf5472b976846721c75d3c24faddf953782e54c09822a18"
+    },
+    {
+      "path": "family-1440.png",
+      "sha256": "725f3fe8b15837c697c7350b7668096f899dbdff7d915e3681c6c4acff230aec"
+    },
+    {
+      "path": "member-1440.png",
+      "sha256": "c45852bd41163ecf1a9098c695e5fb4ee1f84e2824ca1d711af79f35fa1e32d5"
+    },
+    {
+      "path": "member-Документы-390.png",
+      "sha256": "3464c3b18e44f819a4545a1ac5890082525832dca463c696dddeffcd6bb79322"
+    },
+    {
+      "path": "payments-1440.png",
+      "sha256": "735cb5c0853f0a15b63f8a4928d2d33221a78915aa0bdabb7beccc63532e28e0"
+    },
+    {
+      "path": "payments-390.png",
+      "sha256": "8fac26107f8940b85e9b92ff7434cfc6140ec4492f78a0ac4f970b18d5557747"
+    },
+    {
+      "path": "payment-editor-390.png",
+      "sha256": "a15cb3d5b5b7d44765acad45cff5a65935b54fd87ca840fcab1e7ce75216060d"
+    },
+    {
+      "path": "plans-1440.png",
+      "sha256": "64d4459c5c950726239e168af73d9207856da8b42ccb23832894349ebef81412"
+    },
+    {
+      "path": "notifications-1440.png",
+      "sha256": "2ff209f996175935bb563efc840d073a0c1cbd8fc8271511a1921a5edc961612"
+    },
+    {
+      "path": "notifications-390.png",
+      "sha256": "bc849c72559bf2d399687e8e8c740f4de0f5c00d7bb207b1e50e4263e26868c4"
+    },
+    {
+      "path": "settings-320.png",
+      "sha256": "eb2f0e7a27f013c792247ab8a722141aa5942a6fb9b3598dcddb287e890752d1"
+    },
+    {
+      "path": "parent-family-390.png",
+      "sha256": "112b6f4573daf61d122eb003d523fe50af2f3ebb2d90cd8ffdefbb88811c4ed5"
+    },
+    {
+      "path": "parent-payments-390.png",
+      "sha256": "be6bbbd32a59f84b70c7b50e2eadb95f75bcb04c52bd867a72f64dfa3fff4990"
+    },
+    {
+      "path": "attendance-390.png",
+      "sha256": "2c0695df67114353e225c4bb7159803d6560a84f0bb1243b44ffc52a3997e430"
+    },
+    {
+      "path": "journal-complete-390.png",
+      "sha256": "5d03e9b170f9775f8bcaca46300bd9c0af46e1dcd3fdc895950662cff18d155e"
+    },
+    {
+      "path": "unavailable-320.png",
+      "sha256": "89e07c20015144555133daf7133a050862293c16d403338827b6a1a6b63ff649"
+    },
+    {
+      "path": "finance-report-1440.png",
+      "sha256": "44e03f8d6897de3d40499a8fbb60ef48f6f908e75d75317575d50db6b95751bd"
+    },
+    {
+      "path": "member-Документы-320.png",
+      "sha256": "564c735ef7da40f2594b71d8a1f05fff13fd0daa8d363f9f230343870224087a"
+    }
+  ]
+}

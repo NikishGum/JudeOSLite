@@ -1,0 +1,36 @@
+{
+  "engine": "webkit",
+  "source": "synthetic contract fixtures; not backend acceptance",
+  "screens": [
+    "home",
+    "families",
+    "family",
+    "member",
+    "member-Группы",
+    "member-Посещения",
+    "member-Платежи",
+    "member-Документы",
+    "payments",
+    "subscriptions",
+    "plans",
+    "payment-editor",
+    "finance-report",
+    "profile",
+    "notifications",
+    "settings",
+    "sessions",
+    "unavailable",
+    "parent-family",
+    "parent-payments",
+    "attendance",
+    "journal-complete"
+  ],
+  "mutationsChecked": [
+    "moneyMinor",
+    "requestId retry",
+    "document upload/download URL (binary backend deferred)",
+    "read-all",
+    "attendance next/complete"
+  ],
+  "pageErrors": []
+}

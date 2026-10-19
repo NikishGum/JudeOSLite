@@ -8,6 +8,8 @@ import { RecentChanges } from './RecentChanges';
 import { calendarDate, sessionTime, type Mode, type Panel, type Session } from './types';
 import { useReadBlock } from './useReadBlock';
 import './dashboard.css';
+import { BookOpenCheck, CalendarDays, Plus, RefreshCw, Users, UsersRound } from 'lucide-react';
+import { FinanceSummary } from '../club-workspace/Payments';
 
 const href = (session: Session) => sessionHref(session.clubId, { sessionId: session.id, groupId: session.groupId, from: session.date, through: session.date, view: 'day', journal: session.canMark ? 'trainer' : 'admin' });
 const action = (session: Session) => session.canMark && session.status === 'open' ? 'Продолжить отметки' : session.status === 'open' ? 'Открыть журнал' : 'Открыть занятие';
@@ -38,10 +40,10 @@ function NextSession({ panel }: { panel: Panel }) {
   </section>;
 }
 function Counters({ panel }: { panel: Panel }) {
-  const fields = [ ...(panel.counters.participants === null ? [] : [{ key: 'participants', label: 'Активные участники', value: panel.counters.participants }]),
-    { key: 'groups', label: panel.mode === 'trainer' ? 'Назначенные группы' : 'Активные группы', value: panel.counters.groups },
-    { key: 'today', label: 'Занятия сегодня', value: panel.counters.today }, { key: 'open', label: 'Открытые журналы', value: panel.counters.open } ];
-  return <dl className="dashboard-counters" aria-label="Показатели главной">{fields.map((field) => <div key={field.key}><dt>{field.label}</dt><dd data-counter={field.key}>{field.value}</dd></div>)}</dl>;
+  const fields = [ ...(panel.counters.participants === null ? [] : [{ key: 'participants', label: 'Активные участники', value: panel.counters.participants, icon: Users }]),
+    { key: 'groups', label: panel.mode === 'trainer' ? 'Назначенные группы' : 'Активные группы', value: panel.counters.groups, icon: UsersRound },
+    { key: 'today', label: 'Занятия сегодня', value: panel.counters.today, icon: CalendarDays }, { key: 'open', label: 'Открытые журналы', value: panel.counters.open, icon: BookOpenCheck } ];
+  return <dl className="dashboard-counters" aria-label="Показатели главной">{fields.map((field) => <div key={field.key}><dt><field.icon aria-hidden="true" />{field.label}</dt><dd data-counter={field.key}>{field.value}</dd></div>)}</dl>;
 }
 function SessionList({ panel, unfinished = false }: { panel: Panel; unfinished?: boolean }) {
   const sessions = unfinished ? panel.unfinished : panel.today;
@@ -72,7 +74,7 @@ function Groups({ panel }: { panel: Panel }) {
     <div className="dashboard-links">{panel.clubs.filter((club) => club.canManage).map((club) => <a key={club.id} href={routePath({ clubId: club.id, section: 'groups' })}>Все группы · {club.name}</a>)}</div>
   </section>;
 }
-export function Dashboard({ clubId, mode }: { clubId: string; mode: Mode }) {
+export function Dashboard({ clubId, mode, displayName }: { clubId: string; mode: Mode; displayName: string }) {
   const compact = useCompactLayout();
   const block = useReadBlock<Panel>(`/api/dashboard?${new URLSearchParams({ clubId })}`);
   const panel = block.data?.mode === mode ? block.data : null;
@@ -81,13 +83,15 @@ export function Dashboard({ clubId, mode }: { clubId: string; mode: Mode }) {
   const noAssignments = panel && !panel.clubs.length;
   const secondary = <>{panel && !noAssignments && <Groups panel={panel} />}{mode !== 'trainer' && <RecentChanges clubId={clubId} />}</>;
   return <div className={`dashboard dashboard-${mode}`} data-dashboard-mode={mode}>
-    <div className="dashboard-intro"><p>{panel?.clubs.length === 1 ? panel.clubs[0].name : mode === 'owner' ? 'Обзор сети' : mode === 'administrator' ? 'Ваши филиалы' : 'Ваши назначения'}</p><button type="button" className="secondary" aria-label="Обновить главную" disabled={block.loading} onClick={() => window.dispatchEvent(new Event('attendance-changed'))}>Обновить</button></div>
+    <div className="dashboard-intro"><div><h2>Добро пожаловать, {displayName.trim().split(/\s+/)[0]}!</h2><p>{panel?.clubs.length === 1 ? panel.clubs[0].name : mode === 'owner' ? 'Обзор сети' : mode === 'administrator' ? 'Ваши филиалы' : 'Ваши назначения'}</p></div><button type="button" className="secondary" aria-label="Обновить главную" disabled={block.loading} onClick={() => window.dispatchEvent(new Event('attendance-changed'))}><RefreshCw aria-hidden="true" />Обновить</button></div>
     {block.loading && <p role="status">Загружаем рабочий день…</p>}
     {block.error && <div role="alert" className="dashboard-panel error"><p>{block.error}</p><button type="button" onClick={block.refresh}>Повторить загрузку дня</button></div>}
     {noAssignments && <section className="dashboard-panel"><h2>{mode === 'owner' ? 'Филиалы пока не добавлены' : 'Нет доступных назначений'}</h2><p>{mode === 'owner' ? 'Добавьте филиал, затем участников, группы и расписание.' : 'Обратитесь к владельцу клуба за назначением.'}</p>{mode === 'owner' && <a href="/clubs">Перейти к филиалам</a>}</section>}
+    {mode !== 'owner' && compact && panel && !noAssignments && <NextSession panel={panel} />}
+    {panel && !noAssignments && <Counters panel={panel} />}
+    {primaryClub && <div className="dashboard-create"><a className="dashboard-primary" href={routePath({ clubId: primaryClub.id, section: 'participants', detail: 'new' })}><Plus aria-hidden="true" />Добавить участника · {primaryClub.name}</a></div>}
     <div className="dashboard-grid"><div className="dashboard-main">
-      {mode === 'owner' ? <OwnerOverview clubId={clubId} /> : panel && !noAssignments && <><NextSession panel={panel} /><Counters panel={panel} /></>}
-      {primaryClub && <div className="dashboard-create"><a className="dashboard-primary" href={routePath({ clubId: primaryClub.id, section: 'participants', detail: 'new' })}>Добавить участника · {primaryClub.name}</a></div>}
+      {mode === 'owner' ? <><OwnerOverview clubId={clubId} />{clubId && <FinanceSummary clubId={clubId} chart />}</> : !compact && panel && !noAssignments && <NextSession panel={panel} />}
       {!compact && secondary}
     </div><aside className="dashboard-side" aria-label="Рабочие занятия">
       {panel && !noAssignments && <><SessionList panel={panel} /><SessionList panel={panel} unfinished /></>}

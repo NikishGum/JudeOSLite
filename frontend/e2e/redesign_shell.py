@@ -13,7 +13,7 @@ def check_shell(browser, page, signin, api, owner, club, group, trainer, root, e
     signin(value, 'multi')
     value.goto(root+'/clubs/'+club['id'])
     expect(value.locator('main h1')).to_have_text('Главная')
-    expected = ['Главная', 'Занятия', 'Участники', 'Группы', 'Журналы', 'Сотрудники', 'История']
+    expected = ['Главная', 'Клиенты', 'Участники', 'Группы', 'Занятия', 'Журналы', 'Платежи', 'Сотрудники', 'Уведомления', 'История', 'Профиль', 'Настройки']
     assert value.locator('.sidebar a').all_text_contents() == expected
     expect(value.locator('.account')).to_contain_text('Администратор · Тренер')
     open_section(value, 'Журналы')
@@ -80,7 +80,7 @@ def check_shell(browser, page, signin, api, owner, club, group, trainer, root, e
     value.keyboard.press('Tab')
     expect(dialog.locator('.dialog-top-close')).to_be_focused()
     value.keyboard.press('Tab')
-    expect(dialog.get_by_role('link', name='Группы', exact=True)).to_be_focused()
+    expect(dialog.get_by_role('link', name='Клиенты', exact=True)).to_be_focused()
     value.screenshot(path=f'/tmp/rd183-{engine}-more-320.png')
     value.keyboard.press('Escape')
     expect(more).to_be_focused()
@@ -109,7 +109,7 @@ def check_shell(browser, page, signin, api, owner, club, group, trainer, root, e
     assert value.locator('.sidebar').count() == 0
     assert value.locator('.bottom-navigation a').all_text_contents() == ['Главная', 'Занятия', 'Журналы']
     value.get_by_role('button', name='Ещё', exact=True).click()
-    assert value.locator('.more-navigation a').all_text_contents() == ['История']
+    assert value.locator('.more-navigation a').all_text_contents() == ['Уведомления', 'История', 'Профиль', 'Настройки']
     value.keyboard.press('Escape')
     denied = value.evaluate("async path => {const r=await fetch(path);return {status:r.status,type:r.headers.get('content-type')}}", '/api/clubs/'+club['id']+'/participants')
     assert denied['status'] == 404 and 'json' in denied['type'], denied

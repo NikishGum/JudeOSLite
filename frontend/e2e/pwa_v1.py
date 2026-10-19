@@ -1,4 +1,4 @@
-from runtime_ui import settle_shell, assert_page_targets
+from runtime_ui import settle_shell, assert_page_targets, observe_api, wait_for_api_idle
 from runtime_ui import signout
 """Disposable UI -> Go -> PostgreSQL PWA/browser QA; docs/testing-v1.md."""
 import json
@@ -113,6 +113,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             contrast_floor = {4.5: float('inf'), 3: float('inf')}
             def page(context):
                 value = context.new_page()
+                observe_api(value)
                 value.pwa_api_events = []
                 def page_error(error):
                     errors.append(str(error))
@@ -127,10 +128,16 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             def signin(value, login='owner', navigate=True):
                 if navigate:
                     value.goto(ROOT)
+                # Settle the initial auth read before typing into controlled fields.
+                value.wait_for_load_state('networkidle')
+                wait_for_api_idle(value)
                 value.get_by_label('Логин', exact=True).fill(login)
                 value.get_by_label('Пароль', exact=True).fill(PASSWORD)
+                expect(value.get_by_label('Логин', exact=True)).to_have_value(login)
                 value.get_by_role('button', name='Войти', exact=True).click()
                 expect(value.get_by_role('button', name='Меню профиля', exact=True)).to_be_visible()
+                value.wait_for_load_state('networkidle')
+                wait_for_api_idle(value)
             def api(value, method, path, data=None):
                 result = value.evaluate('''async ([method,path,data]) => {
                   const me = await (await fetch('/api/auth/me', {cache:'no-store'})).json();
@@ -213,7 +220,10 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 for width in (320, 390, 768, 900, 1280, 1440):
                     value.set_viewport_size({'width': width, 'height': 900})
                     settle_shell(value, width)
-                    assert value.evaluate('document.documentElement.scrollWidth <= innerWidth'), (role, width)
+                    if not value.evaluate('document.documentElement.scrollWidth <= innerWidth'):
+                        value.screenshot(path=f'/tmp/rd08-overflow-{ENGINE}-{role}-{width}.png')
+                        overflow=value.evaluate('''()=>[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width&&r.right>innerWidth+1&&!e.closest('[data-slot="sidebar"]')}).slice(0,12).map(e=>({tag:e.tagName,cls:e.className,text:e.textContent.slice(0,60),rect:e.getBoundingClientRect().toJSON()}))''')
+                        raise AssertionError((role,width,overflow))
                     contrast = contrast_audit(value)
                     assert not contrast['failures'] and not contrast['unmeasured'], (role, width, contrast)
                     for pair in contrast['pairs']:
@@ -245,7 +255,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             owner_context = browser_type.launch_persistent_context(str(temp/'profile'), headless=True, executable_path=path, viewport={'width': 320, 'height': 900})
             owner = page(owner_context)
             owner.goto(ROOT)
-            expect(owner.get_by_role('heading', name='Вход для сотрудников')).to_be_visible()
+            expect(owner.get_by_role('heading', name='Вход в аккаунт')).to_be_visible()
             dimensions(owner, 'login')
             owner.locator('.install-help summary').click()
             expect(owner.locator('.install-help')).to_contain_text('iPhone / Safari')
@@ -423,7 +433,8 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             # owner/admin contexts exercise the real worker/cache/update behavior.
             trainer_context = browser.new_context(viewport={'width': 390, 'height': 844}, has_touch=True, service_workers='block' if ENGINE == 'webkit' else 'allow')
             tp = page(trainer_context); signin(tp, 'trainer')
-            tp.get_by_label('Филиал', exact=True).select_option(club['id'])
+            expect(tp.get_by_label('Филиал', exact=True)).to_have_count(0)
+            tp.goto(ROOT+'/clubs/'+club['id']+'/home')
             assert tp.locator('.sidebar').count() == 0
             assert tp.locator('.bottom-navigation a').all_text_contents() == ['Главная', 'Занятия', 'Журналы']
             open_section(tp, 'Журналы')
@@ -607,7 +618,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
                 command('docker', 'stop', APP)
             try:
                 owner.reload()
-                expect(owner.get_by_role('heading', name='Вход для сотрудников')).to_be_visible()
+                expect(owner.get_by_role('heading', name='Вход в аккаунт')).to_be_visible()
                 expect(owner.locator('.owner-dashboard')).to_have_count(0)
                 expect(owner.locator('.pwa-status [role="alert"]')).to_contain_text('Нет сети')
                 try:
@@ -740,6 +751,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             expect(tp.locator('.session-journal')).to_have_count(0)
             signin(tp, 'admin')
             expect(tp.locator('.trainer-sessions')).to_have_count(0)
+            wait_for_api_idle(tp)
             tp.reload(); expect(tp.locator('.trainer-sessions')).to_have_count(0)
             if ENGINE == 'chromium':
                 expect(tp.locator('.account')).to_contain_text('Synthetic Admin')
@@ -762,7 +774,8 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             signout(tp)
             revoked_id = sql(f"INSERT INTO pride.training_sessions(club_id,group_id,trainer_id,starts_on,timezone,starts_at,ends_at) VALUES('{club['id']}','{group['id']}','{trainer['id']}','{today}','Europe/Minsk','{today} 13:00+03','{today} 14:00+03') RETURNING id").splitlines()[0]
             signin(tp, 'trainer')
-            tp.get_by_label('Филиал', exact=True).select_option(club['id'])
+            expect(tp.get_by_label('Филиал', exact=True)).to_have_count(0)
+            tp.goto(ROOT+'/clubs/'+club['id']+'/home')
             open_section(tp, 'Журналы')
             tp.locator('.trainer-session-list li').filter(has_text='13:00').get_by_role('button', name='Открыть журнал', exact=True).click()
             tp.get_by_role('button', name='Подтвердить открытие журнала', exact=True).click()

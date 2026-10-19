@@ -1,4 +1,44 @@
 """Actions moved into the real profile menu by the approved shadcn shell."""
+import time
+
+
+def observe_api(page):
+    """Track SPA reads as well as initial-document network activity."""
+    if hasattr(page, 'pride_api_state'):
+        return
+    state = {'pending': set(), 'changed': time.monotonic()}
+    page.pride_api_state = state
+    def started(request):
+        # Requests abandoned with the old document may never emit a terminal
+        # event. A real navigation starts a new observation generation.
+        # SPA history changes do not issue a navigation request.
+        if request.is_navigation_request() and request.frame == page.main_frame:
+            state['pending'].clear()
+            state['changed'] = time.monotonic()
+        if '/api/' in request.url and request.resource_type in ('fetch', 'xhr'):
+            state['pending'].add(request)
+            state['changed'] = time.monotonic()
+    def finished(request):
+        if request in state['pending']:
+            state['pending'].discard(request)
+            state['changed'] = time.monotonic()
+    page.on('request', started)
+    page.on('requestfinished', finished)
+    page.on('requestfailed', finished)
+
+
+def wait_for_api_idle(page, timeout=15):
+    # load_state('networkidle') may already have fired before a later SPA fetch.
+    # Require observed requests to finish and a quiet renderer turn before teardown.
+    state = page.pride_api_state
+    start = time.monotonic()
+    while time.monotonic() - start < timeout:
+        if not state['pending'] and time.monotonic() - max(start, state['changed']) >= .2:
+            return
+        page.wait_for_timeout(25)
+    raise AssertionError(('API did not settle', [r.url.split('?')[0] for r in state['pending']]))
+
+
 def signout(page):
     page.get_by_role('button', name='Меню профиля', exact=True).click()
     page.get_by_role('menuitem', name='Выйти', exact=True).click()
@@ -16,9 +56,10 @@ def assert_control_target(control, width):
     assert rect and rect['height'] >= minimum and rect['width'] >= minimum, (width, minimum, control.text_content(), control.get_attribute('class'), control.get_attribute('aria-label'), rect)
 
 
-def assert_page_targets(page, width):
+def assert_page_targets(page, width, extra_selector=''):
+    settle_shell(page, width)
     # Read one DOM snapshot: responsive React mounts can invalidate nth locators.
-    controls = page.locator('button:visible,input:visible,select:visible,summary:visible,.workspace-navigation a:visible').evaluate_all('''nodes => nodes.filter(n=>!['checkbox','radio'].includes(n.type)).map(n=>({
+    controls = page.locator('button:visible,input:visible,select:visible,summary:visible,.workspace-navigation a:visible'+extra_selector).evaluate_all('''nodes => nodes.filter(n=>n.isConnected && n.getClientRects().length && n.getBoundingClientRect().width>0 && n.getBoundingClientRect().height>0 && !['checkbox','radio'].includes(n.type)).map(n=>({
       label:n.getAttribute('aria-label')||n.textContent, classes:[...n.classList], slot:n.dataset.slot,
       width:n.getBoundingClientRect().width,height:n.getBoundingClientRect().height
     }))''')

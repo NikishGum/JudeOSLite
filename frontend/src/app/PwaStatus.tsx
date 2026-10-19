@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { beginAppReload, cancelAppReload, pendingMutations } from '../shared/app-lifecycle';
 
 interface InstallPrompt extends Event {
   prompt(): Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
-export function PwaStatus({ beforeUpdate }: { beforeUpdate?: (action: () => void) => void }) {
+export function PwaStatus({ beforeUpdate, installContainer }: { beforeUpdate?: (action: () => void) => void; installContainer?: HTMLElement | null }) {
   const [online, setOnline] = useState(navigator.onLine);
   const [standalone, setStandalone] = useState(() => matchMedia('(display-mode: standalone)').matches || !!(navigator as Navigator & { standalone?: boolean }).standalone);
   const [install, setInstall] = useState<InstallPrompt | null>(null);
@@ -75,15 +76,16 @@ export function PwaStatus({ beforeUpdate }: { beforeUpdate?: (action: () => void
     navigator.serviceWorker.addEventListener('controllerchange', changed, { once: true });
     waiting.postMessage({ type: 'ACTIVATE_UPDATE' });
   }
-  return <aside className="pwa-status" aria-label="Приложение PRIDE">
-    {!online && <p className="error" role="alert">Нет сети. Операции недоступны. Изменения не сохраняются без связи; после подключения повторите действие.</p>}
-    {notice && <p role="status">{notice}</p>}
-    {waiting && <div className="pwa-update"><p role="status">Доступно обновление. {saving ? 'Дождитесь окончания сохранения.' : 'Перед обновлением сохраните введённые данные.'}</p><button disabled={!!saving || applying || !online} onClick={() => beforeUpdate ? beforeUpdate(applyUpdate) : applyUpdate()}>{applying ? 'Обновляем…' : 'Обновить приложение'}</button></div>}
-    {!standalone && <details className="install-help"><summary>Установить PRIDE на устройство</summary>
+  const installHelp = !standalone && <details className="install-help"><summary>Установить PRIDE на устройство</summary>
       <p>iPhone / Safari: «Поделиться» → «На экран Домой» → «Добавить».</p>
       <p>Android / Chrome: меню ⋮ → «Установить приложение» или «Добавить на главный экран». На ПК в Chrome / Edge используйте значок установки в адресной строке.</p>
       <p className="help">Установленное приложение открывается отдельным окном. Для входа и работы нужен интернет.</p>
       {install && <button onClick={() => void installApp()}>Установить приложение</button>}
-    </details>}
+    </details>;
+  return <aside className="pwa-status" aria-label="Приложение PRIDE">
+    {!online && <p className="error" role="alert">Нет сети. Операции недоступны. Изменения не сохраняются без связи; после подключения повторите действие.</p>}
+    {notice && <p role="status">{notice}</p>}
+    {waiting && <div className="pwa-update"><p role="status">Доступно обновление. {saving ? 'Дождитесь окончания сохранения.' : 'Перед обновлением сохраните введённые данные.'}</p><button disabled={!!saving || applying || !online} onClick={() => beforeUpdate ? beforeUpdate(applyUpdate) : applyUpdate()}>{applying ? 'Обновляем…' : 'Обновить приложение'}</button></div>}
+    {installContainer === undefined ? installHelp : installContainer ? createPortal(installHelp, installContainer) : null}
   </aside>;
 }

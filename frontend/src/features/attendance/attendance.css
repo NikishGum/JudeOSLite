@@ -24,7 +24,9 @@
 .attendance-card { border: 0; border-radius: 0; padding: 24px 0; margin: 0; align-content: start; }
 .attendance-card h4 { font-size: clamp(24px, 2.5vw, 32px); font-weight: 500; }
 .attendance-progress-label { font-variant-numeric: tabular-nums; }
-.attendance-present { background: var(--panel-success); }
+.attendance-actions .attendance-present { background: var(--panel-success); color: #fff; }
+.attendance-actions .attendance-present:hover:not(:disabled), .attendance-actions .attendance-present:active:not(:disabled) { background: #1c503d; color: #fff; }
+.attendance-actions .attendance-present:disabled { background: var(--panel-success); color: #fff; opacity: .65; }
 .attendance-summary { gap: 0; }
 .attendance-summary li { border: 0; border-radius: 0; border-bottom: 1px solid var(--panel-line); padding: 16px 0; }
 .attendance-roster { min-width: 0; padding-top: 16px; }

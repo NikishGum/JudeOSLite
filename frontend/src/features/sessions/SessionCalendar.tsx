@@ -8,6 +8,7 @@ import { sessionHref, sessionLocation, trainingChanged, validSessionIds, weekSta
 import { actionNames, nextDate, type Action, type Session } from './types';
 import './sessions.css';
 import { DateNavigation } from '../../shared/ui/DateNavigation';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 type Viewer = { user: { id: string }; clubs: { id: string; roles: string[] }[] };
 export function SessionCalendar({ clubId, timezone, canManage }: { clubId: string; timezone: string; canManage: boolean }) {
@@ -63,7 +64,7 @@ export function SessionCalendar({ clubId, timezone, canManage }: { clubId: strin
       {canManage && <button disabled={!ready || !!editor} onClick={() => { setNotice(''); setEditor('new'); }}>Добавить разовое занятие</button>}
     </div>
     <div className="session-period-toolbar">
-      <div className="session-view" role="group" aria-label="Вид календаря">{([['day', 'День'], ['week', 'Неделя'], ['period', 'Период']] as const).map(([mode, label]) => <button key={mode} className="secondary" aria-pressed={view === mode} disabled={!!editor} onClick={() => period(mode)}>{label}</button>)}</div>
+      <ToggleGroup type="single" className="session-view" aria-label="Вид календаря" value={view} disabled={!!editor} onValueChange={(value) => { if (value === 'day' || value === 'week' || value === 'period') period(value); }}>{([['day', 'День'], ['week', 'Неделя'], ['period', 'Период']] as const).map(([mode, label]) => <ToggleGroupItem key={mode} value={mode}>{label}</ToggleGroupItem>)}</ToggleGroup>
       <button className="secondary" disabled={!!editor} onClick={() => period(view === 'period' ? 'day' : view, today)}>Сегодня</button>
 
     </div>

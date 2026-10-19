@@ -1,0 +1,2 @@
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+RD-08 frontend contract PASS: webkit 22 screen/state groups; synthetic responses; NOT backend acceptance

@@ -4,6 +4,7 @@ import { TrainerEditor, type Draft, type Mode, type Trainer } from './TrainerEdi
 import { Dialog } from '../../shared/ui/Dialog';
 import { PersonAvatar } from '../../app/RuntimeShell';
 import './staff.css';
+import { TrainerProfile } from '../club-workspace/Profile';
 
 const message = (cause: unknown) => cause instanceof ApiError ? cause.message : 'Нет соединения. Проверьте интернет и повторите действие.';
 export function TrainerManagement({ clubId, clubName, isOwner, onSessionRefresh, beforeNavigate }: { clubId: string; clubName: string; beforeNavigate: (action: () => void) => void; isOwner: boolean; onSessionRefresh: () => Promise<void> }) {
@@ -13,6 +14,7 @@ export function TrainerManagement({ clubId, clubName, isOwner, onSessionRefresh,
   const [loadError, setLoadError] = useState('');
   const [attempt, setAttempt] = useState(0);
   const [selected, setSelected] = useState<Trainer | null>(null);
+  const [profile, setProfile] = useState<Trainer | null>(null);
   const [mode, setMode] = useState<Mode | null>(null);
   const [revoke, setRevoke] = useState<Trainer | null>(null);
   const [candidate, setCandidate] = useState('');
@@ -79,7 +81,7 @@ export function TrainerManagement({ clubId, clubName, isOwner, onSessionRefresh,
     {loadError && <div role="alert"><p>{loadError}</p><button className="secondary" onClick={() => setAttempt((value) => value + 1)}>Попробовать снова</button></div>}
     {!loading && !loadError && <>
       {trainers.length === 0 && <p>Тренеры ещё не назначены. Добавьте аккаунт для занятий этого филиала{isOwner ? ' или выберите существующего сотрудника ниже' : ''}.</p>}
-      <ul className="staff-list">{trainers.map((trainer) => <li key={trainer.id}><div className="staff-identity"><PersonAvatar name={trainer.displayName} active={!trainer.disabled} label={trainer.disabled ? 'Аккаунт отключён' : 'Доступен для занятий'} /><div className="staff-copy"><h3>{trainer.displayName}</h3><p className="staff-role">Тренер · {trainer.login}</p><p className="staff-assignments">{clubName}</p>
+      <ul className="staff-list">{trainers.map((trainer) => <li key={trainer.id}><div className="staff-identity"><PersonAvatar name={trainer.displayName} active={!trainer.disabled} label={trainer.disabled ? 'Аккаунт отключён' : 'Доступен для занятий'} /><div className="staff-copy"><h3><button className="name-link" onClick={() => setProfile(trainer)}>{trainer.displayName}</button></h3><p className="staff-role">Тренер · {trainer.login}</p><p className="staff-assignments">{clubName}</p>
         {!trainer.canManageAccount && <p className="help">Аккаунт меняет владелец. Вы управляете назначением этого филиала.</p>}</div></div>
         <div className="actions">{trainer.canManageAccount && <><button className="secondary" disabled={busy} onClick={() => open(trainer, 'account')}>Изменить аккаунт</button><button className="secondary" disabled={busy} onClick={() => open(trainer, 'password')}>Сменить пароль</button></>}
           <button className="secondary" disabled={busy} onClick={() => beforeNavigate(() => { close(); setRevoke(trainer); setNotice(''); })}>Отозвать назначение</button></div>
@@ -90,6 +92,7 @@ export function TrainerManagement({ clubId, clubName, isOwner, onSessionRefresh,
           <button className="secondary" disabled={busy} onClick={() => open(employee, 'account')}>Изменить аккаунт сотрудника</button><button className="secondary" disabled={busy} onClick={() => open(employee, 'password')}>Сменить пароль сотрудника</button></div>}
       </div>}
     </>}
+    {profile && <Dialog title={`Профиль тренера: ${profile.displayName}`} className="wide-panel" onCancel={() => setProfile(null)} cancelLabel="Закрыть профиль"><TrainerProfile trainerId={profile.id} name={profile.displayName} clubId={clubId} clubName={clubName} /></Dialog>}
     <button className="secondary" disabled={busy || loading} onClick={() => { close(); setCandidate(''); setAttempt((value) => value + 1); }}>Обновить тренеров</button>
   </section>;
 }
