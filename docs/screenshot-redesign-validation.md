@@ -1,7 +1,8 @@
 # RD-08 / #200 — проверка frontend19.10.2026
 
 Объём: [дизайн по трём макетам](screenshot-redesign.md) и восемь замечаний
-заказчика. Основа `cf0948f`, ветвь `codex/rd08-pride-screenshots`. Серверный код,
+заказчика. Основа `cf0948f`, реализация `9e167c3`,
+[PR #206](https://github.com/NikishGum/JudeOSLite/pull/206). Серверный код,
 исполняемые миграции и инфраструктурные секреты не менялись. Новые модули
 используют [опубликованный API-контракт](backend-contracts/README.md); их backend
 реализуется параллельно в #201–#204. Родителям аккаунты выдаёт администратор;
@@ -31,7 +32,7 @@ frontend и формы запросов, а не приёмка реальных
 | `screenshot_redesign.py`, Chromium154 | PASS | 22 группы экранов/состояний, ширины1440/390/320, ноль pageerrors |
 | `screenshot_redesign.py`, WebKit26.5 | PASS | Те же контрактные сценарии, ноль pageerrors |
 | `pwa_v1.py`, Chromium154 | PASS | Реальные Go/PostgreSQL, четыре режима расписания2/4/2/1, роли/CSRF, формы, посещаемость40%, offline/lost response, обновление двух сборок |
-| `pwa_v1.py`, WebKit26.5 | В работе | Полный реальный сценарий; итог фиксируется отдельно перед доставкой |
+| `pwa_v1.py`, WebKit26.5 | PASS | Полный реальный сценарий с теми же четырьмя режимами2/4/2/1, ролями/CSRF, SQL/40%, offline/retry, двумя сборками и lifecycle |
 | `redesign_training.py`, Chromium/WebKit | PASS / PASS | Дата/неделя/период, создание/перенос/замена/отмена, журнал, сетевые повторы, конфликт/коррекция |
 | `redesign_reports.py`, Chromium/WebKit | PASS / PASS | Реальный журнал3/7=42.9%, после коррекции4/7=57.1%, даты/архив/перевод/история/отзыв |
 | `redesign_dashboard.py`, Chromium/WebKit | PASS / PASS | Счётчики и CTA по роли,40→60→62.5%, два локальных дня, отзыв/поздние ответы |
@@ -45,6 +46,15 @@ Debian-контейнере и скопированы в `/tmp/rd08-browser-libs
 host validator Playwright не учитывает пользовательский каталог, поэтому для
 локального запуска использован `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1`.
 В CI применяется штатный `playwright install --with-deps`.
+
+Во время локальных WebKit прогонов обнаружены гонки harness: DOM snapshot
+попадал между CSS breakpoint и React mobile mount, либо сохранял уже скрытый
+SW update control. Общий helper теперь ждёт согласованный shell и измеряет
+только connected/visible controls в одном DOM snapshot; минимумы44/36/32px не
+снижены. Вход ожидает первоначальный auth read до заполнения и networkidle
+после профиля перед переходом. Проверки unexpected pageerror и ролей сохранены;
+финальный полный прогон завершился без ошибок. В контрактном тесте исправлены
+точные accessible selectors, включающие текст подсказок, без изменения UI.
 
 ## Восемь замечаний и подтверждение
 
@@ -73,6 +83,9 @@ host validator Playwright не учитывает пользовательски
 [пакет проверки исправлений](../.impeccable/review/rd08/verdict-packet.md).
 Хэши фиксируют файлы; все20 исходных capture проверены независимым reviewer.
 Второй проход ограничен тремя найденными дефектами; итог в `verdict.md`.
+Итог reviewer — **ship в пределах трёх исправлений**, все resolved; это не
+повторная сертификация всего приложения. Полный PWA WebKit завершился позднее
+этого scoped verdict и записан отдельно в `logs/webkit-pwa-verdict.log`.
 Изначальные вложения доступны в чате, а не в cloud filesystem: проверяется
 выполнение извлечённого контракта направления, не попиксельное совпадение.
 
