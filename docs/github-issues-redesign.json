@@ -5,7 +5,7 @@
   "source_main": "72460d8f7bf8fd58fd93eeb026099012033daabf",
   "prototype_commit": "8016b746072e9334567de7fdbba2dcaf2a72fb45",
   "task_count": 12,
-  "dependency_count": 14,
+  "dependency_count": 16,
   "issues": [
     {
       "id": "RD-01",
@@ -94,7 +94,7 @@
       "dependencies": [
         "RD-07"
       ],
-      "body_sha256": "4700971fd56b07b12fc2d474017031c85712259e7edb42c29eaf10036424d983",
+      "body_sha256": "395b0dbaacf77e62e646f99e71a8760a9d8b716d2b67957d3a32da67614530e7",
       "title": "Дизайн PRIDE по макетам и исправления восьми замечаний интерфейса"
     },
     {
@@ -103,10 +103,10 @@
       "github_id": 5922687528,
       "url": "https://github.com/NikishGum/JudeOSLite/issues/201",
       "dependencies": [
-        "RD-08"
+        "RD-07"
       ],
-      "body_sha256": "c38c33e5fd352ba95fd5c485a8fecb059f5fb7e21aa76e1783abc1a966ff60bd",
-      "title": "Семьи, карточка ребёнка и кабинет родителя"
+      "body_sha256": "59c0710c608ace72f18ca36cb8160f8a628ae145659a39900b5b4bbf2dc280cc",
+      "title": "Backend: семьи, профили детей и аккаунты родителей"
     },
     {
       "id": "RD-10",
@@ -114,10 +114,10 @@
       "github_id": 5922687679,
       "url": "https://github.com/NikishGum/JudeOSLite/issues/202",
       "dependencies": [
-        "RD-08"
+        "RD-09"
       ],
-      "body_sha256": "a96149fcf6f9537df028ab34969f45cfdacc72f24e32b193af213d40df6aa870",
-      "title": "Платежи, тарифы и абонементы на реальных данных"
+      "body_sha256": "972e84b226acd50a6ff45dfa48f89e604977a40c05906ef915a83a5ef792885a",
+      "title": "Backend: счета, ручные оплаты, тарифы и абонементы"
     },
     {
       "id": "RD-11",
@@ -125,10 +125,10 @@
       "github_id": 5922687836,
       "url": "https://github.com/NikishGum/JudeOSLite/issues/203",
       "dependencies": [
-        "RD-08"
+        "RD-09"
       ],
-      "body_sha256": "72a4ae3f450f2ed74cfd55e2d49120fd016c1704d9adbc5046df211a75a16b61",
-      "title": "Документы семьи и ребёнка с защищённым доступом"
+      "body_sha256": "412cc503016569987ad9648bc660310f499f0385f0103e91e3b12cd60abb3e86",
+      "title": "Backend: приватные документы ребёнка и безопасное скачивание"
     },
     {
       "id": "RD-12",
@@ -136,10 +136,12 @@
       "github_id": 5922687994,
       "url": "https://github.com/NikishGum/JudeOSLite/issues/204",
       "dependencies": [
-        "RD-08"
+        "RD-09",
+        "RD-10",
+        "RD-11"
       ],
-      "body_sha256": "e76c6286b372600c64ce21efdb36abde518b9a2595effced8c6a9b2d671e7849",
-      "title": "Уведомления, профиль тренера и настройки клуба по макетам"
+      "body_sha256": "385a32fbae03b8a9aa61d357452f90235c082ea9dc695ba7e9dd6e0f0460b53f",
+      "title": "Backend: персональная лента уведомлений и события модулей"
     }
   ],
   "verification": {
@@ -164,6 +166,6 @@
       203,
       204
     ],
-    "authorization": "Заказчик: Реализовать также новые модули с макетов. Одна текущая работа #200; дочерние issues фиксируют приёмку, не параллельную реализацию."
+    "authorization": "19.10: #200 frontend; #201–#204 backend для второго разработчика параллельно. iPay только интерфейс, подключение позже. Аккаунты родителей создаёт администратор."
   }
 }
