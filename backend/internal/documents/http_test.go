@@ -204,9 +204,22 @@ func TestDocumentLifecycleAndIsolation(t *testing.T) {
 		data       []byte
 		name, mime string
 	}{{pdf, "справка 2026.pdf", "application/pdf"}, {png, "image.png", "image/png"}, {jpeg, "photo.jpg", "image/jpeg"}} {
-		d := f.upload(f.admin, f.a, a, tc.data, tc.name)
-		if d.ID == "" || d.MembershipID != a || d.Version != 1 || d.MediaType != tc.mime || d.Size != len(tc.data) || d.ExpiresOn != nil {
+		payload := input(tc.data, tc.name)
+		if i == 0 {
+			payload.ExpiresOn = json.RawMessage(`"2028-02-29"`)
+		}
+		w := f.call(f.admin, "POST", endpoint(f.a, a), payload)
+		f.status(w, 201)
+		d := documentJSON(t, w)
+		if d.ID == "" || d.MembershipID != a || d.Version != 1 || d.MediaType != tc.mime || d.Size != len(tc.data) {
 			t.Fatal(d)
+		}
+		if i == 0 {
+			if d.ExpiresOn == nil || *d.ExpiresOn != "2028-02-29" {
+				t.Fatal("expiry date lost")
+			}
+		} else if d.ExpiresOn != nil {
+			t.Fatal("unknown expiry changed")
 		}
 		url := endpoint(f.a, a) + "/" + d.ID + "/download"
 		for _, c := range []client{f.owner, f.admin, pa} {

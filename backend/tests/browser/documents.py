@@ -11,9 +11,7 @@ import sys
 import tempfile
 import time
 import uuid
-from datetime import datetime, timedelta
 from urllib.request import urlopen
-from zoneinfo import ZoneInfo
 from playwright.sync_api import sync_playwright, expect
 
 ROOT = 'http://127.0.0.1:18093'
@@ -125,7 +123,7 @@ try:
             page.get_by_role('button',name='Добавить документ',exact=True).click()
             dialog=page.get_by_role('dialog',name='Новый документ',exact=True)
             dialog.get_by_label('Название',exact=True).fill(f'Synthetic Document {i}')
-            dialog.get_by_label('Файл',exact=True).set_input_files({'name':filename,'mimeType':media,'buffer':content})
+            dialog.get_by_label('Файл',exact=False).set_input_files({'name':filename,'mimeType':media,'buffer':content})
             with page.expect_response(lambda response:response.url==ROOT+base and response.request.method=='POST' and response.status==201):
                 dialog.get_by_role('button',name='Загрузить документ',exact=True).click()
             expect(dialog).not_to_be_visible()
@@ -149,6 +147,7 @@ try:
 
         parent_context=browser.new_context(service_workers='block',viewport={'width':390,'height':844})
         parent=parent_context.new_page()
+        parent.on('pageerror',lambda error: errors.append(str(error)))
         parent.goto(ROOT)
         parent.get_by_label('Логин',exact=True).fill('parent')
         parent.get_by_label('Пароль',exact=True).fill(PASSWORD)
@@ -185,7 +184,7 @@ try:
         api(parent,'GET',base+f"/{stored[1]['id']}/download",expected=404)
         api(parent,'GET',base,expected=404)
         assert not errors,errors
-        print(json.dumps({'engine':ENGINE,'result':'PASS','transport':'real frontend -> Go -> PostgreSQL18.6','sampleDocument':stored[0],'checks':['PDF/PNG/JPEG UI upload','binary byte-for-byte browser download + SQL','reload','parent read-only mobile UI','CSRF/foreign UUID/magic/filename/version denial','UI deletion + SQL audit privacy','live unlink on saved URL']},ensure_ascii=False))
+        print(json.dumps({'engine':ENGINE,'browser':browser.version,'result':'PASS','transport':'real frontend -> Go -> PostgreSQL18.6','sampleDocument':stored[0],'checks':['PDF/PNG/JPEG UI upload','binary byte-for-byte browser download + SQL','reload','parent read-only mobile UI','CSRF/foreign UUID/magic/filename/version denial','UI deletion + SQL audit privacy','live unlink on saved URL']},ensure_ascii=False))
         browser.close()
 finally:
     subprocess.run(['docker','rm','-f',APP,DB],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)

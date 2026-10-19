@@ -32,8 +32,7 @@ parent-доступ, оставляет owner/admin чтение по сущес
 `.pdf/.png/.jpg/.jpeg`. MIME вычисляет сервер: клиентское имя не определяет тип.
 Пустые/HTML/SVG/неизвестные файлы, неверный base64, путь/CRLF/control/bidi в имени,
 неверная дата, неизвестные поля и лишний JSON отвергаются400. Название и имя
-trim, предел200 символов; filename дополнительно255 UTF-8 байт. Это проверка
-допустимого формата, а не антивирус или санитарная обработка содержимого PDF.
+trim, предел200 символов; filename дополнительно255 UTF-8 байт.
 
 Файлы не попадают в static/uploads, JSON metadata, localStorage, audit или
 публичную ссылку. Download отдельный binary response с вычисленным Content-Type,
@@ -87,3 +86,54 @@ Page.screenshot calendar timeout30000 после fonts loaded. Этот резу
 `redesign_training.py:91`, ожидание profile-menu после входа; снимок дерева остаётся
 на login. Предшествующие family Chromium/WebKit и оба PWA PASS. Это другой сбой,
 чем screenshot attempt1; повторный запуск сделал другой чат, #203 его не запускала.
+
+
+Предварительный контроль19.10 (до слияния #202):
+`go vet ./...`, `go test -race ./...` с TEST_DATABASE_URL на PostgreSQL18.6 и
+`go build ./cmd/server ./cmd/migrate ./cmd/create-owner` PASS. Для этого взята
+точная опубликованная0012 из PR207/head `2b8298439923c22f0765df1f4d92d95c251fe1d0`
+как временная копия для QA; её код не включается в коммиты #203. Штатный
+DocumentsUpgradeFrom0012/rerun и прежние migration tests PASS. Ранее прямое
+применение SQL0011→0013 через внешний тестовый overlay также PASS после поправки
+fixture: для истёкшей сессии created_at нужно сдвигать в прошлое вместе с expires_at,
+иначе нарушается существующий SQL CHECK. Product auth/schema не менялись.
+Deployment unit43 и claim14 PASS; frontend production build и Docker build PASS.
+Это ещё не финальная browser/серверная стыковка или доставка main.
+
+Предварительная совместная QA-сборка (PR207 `2b82984` + documents `543155f`):
+полный `go vet ./...`/`go test -race ./...` с настоящим PostgreSQL18.6, включая
+billing и documents, PASS. Дополнительно проверена известная дата2028-02-29 и
+неизвестный expiresOn через реальный HTTP/PG. Изолированный QA-server собран с
+внешним compiler overlay: к опубликованному main.go добавлены только import
+и documents.Handler; stock migrations.Check/Apply не ослаблены. Общие tracked
+main.go/build.yml обеих рабочих ветвей не изменялись.
+
+`PWA_TEST_IMAGE=judeoslite:rd203-qa python3 backend/tests/browser/documents.py`
+и его `PWA_BROWSER=webkit` вариант PASS в Chromium154.0.8037.57/WebKit26.5,
+owner1280 и parent390×844, без подмен HTTP. Byte-for-byte download проверен также
+прямым SQL encode(content,'hex'); list/reload/version/delete/audit/CSRF/IDOR/unlink
+подтверждены. В обоих случаях pageerror отсутствуют. Первый Chromium FAIL нового
+harness: label «Файл» включает help text, exact-селектор его не находил. Исправлен
+селектор, assertions не ослаблялись; оба следующих полных прохода exit0.
+
+Локальный WebKit использует проверенные Debian13 runtime libraries в private
+browser cache и PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1 только для проверки
+системных пакетов non-root окружения. Движок и все assertions настоящие; штатный
+CI использует playwright install --with-deps и не требует этого флага.
+
+Фактический пример201 из синтетического WebKit QA (его БД удалена):
+
+```json
+{"id":"3dde0d79-8a82-4a04-996b-b17c075a9f6e","membershipId":"9b0b3f7d-510b-41b9-81c2-0aedf7a4ec3a","name":"Synthetic Document 0","kind":"medical","filename":"proof.pdf","mediaType":"application/pdf","size":42,"expiresOn":null,"createdAt":"2026-10-19T13:40:00.433271Z","version":1}
+```
+
+| Граница потока QA | Результат | Доказательство |
+| --- | --- | --- |
+| UI → POST | PASS | Три upload forms, настоящий201, без pageerror |
+| API → PostgreSQL | PASS | bytea совпадает с независимым hex исходного файла |
+| PostgreSQL → download | PASS | attachment и байты PDF/PNG/JPEG в browser download |
+| Response → UI | PASS | list/reload, read-only parent390, UI delete и SQL |
+| Живые права | PASS | Сохранённый URL после unlink404; HTTP/PG revoke/disable/session tests |
+
+Это предварительная QA-стыковка; окончательные branch/main CI и HTTPS фиксируются
+после штатного подключения в рабочей ветви и завершения окна доставки #202.
