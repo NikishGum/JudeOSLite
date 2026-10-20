@@ -87,6 +87,8 @@ jobs:
           PY
           python3 frontend/e2e/screenshot_redesign.py
           PWA_BROWSER=webkit python3 frontend/e2e/screenshot_redesign.py
+          python3 frontend/e2e/background_refresh.py
+          PWA_BROWSER=webkit python3 frontend/e2e/background_refresh.py
       - name: Deployment policy, controller and server operation tests
         run: python3 -m unittest discover -s deploy/test -p 'test_*.py' -v
       - name: Compose clean startup, migration rerun and restart

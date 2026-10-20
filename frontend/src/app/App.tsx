@@ -148,6 +148,7 @@ export function App() {
   const [clubAttempt, setClubAttempt] = useState(0);
   const epoch = useRef(0);
   const pending = useRef(false);
+  const refreshingSession = useRef(false);
   const authenticated = useRef(false);
   const pageTitle = useRef<HTMLHeadingElement>(null);
 
@@ -172,16 +173,20 @@ export function App() {
       if (signal?.aborted || generation !== epoch.current) return;
       authenticated.current = true;
       setCsrfToken(result.csrfToken);
-      setSession(result);
+      setSession((previous) => JSON.stringify(previous) === JSON.stringify(result) ? previous : result);
       setError("");
     } catch (cause) {
       if (signal?.aborted || generation !== epoch.current) return;
       if (cause instanceof ApiError && cause.status === 401) forgetSession();
       else {
         setError(message(cause));
-        setSession(null);
-        setClub(null);
-        setCsrfToken(null);
+        // A failed background check is not a logout. Keep drafts and the CSRF
+        // token until the server actually rejects the session.
+        if (!authenticated.current) {
+          setSession(null);
+          setClub(null);
+          setCsrfToken(null);
+        }
       }
     } finally {
       if (!signal?.aborted && generation === epoch.current) setLoading(false);
@@ -227,9 +232,12 @@ export function App() {
       if (
         authenticated.current &&
         document.visibilityState === "visible" &&
-        !pending.current
-      )
-        void loadSession(controller.signal);
+        !pending.current &&
+        !refreshingSession.current
+      ) {
+        refreshingSession.current = true;
+        void loadSession(controller.signal).finally(() => { refreshingSession.current = false; });
+      }
     };
     window.history.replaceState(
       { prideIndex: historyIndex.current },
@@ -286,7 +294,7 @@ export function App() {
     if (!loading) pageTitle.current?.focus();
   }, [userId, loading, route.section]);
   const available = session?.clubs.find((item) => item.id === selectedId);
-  const roles = available?.roles.join(",");
+  const roles = available?.roles.slice().sort().join(",");
   const clubName = available?.name;
   const clubTimezone = available?.timezone;
   const trainerOnly =
@@ -384,7 +392,7 @@ export function App() {
     club.id === available.id &&
     club.name === available.name &&
     club.timezone === available.timezone &&
-    club.roles.join(",") === roles
+    club.roles.slice().sort().join(",") === roles
       ? club
       : null;
   const canManage =
@@ -410,7 +418,7 @@ export function App() {
     label: sections[section],
   }));
   const assignmentKey = session?.clubs
-    .map((c) => `${c.id}:${c.roles.join(",")}`)
+    .map((c) => `${c.id}:${c.roles.slice().sort().join(",")}`)
     .sort()
     .join(";");
   const hasAdministration = !!session?.clubs.some((c) =>

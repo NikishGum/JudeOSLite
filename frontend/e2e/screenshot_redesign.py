@@ -103,7 +103,7 @@ class Fixture:
 def main():
     errors=[]; results=[]
     with sync_playwright() as p:
-        browser=getattr(p,ENGINE).launch()
+        browser=getattr(p,ENGINE).launch(executable_path=os.environ.get('CHROMIUM_PATH') if ENGINE=='chromium' else None)
         def setup(role='owner',motion='reduce'):
             fixture=Fixture(role);context=browser.new_context(viewport={'width':1440,'height':1000},reduced_motion=motion,service_workers='block',accept_downloads=True);context.add_init_script('delete Navigator.prototype.serviceWorker');context.route('**/api/**',fixture.route);page=context.new_page();observe_api(page);page.on('pageerror',lambda error:errors.append(str(error)));return context,page,fixture
         ctx,ui,fixture=setup()
