@@ -271,19 +271,27 @@ try:
         assert sql(f"SELECT count(*) FROM pride.club_memberships WHERE club_id='{a['id']}' AND archived_at IS NULL") == '3'
         home(admin_page, a['id']); counter(admin_page, 'participants', 3)
         owner_page.evaluate("window.dispatchEvent(new Event('attendance-changed'))"); metric('percentage', '62,5%')
-        # Independent failures never fabricate zeros or leave stale block contents.
+        # Transport failures keep mounted data and expose an error for each block.
+        agenda_before = owner_page.locator('.dashboard-agenda').first.element_handle()
         owner_page.route('**/api/dashboard?*', lambda route: route.abort())
         owner_page.get_by_role('button', name='Обновить главную', exact=True).click()
         expect(owner_page.get_by_role('button', name='Повторить загрузку дня', exact=True)).to_be_visible(); metric('percentage', '62,5%')
-        expect(owner_page.locator('.dashboard-agenda')).to_have_count(0)
+        assert agenda_before.evaluate('node => node.isConnected'), 'Network error unmounted the agenda'
         owner_page.unroute('**/api/dashboard?*'); owner_page.get_by_role('button', name='Повторить загрузку дня', exact=True).click(); expect(owner_page.locator('.dashboard-agenda').first).to_be_visible()
+        totals_before = screen.locator('.report-totals').element_handle()
         owner_page.route('**/api/reports/attendance?*', lambda route: route.abort())
         owner_page.get_by_role('button', name='Обновить главную', exact=True).click()
         expect(screen.get_by_role('button', name='Повторить загрузку обзора', exact=True)).to_be_visible()
-        expect(screen.locator('[data-metric]')).to_have_count(0); expect(owner_page.locator('.dashboard-agenda').first).to_be_visible()
+        metric('percentage', '62,5%')
+        assert totals_before.evaluate('node => node.isConnected'), 'Network error unmounted the overview'
+        expect(owner_page.locator('.dashboard-agenda').first).to_be_visible()
         owner_page.unroute('**/api/reports/attendance?*'); screen.get_by_role('button', name='Повторить загрузку обзора', exact=True).click(); metric('percentage', '62,5%')
+        changes = owner_page.locator('.dashboard-changes')
+        changes_before = changes.locator('ol').element_handle()
         owner_page.route('**/api/audit/events?*', lambda route: route.abort()); owner_page.get_by_role('button', name='Обновить главную', exact=True).click()
-        changes = owner_page.locator('.dashboard-changes'); expect(changes.get_by_role('button', name='Повторить загрузку изменений', exact=True)).to_be_visible(); expect(changes.locator('li')).to_have_count(0); metric('percentage', '62,5%')
+        expect(changes.get_by_role('button', name='Повторить загрузку изменений', exact=True)).to_be_visible()
+        assert changes_before.evaluate('node => node.isConnected'), 'Network error unmounted recent changes'
+        metric('percentage', '62,5%')
         owner_page.unroute('**/api/audit/events?*'); changes.get_by_role('button', name='Повторить загрузку изменений', exact=True).click(); expect(changes.locator('li').first).to_be_visible()
         assert '+375291234567' not in changes.inner_text() and 'Synthetic dashboard correction' not in changes.inner_text()
         # A closed empty group uses the report's null denominator, not a fallback.
