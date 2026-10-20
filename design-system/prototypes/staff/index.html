@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ru">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Сотрудники — UX-концепции PRIDE</title><link rel="stylesheet" href="staff.css"><script defer src="staff.js"></script></head>
+<body>
+<!-- THESIS: two staff access workflows: scan a roster or work in a selected account.
+OWN-WORLD: inherited PRIDE Rubik, red #DB0C0C, cool neutral surfaces, 5/10/20px radii.
+STORY: find staff, understand roles and branches, grant access, reset password, remove one assignment or disable all access.
+FIRST VIEWPORT: compact concept switch, section title and add action, search and role / branch / access filters, roster; concept B keeps selected account beside roster.
+FORM: user-pinned established design system; code-led two alternatives expressly requested, no identity selection.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance -->
+<a class="skip" href="#workspace">К сотрудникам</a>
+<div class="concept-bar"><div class="concept-controls" aria-label="Вариант прототипа"><span class="demo-label">UX-прототип</span><button data-concept="a" aria-pressed="true">А · Быстрый реестр</button><button data-concept="b" aria-pressed="false">Б · Карточка доступа</button></div><span class="demo-note">Вымышленные данные · изменения до перезагрузки</span></div>
+<main id="workspace" tabindex="-1">
+<div class="concept-description" id="concept-description"></div>
+<header class="section-header"><div><h1>Сотрудники</h1><p>Команда, роли и доступ к филиалам.</p></div><button class="primary" id="add-staff"></button></header>
+<div class="workbench" id="workbench"><section class="roster panel" aria-label="Реестр сотрудников"><div class="toolbar"><label class="search"><span id="search-icon"></span><input id="search" type="search" aria-label="Найти сотрудника" placeholder="Имя или логин"><kbd aria-hidden="true">/</kbd></label><div class="filters"><label class="sr-only" for="role-filter">Роль сотрудника</label><select id="role-filter"><option value="all">Все роли</option><option value="trainer">Тренеры</option><option value="admin">Администраторы</option></select><label class="sr-only" for="branch">Филиал</label><select id="branch"><option value="all">Все филиалы</option><option value="east">Брест · Восток</option><option value="center">Брест · Центр</option><option value="kobrin">Кобрин</option></select><label class="sr-only" for="status-filter">Статус доступа</label><select id="status-filter"><option value="all">Любой доступ</option><option value="active">Доступ открыт</option><option value="disabled">Отключён</option><option value="unassigned">Без назначений</option></select></div></div><div class="results-line"><span id="results" role="status" aria-live="polite"></span><button class="text-button" id="reset-filters" hidden>Сбросить фильтры</button><label class="sort-label">Порядок <select id="sort"><option value="asc">А — Я</option><option value="desc">Я — А</option></select></label></div><div id="roster-content"></div><div class="list-foot">Аккаунт общий для сети. Роли и доступ задаются отдельно для каждого филиала.</div></section><section id="detail" class="detail panel" aria-label="Карточка сотрудника" hidden></section></div>
+<p class="prototype-foot">Прототип для владельца сети. Данные не отправляются на сервер.</p>
+</main>
+<dialog id="dialog" aria-labelledby="dialog-title"><div class="dialog-top"><h2 id="dialog-title"></h2><button class="icon-button" id="close-dialog" aria-label="Закрыть окно"></button></div><div id="dialog-body"></div></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+</body></html>

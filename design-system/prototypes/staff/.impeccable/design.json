@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-20T08:00:00+03:00",
+  "title": "Design System: PRIDE — сотрудники (локальный прототип)",
+  "extensions": {
+    "shadows": [
+      {
+        "name": "toast",
+        "value": "0 8px 24px rgba(33,37,41,.14)",
+        "purpose": "Только уведомление прототипа."
+      }
+    ],
+    "motion": [
+      {
+        "name": "button",
+        "value": "background-color 160ms ease-out",
+        "purpose": "Фон кнопки."
+      },
+      {
+        "name": "toast",
+        "value": "opacity 180ms ease-out, transform 180ms ease-out",
+        "purpose": "Появление уведомления; reduced motion отключает переходы."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow-desktop",
+        "value": "1100px"
+      },
+      {
+        "name": "single-detail",
+        "value": "800px"
+      },
+      {
+        "name": "mobile-roster",
+        "value": "575px"
+      },
+      {
+        "name": "single-filter-column",
+        "value": "360px"
+      }
+    ],
+    "componentEffects": [
+      {
+        "name": "dialog-backdrop",
+        "value": "rgba(33,37,41,.36)",
+        "purpose": "Подложка нативного диалога."
+      },
+      {
+        "name": "focus-visible",
+        "value": "2px solid var(--pride-brand); outline-offset: 3px",
+        "purpose": "Все интерактивные элементы."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Основная кнопка",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Создание сотрудника и подтверждение формы.",
+      "html": "<button class=\"ds-primary\">Добавить сотрудника</button>",
+      "css": ".ds-primary {min-height:44px;padding:10px 16px;border-radius:var(--pride-radius-button,5px);font:500 14px/1.5 var(--pride-font,Rubik,sans-serif);cursor:pointer;transition:background-color 160ms ease-out;background:var(--pride-brand,#db0c0c);color:white;border:1px solid var(--pride-brand,#db0c0c)} .ds-primary:hover {background:var(--pride-brand-hover,#323232);border-color:var(--pride-brand-hover,#323232)} .ds-primary:focus-visible { outline:2px solid var(--pride-brand, #db0c0c); outline-offset:3px; }"
+    },
+    {
+      "name": "Вторичная кнопка",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Редактирование и вспомогательные операции.",
+      "html": "<button class=\"ds-secondary\">Изменить</button>",
+      "css": ".ds-secondary {min-height:44px;padding:10px 16px;border-radius:var(--pride-radius-button,5px);font:500 14px/1.5 var(--pride-font,Rubik,sans-serif);cursor:pointer;transition:background-color 160ms ease-out;background:white;color:var(--pride-text,#212529);border:1px solid var(--pride-border,#dedede)} .ds-secondary:hover {background:var(--pride-surface-section,#eff3f9)} .ds-secondary:focus-visible { outline:2px solid var(--pride-brand, #db0c0c); outline-offset:3px; }"
+    },
+    {
+      "name": "Поле формы",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Подписанное поле создания или изменения аккаунта.",
+      "html": "<label class=\"ds-field\">Логин<input class=\"ds-input\" value=\"ivan.petrov\"></label>",
+      "css": ".ds-field {display:grid;gap:8px;font:500 14px/1.5 var(--pride-font,Rubik,sans-serif);color:var(--pride-text,#212529)} .ds-input {height:44px;padding:10px 12px;border:1px solid var(--pride-border,#dedede);border-radius:var(--pride-radius-field,10px);background:white;color:var(--pride-text,#212529);font:400 14px/1.5 var(--pride-font,Rubik,sans-serif)} .ds-input:hover {border-color:var(--pride-text-secondary,#626b72)} .ds-input:focus-visible { outline:2px solid var(--pride-brand, #db0c0c); outline-offset:3px; }"
+    },
+    {
+      "name": "Открытый доступ",
+      "kind": "chip",
+      "refersTo": "badge-active",
+      "description": "Текстовый статус с декоративным индикатором.",
+      "html": "<span class=\"ds-badge\">Доступ открыт</span>",
+      "css": ".ds-badge {display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:var(--pride-radius-badge,30px);background:#edf6f1;color:#24664e;font:400 12px/1.5 var(--pride-font,Rubik,sans-serif);white-space:nowrap} .ds-badge::before {content:\"\";width:5px;height:5px;border-radius:50%;background:currentColor}"
+    },
+    {
+      "name": "Рабочая панель",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Плоская поверхность реестра или карточки, без универсальной тени.",
+      "html": "<section class=\"ds-panel\"><h3 class=\"ds-heading\">Роли и филиалы</h3><p class=\"ds-copy\">Каждое назначение даёт доступ к одному филиалу.</p></section>",
+      "css": ".ds-panel {padding:24px;background:white;border-radius:var(--pride-radius-panel,20px);color:var(--pride-text,#212529);font-family:var(--pride-font,Rubik,sans-serif)} .ds-heading {margin:0 0 12px;font-size:16px;font-weight:500} .ds-copy {margin:0;font-size:13px;line-height:1.5;color:var(--pride-text-secondary,#626b72)}"
+    },
+    {
+      "name": "Переключатель концепций",
+      "kind": "nav",
+      "description": "Только управление сравнением двух локальных вариантов.",
+      "html": "<nav class=\"ds-concepts\" aria-label=\"Вариант прототипа\"><button class=\"ds-concept\" aria-pressed=\"true\">А · Быстрый реестр</button><button class=\"ds-concept\" aria-pressed=\"false\">Б · Карточка доступа</button></nav>",
+      "css": ".ds-concepts {display:flex;gap:8px;flex-wrap:wrap} .ds-concept {min-height:44px;padding:10px 16px;border-radius:var(--pride-radius-button,5px);font:500 14px/1.5 var(--pride-font,Rubik,sans-serif);cursor:pointer;transition:background-color 160ms ease-out;font-size:13px;border:1px solid transparent;background:var(--pride-surface-subtle,#f5f7fa);color:var(--pride-text,#212529)} .ds-concept[aria-pressed=\"true\"] {background:var(--pride-text,#212529);color:white} .ds-concept:hover {background:var(--pride-surface-section,#eff3f9);color:var(--pride-text,#212529)} .ds-concept:focus-visible { outline:2px solid var(--pride-brand, #db0c0c); outline-offset:3px; }"
+    }
+  ],
+  "narrative": {
+    "overview": "Снимок кода от 20.10.2026. Документ описывает только [два самостоятельных прототипа](index.html), не заменяет корневой [DESIGN.md](../../../DESIGN.md), [полную спецификацию PRIDE](../../README.md) или [PRODUCT.md](../../../PRODUCT.md). При расхождении глобальные источники остаются авторитетными. Frontmatter фиксирует реально применённые локальные значения, а не новую глобальную норму.\n\n**Подтверждённая основа:** существующая идентичность PRIDE, локальный Rubik, красный акцент, холодные светлые поверхности и исходные радиусы. **Уточнение заказчика:** два варианта без оболочки приложения и бокового меню, один реестр с фильтрами роли, филиала и доступа; тренер и администратор могут совмещаться. Это ограничение данного экрана, а не запрет других композиций во всём продукте.\n\n**Локальные предложения:** плотность реестра, размеры заголовков, ширина рабочего пространства, композиции А/Б и общая форма выдачи ролей. Выбор окончательной композиции ещё не подтверждён. Вариант Б предложен для частого изменения доступа; это рекомендация прототипа.",
+    "keyCharacteristics": [
+      "Узнаваемая визуальная основа PRIDE без новой идентичности.",
+      "Один аккаунт, несколько назначений «роль + филиал».",
+      "Различие композиций при общем наборе действий.",
+      "Синтетические данные и изменения только в памяти страницы."
+    ],
+    "rules": [],
+    "dos": [
+      "**Do** сохранять прямые импорты глобальных шрифтов и токенов.",
+      "**Do** различать весь аккаунт и отдельное назначение «роль + филиал».",
+      "**Do** проверять desktop и mobile, перенос длинного текста, клавиатурный фокус и reduced motion.",
+      "**Do** считать [verification.md](verification.md) датированным протоколом проверки, а снимки в evidence/ — доказательствами конкретного состояния."
+    ],
+    "donts": [
+      "**Don't** переносить локальную композицию, типографику или семантические цвета в глобальную систему без отдельного решения.",
+      "**Don't** возвращать отвергнутые вкладки категорий сотрудников в этот прототип.",
+      "**Don't** трактовать демонстрацию owner-действий как разрешение администратору в production.",
+      "**Don't** хранить реальные персональные данные или пароли в демонстрации."
+    ]
+  }
+}
