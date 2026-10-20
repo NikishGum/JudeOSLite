@@ -12,7 +12,7 @@ transforming...
 rendering chunks...
 computing gzip size...
 dist/index.html                                  1.01 kB │ gzip:   0.50 kB
-dist/assets/pwa-shell-a241c4f66f672901.html      1.01 kB │ gzip:   0.50 kB
+dist/assets/pwa-shell-3636796ffa92386d.html      1.01 kB │ gzip:   0.50 kB
 dist/sw.js                                       2.42 kB
 dist/assets/rubik-cyrillic-ext-BgEjOSi_.woff2   12.28 kB
 dist/assets/rubik-cyrillic-6J3aU1sj.woff2       15.10 kB
@@ -21,13 +21,13 @@ dist/assets/rubik-latin-ext-xIGCplNB.woff2      19.28 kB
 dist/assets/rubik-latin-0V_ixqQm.woff2          35.32 kB
 dist/assets/index-B6ceyPF5.css                 166.15 kB │ gzip:  29.00 kB
 dist/assets/rolldown-runtime-hePW80VL.js         0.71 kB │ gzip:   0.42 kB
-dist/assets/calendar-8fFpqfb_.js                70.33 kB │ gzip:  20.62 kB
+dist/assets/calendar-DKIkKxnz.js                70.33 kB │ gzip:  20.62 kB
 dist/assets/ui-vendor-DDMGJ27V.js              159.50 kB │ gzip:  53.97 kB
-dist/assets/index-3dZXbFW3.js                  553.60 kB │ gzip: 147.57 kB
+dist/assets/index-DEO4VFZT.js                  553.77 kB │ gzip: 147.60 kB
 
 [plugin builtin:vite-reporter]
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
-✓ built in 683ms
+✓ built in 710ms

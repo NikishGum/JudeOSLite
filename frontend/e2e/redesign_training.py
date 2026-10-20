@@ -383,6 +383,11 @@ try:
         expect(tr.locator('.session-roster')).to_contain_text('не история посещения')
         expect(tr.locator('.session-roster-list > li')).to_have_count(45)
         expect(tr.locator('.attendance-cards')).to_have_count(0)
+        tr.locator('.session-roster-member').first.click()
+        expect(tr.locator('.session-member-panel')).to_contain_text('Занятие отменено')
+        expect(tr.locator('.session-member-panel')).to_contain_text('сведений о посещении нет')
+        expect(tr.locator('.session-member-panel')).not_to_contain_text('будет доступна после открытия')
+        shots(tr, 'cancelled-athlete')
         assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{stress}'") == '0'
         # Calendar boundaries and the inclusive 366-day limit.
         admin.goto(ROOT+'/clubs/'+a['id']+'/sessions?from=2026-12-28&through=2027-01-03&view=week')

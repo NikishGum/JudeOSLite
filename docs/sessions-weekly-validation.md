@@ -52,6 +52,14 @@ LD_LIBRARY_PATH; host dependency preflight пропущен только лок�
 использованы прямой контекст, adapt/Operate/craft-floor, проверка React-компонентов.
 CI/доставка/публичная проверка результата фиксируются в live issue/PR.
 
+Независимый [finish review](../.impeccable/review/ux216-fix/finish-review.md)
+нашёл одно замечание: выбранный спортсмен отменённого занятия без снимка
+получал обещание будущего открытия журнала. Исправлено на явное отсутствие
+истории посещения; добавлен реальный сценарий выбора после отмены с проверкой
+нулевых attendance_records. Оба браузерных набора повторно PASS.
+[Verdict pass](../.impeccable/review/ux216-fix/finish-verdict.md): ship,
+единственное замечание resolved; область вердикта — именно это исправление.
+
 20.10.2026. Требования: [sessions-weekly-ux.md](sessions-weekly-ux.md).
 Работа выполняется в `codex/ux-216-weekly-sessions` от main `f8f027f`.
 Регистрация очереди `bd916a3` доставлена в main до назначения; 14 coordination
