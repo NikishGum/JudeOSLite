@@ -115,6 +115,24 @@ try:
                 for target in value.locator('.session-calendar .date-step:visible,.session-calendar .date-select-trigger:visible').all():
                     box = target.bounding_box()
                     assert box['width'] >= 44 and box['height'] >= 44, box
+                if name == 'weekly-calendar':
+                    layout = value.locator('.session-days').evaluate('''e => ({
+                        columns: getComputedStyle(e).gridTemplateColumns.split(' ').length,
+                        days: [...e.children].map(day => ({x: day.getBoundingClientRect().x, y: day.getBoundingClientRect().y,
+                            background: getComputedStyle(day).backgroundColor})),
+                    })''')
+                    assert layout['columns'] == (7 if width >= 1280 else 1), (width, layout)
+                    assert all(day['background'] != 'rgba(0, 0, 0, 0)' for day in layout['days']), layout
+                    if width >= 1280:
+                        assert max(day['y'] for day in layout['days']) - min(day['y'] for day in layout['days']) < 1, layout
+                        assert len({round(day['x']) for day in layout['days']}) == 7, layout
+                    if width <= 390:
+                        toggle = value.locator('.session-filter-toggle')
+                        expect(toggle).to_have_attribute('aria-expanded', 'false')
+                        expect(value.get_by_label('Группа календаря', exact=True)).not_to_be_visible()
+                        toggle.click()
+                        expect(value.get_by_label('Группа календаря', exact=True)).to_be_visible()
+                        toggle.click()
                 value.evaluate('window.scrollTo(0,0)')
                 value.screenshot(path=f'/tmp/rd185-{ENGINE}-{name}-{width}.png', full_page=True)
         own = page('owner')
@@ -209,7 +227,8 @@ try:
         expect(admin.locator('.session-list > li')).to_have_count(2)
         shots(admin, 'calendar')
         tr = page('trainer'); tr.goto(calendar)
-        tr.locator(f'[data-session-id="{sid}"]').get_by_role('link').first.click()
+        # Clicking the status area of the card must open the same permanent page as its time.
+        tr.locator(f'[data-session-id="{sid}"] .training-status').click()
         expect(tr).to_have_url(__import__('re').compile('/sessions/'+sid))
         expect(tr.get_by_role('button', name='Подтвердить открытие журнала', exact=True)).to_be_visible()
         expect(tr.locator('.session-roster')).to_contain_text('Предварительный состав')
@@ -218,7 +237,36 @@ try:
         tr.get_by_label('Поиск по составу', exact=True).fill('Борис')
         expect(tr.locator('.session-roster-list > li')).to_have_count(1)
         tr.get_by_label('Поиск по составу', exact=True).fill('')
+        # The left roster switches the read-only athlete area on the right; it does not open the journal.
+        tr.get_by_role('button', name='Посмотреть спортсмена: Борис · контроль', exact=True).click()
+        expect(tr.locator('.session-member-panel h3')).to_have_text('Борис · контроль')
+        expect(tr.locator('.session-member-panel')).to_contain_text('предварительном составе')
+        expect(tr.get_by_role('button', name='Посмотреть спортсмена: Борис · контроль', exact=True)).to_have_attribute('aria-pressed', 'true')
+        tr.get_by_role('button', name='Посмотреть спортсмена: Виктор · контроль', exact=True).click()
+        expect(tr.locator('.session-member-panel h3')).to_have_text('Виктор · контроль')
+        assert sql(f"SELECT (roster_frozen_at IS NULL)::text || '|' || version FROM pride.training_sessions WHERE id='{sid}'") == 'true|1'
+        live_group = api(own, 'POST', base+'/groups', {'name': 'Текущая тренировка · контроль'})
+        live_sid = sql(f"INSERT INTO pride.training_sessions(club_id,group_id,trainer_id,starts_on,timezone,starts_at,ends_at) VALUES('{a['id']}','{live_group['id']}','{trainer['id']}',((now()-interval '5 minutes') AT TIME ZONE 'Europe/Minsk')::date,'Europe/Minsk',now()-interval '5 minutes',now()+interval '55 minutes') RETURNING id").splitlines()[0]
         tr.reload()
+        current_link = tr.get_by_role('link', name='К текущей тренировке', exact=True)
+        expect(current_link).to_be_visible()
+        current_link.click()
+        expect(tr).to_have_url(ROOT+'/clubs/'+a['id']+'/sessions/'+live_sid+'?journal=trainer')
+        expect(tr.locator('.session-detail-heading')).to_contain_text(live_group['name'])
+        expect(tr.get_by_role('link', name='К текущей тренировке', exact=True)).to_have_count(0)
+        assert sql(f"SELECT status || '|' || (roster_frozen_at IS NULL)::text FROM pride.training_sessions WHERE id='{live_sid}'") == 'planned|true'
+        tr.go_back()
+        expect(tr.locator('.session-roster-list > li')).to_have_count(3)
+        tr.get_by_role('button', name='Посмотреть спортсмена: Виктор · контроль', exact=True).click()
+        shots(tr, 'selected-athlete')
+        layout = tr.locator('.session-detail-layout').evaluate('e => [...e.children].map(child => child.getBoundingClientRect().x)')
+        assert layout[0] < layout[1], layout
+        tr.get_by_role('button', name='Вернуться к журналу', exact=True).click()
+        # Finishing an interval removes it from the current-training shortcut.
+        live_journal = api(tr, 'POST', base+'/trainer-sessions/'+live_sid+'/journal/open', {'version': 1})
+        api(tr, 'POST', base+'/trainer-sessions/'+live_sid+'/journal/close', {'version': live_journal['session']['version']})
+        tr.reload()
+        expect(tr.get_by_role('link', name='К текущей тренировке', exact=True)).to_have_count(0)
         expect(tr.locator('.session-roster-list > li')).to_have_count(3)
         assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{sid}'") == '0'
         assert sql(f"SELECT (roster_frozen_at IS NULL)::text || '|' || version FROM pride.training_sessions WHERE id='{sid}'") == 'true|1'
