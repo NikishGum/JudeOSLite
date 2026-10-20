@@ -1,0 +1,5 @@
+PASS roster, dated transfer/exclude, weekly preview/change, far move, planned cancel/network, once
+PASS open cancellation preserves marks/snapshot, closed restriction, parity/date-list, trainer replacement
+PASS lost response reconciliation and stale version input
+PASS focus handoff, future date-list validity, unavailable mobile recovery, contrast and touch sizes
+{"browser": "151.0.7922.34", "club": "45dabc99-8a38-4a85-9937-c2d43a4dd100", "group": "d881250c-403e-41cd-a7bc-ddfffe88d52c", "checks": "roster multi partial/double submit, transfer/exclude/date boundaries, contextual weekly preview/change, moved exception/cancel/history, once/open snapshot, role/branch, dirty/keyboard, 1440/1280/390/320", "screenshots": "/tmp/groups214-evidence", "errors": []}

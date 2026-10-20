@@ -21,7 +21,17 @@ export function GroupRoster({ clubId, group, groups, today, date, onDate, before
   const [results, setResults] = useState<Result[]>([]), [busy, setBusy] = useState(false);
   const [member, setMember] = useState<{ interval: Interval; action: 'transfer' | 'exclude' | 'history' } | null>(null);
   const [notice, setNotice] = useState('');
-  const pending = useRef(false), mounted = useRef(true);
+  const pending = useRef(false), mounted = useRef(true), addHeading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (!adding) return;
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    addHeading.current?.focus(); addHeading.current?.scrollIntoView({ block: 'start' });
+    return () => { if (previous?.isConnected) previous.focus(); };
+  }, [adding]);
+  function openAdding() {
+    if (adding) { addHeading.current?.focus(); addHeading.current?.scrollIntoView({ block: 'start' }); }
+    else beforeNavigate(() => { setAdding(true); setNotice(''); });
+  }
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   useEffect(() => {
     const c = new AbortController(); setLoading(true); setError(''); setRoster([]);
@@ -84,7 +94,7 @@ export function GroupRoster({ clubId, group, groups, today, date, onDate, before
     } finally { endMutation(); if (mounted.current) { pending.current = false; setBusy(false); } }
   }
   return <div className="group-roster">
-    <div className="section-heading"><h4>Участники группы</h4>{!group.archived && <button disabled={busy} onClick={() => beforeNavigate(() => { setAdding(true); setNotice(''); })}>Добавить участников</button>}</div>
+    <div className="section-heading"><h4>Участники группы</h4>{!group.archived && <button disabled={busy} onClick={openAdding}>Добавить участников</button>}</div>
     {notice && <p role="status">{notice}</p>}
     <div className="group-roster-date"><label className="field">Состав на дату<input type="date" min="0001-01-01" required value={date} onChange={(e) => onDate(e.target.value)} /></label><button className="secondary" disabled={loading || busy} onClick={() => setAttempt((v) => v + 1)}>Обновить состав</button></div>
     <p className="help">Просмотр истории на выбранную дату. Дата добавления или перевода задаётся отдельно.</p>
@@ -92,7 +102,7 @@ export function GroupRoster({ clubId, group, groups, today, date, onDate, before
     {!loading && !error && <><p>На {displayDate(date)}: {roster.length} участников.</p>{roster.length === 0 && <p>В составе на эту дату никого нет.{!group.archived && ' Добавьте участников из реестра.'}</p>}<ul className="group-people">{roster.map((i) => <li key={i.id}><div><strong>{i.fullName}</strong><p className="help">{displayDate(i.birthDate)}{i.cardArchived ? ' · карточка в архиве' : ''}</p></div><details><summary>Действия с участником<span className="sr-only"> {i.fullName}</span></summary><div className="actions">
       {!i.cardArchived && <button className="secondary" onClick={() => beforeNavigate(() => setMember({ interval: i, action: 'transfer' }))}>Перевести</button>}<button className="secondary" onClick={() => beforeNavigate(() => setMember({ interval: i, action: 'exclude' }))}>Завершить участие</button><button className="secondary" onClick={() => beforeNavigate(() => setMember({ interval: i, action: 'history' }))}>История участия</button>
     </div></details></li>)}</ul></>}
-    {adding && <div className="group-add"><div className="section-heading"><h4>Добавить в «{group.name}»</h4><button className="secondary" disabled={busy} onClick={() => beforeNavigate(() => { setAdding(false); setSelected([]); setResults([]); })}>Закрыть добавление</button></div>
+    {adding && <div className="group-add"><div className="section-heading"><h4 ref={addHeading} tabIndex={-1}>Добавить в «{group.name}»</h4><button className="secondary" disabled={busy} onClick={() => beforeNavigate(() => { setAdding(false); setSelected([]); setResults([]); })}>Закрыть добавление</button></div>
       <form className="registry-search" onSubmit={(e) => { e.preventDefault(); setQuery(search.trim()); setPage(0); }}><label className="field">Найти участника в реестре<input type="search" maxLength={200} value={search} onChange={(e) => setSearch(e.target.value)} /></label><button type="submit" disabled={busy}>Найти</button></form>
       {cardsLoading && <p role="status">Загружаем реестр…</p>}{cardsError && <div role="alert"><p>{cardsError}</p><button disabled={busy} onClick={() => setAttempt((v) => v + 1)}>Повторить загрузку реестра</button></div>}
       <form key={formKey} onSubmit={(e) => void add(e)} aria-busy={busy}><fieldset disabled={busy || results.some((r) => r.state === 'unknown')}>

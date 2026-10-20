@@ -22,9 +22,10 @@
 .group-workspace .group-choice { display: block; width: 100%; text-align: left; padding: 14px 12px; min-height: 68px; color: var(--pride-text); background: transparent; border: 1px solid transparent; border-radius: 8px; font-weight: 400; white-space: normal; overflow-wrap: anywhere; }
 .group-workspace .group-choice strong, .group-workspace .group-choice span { display: block; }
 .group-workspace .group-choice p { margin: 6px 0 0; font-size: 13px; line-height: 1.5; }
-.group-workspace .group-choice:hover { background: var(--pride-surface-subtle); }
+.group-workspace .group-choice:hover { background: var(--pride-surface-subtle); color: var(--pride-text); }
 .group-workspace .group-choice[aria-current="true"] { background: var(--pride-surface-subtle); border-color: var(--pride-border); border-left: 3px solid var(--pride-brand); }
 .group-workspace .group-workarea { min-width: 0; }
+.group-workspace :is(h3, h4)[tabindex="-1"] { scroll-margin-top: 100px; }
 .group-workspace .group-header h3 { margin: 0; font-size: 22px; }
 .group-workspace .group-header .section-heading { margin-bottom: 12px; align-items: flex-start; }
 .group-workspace .group-rule-summary { margin: 6px 0; line-height: 1.6; }

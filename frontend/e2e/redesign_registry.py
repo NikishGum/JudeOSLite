@@ -212,36 +212,47 @@ def check_registry(browser, page, signin, api, owner, root, engine, open_section
     for gid, date, count in ((g1['id'], '2025-09-30', 2), (g1['id'], '2025-10-01', 1), (g2['id'], '2025-10-01', 1)):
         ui.goto(root+f"/clubs/{a['id']}/groups?detail={gid}")
         ui.get_by_label('Состав на дату', exact=True).fill(date)
-        expect(ui.locator('.group-detail')).to_contain_text(': '+str(count)+' участников.')
+        expect(ui.locator('.group-roster')).to_contain_text(': '+str(count)+' участников.')
     ui.reload(); expect(ui.get_by_label('Состав на дату', exact=True)).to_be_visible()
     ui.get_by_role('button', name='К занятиям группы', exact=True).click()
     assert '/sessions?group='+g2['id'] in ui.url, ui.url
     ui.go_back(); expect(ui.get_by_label('Состав на дату', exact=True)).to_be_visible()
-    ui.get_by_role('button', name='Закрыть состав', exact=True).click()
+    open_section(ui, 'Группы')
     assert '?detail=' not in ui.url
-    ui.get_by_role('button', name='В архив Synthetic младшая', exact=True).click()
+    ui.locator('.group-choice').filter(has_text='Synthetic младшая').click()
+    settings = ui.locator('.group-header details')
+    if settings.get_attribute('open') is None: settings.locator('summary').click()
+    expect(settings).to_have_attribute('open', '')
+    ui.locator('.group-header').get_by_role('button', name='В архив', exact=True).click()
     ui.get_by_role('button', name='Отмена архива группы', exact=True).click()
     assert not next(g for g in api(ui, 'GET', f"/api/clubs/{a['id']}/groups?state=all") if g['id'] == g1['id'])['archived']
-    ui.get_by_role('button', name='В архив Synthetic младшая', exact=True).click()
+    ui.locator('.group-choice').filter(has_text='Synthetic младшая').click()
+    settings = ui.locator('.group-header details')
+    if settings.get_attribute('open') is None: settings.locator('summary').click()
+    expect(settings).to_have_attribute('open', '')
+    ui.locator('.group-header').get_by_role('button', name='В архив', exact=True).click()
     ui.get_by_role('button', name='Подтвердить архив группы', exact=True).click()
     expect(ui.get_by_role('status').filter(has_text='Группа в архиве')).to_be_visible()
     ui.get_by_label('Состояние групп', exact=True).select_option('all')
-    ui.get_by_role('button', name='Показать состав Synthetic младшая', exact=True).click()
+    ui.locator('.group-choice').filter(has_text='Synthetic младшая').click()
     ui.get_by_label('Состав на дату', exact=True).fill('2025-09-30')
-    expect(ui.locator('.group-detail')).to_contain_text('2 участников.')
+    expect(ui.locator('.group-roster')).to_contain_text('2 участников.')
     shots('groups-list')
     ui.get_by_role('button', name='Создать группу', exact=True).click(); shots('group-form')
-    panel.get_by_role('button', name='Отменить правку', exact=True).click()
+    panel.get_by_role('button', name='Закрыть форму группы', exact=True).click()
     # Scope change and trainer-only/foreign API never expose contacts.
-    with ui.expect_response(lambda response: f"/api/clubs/{b['id']}/participants?" in response.url and response.status == 200) as changed_scope:
+    with ui.expect_response(lambda response: f"/api/clubs/{b['id']}/groups?state=all" in response.url and response.status == 200) as changed_scope:
         ui.get_by_label('Филиал', exact=True).select_option(b['id'])
-    expect(ui.locator('.group-detail')).to_have_count(0)
+    expect(ui.locator('.group-roster')).to_have_count(0)
     # The fixture deliberately shares this identity with B above. Its name is
     # legitimate here; the local membership ID and contacts must belong to B.
-    b_cards = changed_scope.value.json()['items']
+    assert changed_scope.value.json() == []
+    expect(ui.locator('.group-header')).to_have_count(0)
+    b_cards = api(ui, 'GET', f"/api/clubs/{b['id']}/participants?state=all")['items']
     assert len(b_cards) == 1 and b_cards[0]['participantId'] == card['participantId']
     assert b_cards[0]['id'] != card['id']
-    expect(ui.get_by_role('button', name='Группы участника Synthetic однофамилец', exact=True)).to_be_visible()
+    open_section(ui, 'Участники')
+    expect(ui.locator('.participant-rows')).to_contain_text('Synthetic однофамилец')
     assert ui.evaluate("async p=>(await fetch(p)).status", f"/api/clubs/{b['id']}/participants/{card['id']}") == 404
     forbidden = admin.evaluate("async p=>(await fetch(p)).status", f"/api/clubs/{b['id']}/participants/{card['id']}")
     assert forbidden == 404

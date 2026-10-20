@@ -11,6 +11,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 from playwright.sync_api import sync_playwright, expect
 from runtime_ui import observe_api, wait_for_api_idle, assert_page_targets
+from redesign_accessibility import contrast_audit
 
 ROOT = 'http://127.0.0.1:8080'
 OUT = Path(os.environ.get('GROUPS214_EVIDENCE', '/tmp/groups214-evidence'))
@@ -62,6 +63,7 @@ def run():
   expect(admin.locator('.group-header')).to_contain_text('Регулярное расписание не задано')
   expect(admin.get_by_role('button',name='Добавить участников',exact=True)).to_be_visible()
   admin.get_by_role('button',name='Добавить участников',exact=True).click()
+  expect(admin.locator('.group-add h4').first).to_be_focused()
   for c in cards:admin.locator('.group-pick-list label').filter(has_text=c['fullName']).get_by_role('checkbox').check()
   admin.get_by_label('Дата зачисления',exact=True).fill(date(-2))
   admin.get_by_role('tab',name='Расписание',exact=True).click()
@@ -76,7 +78,7 @@ def run():
   expect(admin.locator('.group-add')).to_contain_text('Добавлен')
   expect(admin.locator('.group-add')).to_contain_text('На эти даты участник уже состоит в группе')
   assert sql(f"SELECT count(*) FROM pride.group_memberships WHERE group_id='{g['id']}'")=='2'
-  admin.get_by_role('button',name='Закрыть добавление',exact=True).click();leave();expect(admin.locator('.group-add')).to_have_count(0)
+  admin.get_by_role('button',name='Закрыть добавление',exact=True).click();leave();expect(admin.locator('.group-add')).to_have_count(0);expect(admin.get_by_role('button',name='Добавить участников',exact=True)).to_be_focused()
   # Transfer dates are independent of the historical roster date.
   row=admin.locator('.group-people > li').filter(has_text=cards[0]['fullName']);row.locator('summary').click();row.get_by_role('button',name='Перевести',exact=True).click()
   dialog=admin.get_by_role('dialog');dialog.get_by_label('Новая группа',exact=True).select_option(target['id']);dialog.get_by_label('Дата действия',exact=True).fill(date(1));expect(dialog).to_contain_text('Последний день в прежней группе');dialog.get_by_role('button',name='Сохранить перевод',exact=True).click()
@@ -146,6 +148,10 @@ def run():
   row=admin.locator(f'.group-sessions > li[data-session-id="{planned["id"]}"]');row.locator('summary').click();row.get_by_role('button',name='Заменить тренера',exact=True).click();form=admin.locator('.group-session-editor');form.get_by_label('Фактический тренер',exact=True).select_option(trainer2['id']);form.get_by_role('button',name='Подтвердить изменение занятия',exact=True).click();expect(form).to_have_count(0);expect(admin.locator(f'.group-sessions > li[data-session-id="{planned["id"]}"]')).to_contain_text(trainer2['displayName'])
   print('PASS open cancellation preserves marks/snapshot, closed restriction, parity/date-list, trainer replacement',flush=True)
   go();admin.get_by_role('tab',name='Расписание',exact=True).click()
+  # Future date-list picker stays valid initially and after advancing effective date.
+  go(target);admin.get_by_role('tab',name='Расписание',exact=True).click()
+  dates_row=admin.locator('.group-rules > li').filter(has_text='10:00–11:00');dates_row.get_by_role('button',name='Изменить расписание',exact=True).click();editor=admin.locator('.group-rule-editor');assert editor.locator('form').evaluate('f=>f.checkValidity()')
+  editor.get_by_label('Применить изменения с даты',exact=True).fill(date(3));assert editor.locator('form').evaluate('f=>f.checkValidity()');expect(editor.get_by_label('Дата в календаре',exact=True)).to_have_value(date(3));editor.get_by_role('button',name='Показать предпросмотр',exact=True).click();expect(editor.locator('.schedule-preview')).to_be_visible();editor.get_by_role('button',name='Отменить форму расписания',exact=True).click();leave();expect(editor).to_have_count(0)
   # A lost successful batch response is reconciled from the dated history.
   probe=api(owner,'POST',base+'/participants',{'identity':{'fullName':'Проверка потерянного ответа','birthDate':'2014-01-01'},'joinedOn':'2020-01-01','contactKind':'phone','contactValue':'+375291234568'},201)
   go(target);admin.get_by_role('button',name='Добавить участников',exact=True).click();admin.locator('.group-pick-list label').filter(has_text=probe['fullName']).get_by_role('checkbox').check()
@@ -181,9 +187,13 @@ def run():
    for width in [1440,1280,390,320]:
     admin.set_viewport_size({'width':width,'height':1000 if width>767 else 844});assert_page_targets(admin,width)
     assert admin.evaluate('document.documentElement.scrollWidth<=innerWidth'),(tab,width)
+    audit=contrast_audit(admin);assert not audit['failures'],(tab,width,audit['failures'])
     admin.evaluate('window.scrollTo(0,0)')
     admin.screenshot(path=str(OUT/f'{tab}-{width}.png'),full_page=True,animations='disabled')
   admin.set_viewport_size({'width':390,'height':844});admin.get_by_role('button',name='К списку групп',exact=True).click();expect(admin.locator('.group-index')).to_be_visible();admin.locator('.group-choice').filter(has_text=target['name']).click();expect(admin.locator('.group-header')).to_contain_text(target['name']);admin.get_by_role('button',name='К списку групп',exact=True).click();admin.locator('.group-choice').filter(has_text=g['name']).click();expect(admin.get_by_role('tab',name='Расписание',exact=True)).to_have_attribute('aria-selected','true')
+  admin.goto(ROOT+'/clubs/'+club['id']+'/groups?detail='+str(uuid.uuid4()));expect(admin.locator('.group-workarea')).to_contain_text('Группа недоступна');admin.get_by_role('button',name='К списку групп',exact=True).click();expect(admin.locator('.group-index')).to_be_visible()
+  admin.set_viewport_size({'width':1440,'height':1000});admin.locator('.group-choice').first.hover();assert not contrast_audit(admin)['failures']
+  print('PASS focus handoff, future date-list validity, unavailable mobile recovery, contrast and touch sizes',flush=True)
   assert not errors,errors
   print(json.dumps({'browser':browser.version,'club':club['id'],'group':g['id'],'checks':'roster multi partial/double submit, transfer/exclude/date boundaries, contextual weekly preview/change, moved exception/cancel/history, once/open snapshot, role/branch, dirty/keyboard, 1440/1280/390/320','screenshots':str(OUT),'errors':errors},ensure_ascii=False))
   browser.close()

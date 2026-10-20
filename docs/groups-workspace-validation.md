@@ -17,15 +17,26 @@ acquired=true, единственный StarMadeGalaxy / In progress прове�
   открытие настоящего snapshot и отмена с подтверждением.
 - Финальный расширенный сценарий (SQL count сохранённых marks/snapshot, closed guards,
   day_parity/date_list, замена тренера, потеря ответа после commit/версия/права,
-  состояние ошибки/retry, keyboard, размеры1440/1280/390/320): PENDING.
+  состояние ошибки/retry, keyboard, размеры1440/1280/390/320): PASS.
+  Лог: `.impeccable/review/groups214/targeted-pass.log`, JS errors=[],
+  Chromium151.0.7922.34, Go1.27.2, PostgreSQL18.6.
 - Настольные/мобильные снимки реального тестового администратора на синтетической БД:
   `.impeccable/review/groups214/{roster,schedule,rule-editor}-{1440,390}.png`,
   `list-390.png`. Первый scrolling capture был недостоверен (fixed skip-link);
   заменён снимками от document top. Локальная корректировка убрала повторный
   заголовок/создание группы с мобильной detail-страницы, сохранив их в списке.
-- Независимый Impeccable finish review: PENDING. Launcher/detector/craft-floor
-  недоступны; применены прочитанный skill/new-work и direct project context.
-- Штатный Build and checks39428487194 на da51751: RUNNING. Workflow не менялся.
+- Независимый Impeccable finish review: FIX→SHIP по трём исправлениям F1–F3
+  (фокус добавления, валидность future date-list picker, mobile unavailable recovery).
+  Два отдельных отчёта/измерения в `.impeccable/review/groups214/`; craft-floor
+  прочитан при review и root до исправлений, launcher/detector отсутствуют.
+- Штатный Build and checks39428487194 на da51751: FAIL в прежнем selector
+  `.group-detail` внутри redesign_registry.py:215. Проверки состава/границ дат/архива/
+  переходов/ID сохранены, локальный fragment адаптирован к новой group-roster,
+  contextual settings и реальному read групп при смене филиала. Без retries или
+  увеличения timeout. Точный изменённый group-fragment отдельно выполнен на
+  Chromium/Go/PostgreSQL,1280/390/320: PASS (`registry-group-fragment-pass.log`).
+  Новый штатный CI финального SHA проверяется до закрытия; итоговые run/SHA — live #214.
+  Workflow не менялся.
 
 ## Неполные попытки
 
@@ -37,7 +48,16 @@ label/htmlFor у новой группы перевода и фильтра со
 `training_session_id`; production SQL/миграции не менялись. После нескольких
 свежих входов локальный login limiter вернул429/15 минут; лимит не отключался,
 повторный login отложен до естественного конца окна. Неполные попытки не PASS
-полного адресного сценария.
+полного адресного сценария. Ещё один неполный harness-проход ожидал date-list
+правило, оставшись в другой группе; перед assertion добавлен явный переход в
+нужный groupId. Последующий полный адресный прогон PASS.
+
+Локальная адресная проверка адаптированного fragment также обнаружила hover:
+глобальное правило button:hover давало белый заголовок выбранной группы на светлой
+поверхности (1,07:1). В локальном `.group-choice:hover` явно сохранён существующий
+тёмный text token. Повтор тех же состояний, включая архивную группу, прошёл contrast
+на1280/390/320. Общий CSS/токены не менялись. Это механическое исправление состояния,
+не новый визуальный цикл; прочие пункты независимого verdict остаются в его scope.
 
 ## Границы
 

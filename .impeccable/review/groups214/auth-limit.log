@@ -1,0 +1,55 @@
+Traceback (most recent call last):
+  File "/workspace/JudeOSLite/frontend/e2e/groups_workspace.py", line 168, in <module>
+    if __name__=='__main__':run()
+                            ^^^^^
+  File "/workspace/JudeOSLite/frontend/e2e/groups_workspace.py", line 35, in run
+    owner=login()
+          ^^^^^^^
+  File "/workspace/JudeOSLite/frontend/e2e/groups_workspace.py", line 33, in login
+    page.get_by_label('Логин',exact=True).fill(name);page.get_by_label('Пароль',exact=True).fill(PASSWORD);page.get_by_role('button',name='Войти',exact=True).click();expect(page.locator('.app-shell')).to_be_visible();wait_for_api_idle(page)
+                                                                                                                                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/playwright/sync_api/_generated.py", line 23332, in to_be_visible
+    self._sync(
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 852, in to_be_visible
+    await self._expect_impl(
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 128, in _expect_impl
+    _record_soft_or_raise(
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 60, in _record_soft_or_raise
+    raise error
+AssertionError: Locator expected to be visible
+Actual value: None
+Error: element(s) not found 
+Call log:
+  - Expect "to_be_visible" with timeout 5000ms
+  - waiting for locator(".app-shell")
+
+Aria snapshot:
+- link "К основному содержимому":
+  - /url: "#workspace"
+- banner:
+  - link "PRIDE — главная":
+    - /url: /
+    - text: Клуб дзюдо
+    - strong: PRIDE
+  - text: Для сотрудников клуба
+- main:
+  - complementary "Приложение PRIDE":
+    - status: Установка пока недоступна. Можно продолжать работу в браузере.
+  - heading "Вход в аккаунт" [level=1]
+  - alert:
+    - paragraph: Слишком много попыток. Попробуйте через 15 минут.
+    - button "Проверить подключение и доступ"
+  - region "PRIDE CLUB OS":
+    - heading "PRIDE CLUB OS" [level=2]
+    - paragraph: Всё для вашего клуба в одном пространстве
+    - text: Логин
+    - textbox "Логин": owner
+    - text: Пароль
+    - textbox "Пароль"
+    - button "Войти"
+    - paragraph: Нет доступа или забыли пароль? Обратитесь к администратору клуба.
+  - group: Установить PRIDE на устройство
+- contentinfo: Клуб дзюдо PRIDE

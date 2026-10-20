@@ -16,7 +16,7 @@ export function GroupScheduleEditor({ clubId, timezone, rule, group, trainers, o
       groupId: group.id, trainerId: '', mode: 'weekly', weekdays: [1, 3, 5], startsTime: '18:00', durationMinutes: 60, from, until: null, version: 0,
     };
   });
-  const [picked, setPicked] = useState(today);
+  const [picked, setPicked] = useState(() => input.from > today ? input.from : today);
   const [preview, setPreview] = useState<Preview | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -28,7 +28,7 @@ export function GroupScheduleEditor({ clubId, timezone, rule, group, trainers, o
     heading.current?.focus(); heading.current?.scrollIntoView({ block: 'start' });
     return () => { mounted.current = false; if (previous?.isConnected) previous.focus(); };
   }, []);
-  function change(patch: Partial<ScheduleInput>) { setInput((old) => ({ ...old, ...patch })); setPreview(null); setError(''); }
+  function change(patch: Partial<ScheduleInput>) { if (patch.from && picked < patch.from) setPicked(patch.from); setInput((old) => ({ ...old, ...patch })); setPreview(null); setError(''); }
   function body(): ScheduleInput {
     return { groupId: input.groupId, trainerId: input.trainerId, mode: input.mode, startsTime: input.startsTime,
       durationMinutes: input.durationMinutes, from: input.mode === 'once' ? (input.selectedDates?.[0] ?? '') : input.from,

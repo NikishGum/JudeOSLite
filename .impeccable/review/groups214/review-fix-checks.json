@@ -1,0 +1,16 @@
+{
+  "F1": [
+    {
+      "width": 1440,
+      "headingY": 222.0625,
+      "openedFocus": true
+    },
+    {
+      "width": 390,
+      "headingY": 124.171875,
+      "openedFocus": true
+    }
+  ],
+  "F3": "unavailable mobile back returns to list",
+  "F2": "future date-list form validity + advanced date + real preview PASS in groups_workspace.py"
+}

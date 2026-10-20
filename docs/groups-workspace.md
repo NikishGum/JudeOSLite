@@ -90,6 +90,6 @@ SQL меняет даты только подготовленных fixture-за
 
 Impeccable: skill и new-work прочитаны, Mode Operate, расширение существующего PRIDE.
 Launcher отсутствовал; применён direct context fallback по PRODUCT/DESIGN,
-design-system и incumbent UI. Cloud skill references затем стали недоступны;
-craft-floor/detector не запускались. Изменения DESIGN.md/токенов не нужны:
+design-system и incumbent UI. Cloud skill references затем стали недоступны root; craft-floor позднее прочитан
+в независимом review и передан root для ручной проверки/исправлений. Detector не запускался. Изменения DESIGN.md/токенов не нужны:
 композиция использует существующие Rubik/палитру/панели/контролы.
