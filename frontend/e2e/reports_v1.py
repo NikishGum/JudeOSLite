@@ -100,11 +100,11 @@ with sync_playwright() as p:
     row.get_by_role('button', name='Сохранить исправление', exact=True).click()
     metric('present', '4'); metric('absent', '3'); metric('percentage', '57,1%')
     assert sql(f"SELECT count(*) FROM pride.audit_events WHERE entity_id='{ja['records'][2]['id']}' AND action='corrected'") == '1'
-    # A failed request clears totals; retry retains the chosen period.
+    # A failed same-scope read preserves totals and the chosen period for retry.
     owner.route('**/api/reports/attendance?*', lambda route: route.abort())
     screen.get_by_role('button', name='Обновить статистику', exact=True).click()
     expect(screen.get_by_role('alert')).to_contain_text('Нет соединения')
-    expect(screen.locator('[data-metric="present"]')).to_have_count(0)
+    metric('present', '4'); metric('percentage', '57,1%')
     owner.unroute('**/api/reports/attendance?*')
     screen.get_by_role('button', name='Повторить загрузку статистики', exact=True).click(); metric('percentage', '57,1%')
     # A late response from A cannot replace the subsequently selected B.

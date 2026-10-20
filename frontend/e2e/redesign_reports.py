@@ -216,11 +216,13 @@ try:
         owner.evaluate("window.dispatchEvent(new Event('attendance-changed'))")
         metric('present','4'); metric('absent','3'); metric('percentage','57,1%')
         assert sql(f"SELECT count(*) FROM pride.audit_events WHERE entity_id='{ja['records'][2]['id']}' AND action='corrected'") == '1'
-        # Error/retry has no fabricated zero. Hold a genuine response across a newer filter.
+        # A transport error preserves the last report; only a new scope clears it.
+        totals_before = screen.locator('.report-totals').element_handle()
         owner.route('**/api/reports/attendance?*', lambda route: route.abort())
         screen.get_by_role('button', name='Обновить статистику', exact=True).click()
         expect(screen.get_by_role('alert')).to_contain_text('Нет соединения')
-        expect(screen.locator('[data-metric="closed"]')).to_have_count(0)
+        metric('present','4'); metric('percentage','57,1%')
+        assert totals_before.evaluate('node => node.isConnected'), 'Network error unmounted the report'
         owner.unroute('**/api/reports/attendance?*')
         screen.get_by_role('button', name='Повторить загрузку статистики', exact=True).click(); metric('percentage','57,1%')
         def hold(value, target):
