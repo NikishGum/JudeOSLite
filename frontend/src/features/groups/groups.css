@@ -14,3 +14,62 @@
   .groups > .registry-list > li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
   .groups > .registry-list > li .actions { justify-content: flex-end; }
 }
+
+/* Local composition only: the Sessions surface and shared tokens stay unchanged. */
+.group-workspace .group-columns { display: grid; grid-template-columns: minmax(210px, 27%) minmax(0, 1fr); gap: 28px; margin-top: 24px; }
+.group-workspace .group-index { border-right: 1px solid var(--panel-line); padding-right: 24px; min-width: 0; }
+.group-workspace .group-index > ul, .group-workspace .group-people, .group-workspace .group-rules, .group-workspace .group-sessions, .group-workspace .group-pick-list { list-style: none; padding: 0; margin: 16px 0; }
+.group-workspace .group-choice { display: block; width: 100%; text-align: left; padding: 14px 12px; min-height: 68px; color: var(--pride-text); background: transparent; border: 1px solid transparent; border-radius: 8px; font-weight: 400; white-space: normal; overflow-wrap: anywhere; }
+.group-workspace .group-choice strong, .group-workspace .group-choice span { display: block; }
+.group-workspace .group-choice p { margin: 6px 0 0; font-size: 13px; line-height: 1.5; }
+.group-workspace .group-choice:hover { background: var(--pride-surface-subtle); }
+.group-workspace .group-choice[aria-current="true"] { background: var(--pride-surface-subtle); border-color: var(--pride-border); border-left: 3px solid var(--pride-brand); }
+.group-workspace .group-workarea { min-width: 0; }
+.group-workspace .group-header h3 { margin: 0; font-size: 22px; }
+.group-workspace .group-header .section-heading { margin-bottom: 12px; align-items: flex-start; }
+.group-workspace .group-rule-summary { margin: 6px 0; line-height: 1.6; }
+.group-workspace .group-rule-summary .help { font-size: inherit; }
+.group-workspace .group-tabs { display: flex; gap: 24px; border-bottom: 1px solid var(--panel-line); margin: 24px 0; }
+.group-workspace .group-tabs button { background: transparent; border: 0; border-radius: 0; color: var(--pride-text); padding: 12px 4px; min-height: 48px; border-bottom: 2px solid transparent; }
+.group-workspace .group-tabs button[aria-selected="true"] { color: var(--pride-brand); border-bottom-color: var(--pride-brand); }
+.group-workspace .group-people > li, .group-workspace .group-rules > li, .group-workspace .group-sessions > li { border-bottom: 1px solid var(--panel-line); padding: 18px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.group-workspace .group-people p, .group-workspace .group-rules p, .group-workspace .group-sessions p { margin: 6px 0 0; }
+.group-workspace details summary { display: list-item; cursor: pointer; min-height: 44px; padding: 12px 6px; font-size: 14px; font-weight: 500; overflow-wrap: anywhere; }
+.group-workspace details .actions { margin: 8px 0; gap: 8px; }
+.group-workspace details:not([open]) { max-width: 190px; }
+.group-workspace .group-roster-date, .group-workspace .group-period { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin: 16px 0; }
+.group-workspace .group-roster-date .field, .group-workspace .group-period .field { max-width: 220px; margin: 0; }
+.group-workspace .group-add, .group-workspace .group-rule-editor, .group-workspace .group-session-editor { padding: 24px 0; margin-top: 24px; border-top: 1px solid var(--panel-line); }
+.group-workspace .group-add .field, .group-workspace .group-rule-editor .field, .group-workspace .group-session-editor .field { margin: 16px 0; }
+.group-workspace .group-pick-list { max-height: 360px; overflow-y: auto; }
+.group-workspace .group-pick-list label { display: flex; gap: 12px; min-height: 56px; padding: 10px 4px; align-items: center; border-bottom: 1px solid var(--panel-line); cursor: pointer; }
+.group-workspace .group-pick-list small { display: block; color: var(--pride-text-secondary); font-size: 13px; margin-top: 4px; }
+.group-workspace .group-pick-list input, .group-workspace .group-check input, .group-workspace .schedule-weekdays input { width: 20px; height: 20px; flex: 0 0 20px; margin: 0; padding: 0; }
+.group-workspace .group-check { display: flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; }
+.group-workspace .group-exceptions { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--panel-line); }
+.group-workspace .group-calendar-link { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--panel-line); }
+.group-workspace .group-empty { padding: 40px 8px; max-width: 55ch; }
+.group-workspace .group-back { display: none; }
+.group-workspace .schedule-time, .group-workspace .session-time { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.group-workspace .schedule-weekdays { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0; }
+.group-workspace .schedule-weekdays legend { margin-bottom: 8px; }
+.group-workspace .schedule-weekdays label { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px; border: 1px solid var(--panel-line); border-radius: 5px; }
+.group-workspace .schedule-dates { padding-left: 20px; max-height: 300px; overflow-y: auto; }
+.group-workspace .schedule-dates li { padding: 8px 0; }
+.group-workspace .schedule-preview { margin-top: 24px; padding: 20px; border-radius: 12px; background: var(--pride-surface-subtle); }
+.group-workspace [hidden] { display: none; }
+@media (max-width: 1099px) {
+  .group-workspace .group-columns { display: block; }
+  .group-workspace .group-index { border: 0; padding: 0; }
+  .group-workspace.has-selection .group-index, .group-workspace:not(.has-selection) .group-workarea { display: none; }
+  .group-workspace .group-back { display: inline-flex; margin-bottom: 24px; }
+}
+@media (max-width: 600px) {
+  .group-workspace .group-people > li, .group-workspace .group-rules > li, .group-workspace .group-sessions > li { display: block; }
+  .group-workspace .group-people details, .group-workspace .group-sessions details { margin-top: 8px; }
+  .group-workspace .schedule-time, .group-workspace .session-time { grid-template-columns: 1fr; gap: 0; }
+  .group-workspace .group-header h3 { font-size: 20px; }
+  .group-workspace .group-choice p, .group-workspace details summary { font-size: 16px; }
+  .group-workspace .group-period { align-items: stretch; }
+  .group-workspace .group-period .field { order: -1; max-width: none; flex-basis: 100%; }
+}
