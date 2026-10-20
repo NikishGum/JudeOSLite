@@ -1,0 +1,295 @@
+{
+  "at": "2026-10-20T12:20:20.585787+03:00",
+  "origin": "https://test.judopride.tech",
+  "result": "INCOMPLETE",
+  "checks": [
+    "existing QA188 control journal/API ledger 2/5=40%; owner/admin/trainer isolation",
+    "live HTTPS role withdrawal removes visible roster; rejected save leaves five unmarked records",
+    "disable revokes live session; enable does not revive it; password change revokes a fresh session"
+  ],
+  "requests": [
+    {
+      "role": "owner",
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/journals/7846284c-7823-47a6-adf9-4c65b53aae38",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/reports/attendance?from=2026-10-15&until=2026-10-15&clubId=867a31f5-7d4d-4f35-9916-65119041beb4&groupId=697f2685-64d1-4993-bcc7-c3c238a059a7",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/reports/filters",
+      "status": 403,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/reports/filters",
+      "status": 403,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/journals/7846284c-7823-47a6-adf9-4c65b53aae38",
+      "status": 404,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/participants",
+      "status": 404,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "POST",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/trainers",
+      "status": 201,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "POST",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/sessions",
+      "status": 201,
+      "cache": "no-store"
+    },
+    {
+      "role": "probe",
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "probe",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "probe",
+      "method": "POST",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/trainer-sessions/aafba613-4de3-456d-8cda-a008f329b3a9/journal/open",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "POST",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/trainers/e95c634b-fdd6-4256-b464-399719d0c891/revoke",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "probe",
+      "method": "GET",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/trainer-sessions/aafba613-4de3-456d-8cda-a008f329b3a9/journal",
+      "status": 404,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/journals/aafba613-4de3-456d-8cda-a008f329b3a9",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/trainer-accounts",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "POST",
+      "path": "/api/staff/e95c634b-fdd6-4256-b464-399719d0c891/trainer-assignments",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/trainer-accounts",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "PUT",
+      "path": "/api/staff/e95c634b-fdd6-4256-b464-399719d0c891/account",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "probe",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 401,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/trainer-accounts",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "PUT",
+      "path": "/api/staff/e95c634b-fdd6-4256-b464-399719d0c891/account",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "probe",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 401,
+      "cache": "no-store"
+    },
+    {
+      "role": "probe-fresh",
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "probe-fresh",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/trainer-accounts",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "POST",
+      "path": "/api/staff/e95c634b-fdd6-4256-b464-399719d0c891/password",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "probe-fresh",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 401,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/journals/aafba613-4de3-456d-8cda-a008f329b3a9",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "POST",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/sessions/aafba613-4de3-456d-8cda-a008f329b3a9/cancel",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/trainer-accounts",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "PUT",
+      "path": "/api/staff/e95c634b-fdd6-4256-b464-399719d0c891/account",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/trainer-accounts",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "POST",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/trainers/e95c634b-fdd6-4256-b464-399719d0c891/revoke",
+      "status": 200,
+      "cache": "no-store"
+    }
+  ],
+  "probeUserId": "e95c634b-fdd6-4256-b464-399719d0c891",
+  "probeSessionId": "aafba613-4de3-456d-8cda-a008f329b3a9",
+  "cleanup": "probe session cancelled; probe account disabled and trainer assignment revoked",
+  "tlsVerification": true,
+  "secretsPersisted": false,
+  "limits": [
+    "session natural expiry tested only on disposable DB",
+    "different-release SW activation tested only on two local builds",
+    "native PWA installation and physical device checks not performed by this runner"
+  ]
+}

@@ -1,0 +1,28 @@
+
+> judeoslite-frontend@0.1.0 build
+> npm run typecheck && vite build
+
+
+> judeoslite-frontend@0.1.0 typecheck
+> tsc --noEmit
+
+vite v8.3.4 building client environment for production...
+transforming...
+✓ 2460 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                  1.01 kB │ gzip:   0.50 kB
+dist/assets/pwa-shell-ddbfb25cefa5363b.html      1.01 kB │ gzip:   0.50 kB
+dist/sw.js                                       2.42 kB
+dist/assets/rubik-cyrillic-ext-BgEjOSi_.woff2   12.28 kB
+dist/assets/rubik-cyrillic-6J3aU1sj.woff2       15.10 kB
+dist/assets/logo-pride-BmLOUEvF.png             16.36 kB
+dist/assets/rubik-latin-ext-xIGCplNB.woff2      19.28 kB
+dist/assets/rubik-latin-0V_ixqQm.woff2          35.32 kB
+dist/assets/index-DSkrm5m2.css                 148.66 kB │ gzip:  26.32 kB
+dist/assets/rolldown-runtime-hePW80VL.js         0.71 kB │ gzip:   0.42 kB
+dist/assets/calendar-Dbkg5eW3.js                70.33 kB │ gzip:  20.62 kB
+dist/assets/ui-vendor-CNKO1Slx.js              158.57 kB │ gzip:  53.68 kB
+dist/assets/index-IyKoR1Ya.js                  493.17 kB │ gzip: 133.74 kB
+
+✓ built in 890ms

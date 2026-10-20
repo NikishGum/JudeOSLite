@@ -1,0 +1,60 @@
+{
+  "assets": [
+    {
+      "path": "/assets/index-DSkrm5m2.css",
+      "status": 200,
+      "cache": "public, max-age=31536000, immutable",
+      "sha256": "472b542e3e6a6b59e1019efd0f7d02371b69e9c8ed92c21eece3516ccedc5c3a",
+      "matchesCurrentBuild": true
+    },
+    {
+      "path": "/assets/index-IyKoR1Ya.js",
+      "status": 200,
+      "cache": "public, max-age=31536000, immutable",
+      "sha256": "c8439d96fe7a1e02e99018389009cf96b8b619395755d4bda744f3d19a97f104",
+      "matchesCurrentBuild": true
+    },
+    {
+      "path": "/assets/pride-any-192-b0e310ba1bea.png",
+      "status": 200,
+      "cache": "public, max-age=31536000, immutable",
+      "sha256": "b0e310ba1bea8e8903b1c1cf4639c8542c6cac1b71ee22efe9dba9e86292df1d",
+      "matchesCurrentBuild": true
+    },
+    {
+      "path": "/assets/rolldown-runtime-hePW80VL.js",
+      "status": 200,
+      "cache": "public, max-age=31536000, immutable",
+      "sha256": "580ad8c58061a4dde99bde0a56905e382f0568516ee2f5b84dbfb52085709021",
+      "matchesCurrentBuild": true
+    },
+    {
+      "path": "/assets/ui-vendor-CNKO1Slx.js",
+      "status": 200,
+      "cache": "public, max-age=31536000, immutable",
+      "sha256": "e3d83d49215b154660b71f4260f07b3c7d7de0b0d7297ce773545aa37856bd00",
+      "matchesCurrentBuild": true
+    }
+  ],
+  "icons": [
+    {
+      "path": "/assets/pride-any-192-b0e310ba1bea.png",
+      "width": 192,
+      "height": 192,
+      "purpose": "any"
+    },
+    {
+      "path": "/assets/pride-any-512-042391ab33a4.png",
+      "width": 512,
+      "height": 512,
+      "purpose": "any"
+    },
+    {
+      "path": "/assets/pride-maskable-512-8dd07e24421e.png",
+      "width": 512,
+      "height": 512,
+      "purpose": "maskable"
+    }
+  ],
+  "allAssetsMatch": true
+}

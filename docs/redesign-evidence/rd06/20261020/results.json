@@ -1,0 +1,391 @@
+{
+  "date": "2026-10-20",
+  "timezone": "Europe/Minsk",
+  "issue": 188,
+  "sourceSha": "19f6d13270353906a529cce234e53eac12efdefc",
+  "image": "sha256:368adab4631b84f859583639f52d6880a4ea8ab686928dd7dbb170d816ecdebb",
+  "environment": {
+    "os": "Linux-6.18.55-x86_64-with-glibc2.41",
+    "playwright": "1.62.0",
+    "postgres": "18.6-bookworm",
+    "node": "24.19.0",
+    "go": "1.27.2"
+  },
+  "claim": {
+    "repeated": false,
+    "actor": "StarMadeGalaxy",
+    "run": 38699613597,
+    "acquired": true
+  },
+  "successfulScenarios": 8,
+  "attempts": [
+    {
+      "suite": "pwa_v1",
+      "engine": "chromium",
+      "command": [
+        "python3",
+        "frontend/e2e/pwa_v1.py"
+      ],
+      "sourceSha": "19f6d13270353906a529cce234e53eac12efdefc",
+      "startedAt": "2026-10-20T09:06:12.275831+00:00",
+      "endedAt": "2026-10-20T09:07:50.924546+00:00",
+      "exitCode": 0,
+      "durationSeconds": 98.648715,
+      "log": "pwa_v1-chromium.log",
+      "logSha256": "23168762b7e89431c84eaa74cc842f13247c3b35ec2b24cf5efbd3d99f46c741"
+    },
+    {
+      "suite": "pwa_v1",
+      "engine": "webkit",
+      "command": [
+        "python3",
+        "frontend/e2e/pwa_v1.py"
+      ],
+      "sourceSha": "19f6d13270353906a529cce234e53eac12efdefc",
+      "startedAt": "2026-10-20T09:07:50.925346+00:00",
+      "endedAt": "2026-10-20T09:08:12.464177+00:00",
+      "exitCode": 1,
+      "durationSeconds": 21.538831,
+      "log": "pwa_v1-webkit.log",
+      "logSha256": "61aabc1b3c5eba82568399b30a0ed1b19a43da7db59878bbe551e66f53d7d99d",
+      "originalRawLogSha256": "193040e3279016b03e3d942ced51b8f39b42ae967e52d1823ceee7f0fdd696c2",
+      "originalRawLogGzip": "pwa_v1-webkit.log.raw.gz"
+    },
+    {
+      "suite": "pwa_v1",
+      "engine": "webkit",
+      "attempt": 2,
+      "command": [
+        "python3",
+        "frontend/e2e/pwa_v1.py"
+      ],
+      "sourceSha": "19f6d13270353906a529cce234e53eac12efdefc",
+      "startedAt": "2026-10-20T09:10:13.108263+00:00",
+      "endedAt": "2026-10-20T09:10:35.113133+00:00",
+      "exitCode": 1,
+      "durationSeconds": 22.00487,
+      "log": "pwa_v1-webkit-attempt2.log",
+      "logSha256": "2f028e68a0ac9070028a3825718fe71cc8d92c12220165d8d661ee1e92dcac45",
+      "originalRawLogSha256": "4a3624469d73fbec23fa167ae5e3f19c6b027898bcc446d49a699923265a2ec4",
+      "originalRawLogGzip": "pwa_v1-webkit-attempt2.log.raw.gz"
+    },
+    {
+      "suite": "pwa_v1",
+      "engine": "webkit",
+      "attempt": 3,
+      "command": [
+        "python3",
+        "frontend/e2e/pwa_v1.py"
+      ],
+      "sourceSha": "19f6d13270353906a529cce234e53eac12efdefc",
+      "startedAt": "2026-10-20T09:11:33.934804+00:00",
+      "endedAt": "2026-10-20T09:14:32.291191+00:00",
+      "exitCode": 0,
+      "durationSeconds": 178.356387,
+      "log": "pwa_v1-webkit-attempt3.log",
+      "logSha256": "cfe911afe714025a0e1592d97533f9314bddfba7ea24c30d2a3207a0c8fe8fba"
+    },
+    {
+      "suite": "redesign_training",
+      "engine": "chromium",
+      "attempt": 1,
+      "command": [
+        "python3",
+        "frontend/e2e/redesign_training.py"
+      ],
+      "sourceSha": "19f6d13270353906a529cce234e53eac12efdefc",
+      "startedAt": "2026-10-20T09:14:32.296922+00:00",
+      "endedAt": "2026-10-20T09:15:03.392749+00:00",
+      "exitCode": 0,
+      "durationSeconds": 31.095827,
+      "log": "redesign_training-chromium.log",
+      "logSha256": "860975856e49cb4309b570be45410b8e6917f6ff1d658133e5e1307e356d7d36"
+    },
+    {
+      "suite": "redesign_training",
+      "engine": "webkit",
+      "attempt": 1,
+      "command": [
+        "python3",
+        "frontend/e2e/redesign_training.py"
+      ],
+      "sourceSha": "19f6d13270353906a529cce234e53eac12efdefc",
+      "startedAt": "2026-10-20T09:15:03.393447+00:00",
+      "endedAt": "2026-10-20T09:15:40.861590+00:00",
+      "exitCode": 0,
+      "durationSeconds": 37.468143,
+      "log": "redesign_training-webkit.log",
+      "logSha256": "981b361f5050f737c07615458b5fec61b27f6a10772a719bcd3a68255a0fa266"
+    },
+    {
+      "suite": "redesign_reports",
+      "engine": "chromium",
+      "attempt": 1,
+      "command": [
+        "python3",
+        "frontend/e2e/redesign_reports.py"
+      ],
+      "sourceSha": "19f6d13270353906a529cce234e53eac12efdefc",
+      "startedAt": "2026-10-20T09:15:40.864072+00:00",
+      "endedAt": "2026-10-20T09:16:19.283807+00:00",
+      "exitCode": 0,
+      "durationSeconds": 38.419735,
+      "log": "redesign_reports-chromium.log",
+      "logSha256": "0bd9ac39b46e40b13636cdc3a161726aeabe3d8322ddbdb2058819de5637589e"
+    },
+    {
+      "suite": "redesign_reports",
+      "engine": "webkit",
+      "attempt": 1,
+      "command": [
+        "python3",
+        "frontend/e2e/redesign_reports.py"
+      ],
+      "sourceSha": "19f6d13270353906a529cce234e53eac12efdefc",
+      "startedAt": "2026-10-20T09:16:19.286400+00:00",
+      "endedAt": "2026-10-20T09:17:03.991771+00:00",
+      "exitCode": 0,
+      "durationSeconds": 44.705371,
+      "log": "redesign_reports-webkit.log",
+      "logSha256": "678c604720e173212ed229ffe99d5293c2f2976915ce03e72c0655dd9c16e6e8"
+    },
+    {
+      "suite": "redesign_dashboard",
+      "engine": "chromium",
+      "attempt": 1,
+      "command": [
+        "python3",
+        "frontend/e2e/redesign_dashboard.py"
+      ],
+      "sourceSha": "19f6d13270353906a529cce234e53eac12efdefc",
+      "startedAt": "2026-10-20T09:17:03.992305+00:00",
+      "endedAt": "2026-10-20T09:17:41.785332+00:00",
+      "exitCode": 0,
+      "durationSeconds": 37.793027,
+      "log": "redesign_dashboard-chromium.log",
+      "logSha256": "8458fe373e949de87d57c0236d7ab1d6d4d170a0b031261a9fe1e2133ab573b8"
+    },
+    {
+      "suite": "redesign_dashboard",
+      "engine": "webkit",
+      "attempt": 1,
+      "command": [
+        "python3",
+        "frontend/e2e/redesign_dashboard.py"
+      ],
+      "sourceSha": "19f6d13270353906a529cce234e53eac12efdefc",
+      "startedAt": "2026-10-20T09:17:41.786292+00:00",
+      "endedAt": "2026-10-20T09:18:33.192529+00:00",
+      "exitCode": 0,
+      "durationSeconds": 51.406237,
+      "log": "redesign_dashboard-webkit.log",
+      "logSha256": "f468a9b612a6e01cd6540173ae9c87b41b822bdca9493e4c80d2668c55e8cf66"
+    }
+  ],
+  "summaries": [
+    {
+      "suite": "pwa_v1",
+      "engine": "chromium",
+      "results": [
+        {
+          "check": "rendered-text-contrast",
+          "normalMinimum": 4.88,
+          "largeMinimum": 5.43
+        },
+        {
+          "engine": "chromium",
+          "version": "151.0.7922.34",
+          "scheduleCounts": {
+            "weekly": 2,
+            "day_parity": 4,
+            "date_list": 2,
+            "once": 1
+          },
+          "report": {
+            "conducted": 1,
+            "present": 2,
+            "absent": 3,
+            "unknown": 2,
+            "illness": 0,
+            "excused": 1,
+            "percentage": 40
+          },
+          "nativeHistoryReturn": "fresh session and role verified; BFCache not measured",
+          "checks": "manifest/icons; admin UI/five participants/four schedules; cards/three reasons/defaults/correction/report; 320/390/768/900/1280/1440; rendered text contrast 4.5/3; double tap/delay/offline; mark/close/correct precommit error/lost response/SQL/reload; mark idempotent retry/correction stale retry; closed/cancelled/role revoke; static-only cache/logout/account swap/expiry/pagehide/native history return/fresh me; two builds/waiting/save guard/other-tab save",
+          "physicalInstallation": "NOT TESTED"
+        }
+      ]
+    },
+    {
+      "suite": "pwa_v1",
+      "engine": "webkit",
+      "results": [
+        {
+          "check": "rendered-text-contrast",
+          "normalMinimum": 4.88,
+          "largeMinimum": 5.43
+        },
+        {
+          "engine": "webkit",
+          "version": "26.5",
+          "scheduleCounts": {
+            "weekly": 2,
+            "day_parity": 4,
+            "date_list": 2,
+            "once": 1
+          },
+          "report": {
+            "conducted": 1,
+            "present": 2,
+            "absent": 3,
+            "unknown": 2,
+            "illness": 0,
+            "excused": 1,
+            "percentage": 40
+          },
+          "nativeHistoryReturn": "fresh session and role verified; BFCache not measured",
+          "checks": "manifest/icons; admin UI/five participants/four schedules; cards/three reasons/defaults/correction/report; 320/390/768/900/1280/1440; rendered text contrast 4.5/3; double tap/delay/offline; mark/close/correct precommit error/lost response/SQL/reload; mark idempotent retry/correction stale retry; closed/cancelled/role revoke; static-only cache/logout/account swap/expiry/pagehide/native history return/fresh me; two builds/waiting/save guard/other-tab save",
+          "physicalInstallation": "NOT TESTED"
+        }
+      ]
+    },
+    {
+      "suite": "redesign_training",
+      "engine": "chromium",
+      "results": [
+        {
+          "engine": "chromium",
+          "version": "151.0.7922.34",
+          "result": "PASS",
+          "checks": "day/week/period, ID scope/two clubs, create/reschedule/replace/cancel, direct journal/back/reload, Escape/focus, double tap/network/reload, correction conflict/history, 320/390/1280"
+        }
+      ]
+    },
+    {
+      "suite": "redesign_training",
+      "engine": "webkit",
+      "results": [
+        {
+          "engine": "webkit",
+          "version": "26.5",
+          "result": "PASS",
+          "checks": "day/week/period, ID scope/two clubs, create/reschedule/replace/cancel, direct journal/back/reload, Escape/focus, double tap/network/reload, correction conflict/history, 320/390/1280"
+        }
+      ]
+    },
+    {
+      "suite": "redesign_reports",
+      "engine": "chromium",
+      "results": [
+        {
+          "engine": "chromium",
+          "version": "151.0.7922.34",
+          "result": "PASS",
+          "ledger": "3/7=42.9%; corrected 4/7=57.1%; empty closed; planned/open/cancelled; archived/transfer; saved session timezone",
+          "checks": "quick Sunday/year/Minsk vs browser date; custom restore; same names/ID drilldown/session period; error/retry/stale responses; audit 50+8 paging/scope/public envelope; live admin+owner revoke; keyboard; 320/390/1280"
+        }
+      ]
+    },
+    {
+      "suite": "redesign_reports",
+      "engine": "webkit",
+      "results": [
+        {
+          "engine": "webkit",
+          "version": "26.5",
+          "result": "PASS",
+          "ledger": "3/7=42.9%; corrected 4/7=57.1%; empty closed; planned/open/cancelled; archived/transfer; saved session timezone",
+          "checks": "quick Sunday/year/Minsk vs browser date; custom restore; same names/ID drilldown/session period; error/retry/stale responses; audit 50+8 paging/scope/public envelope; live admin+owner revoke; keyboard; 320/390/1280"
+        }
+      ]
+    },
+    {
+      "suite": "redesign_dashboard",
+      "engine": "chromium",
+      "results": [
+        {
+          "engine": "chromium",
+          "version": "151.0.7922.34",
+          "result": "PASS",
+          "ledger": "2/5=40%; correction3/5=60%; close5/8=62.5%; empty closed null",
+          "checks": "two 24-hour-separated local dates; role scopes/counters/frozen roster; exact group/journal/create links; real mark/close/correction/archive; independent failures+retry; multi-role actual trainer; revoke/late replies/logout; 1440/1280/768/390/320; touch targets/main action"
+        }
+      ]
+    },
+    {
+      "suite": "redesign_dashboard",
+      "engine": "webkit",
+      "results": [
+        {
+          "engine": "webkit",
+          "version": "26.5",
+          "result": "PASS",
+          "ledger": "2/5=40%; correction3/5=60%; close5/8=62.5%; empty closed null",
+          "checks": "two 24-hour-separated local dates; role scopes/counters/frozen roster; exact group/journal/create links; real mark/close/correction/archive; independent failures+retry; multi-role actual trainer; revoke/late replies/logout; 1440/1280/768/390/320; touch targets/main action"
+        }
+      ]
+    }
+  ],
+  "sourceFileSha256": {
+    "frontend/e2e/pwa_v1.py": "93f5092ec0f7651f6899bbe0e42a5db004cfefa69a6a70de54771accc58e9691",
+    "frontend/e2e/redesign_training.py": "56fd8e21a7d6c55e7bb8dec8e312e047b7b478a10ea63062488b4c7936114bae",
+    "frontend/e2e/redesign_reports.py": "3972d1a62578b926392151509c5274a6666e4cc01506e288b348fc3622b4e9bc",
+    "frontend/e2e/redesign_dashboard.py": "101d8f5dd4f3b5b3c74db729d5031c0506c6ac4198417e0f3cf359c12a42a480",
+    "frontend/e2e/redesign_accessibility.py": "56950ccc72bf9eb208eb66f799247afc915f856471ced0cc8c18a4223bc34225",
+    "frontend/e2e/runtime_ui.py": "02982e80805ae0d0dfa99fb2fabbfd4ba33be15d4450c83e3ec2f37a6d281bb6"
+  },
+  "evidenceSha256": {
+    "chromium-owner-report-1440.png": "378b3b27a354e5a1195b24827d01889e8953e2457e7020df1ba9517c185d9cdc",
+    "chromium-trainer-390.png": "42c19250d1709f2503ff9abb18c9f9f94a8412f38eafb8b46881a8d74eb390f5",
+    "frontend-build.log": "ac3b75ff4195ff72c0f19c55d44a6532724349c72ce0e3852c3dda418e12937d",
+    "https-attempts.json": "3f5cf0028ac2bad5470f232b7e999230acdd158d349ac4e5170c0421c3e917b5",
+    "https-control-report.png": "63d4492658b8f7be6f5b2a7d81d35a18440f1ff595eb021dd200ab357e60f5f7",
+    "https-lifecycle-attempt1.json": "7621dad2eeccfaf7f299151470028076291e5e2b8f8dfba8211bb7fdb94e91ca",
+    "https-lifecycle-attempt2.json": "92a4be64a59254127fd45516ef580afac9046cb0123a4cd05891fc55fadc2914",
+    "https-lifecycle-attempt3.json": "cc47404173322ed1a7829362e220436e5e9835bdbb796bb1c4a09fcd7b101c87",
+    "https-lifecycle-attempt4.json": "59b0c1142b94af6168bb3e4146eafb0b76991245a9d854674ffabd25eeef398f",
+    "https-lifecycle.json": "9fe5ae0def16727b1b1d6114c0a95f5cdaabb94812b88cdbfc4e0917a5b7e4c6",
+    "public-assets.json": "6395d4ca59a13f244b4838624fb9976b62c876d8fb1851ca6310182e6d611d1c",
+    "public-https.json": "57817a89eb2bc1b68d5a00f76b78629f780298c565cb730201f8b7d3c968d3ea",
+    "pwa_v1-chromium.log": "23168762b7e89431c84eaa74cc842f13247c3b35ec2b24cf5efbd3d99f46c741",
+    "pwa_v1-webkit-attempt2.log": "2f028e68a0ac9070028a3825718fe71cc8d92c12220165d8d661ee1e92dcac45",
+    "pwa_v1-webkit-attempt2.log.raw.gz": "d1c41dd0a797f9210f3752d2a131d0df6f6242f2808a5197974aec4acf186d1d",
+    "pwa_v1-webkit-attempt3.log": "cfe911afe714025a0e1592d97533f9314bddfba7ea24c30d2a3207a0c8fe8fba",
+    "pwa_v1-webkit.log": "61aabc1b3c5eba82568399b30a0ed1b19a43da7db59878bbe551e66f53d7d99d",
+    "pwa_v1-webkit.log.raw.gz": "3300db673eacf0f1594105d72d111b7e84dc02903c9274b8f1941c6f8e9febc0",
+    "redesign_dashboard-chromium.log": "8458fe373e949de87d57c0236d7ab1d6d4d170a0b031261a9fe1e2133ab573b8",
+    "redesign_dashboard-webkit.log": "f468a9b612a6e01cd6540173ae9c87b41b822bdca9493e4c80d2668c55e8cf66",
+    "redesign_reports-chromium.log": "0bd9ac39b46e40b13636cdc3a161726aeabe3d8322ddbdb2058819de5637589e",
+    "redesign_reports-webkit.log": "678c604720e173212ed229ffe99d5293c2f2976915ce03e72c0655dd9c16e6e8",
+    "redesign_training-chromium.log": "860975856e49cb4309b570be45410b8e6917f6ff1d658133e5e1307e356d7d36",
+    "redesign_training-webkit.log": "981b361f5050f737c07615458b5fec61b27f6a10772a719bcd3a68255a0fa266",
+    "webkit-dependency.json": "c76cffd6e5ab51ada0e554d020922be4dbbd270124642f9e52ec327599b9459a",
+    "webkit-owner-report-1440.png": "dc8974beebc5a32237b1b61edb6548cdc775136c7a1371a9568be81c02477b95",
+    "webkit-trainer-390.png": "00c51dd5069a3fa83bd1e574d9fb427ac2af4e6641c65e9f5ec6885542214a36"
+  },
+  "scope": {
+    "localBrowserGoPostgres": "PASS",
+    "publicHttps": "PASS",
+    "publicAuthenticatedRoleSmoke": "PASS: six real HTTPS browser/API checks,40 recorded API requests; TLS verified",
+    "currentNativePwaInstallation": "NOT RUN",
+    "employeeIndependentAcceptance": "NOT RUN",
+    "androidPhysical": "DEFERRED by user 2026-10-15",
+    "remainingIphoneManual": "DEFERRED by user 2026-10-15",
+    "previousVisualAcceptance": "2026-10-15; does not accept subsequent #198/#200 design"
+  },
+  "webkitSetup": {
+    "failure": "First two attempts stopped before launch: libGLESv2.so.2 absent from system ldconfig cache",
+    "repair": "Official Debian libgles2 1.7.0-1+b2 extracted to user-owned directory; hash in webkit-dependency.json",
+    "verification": "ctypes.CDLL and actual WebKit26.5 launch/DOM smoke PASS",
+    "settings": "LD_LIBRARY_PATH points to extracted library. PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1 skips ldconfig-only preflight, which ignores that user-local library; application/browser assertions unchanged."
+  },
+  "liveHttps": {
+    "result": "PASS",
+    "applicationSha": "19f6d13270353906a529cce234e53eac12efdefc",
+    "runnerSha256": "13dd44fde083595a81a502d542c084d28ec79fe6c91046c7c2d43812693651c7",
+    "evidence": "https-lifecycle.json",
+    "attempts": "https-attempts.json",
+    "physicalDeviceInstallation": "NOT RUN",
+    "at": "2026-10-20T12:36:10.143771+03:00"
+  }
+}

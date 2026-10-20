@@ -727,6 +727,45 @@ Chromium151.0.7922.34/WebKit26.5, production Docker build. Новый harness и
 Окончательные SHA/CI/main/Deploy/Done — live #203, эта запись не заменяет очередь.
 #188/физические устройства и пользовательская приёмка не закрываются по этим тестам.
 
+## RD-06: актуальный технический повтор — 20.10.2026
+
+Пользователь явно поручил продолжить #188 в текущем облачном чате. Предыдущие
+три чата idle/notLoaded, конфликтующих PR нет; исходный claim StarMadeGalaxy /
+fc02eb61696d4543b4e75cc757b604e3 / run38699613597 acquired=true проверен.
+Повторного claim/переназначения нет. Изолированная ветвь
+codex/rd-06-current-validation от main19f6d13270353906a529cce234e53eac12efdefc.
+
+Восемь полных pwa_v1/redesign_training/reports/dashboard Chromium151.0.7922.34 /
+WebKit26.5 на Go/PG18.6 PASS: текущие формы/права/история, четыре расписания,
+40% и независимые SQL-ledgers, revoke/expiry/stale/network/cache/update двух builds.
+Контраст4.88/5.43, 320/390/768/900/1280/1440, keyboard/focus и основные mobile44px.
+Две первые WebKit попытки остановились до запуска из-за libGLESv2; официальный
+пакет Debian загружен с проверкой SHA в пользовательский каталог, реальный launch
+и DOM проверены. Подробные локальные настройки/preflight, все попытки/логи/хеши и
+новые снимки — [протокол20.10](../redesign-evidence/rd06/20261020/README.md).
+Impeccable audit прочитан; launcher/context/detector отсутствуют, применён direct
+context fallback. Production-код и существующие assertions не менялись.
+
+Публичный HTTPS показал тот же release SHA/health/readiness200, закрытые API401/
+no-store и побайтное совпадение текущих JS/CSS с build. Пользователь предоставил
+тестовый вход; пароль/cookies/токены в Git/доказательства не включаются. Новый
+opt-in frontend/e2e/redesign_https.py работает только на существующем QA188,
+с отдельным отключаемым техническим аккаунтом/отменяемым занятием; исходный
+контрольный журнал сохраняется. Финальный HTTPS прогон12:31 — PASS,40 записанных
+API-запросов: контроль40% в API/UI, offline mark без записи, live role revoke,
+disable/enable/password с прекращением сессий, static-only cache, поздний owner
+ответ после admin login/reload. Probe account отключён/роль снята, занятие
+отменено с5NULL. Неполные harness попытки сохранены (labels/unique cancelled slot/
+лимит входов); после устранения причин выполнен полный прогон, лимит не обходили.
+Естественный expiry и другой release SW activation проверены только локально.
+Точная доставка/CI/main/deploy — в протоколе и #188.
+
+Физические PASS и принятие интерфейса15.10 относятся к прежнему release;
+новое оформление #198/#200 ими не принято. Android и оставшиеся ручные iPhone
+проверки сохраняют согласованный DEFERRED/NOT RUN; повторно не запрашивать.
+Самостоятельные проходы сотрудников ещё не подтверждены. #188 остаётся
+OPEN/In progress до оставшихся критериев/явного изменения объёма заказчиком.
+
 CI RD-11: d57b1ae PR39264454781 PASS, push39264328305 FAIL в synthetic
 screenshot_redesign.py:151 (counter после focus/networkidle). Тот же FAIL
 воспроизведён локально. В рамках проверки исправлен только e2e harness:
