@@ -1,0 +1,88 @@
+{
+  "at": "2026-10-20T09:04:49.707224+00:00",
+  "origin": "https://test.judopride.tech",
+  "tlsVerification": true,
+  "checks": [
+    {
+      "path": "/release.json",
+      "status": 200,
+      "cache": "no-cache",
+      "type": "application/json",
+      "release": {
+        "sha": "19f6d13270353906a529cce234e53eac12efdefc"
+      }
+    },
+    {
+      "path": "/api/healthz",
+      "status": 200,
+      "cache": "no-store",
+      "type": "application/json; charset=utf-8"
+    },
+    {
+      "path": "/api/readyz",
+      "status": 200,
+      "cache": "no-store",
+      "type": "application/json; charset=utf-8"
+    },
+    {
+      "path": "/api/auth/me",
+      "status": 401,
+      "cache": "no-store",
+      "type": "application/json; charset=utf-8"
+    },
+    {
+      "path": "/api/dashboard",
+      "status": 401,
+      "cache": "no-store",
+      "type": "application/json; charset=utf-8"
+    },
+    {
+      "path": "/api/reports/attendance",
+      "status": 401,
+      "cache": "no-store",
+      "type": "application/json; charset=utf-8"
+    },
+    {
+      "path": "/api/notifications",
+      "status": 401,
+      "cache": "no-store",
+      "type": "application/json; charset=utf-8"
+    },
+    {
+      "path": "/api/portal/families",
+      "status": 401,
+      "cache": "no-store",
+      "type": "application/json; charset=utf-8"
+    },
+    {
+      "path": "/manifest.webmanifest",
+      "status": 200,
+      "cache": "no-cache",
+      "type": "text/plain; charset=utf-8",
+      "manifest": {
+        "name": "PRIDE — рабочее пространство",
+        "display": "standalone",
+        "start_url": "/",
+        "scope": "/"
+      }
+    },
+    {
+      "path": "/sw.js",
+      "status": 200,
+      "cache": "no-cache",
+      "type": "text/javascript; charset=utf-8"
+    },
+    {
+      "path": "/",
+      "status": 200,
+      "cache": "no-cache",
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "path": "/history",
+      "status": 200,
+      "cache": "no-cache",
+      "type": "text/html; charset=utf-8"
+    }
+  ]
+}

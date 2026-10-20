@@ -1,0 +1,40 @@
+{
+  "failures": [
+    {
+      "attempt": 1,
+      "result": "INCOMPLETE",
+      "reason": "Incorrect harness labels for custom report dates; three live checks passed; cleanup completed",
+      "resultFile": "https-lifecycle-attempt1.json",
+      "runnerSha256": "c9c4864a1261764a32bc40f60b1f043bbf877130741c9d017dff65fc40131206"
+    },
+    {
+      "attempt": 2,
+      "result": "INCOMPLETE",
+      "reason": "Cancelled probe retains unique group/time key; create409; account cleanup completed",
+      "resultFile": "https-lifecycle-attempt2.json",
+      "runnerSha256": "0f693ca1be404a3c35d1bf21af8beb0c54126ade5dbc0119505e9a4751d21360"
+    },
+    {
+      "attempt": 3,
+      "result": "INCOMPLETE",
+      "reason": "Duplicate API/UI owner logins reached the existing15-minute limit; three checks passed; cleanup completed",
+      "resultFile": "https-lifecycle-attempt3.json",
+      "runnerSha256": "02ff87a2782f90385c5a8a22926a7c8d0b2051dc1029380b19ecb7c21da7f25d"
+    }
+  ],
+  "finalResult": "PASS",
+  "finalFile": "https-lifecycle.json",
+  "confirmations": [
+    {
+      "attempt": 4,
+      "result": "PASS",
+      "resultFile": "https-lifecycle-attempt4.json"
+    },
+    {
+      "attempt": 5,
+      "result": "PASS",
+      "resultFile": "https-lifecycle.json",
+      "note": "Added explicit live page/panel overflow assertions and stable metric capture"
+    }
+  ]
+}
