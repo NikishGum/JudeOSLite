@@ -1,0 +1,321 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-20T00:00:00+03:00",
+  "title": "Design System: PRIDE — Занятия, UX-прототипы",
+  "extensions": {
+    "colorMeta": {
+      "brand": {
+        "role": "primary",
+        "displayName": "brand",
+        "tonalRamp": [
+          "oklch(15.00% 0.22664 28.82)",
+          "oklch(26.43% 0.22664 28.82)",
+          "oklch(37.86% 0.22664 28.82)",
+          "oklch(49.29% 0.22664 28.82)",
+          "oklch(60.71% 0.22664 28.82)",
+          "oklch(72.14% 0.22664 28.82)",
+          "oklch(83.57% 0.22664 28.82)",
+          "oklch(95.00% 0.22664 28.82)"
+        ]
+      },
+      "brand-hover": {
+        "role": "neutral",
+        "displayName": "brand-hover",
+        "tonalRamp": [
+          "oklch(15.00% 0.00000 0.00)",
+          "oklch(26.43% 0.00000 0.00)",
+          "oklch(37.86% 0.00000 0.00)",
+          "oklch(49.29% 0.00000 0.00)",
+          "oklch(60.71% 0.00000 0.00)",
+          "oklch(72.14% 0.00000 0.00)",
+          "oklch(83.57% 0.00000 0.00)",
+          "oklch(95.00% 0.00000 0.00)"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "text",
+        "tonalRamp": [
+          "oklch(15.00% 0.00949 248.19)",
+          "oklch(26.43% 0.00949 248.19)",
+          "oklch(37.86% 0.00949 248.19)",
+          "oklch(49.29% 0.00949 248.19)",
+          "oklch(60.71% 0.00949 248.19)",
+          "oklch(72.14% 0.00949 248.19)",
+          "oklch(83.57% 0.00949 248.19)",
+          "oklch(95.00% 0.00949 248.19)"
+        ]
+      },
+      "text-secondary": {
+        "role": "neutral",
+        "displayName": "text-secondary",
+        "tonalRamp": [
+          "oklch(15.00% 0.01561 241.18)",
+          "oklch(26.43% 0.01561 241.18)",
+          "oklch(37.86% 0.01561 241.18)",
+          "oklch(49.29% 0.01561 241.18)",
+          "oklch(60.71% 0.01561 241.18)",
+          "oklch(72.14% 0.01561 241.18)",
+          "oklch(83.57% 0.01561 241.18)",
+          "oklch(95.00% 0.01561 241.18)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "surface",
+        "tonalRamp": [
+          "oklch(15.00% 0.00000 0.00)",
+          "oklch(26.43% 0.00000 0.00)",
+          "oklch(37.86% 0.00000 0.00)",
+          "oklch(49.29% 0.00000 0.00)",
+          "oklch(60.71% 0.00000 0.00)",
+          "oklch(72.14% 0.00000 0.00)",
+          "oklch(83.57% 0.00000 0.00)",
+          "oklch(95.00% 0.00000 0.00)"
+        ]
+      },
+      "surface-subtle": {
+        "role": "neutral",
+        "displayName": "surface-subtle",
+        "tonalRamp": [
+          "oklch(15.00% 0.00453 258.32)",
+          "oklch(26.43% 0.00453 258.32)",
+          "oklch(37.86% 0.00453 258.32)",
+          "oklch(49.29% 0.00453 258.32)",
+          "oklch(60.71% 0.00453 258.32)",
+          "oklch(72.14% 0.00453 258.32)",
+          "oklch(83.57% 0.00453 258.32)",
+          "oklch(95.00% 0.00453 258.32)"
+        ]
+      },
+      "surface-section": {
+        "role": "neutral",
+        "displayName": "surface-section",
+        "tonalRamp": [
+          "oklch(15.00% 0.00911 258.34)",
+          "oklch(26.43% 0.00911 258.34)",
+          "oklch(37.86% 0.00911 258.34)",
+          "oklch(49.29% 0.00911 258.34)",
+          "oklch(60.71% 0.00911 258.34)",
+          "oklch(72.14% 0.00911 258.34)",
+          "oklch(83.57% 0.00911 258.34)",
+          "oklch(95.00% 0.00911 258.34)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "border",
+        "tonalRamp": [
+          "oklch(15.00% 0.00000 0.00)",
+          "oklch(26.43% 0.00000 0.00)",
+          "oklch(37.86% 0.00000 0.00)",
+          "oklch(49.29% 0.00000 0.00)",
+          "oklch(60.71% 0.00000 0.00)",
+          "oklch(72.14% 0.00000 0.00)",
+          "oklch(83.57% 0.00000 0.00)",
+          "oklch(95.00% 0.00000 0.00)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "line",
+        "tonalRamp": [
+          "oklch(15.00% 0.00630 255.48)",
+          "oklch(26.43% 0.00630 255.48)",
+          "oklch(37.86% 0.00630 255.48)",
+          "oklch(49.29% 0.00630 255.48)",
+          "oklch(60.71% 0.00630 255.48)",
+          "oklch(72.14% 0.00630 255.48)",
+          "oklch(83.57% 0.00630 255.48)",
+          "oklch(95.00% 0.00630 255.48)"
+        ]
+      },
+      "success": {
+        "role": "semantic",
+        "displayName": "success",
+        "tonalRamp": [
+          "oklch(15.00% 0.07789 165.78)",
+          "oklch(26.43% 0.07789 165.78)",
+          "oklch(37.86% 0.07789 165.78)",
+          "oklch(49.29% 0.07789 165.78)",
+          "oklch(60.71% 0.07789 165.78)",
+          "oklch(72.14% 0.07789 165.78)",
+          "oklch(83.57% 0.07789 165.78)",
+          "oklch(95.00% 0.07789 165.78)"
+        ]
+      },
+      "success-bg": {
+        "role": "semantic",
+        "displayName": "success-bg",
+        "tonalRamp": [
+          "oklch(15.00% 0.01157 162.05)",
+          "oklch(26.43% 0.01157 162.05)",
+          "oklch(37.86% 0.01157 162.05)",
+          "oklch(49.29% 0.01157 162.05)",
+          "oklch(60.71% 0.01157 162.05)",
+          "oklch(72.14% 0.01157 162.05)",
+          "oklch(83.57% 0.01157 162.05)",
+          "oklch(95.00% 0.01157 162.05)"
+        ]
+      },
+      "warning": {
+        "role": "semantic",
+        "displayName": "warning",
+        "tonalRamp": [
+          "oklch(15.00% 0.10251 66.18)",
+          "oklch(26.43% 0.10251 66.18)",
+          "oklch(37.86% 0.10251 66.18)",
+          "oklch(49.29% 0.10251 66.18)",
+          "oklch(60.71% 0.10251 66.18)",
+          "oklch(72.14% 0.10251 66.18)",
+          "oklch(83.57% 0.10251 66.18)",
+          "oklch(95.00% 0.10251 66.18)"
+        ]
+      },
+      "warning-bg": {
+        "role": "semantic",
+        "displayName": "warning-bg",
+        "tonalRamp": [
+          "oklch(15.00% 0.02367 79.75)",
+          "oklch(26.43% 0.02367 79.75)",
+          "oklch(37.86% 0.02367 79.75)",
+          "oklch(49.29% 0.02367 79.75)",
+          "oklch(60.71% 0.02367 79.75)",
+          "oklch(72.14% 0.02367 79.75)",
+          "oklch(83.57% 0.02367 79.75)",
+          "oklch(95.00% 0.02367 79.75)"
+        ]
+      }
+    },
+    "shadows": [
+      {
+        "name": "dialog",
+        "value": "0 24px 64px -24px #21252966",
+        "purpose": "Модальное окно"
+      },
+      {
+        "name": "toast",
+        "value": "0 12px 32px -12px #21252966",
+        "purpose": "Сообщение о локальном действии"
+      }
+    ],
+    "motion": [
+      {
+        "name": "feedback",
+        "value": "160ms ease-out",
+        "purpose": "Цвет кнопки и появление сообщения; отключается при reduced motion"
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact",
+        "value": "1190px"
+      },
+      {
+        "name": "trainer-inline",
+        "value": "950px"
+      },
+      {
+        "name": "mobile",
+        "value": "700px"
+      },
+      {
+        "name": "stack-fields",
+        "value": "380px"
+      }
+    ],
+    "provenance": {
+      "scope": "artifact-only; UX proposals",
+      "source": "index.html, sessions.css, sessions.js; inherited ../../tokens.css; existing app semantic colors",
+      "tonalRamps": "Synthesized OKLCH preview metadata only; not shipped tokens or recommendations"
+    }
+  },
+  "components": [
+    {
+      "name": "Разовое занятие",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Построенный вариант кнопки прототипа.",
+      "html": "<button class=\"ds-button-primary\">Разовое занятие</button>",
+      "css": ".ds-button-primary{min-height:44px;display:inline-flex;justify-content:center;align-items:center;gap:8px;border:1px solid var(--pride-border,#dedede);border-radius:var(--pride-radius-button,5px);padding:10px 16px;font:500 14px/1.5 var(--pride-font,Rubik,sans-serif);cursor:pointer;transition:background-color 160ms ease-out,color 160ms ease-out;background:var(--pride-brand,#db0c0c);color:white}.ds-button-primary:hover{background:var(--pride-brand-hover,#323232)}.ds-button-primary:focus-visible{outline:2px solid var(--pride-brand,#db0c0c);outline-offset:3px}.ds-button-primary:disabled{opacity:.5;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-button-primary{transition:none}}.ds-button-primary{border-color:var(--pride-brand,#db0c0c)}.ds-button-primary:hover{border-color:var(--pride-brand-hover,#323232)}"
+    },
+    {
+      "name": "Журнал",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Построенный вариант кнопки прототипа.",
+      "html": "<button class=\"ds-button-secondary\">Журнал</button>",
+      "css": ".ds-button-secondary{min-height:44px;display:inline-flex;justify-content:center;align-items:center;gap:8px;border:1px solid var(--pride-border,#dedede);border-radius:var(--pride-radius-button,5px);padding:10px 16px;font:500 14px/1.5 var(--pride-font,Rubik,sans-serif);cursor:pointer;transition:background-color 160ms ease-out,color 160ms ease-out;background:white;color:var(--pride-text,#212529)}.ds-button-secondary:hover{background:var(--pride-surface-subtle,#f5f7fa)}.ds-button-secondary:focus-visible{outline:2px solid var(--pride-brand,#db0c0c);outline-offset:3px}.ds-button-secondary:disabled{opacity:.5;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-button-secondary{transition:none}}"
+    },
+    {
+      "name": "Сегодня",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "Построенный вариант кнопки прототипа.",
+      "html": "<button class=\"ds-button-quiet\">Сегодня</button>",
+      "css": ".ds-button-quiet{min-height:44px;display:inline-flex;justify-content:center;align-items:center;gap:8px;border:1px solid var(--pride-border,#dedede);border-radius:var(--pride-radius-button,5px);padding:10px 16px;font:500 14px/1.5 var(--pride-font,Rubik,sans-serif);cursor:pointer;transition:background-color 160ms ease-out,color 160ms ease-out;background:var(--pride-surface-subtle,#f5f7fa);color:var(--pride-text,#212529)}.ds-button-quiet:hover{background:var(--pride-surface-section,#eff3f9)}.ds-button-quiet:focus-visible{outline:2px solid var(--pride-brand,#db0c0c);outline-offset:3px}.ds-button-quiet:disabled{opacity:.5;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-button-quiet{transition:none}}.ds-button-quiet{border-color:transparent}"
+    },
+    {
+      "name": "Поле",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Нативное подписанное поле формы.",
+      "html": "<label class=\"ds-field\">Дата<input type=\"date\" value=\"2026-10-20\"></label>",
+      "css": ".ds-field{display:grid;gap:8px;font:500 14px/1.5 var(--pride-font,Rubik,sans-serif);color:var(--pride-text,#212529)}.ds-field input{min-width:0;min-height:48px;padding:12px;border:1px solid var(--pride-border,#dedede);background:white;border-radius:10px;font:400 16px var(--pride-font,Rubik,sans-serif);color:inherit;caret-color:var(--pride-brand,#db0c0c)}.ds-field input:focus-visible{outline:2px solid var(--pride-brand,#db0c0c);outline-offset:3px}"
+    },
+    {
+      "name": "Сравнение концепций",
+      "kind": "nav",
+      "description": "Только навигация между двумя прототипами.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Варианты дизайна\"><a href=\"?concept=day\" aria-current=\"page\">Повестка дня</a><a href=\"?concept=week\">Обзор недели</a></nav>",
+      "css": ".ds-nav{display:flex;gap:4px;padding:4px;background:var(--pride-surface-subtle,#f5f7fa);border-radius:10px;font:500 14px/1.5 var(--pride-font,Rubik,sans-serif)}.ds-nav a{display:flex;align-items:center;min-height:40px;padding:8px 20px;text-decoration:none;border-radius:5px;color:var(--pride-text-secondary,#626b72)}.ds-nav a[aria-current]{background:var(--pride-text,#212529);color:white}.ds-nav a:hover{background:var(--pride-surface-section,#eff3f9);color:var(--pride-text,#212529)}.ds-nav a[aria-current]:hover{background:var(--pride-brand-hover,#323232);color:white}.ds-nav a:focus-visible{outline:2px solid var(--pride-brand,#db0c0c);outline-offset:3px}"
+    },
+    {
+      "name": "Статусы журнала",
+      "kind": "chip",
+      "description": "Текст и цвет дополняют друг друга; метки не интерактивны.",
+      "html": "<span class=\"ds-status ds-open\">Журнал открыт</span> <span class=\"ds-status ds-closed\">Завершено</span>",
+      "css": ".ds-status{display:inline-flex;gap:6px;border-radius:4px;padding:4px 8px;font:500 12px/1.5 var(--pride-font,Rubik,sans-serif)}.ds-open{background:var(--warning-bg,#fff5e5);color:var(--warning,#86520e)}.ds-closed{background:var(--success-bg,#edf6f1);color:var(--success,#24664e)}"
+    },
+    {
+      "name": "Панель расписания",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Плоская белая поверхность, без тени.",
+      "html": "<section class=\"ds-panel\" aria-label=\"Календарь занятий\">Расписание и журналы</section>",
+      "css": ".ds-panel{padding:24px;border-radius:var(--pride-radius-panel,20px);background:var(--pride-surface,white);color:var(--pride-text,#212529);font:400 14px/1.5 var(--pride-font,Rubik,sans-serif)}"
+    },
+    {
+      "name": "Выбранный день",
+      "kind": "button",
+      "description": "День, количество занятий и явно выбранное состояние.",
+      "html": "<button class=\"ds-day\" aria-pressed=\"true\" aria-label=\"Вторник, 20 октября, 6 занятий\"><span>вт</span><strong>20</strong><span>6 занятий</span></button>",
+      "css": ".ds-day{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-height:84px;padding:12px 16px;border:1px solid var(--pride-brand,#db0c0c);border-radius:10px;background:white;color:var(--pride-text-secondary,#626b72);font:400 12px/1.5 var(--pride-font,Rubik,sans-serif);cursor:pointer}.ds-day strong{font-size:24px;font-weight:500;line-height:1.2;color:var(--pride-brand,#db0c0c)}.ds-day:hover{background:var(--pride-surface-section,#eff3f9)}.ds-day:focus-visible{outline:2px solid var(--pride-brand,#db0c0c);outline-offset:3px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "PRIDE — белые и холодные серые поверхности, красный акцент",
+    "overview": "Снимок кода от 20.10.2026: [index.html](index.html), [sessions.css](sessions.css), [sessions.js](sessions.js). Наследует визуальный мир [корневого DESIGN.md](../../../DESIGN.md), [спецификации](../../README.md) и [токенов](../../tokens.css). Это описание только данного артефакта, не обновление глобальной дизайн-системы.\n\nДве самостоятельные концепции раздела используют одинаковые данные, формы и состояния. Приоритет «журнал и управление сегодняшними занятиями» подтверждён заказчиком; композиция повестки, сетка недели и дополнительные ограничения форм остаются предложениями UX. Верхний переключатель сравнивает концепции, а не задаёт навигацию приложения. Здесь нет боковой панели и полной оболочки.",
+    "keyCharacteristics": [
+      "Rubik и унаследованные поверхности PRIDE.",
+      "Компактные строки с явным действием журнала.",
+      "Одинаковые диалоги для двух концепций."
+    ],
+    "rules": [
+      {
+        "name": "The Status Text Rule",
+        "body": "Цвет статуса сопровождается текстом; отмена дополнительно обозначена зачёркнутым названием.",
+        "section": "colors"
+      }
+    ],
+    "dos": [
+      "**Do** сохранять источники цветов и локальную семантику раздельно.",
+      "**Do** сохранять текст статуса, доступные подписи и видимый фокус.",
+      "**Do** рассматривать этот документ вместе с кодом и README прототипа."
+    ],
+    "donts": [
+      "**Don't** считать композиции и проверки демо утверждёнными production-требованиями.",
+      "**Don't** переносить локальные размеры и семантические оттенки в глобальные токены по этому снимку."
+    ]
+  }
+}

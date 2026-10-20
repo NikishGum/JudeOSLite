@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f5f7fa">
+  <title>Занятия — варианты UX · PRIDE</title>
+  <link rel="stylesheet" href="../../fonts/fonts.css">
+  <link rel="stylesheet" href="../../tokens.css">
+  <link rel="stylesheet" href="sessions.css">
+  <script src="sessions.js" defer></script>
+</head>
+<body>
+<!-- THESIS: Two comparable section-only concepts: act on today's lessons, or plan the week.
+OWN-WORLD: Inherit PRIDE Rubik, #DB0C0C, white and cool gray, 5px buttons, 10px fields, 20px panels. No navigation shell.
+STORY: Choose a day, scan time/group/trainer/status, open its journal or make a scoped change.
+FIRST VIEWPORT: Compact concept switch, section heading and add action, one date toolbar, filters, then current/upcoming agenda rows and collapsed completed history. Week alternative uses a time grid; mobile uses a selected-day agenda.
+FORM: User-pinned pair, code-led; no concept lottery or selection gate because both prototypes are the requested deliverable. Signature: context actions open the same lesson without losing the selected date or filters. Motion: 160ms feedback, reduced-motion supported.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance -->
+  <a class="skip-link" href="#main">К занятиям</a>
+  <div class="concept-bar">
+    <div class="concept-inner">
+      <span class="prototype-label">UX-прототип <span>· вымышленные данные</span></span>
+      <nav class="concept-switch" aria-label="Варианты дизайна">
+        <a href="?concept=day" data-concept="day" aria-current="page">Повестка дня</a>
+        <a href="?concept=week" data-concept="week">Обзор недели</a>
+      </nav>
+      <button class="text-button concept-about" data-action="about">Что изменилось</button>
+    </div>
+  </div>
+  <main id="main" class="workspace">
+    <header class="page-heading">
+      <div><h1>Занятия</h1><p>Брест · Восток <span class="separator">/</span> Расписание и журналы</p></div>
+      <button class="button primary" data-action="add"><span data-icon="plus"></span>Разовое занятие</button>
+    </header>
+    <section class="schedule" aria-label="Календарь занятий">
+      <div class="toolbar">
+        <div class="date-controls">
+          <div class="step-controls"><button class="icon-button" data-action="prev" aria-label="Предыдущая неделя"><span data-icon="left"></span></button><button class="icon-button" data-action="next" aria-label="Следующая неделя"><span data-icon="right"></span></button></div>
+          <button class="date-title" data-action="date"><span id="date-title"></span><span data-icon="chevron"></span></button>
+          <button class="button quiet today" data-action="today">Сегодня</button>
+        </div>
+        <span class="timezone">Время Минска <span data-icon="clock"></span></span>
+      </div>
+      <div id="day-strip" class="day-strip" aria-label="Выбрать день"></div>
+      <div class="filters">
+        <label class="select-filter"><span data-icon="group"></span><span class="sr-only">Группа</span><select id="group-filter"><option value="all">Все группы</option><option value="first">Первые шаги · 6–9 лет</option><option value="base">Основы дзюдо · 10–13 лет</option><option value="team">Сборная · 14–17 лет</option></select></label>
+        <label class="select-filter"><span data-icon="person"></span><span class="sr-only">Тренер</span><select id="trainer-filter"><option value="all">Все тренеры</option><option value="viktor">Виктор Шевцов</option><option value="anna">Анна Станкевич</option></select></label>
+        <label class="select-filter"><span class="sr-only">Статус занятия</span><select id="status-filter"><option value="all">Все статусы</option><option value="open">Журнал открыт</option><option value="planned">Запланировано</option><option value="closed">Завершено</option><option value="cancelled">Отменено</option></select></label>
+        <button class="text-button reset" data-action="reset" hidden>Сбросить</button>
+        <span class="result-count" id="result-count" role="status"></span>
+      </div>
+      <div id="schedule-content"></div>
+    </section>
+    <footer class="prototype-footer"><span id="concept-description"></span><span>Демо: 20 октября 2026, 16:20 · изменения до перезагрузки</span></footer>
+  </main>
+  <dialog id="lesson-dialog" aria-labelledby="dialog-title"><div id="dialog-content"></div></dialog>
+  <div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>
