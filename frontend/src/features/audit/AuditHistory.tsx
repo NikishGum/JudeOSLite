@@ -29,7 +29,9 @@ export function AuditHistory({ selectedClubId }: { selectedClubId: string }) {
  useEffect(() => {
   const controller = new AbortController(); active.current?.abort(); active.current = controller;
   const generation = ++epoch.current;
-  setPage(null); setLoading(true); setError('');
+  // Filter/page changes already clear the old scope in clearPending().
+  // Timer/focus reads keep the current events and expanded record details.
+  setLoading(page === null); if (!page) setError('');
   async function load() {
    try {
     const allowed = await apiGet<Filters>('/api/audit/filters', controller.signal);
@@ -37,11 +39,10 @@ export function AuditHistory({ selectedClubId }: { selectedClubId: string }) {
     setFilters(allowed);
     const params = new URLSearchParams(selection); if (cursor) params.set('cursor', cursor);
     const result = await apiGet<Page>(`/api/audit/events?${params}`, controller.signal);
-    if (!controller.signal.aborted && generation === epoch.current) { setFilters(allowed); setPage(result); setHidden(false); }
+    if (!controller.signal.aborted && generation === epoch.current) { setFilters(allowed); setPage(result); setHidden(false); setError(''); }
    } catch (cause) {
     if (controller.signal.aborted || generation !== epoch.current) return;
-    setPage(null);
-    if (cause instanceof ApiError && (cause.status === 401 || cause.status === 403)) { setFilters(null); setHidden(true); }
+    if (cause instanceof ApiError && [401, 403, 404, 410].includes(cause.status)) { setPage(null); setFilters(null); setHidden(true); }
     else setError(failure(cause));
    } finally { if (!controller.signal.aborted && generation === epoch.current) setLoading(false); }
   }

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { ApiError, apiGet } from '../../shared/api';
 
-/** Independent, uncached read blocks; an old scope never survives a new key. */
+/** Revalidate in place; only a different API scope discards the current data. */
 export function useReadBlock<T>(path: `/api/${string}`) {
   const [attempt, setAttempt] = useState(0);
-  const key = JSON.stringify([path, attempt]);
+  const key = path;
   const [state, setState] = useState<{ key: string; data: T | null; loading: boolean; error: string }>({ key: '', data: null, loading: true, error: '' });
   useEffect(() => {
     const refresh = () => { if (document.visibilityState === 'visible') setAttempt((value) => value + 1); };
@@ -21,15 +21,20 @@ export function useReadBlock<T>(path: `/api/${string}`) {
   }, []);
   useEffect(() => {
     const controller = new AbortController();
-    setState({ key, data: null, loading: true, error: '' });
+    setState((previous) => previous.key === key && previous.data !== null
+      ? previous
+      : { key, data: null, loading: true, error: '' });
     apiGet<T>(path, controller.signal).then((data) => {
       if (!controller.signal.aborted) setState({ key, data, loading: false, error: '' });
     }).catch((cause: unknown) => {
       if (controller.signal.aborted) return;
-      setState({ key, data: null, loading: false, error: cause instanceof ApiError ? cause.message : 'Нет соединения. Повторите загрузку этого блока.' });
+      const denied = cause instanceof ApiError && [401, 403, 404, 410].includes(cause.status);
+      setState((previous) => ({ key,
+        data: !denied && previous.key === key ? previous.data : null,
+        loading: false, error: cause instanceof ApiError ? cause.message : 'Нет соединения. Повторите загрузку этого блока.' }));
       if (cause instanceof ApiError && [403, 404].includes(cause.status)) window.dispatchEvent(new Event('session-changed'));
     });
     return () => controller.abort();
-  }, [path, key]);
+  }, [path, key, attempt]);
   return { ...(state.key === key ? state : { data: null, loading: true, error: '' }), refresh: () => setAttempt((value) => value + 1) };
 }

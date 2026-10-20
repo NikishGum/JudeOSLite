@@ -44,10 +44,9 @@ export function NotificationBell({ onOpen }: { onOpen: () => void }) {
     const refresh = () => {
       if (document.visibilityState === "visible") inbox.refresh();
     };
-    const timer = window.setInterval(refresh, 30_000);
+    // useResource owns the interval and focus/visibility revalidation.
     window.addEventListener("club-data-changed", refresh);
     return () => {
-      window.clearInterval(timer);
       window.removeEventListener("club-data-changed", refresh);
     };
   }, []);

@@ -119,3 +119,9 @@ assertions, без retries/увеличения timeout/ослабления п�
 Повторная сборка зафиксирована отдельно в `docker-build-history-final.log`.
 Первый branch Build39444474780 на a41aac8 отменён как superseded для проверки
 уточнённого predicate; Coordination39444474765 завершён success.
+
+Перед доставкой интегрирован main `af1aa91` (фоновое обновление без сброса экрана).
+Изменения App/общих resource hooks и оба новых background_refresh сценария CI
+сохранены. Конфликт только в prepend памяти разрешён сохранением обеих записей.
+Совместный production image проверен отдельно в `docker-build-merged.log`;
+полный штатный CI проверяет совмещённый SHA, включая staff и background refresh.

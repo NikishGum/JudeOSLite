@@ -23,19 +23,22 @@ export function useResource<T>(
   const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     let controller: AbortController | undefined;
+    let inFlight = false;
     function load() {
-      controller?.abort();
+      // Focus and visibilitychange often arrive together. Share the active read.
+      if (inFlight) return;
+      inFlight = true;
       const current = new AbortController();
       controller = current;
       // A background read must not unmount editors or discard their drafts.
-      setState((previous) => ({
+      setState((previous) => previous.path === path && previous.data !== null ? previous : ({
         path,
         data: previous.path === path ? previous.data : null,
         loading: !!path && !(previous.path === path && previous.data),
         unavailable: false,
         error: "",
       }));
-      if (!path) return;
+      if (!path) { inFlight = false; return; }
       void apiGet<T>(path, controller.signal)
         .then((data) => {
           if (!current.signal.aborted)
@@ -67,7 +70,8 @@ export function useResource<T>(
             unavailable,
             error: unavailable ? "" : errorMessage(error),
           }));
-        });
+        })
+        .finally(() => { inFlight = false; });
     }
     function revalidate() {
       if (document.visibilityState === "visible") load();
