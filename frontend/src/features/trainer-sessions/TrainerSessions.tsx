@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { ApiError, apiGet } from '../../shared/api';
 import type { Session } from '../sessions/types';
+import { sessionHref } from '../sessions/navigation';
+import '../sessions/sessions.css';
 import { SessionJournal } from './SessionJournal';
 import { stateNames } from './types';
 import './trainer-sessions.css';
@@ -34,6 +36,7 @@ export function TrainerSessions({ clubId, timezone }: Props) {
     <ul className="trainer-session-list">{items.map((item) => <li key={item.id}>
       <div><strong>{item.groupName}</strong><p>{new Intl.DateTimeFormat('ru', { timeZone: item.timezone, hour: '2-digit', minute: '2-digit' }).format(new Date(item.startsAt))} · {stateNames[item.status]}</p>
         {item.status === 'cancelled' && <p>{item.cancellationReason}</p>}</div>
+      <a className="session-link" href={sessionHref(clubId, { sessionId: item.id, journal: 'trainer', from: date, through: date, view: 'day' })}>Страница тренировки</a>
       {item.status !== 'cancelled' && <button disabled={selected?.id === item.id || (item.status === 'planned' && item.date > today())} onClick={() => setSelected(item)}>{item.status === 'planned' ? 'Открыть журнал' : 'Посмотреть журнал'}</button>}
     </li>)}</ul>
     {selected && <SessionJournal key={selected.id} clubId={clubId} initial={selected} onChanged={(item) => { if (mounted.current) setItems((values) => values.map((v) => v.id === item.id ? item : v)); }} />}

@@ -244,6 +244,9 @@ func TestCorrectionsIntegration(t *testing.T) {
 	status(t, admin.call("GET", "/api/clubs/"+f.club+"/journals?date=2000-02-01&groupId="+foreignGroup, nil), 404)
 	beforeSession := j.Session
 	updated := parse[Journal](t, admin.call("PUT", target, Input{record.Version, "present", nil, "  Исправлена ошибка тренера  "}), 200)
+	if updated.Roster.Source != "snapshot" || updated.Roster.Summary == nil || updated.Roster.Summary.Present != 1 || updated.Roster.Summary.Absent != 1 || len(updated.Roster.Members) != 2 {
+		t.Fatalf("correction summary disagrees with records: %+v", updated.Roster)
+	}
 	got := updated.Records[0]
 	if got.State == nil || *got.State != "present" || got.Reason != nil || *got.Origin != "correction" || *got.MarkedBy != adminID || *got.ChangeReason != "Исправлена ошибка тренера" || got.Version != record.Version+1 || !got.Archived || got.MembershipID != record.MembershipID || got.SourceID != record.SourceID {
 		t.Fatalf("invalid corrected historical record %+v", got)

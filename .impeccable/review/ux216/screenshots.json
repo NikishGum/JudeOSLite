@@ -1,0 +1,212 @@
+[
+  {
+    "file": "rd185-chromium-attendance-1280.png",
+    "width": 1280,
+    "height": 1493,
+    "sha256": "5ce124e6e73d626c2250adab8f4176fcee5c94529fbdaf58eefb39c2bf65be58"
+  },
+  {
+    "file": "rd185-chromium-attendance-1440.png",
+    "width": 1440,
+    "height": 1493,
+    "sha256": "b8ea68810afa58e756fa9e35b19ec7b76efdc79676f3a7adf855d6a024d17fa9"
+  },
+  {
+    "file": "rd185-chromium-attendance-320.png",
+    "width": 320,
+    "height": 2262,
+    "sha256": "aab93c0ed1276fd1962617544fe0b5fb5e42b6c949d4bd6857f4a99425a52ef6"
+  },
+  {
+    "file": "rd185-chromium-attendance-390.png",
+    "width": 390,
+    "height": 2137,
+    "sha256": "1f952431884f39a1adb1778a2a05a132dc1e050299d991c4ffdb449f2c98f27d"
+  },
+  {
+    "file": "rd185-chromium-attendance-768.png",
+    "width": 768,
+    "height": 1994,
+    "sha256": "4b74028b5872a3701299a729db31aceb631e7bb723350899e33639fd0987e8ea"
+  },
+  {
+    "file": "rd185-chromium-attendance-action-320.png",
+    "width": 320,
+    "height": 480,
+    "sha256": "80a210458a849b1fa3067d6c5e4647c0f626f08a416084426e13bbdd106f9d1e"
+  },
+  {
+    "file": "rd185-chromium-calendar-1280.png",
+    "width": 1280,
+    "height": 1790,
+    "sha256": "7dacce1505dea6611b557aced86917e495e00634b232aa8d7b519a71fa76a0df"
+  },
+  {
+    "file": "rd185-chromium-calendar-1440.png",
+    "width": 1440,
+    "height": 1790,
+    "sha256": "1e858d7ed7d24175e67a538ed950226466a2be12af7eac350430b0bc6fec0a91"
+  },
+  {
+    "file": "rd185-chromium-calendar-320.png",
+    "width": 320,
+    "height": 2857,
+    "sha256": "8e003a3d5fd2d1b6fee3ec25d317b6f2a0803e3b0457e71f263b59b3b2ffe8cd"
+  },
+  {
+    "file": "rd185-chromium-calendar-390.png",
+    "width": 390,
+    "height": 2696,
+    "sha256": "be165f190d3d6fc2440f8ee841502d2f856359745f26a32370309033c746eed8"
+  },
+  {
+    "file": "rd185-chromium-calendar-768.png",
+    "width": 768,
+    "height": 2176,
+    "sha256": "dc23dd80db271b3c046a0bd7394c031ebaa7d21fa8dd913dfe279510389a6091"
+  },
+  {
+    "file": "rd185-chromium-correction-1280.png",
+    "width": 1280,
+    "height": 2143,
+    "sha256": "a353e0ac5321984ced298bde2bd130c5eb57833cc8e4da459272f05601603c0c"
+  },
+  {
+    "file": "rd185-chromium-correction-1440.png",
+    "width": 1440,
+    "height": 2087,
+    "sha256": "7e5389af5b039e98594f512059eed2ad831caadeb0081219f605e88a1daaf3b8"
+  },
+  {
+    "file": "rd185-chromium-correction-320.png",
+    "width": 320,
+    "height": 3001,
+    "sha256": "78c8d7fe5f5b8c2a377f6df5b8c556ba68b5399514c5338cb754efb8af80f766"
+  },
+  {
+    "file": "rd185-chromium-correction-390.png",
+    "width": 390,
+    "height": 2778,
+    "sha256": "1743472b78686139beb8809960e2d4bb3763f3bd820315716791053637ceebda"
+  },
+  {
+    "file": "rd185-chromium-correction-768.png",
+    "width": 768,
+    "height": 2453,
+    "sha256": "beb3f8f969e57a841982d6793ff8fa0f3a7883946e7abcbca9b71f2a1fdb0767"
+  },
+  {
+    "file": "rd185-chromium-planned-session-1280.png",
+    "width": 1280,
+    "height": 1173,
+    "sha256": "8a785382b353fcd9cf0e2a5f9167628df5a9fc09d5bfe59a8ecee0c84dccc730"
+  },
+  {
+    "file": "rd185-chromium-planned-session-1440.png",
+    "width": 1440,
+    "height": 1173,
+    "sha256": "c10d584204ca62af94d338c23682d716825276ad3d549a28271056516cc60c00"
+  },
+  {
+    "file": "rd185-chromium-planned-session-320.png",
+    "width": 320,
+    "height": 1785,
+    "sha256": "35b86e27b88e49736e965eb233221b8bf86c30c99132cdaae7e8f5fbac870e11"
+  },
+  {
+    "file": "rd185-chromium-planned-session-390.png",
+    "width": 390,
+    "height": 1640,
+    "sha256": "a9bdd738cce636ed096918c3ef64a2839f79c2ceaba7d4d1851cef378f557df6"
+  },
+  {
+    "file": "rd185-chromium-planned-session-768.png",
+    "width": 768,
+    "height": 1547,
+    "sha256": "e4dd30f49dda6a755b726ef01f0f4050b515fddec8bce018eddde8e61894ffb7"
+  },
+  {
+    "file": "rd185-chromium-reasons-320.png",
+    "width": 320,
+    "height": 480,
+    "sha256": "5ae571ce697c127fbaad8f460ab22b9d74e6ef399bda2f8136c32d4784afee8d"
+  },
+  {
+    "file": "rd185-chromium-weekly-calendar-1280.png",
+    "width": 1280,
+    "height": 2050,
+    "sha256": "d938195c1e2e52006ae097a407b724da2eac9c95cc871d575094854d8552d34d"
+  },
+  {
+    "file": "rd185-chromium-weekly-calendar-1440.png",
+    "width": 1440,
+    "height": 1485,
+    "sha256": "42720f5a0f367a2da974f343548ad76faf968391a27d08bef73358db2f1f08c8"
+  },
+  {
+    "file": "rd185-chromium-weekly-calendar-320.png",
+    "width": 320,
+    "height": 2915,
+    "sha256": "9e800b3c5ee3d25d86d0444fa8adb8b4902f82faec9e023edf94da6400ee38dd"
+  },
+  {
+    "file": "rd185-chromium-weekly-calendar-390.png",
+    "width": 390,
+    "height": 2777,
+    "sha256": "8ea27cf1335f1c879d0a5fddc55ae1fa127e23958afb13ba60eae362335803c4"
+  },
+  {
+    "file": "rd185-chromium-weekly-calendar-768.png",
+    "width": 768,
+    "height": 2388,
+    "sha256": "1aa1768b07803cf99a18253ff951d4723b83901c7eac282149fbc20969c3e7ac"
+  },
+  {
+    "file": "rd185-webkit-attendance-1440.png",
+    "width": 1440,
+    "height": 1493,
+    "sha256": "52c46603223e0b29a23c9c1c292a4201717803a48ba4263768a30b5e7da6ed1d"
+  },
+  {
+    "file": "rd185-webkit-attendance-390.png",
+    "width": 390,
+    "height": 2137,
+    "sha256": "f87c7892299abb713112f7b1abe5d066ba5bf9e39d633311e13b070b98d6f986"
+  },
+  {
+    "file": "rd185-webkit-correction-1440.png",
+    "width": 1440,
+    "height": 2066,
+    "sha256": "bbb29c92bc56ec4da779470ff1880300beb71e8c499006a4d5885297917705c4"
+  },
+  {
+    "file": "rd185-webkit-correction-390.png",
+    "width": 390,
+    "height": 2778,
+    "sha256": "4c26c2e44f8b35312827ddbcec60dec170b8c13a22c827d55b98a05355ca4bea"
+  },
+  {
+    "file": "rd185-webkit-planned-session-1440.png",
+    "width": 1440,
+    "height": 1173,
+    "sha256": "ead483225ecd4b8682d091e5bc042ac091067ec41948255cd0456b9091a85014"
+  },
+  {
+    "file": "rd185-webkit-planned-session-390.png",
+    "width": 390,
+    "height": 1640,
+    "sha256": "f107b8d95e079b6b83b2cb11a56a69ddd07de41fad1c3ccfae5a075e8e8dfd54"
+  },
+  {
+    "file": "rd185-webkit-weekly-calendar-1440.png",
+    "width": 1440,
+    "height": 1464,
+    "sha256": "9a98d8fa7be78ac9eb5ba05006b1ea98587ad43cda6f581613c08003aea7dc1b"
+  },
+  {
+    "file": "rd185-webkit-weekly-calendar-390.png",
+    "width": 390,
+    "height": 2777,
+    "sha256": "1dee8228503ec11ea315b90c9c36c42650f2f728cebc860c2208af648989bfff"
+  }
+]

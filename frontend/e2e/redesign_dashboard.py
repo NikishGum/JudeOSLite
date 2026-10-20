@@ -177,7 +177,7 @@ try:
         home(admin_page, a['id']); counter(admin_page, 'participants', 3); counter(admin_page, 'groups', 1); counter(admin_page, 'today', 3); counter(admin_page, 'open', 1)
         assert api(admin_page, 'GET', '/api/dashboard')['mode'] == 'administrator'
         api(admin_page, 'GET', '/api/dashboard?clubId='+b['id'], status=404)
-        expect(admin_page.locator('.dashboard-next > a')).to_have_attribute('href', __import__('re').compile('session='+old))
+        expect(admin_page.locator('.dashboard-next > a')).to_have_attribute('href', __import__('re').compile('/sessions/'+old))
         home(ta, a['id']); counter(ta, 'groups', 1); counter(ta, 'open', 1)
         expect(ta.locator('[data-counter="participants"]')).to_have_count(0); expect(ta.locator('.dashboard-changes')).to_have_count(0); expect(ta.locator('.dashboard-report')).to_have_count(0)
         assert api(ta, 'GET', '/api/dashboard')['counters']['participants'] is None
@@ -216,7 +216,7 @@ try:
         main_action.focus(); expect(main_action).to_be_focused()
         assert main_action.evaluate('e=>parseFloat(getComputedStyle(e).outlineWidth) >= 2')
         main_action.press('Enter')
-        expect(admin_page).to_have_url(__import__('re').compile('session='+old))
+        expect(admin_page).to_have_url(__import__('re').compile('/sessions/'+old))
         expect(admin_page.locator('.admin-journal')).to_be_visible()
         expect(admin_page.locator('.admin-records > li')).to_have_count(3)
         admin_page.reload(); expect(admin_page.locator('.admin-records > li')).to_have_count(3)
@@ -243,14 +243,14 @@ try:
         metric('present', '3'); metric('absent', '2'); metric('percentage', '60,0%')
         assert sql("SELECT count(*) FILTER(WHERE r.state='present')||'/'||count(*) FROM pride.attendance_records r JOIN pride.training_sessions s ON s.id=r.training_session_id WHERE s.status='closed'") == '3/5'
         # Open the exact trainer journal and make a real sequential mark/close.
-        ta.locator('.dashboard-next > a').click(); expect(ta).to_have_url(__import__('re').compile('session='+old))
+        ta.locator('.dashboard-next > a').click(); expect(ta).to_have_url(__import__('re').compile('/sessions/'+old))
         ta.get_by_role('button', name='Присутствует', exact=True).click()
         expect(ta.get_by_role('status').filter(has_text='Сохраняем')).to_have_count(0)
         ta.get_by_role('button', name='Завершить журнал', exact=True).click()
         ta.get_by_role('dialog').get_by_role('button', name='Подтвердить завершение', exact=True).click()
         expect(ta.get_by_role('dialog')).to_have_count(0)
         home(ta, a['id']); counter(ta, 'open', 0)
-        expect(ta.locator('.dashboard-next > a')).to_have_attribute('href', __import__('re').compile('session='+planned))
+        expect(ta.locator('.dashboard-next > a')).to_have_attribute('href', __import__('re').compile('/sessions/'+planned))
         assert sql(f"SELECT status FROM pride.training_sessions WHERE id='{old}'") == 'closed'
         owner_page.evaluate("window.dispatchEvent(new Event('attendance-changed'))")
         # Ledger now includes the previously open three-person historical session.

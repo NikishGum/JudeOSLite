@@ -1,0 +1,129 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.78kB done
+#1 DONE 0.0s
+
+#2 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#2 DONE 0.7s
+
+#3 docker-image://docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+#3 CACHED
+
+#4 [internal] load metadata for docker.io/library/node:24.19.0-bookworm-slim
+#4 ...
+
+#5 [internal] load metadata for docker.io/library/golang:1.27.2-bookworm
+#5 DONE 0.0s
+
+#6 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#6 DONE 0.5s
+
+#4 [internal] load metadata for docker.io/library/node:24.19.0-bookworm-slim
+#4 DONE 0.6s
+
+#7 [internal] load .dockerignore
+#7 transferring context: 150B done
+#7 DONE 0.0s
+
+#8 [frontend 1/7] FROM docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df
+#8 DONE 0.0s
+
+#9 [stage-2 1/6] FROM docker.io/library/debian:bookworm-slim@sha256:7c7b2c966bc9ee8cedfeef67e0e279108992c77681fa595db4a9d65c06ccc587
+#9 DONE 0.0s
+
+#10 [backend 1/6] FROM docker.io/library/golang:1.27.2-bookworm
+#10 DONE 0.0s
+
+#11 [internal] load build context
+#11 transferring context: 63.89kB 0.2s done
+#11 DONE 0.2s
+
+#12 [frontend 2/7] WORKDIR /src/frontend
+#12 CACHED
+
+#13 [frontend 3/7] COPY frontend/package.json frontend/package-lock.json ./
+#13 CACHED
+
+#14 [frontend 4/7] RUN --mount=type=secret,id=proxy_ca     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi;     npm ci --strict-ssl=true
+#14 CACHED
+
+#15 [frontend 5/7] COPY frontend/ ./
+#15 DONE 4.7s
+
+#16 [frontend 6/7] COPY design-system/ /src/design-system/
+#16 DONE 1.9s
+
+#17 [frontend 7/7] RUN npm run build
+#17 2.938
+#17 2.938 > judeoslite-frontend@0.1.0 build
+#17 2.938 > npm run typecheck && vite build
+#17 2.938
+#17 3.021
+#17 3.021 > judeoslite-frontend@0.1.0 typecheck
+#17 3.021 > tsc --noEmit
+#17 3.021
+#17 4.445 vite v8.3.4 building client environment for production...
+#17 4.457 transforming...
+#17 4.956 ✓ 2461 modules transformed.
+#17 5.041 rendering chunks...
+#17 5.152 computing gzip size...
+#17 5.155 dist/index.html                                  1.01 kB │ gzip:   0.50 kB
+#17 5.155 dist/assets/pwa-shell-def68c9f145a2f8f.html      1.01 kB │ gzip:   0.50 kB
+#17 5.155 dist/sw.js                                       2.42 kB
+#17 5.155 dist/assets/rubik-cyrillic-ext-BgEjOSi_.woff2   12.28 kB
+#17 5.155 dist/assets/rubik-cyrillic-6J3aU1sj.woff2       15.10 kB
+#17 5.155 dist/assets/logo-pride-BmLOUEvF.png             16.36 kB
+#17 5.155 dist/assets/rubik-latin-ext-xIGCplNB.woff2      19.28 kB
+#17 5.155 dist/assets/rubik-latin-0V_ixqQm.woff2          35.32 kB
+#17 5.155 dist/assets/index-CKdcHuQ4.css                 154.25 kB │ gzip:  27.20 kB
+#17 5.155 dist/assets/rolldown-runtime-hePW80VL.js         0.71 kB │ gzip:   0.42 kB
+#17 5.155 dist/assets/calendar-D1T34Sj3.js                70.33 kB │ gzip:  20.62 kB
+#17 5.155 dist/assets/ui-vendor-CNKO1Slx.js              158.57 kB │ gzip:  53.68 kB
+#17 5.155 dist/assets/index-CzcCEVEa.js                  504.54 kB │ gzip: 136.52 kB
+#17 5.155
+#17 5.160 [plugin builtin:vite-reporter]
+#17 5.160 (!) Some chunks are larger than 500 kB after minification. Consider:
+#17 5.160 - Using dynamic import() to code-split the application
+#17 5.160 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+#17 5.160 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#17 5.163 ✓ built in 717ms
+#17 DONE 5.2s
+
+#18 [backend 3/6] COPY backend/go.mod backend/go.sum ./
+#18 CACHED
+
+#19 [backend 4/6] RUN --mount=type=secret,id=proxy_ca     if [ -f /run/secrets/proxy_ca ]; then export SSL_CERT_FILE=/run/secrets/proxy_ca; fi;     go mod download
+#19 CACHED
+
+#20 [backend 5/6] COPY backend/ ./
+#20 CACHED
+
+#21 [backend 2/6] WORKDIR /src/backend
+#21 CACHED
+
+#22 [stage-2 2/6] COPY --from=backend /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+#22 CACHED
+
+#23 [backend 6/6] RUN CGO_ENABLED=0 go build -trimpath -o /out/server ./cmd/server &&     CGO_ENABLED=0 go build -trimpath -o /out/migrate ./cmd/migrate &&     CGO_ENABLED=0 go build -trimpath -o /out/create-owner ./cmd/create-owner &&     CGO_ENABLED=0 go build -trimpath -o /out/seed-demo ./cmd/seed-demo
+#23 CACHED
+
+#24 [stage-2 3/6] COPY --from=frontend /src/frontend/dist /app/static
+#24 DONE 0.2s
+
+#25 [stage-2 4/6] COPY --from=backend /out/server /out/migrate /out/create-owner /out/seed-demo /app/
+#25 DONE 0.4s
+
+#26 [stage-2 5/6] RUN printf '{"sha":"%s"}\n' "development" > /app/static/release.json
+#26 DONE 0.3s
+
+#27 [stage-2 6/6] WORKDIR /app
+#27 DONE 0.2s
+
+#28 exporting to image
+#28 exporting layers
+#28 exporting layers 0.7s done
+#28 writing image sha256:63d990ec8e6844e0b853516bf871b5bb1311ddb74b9db2fc5dfe1551918d83cd
+#28 writing image sha256:63d990ec8e6844e0b853516bf871b5bb1311ddb74b9db2fc5dfe1551918d83cd done
+#28 naming to docker.io/library/judeoslite:ci done
+#28 DONE 0.7s

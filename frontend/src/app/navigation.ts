@@ -4,24 +4,26 @@ export const sections = {
   notifications: 'Уведомления', clubs: 'Филиалы', history: 'История', profile: 'Профиль', settings: 'Настройки',
 };
 export type Section = keyof typeof sections;
-export type Route = { clubId: string; section: Section; detail: string; group?: string; invalid: boolean };
+export type Route = { clubId: string; section: Section; detail: string; group?: string; locationKey?: string; invalid: boolean };
 export function readRoute(): Route {
   const parts = window.location.pathname.split('/').filter(Boolean);
   const clubId = parts[0] === 'clubs' && parts.length > 1 ? parts[1] : '';
   const section = clubId ? parts[2] ?? 'home' : parts[0] ?? 'home';
   const known = Object.hasOwn(sections, section);
-  const detail = new URLSearchParams(window.location.search).get('detail') ?? '';
+  const query = new URLSearchParams(window.location.search);
+  const detail = section === 'sessions' ? parts[3] ?? query.get('session') ?? '' : query.get('detail') ?? '';
   const group = new URLSearchParams(window.location.search).get('group') ?? '';
   const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
-  return { clubId, group, section: known ? section as Section : 'home', detail,
-    invalid: (!known && section !== 'login') || parts.length > (clubId ? 3 : 1) || (!!detail && !uuid.test(detail) && !(detail === 'new' && section === 'participants')) || (!!group && (!uuid.test(group) || section !== 'sessions')) };
+  return { clubId, group, locationKey: window.location.pathname + window.location.search, section: known ? section as Section : 'home', detail,
+    invalid: (!known && section !== 'login') || parts.length > (clubId && section === 'sessions' ? 4 : clubId ? 3 : 1) || (parts.length === 4 && section === 'sessions' && !uuid.test(parts[3])) || (!!detail && !uuid.test(detail) && !(detail === 'new' && section === 'participants')) || (!!group && (!uuid.test(group) || section !== 'sessions')) };
 }
 export function routePath(route: Pick<Route, 'clubId' | 'section'> & { detail?: string; group?: string }) {
   const base = route.clubId ? `/clubs/${encodeURIComponent(route.clubId)}/${route.section}` : route.section === 'home' ? '/' : `/${route.section}`;
+  const path = base + (route.section === 'sessions' && route.detail ? `/${encodeURIComponent(route.detail)}` : '');
   const params = new URLSearchParams();
-  if (route.detail) params.set('detail', route.detail);
+  if (route.detail && route.section !== 'sessions') params.set('detail', route.detail);
   if (route.group && route.section === 'sessions') params.set('group', route.group);
-  return base + (params.size ? `?${params}` : '');
+  return path + (params.size ? `?${params}` : '');
 }
 export function allowedSections(owner: boolean, roles: string[], hasAdministration: boolean, parent = false): Section[] {
   const managing = owner || roles.includes('administrator');

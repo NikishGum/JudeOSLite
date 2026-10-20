@@ -129,8 +129,8 @@ export function App() {
         "",
         path,
       );
-    routeRef.current = next;
-    setRoute(next);
+    routeRef.current = readRoute();
+    setRoute(routeRef.current);
     setMore(false);
     setNavigationNotice("");
   }
@@ -404,7 +404,7 @@ export function App() {
     (!!selectedId && !available) ||
     !permitted.includes(route.section) ||
     (!!route.detail &&
-      !["participants", "groups", "families"].includes(route.section));
+      !["participants", "groups", "families", "sessions"].includes(route.section));
   const items = permitted.map((section) => ({
     section,
     label: sections[section],
@@ -899,6 +899,7 @@ export function App() {
                           {route.section === "sessions" && (
                             <>
                               <SessionCalendar
+                                key={route.locationKey ?? route.group ?? "calendar"}
                                 clubId={currentClub.id}
                                 timezone={currentClub.timezone}
                                 canManage={canManage}

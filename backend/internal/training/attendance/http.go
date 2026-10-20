@@ -49,6 +49,7 @@ type Record struct {
 type Journal struct {
 	Session sessions.Session `json:"session"`
 	Records []Record         `json:"records"`
+	Roster  Roster           `json:"roster"`
 }
 
 func respond(w http.ResponseWriter, v any) {
@@ -145,7 +146,11 @@ func ReadRecords(ctx context.Context, tx pgx.Tx, id string) ([]Record, error) {
 }
 func journal(ctx context.Context, tx pgx.Tx, v sessions.Session) (Journal, error) {
 	rs, e := records(ctx, tx, v.ID)
-	return Journal{v, rs}, e
+	if e != nil {
+		return Journal{}, e
+	}
+	roster, e := ReadRoster(ctx, tx, v, rs)
+	return Journal{v, rs, roster}, e
 }
 func recordState(v Record) map[string]any {
 	return map[string]any{"sessionId": nil, "state": v.State, "absenceReason": v.Reason, "markedBy": v.MarkedBy, "markedAt": v.MarkedAt, "origin": v.Origin, "version": v.Version}

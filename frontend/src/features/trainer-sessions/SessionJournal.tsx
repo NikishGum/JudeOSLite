@@ -7,11 +7,11 @@ import { AttendanceCards } from '../attendance/AttendanceCards';
 import { ActionSheet } from '../attendance/ActionSheet';
 import { type AttendanceRecord, type Journal, reasonNames, stateNames } from './types';
 
-type Props = { clubId: string; initial: Session; onChanged: (value: Session) => void };
-export function SessionJournal({ clubId, initial, onChanged }: Props) {
+type Props = { clubId: string; initial: Session; onChanged: (value: Session) => void; initialJournal?: Journal; onRead?: (value: Journal) => void; embedded?: boolean; onUnavailable?: () => void };
+export function SessionJournal({ clubId, initial, onChanged, initialJournal, onRead, embedded = false, onUnavailable }: Props) {
   const base = `/api/clubs/${clubId}/trainer-sessions/${initial.id}/journal` as const;
-  const [journal, setJournal] = useState<Journal | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [journal, setJournal] = useState<Journal | null>(initialJournal ?? null);
+  const [loading, setLoading] = useState(!initialJournal);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [conflict, setConflict] = useState(false);
@@ -21,23 +21,27 @@ export function SessionJournal({ clubId, initial, onChanged }: Props) {
   const mounted = useRef(true);
   const heading = useRef<HTMLHeadingElement>(null);
   const pending = useRef(false);
+  const firstRead = useRef(!!initialJournal);
+  const read = useRef(onRead); read.current = onRead;
+  const unavailableCallback = useRef(onUnavailable); unavailableCallback.current = onUnavailable;
   const changed = useRef(onChanged); changed.current = onChanged;
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   useEffect(() => {
-    if (loading || journal?.session.status !== 'planned') return;
+    if (embedded || loading || journal?.session.status !== 'planned') return;
     heading.current?.focus();
     heading.current?.scrollIntoView({ block: 'start' });
   }, [loading]);
   useEffect(() => {
+    if (attempt === 0 && firstRead.current) return;
     const controller = new AbortController();
     setLoading(true); setError(''); setUnavailable(false); setConflict(false); setConfirm(false); setJournal(null);
     apiGet<Journal>(base, controller.signal).then((result) => {
       if (controller.signal.aborted) return;
-      setJournal(result); changed.current(result.session);
+      setJournal(result); changed.current(result.session); read.current?.(result);
     }).catch((cause: unknown) => {
       if (controller.signal.aborted) return;
       setError(cause instanceof ApiError ? cause.message : 'Нет соединения. Повторите загрузку.');
-      if (cause instanceof ApiError && (cause.status === 404 || cause.status === 401)) setUnavailable(true);
+      if (cause instanceof ApiError && (cause.status === 404 || cause.status === 401)) { setUnavailable(true); unavailableCallback.current?.(); }
     }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
   }, [base, attempt]);
@@ -47,13 +51,13 @@ export function SessionJournal({ clubId, initial, onChanged }: Props) {
     try {
       const result = await run();
       if (!mounted.current) return null;
-      setJournal(result); setConfirm(false); changed.current(result.session); trainingChanged();
+      setJournal(result); setConfirm(false); changed.current(result.session); read.current?.(result); trainingChanged();
       return result;
     } catch (cause) {
       if (!mounted.current) return null;
       setError(cause instanceof ApiError ? cause.message : 'Нет соединения. Изменение не подтверждено. Повторите запрос или обновите журнал.');
       if (cause instanceof ApiError && cause.status === 409) { setConflict(true); setConfirm(false); }
-      if (cause instanceof ApiError && (cause.status === 404 || cause.status === 401)) { setUnavailable(true); setJournal(null); setConfirm(false); }
+      if (cause instanceof ApiError && (cause.status === 404 || cause.status === 401)) { setUnavailable(true); unavailableCallback.current?.(); setJournal(null); setConfirm(false); }
       return null;
     } finally { pending.current = false; if (mounted.current) setBusy(false); }
   }
@@ -73,15 +77,15 @@ export function SessionJournal({ clubId, initial, onChanged }: Props) {
     {unavailable && <p>Доступ к журналу отозван или занятие больше вам не назначено. Обновите список занятий.</p>}
     {loading && <p role="status">Загружаем журнал…</p>}
     {journal && <>
-      <p role="status">{stateNames[journal.session.status]} · Не отмечено: {unmarked} из {journal.records.length}</p>
+      <p role="status">{stateNames[journal.session.status]}{journal.session.rosterFrozen ? ` · Не отмечено: ${unmarked} из ${journal.records.length}` : " · Журнал ещё не открыт"}</p>
       {journal.session.status === 'planned' ? <>
         <p>При открытии сохраняется состав группы на {journal.session.date}.</p>
         {journal.session.date > localDate(journal.session.timezone) && <p>Открыть журнал можно в день занятия.</p>}
         <button disabled={busy || conflict || unavailable || journal.session.date > localDate(journal.session.timezone)} onClick={() => void command(() => apiPost<Journal>(`${base}/open`, { version: journal.session.version }))}>Подтвердить открытие журнала</button>
       </> : <>
-        {journal.session.status === 'cancelled' && <p>Занятие отменено. Отметки сохранены, автоматических отсутствий нет.</p>}
+        {journal.session.status === 'cancelled' && <p>{journal.session.rosterFrozen ? 'Занятие отменено. Отметки сохранены, автоматических отсутствий нет.' : 'Занятие отменено до открытия журнала. Снимок состава не создавался.'}</p>}
         {journal.session.status === 'closed' && <p>Журнал завершён. Для исправления обратитесь к администратору.</p>}
-        <AttendanceCards key={attempt} journal={journal} busy={busy} blocked={!canWrite} error={error} onMark={mark} />
+        {journal.session.rosterFrozen && <AttendanceCards showRoster={!embedded} focusOnEntry={!embedded} key={attempt} journal={journal} busy={busy} blocked={!canWrite} error={error} onMark={mark} />}
       </>}
       {canWrite && <div className="journal-completion">
         <button disabled={busy} onClick={() => setConfirm(true)}>Завершить журнал</button>

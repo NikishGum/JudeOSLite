@@ -7,12 +7,13 @@ import { Button } from '@/components/ui/button';
 type Reason = keyof typeof reasonNames;
 type Props = {
   journal: Journal; busy: boolean; blocked: boolean; error: string;
+  showRoster?: boolean; focusOnEntry?: boolean;
   onMark: (record: AttendanceRecord, value: 'present' | Reason) => Promise<Journal | null>;
 };
 function recordLabel(record: AttendanceRecord) {
   return record.state === null ? 'Не отмечено' : record.state === 'present' ? 'Присутствует' : `Отсутствует · ${reasonNames[record.absenceReason!]}`;
 }
-export function AttendanceCards({ journal, busy, blocked, error, onMark }: Props) {
+export function AttendanceCards({ journal, busy, blocked, error, onMark, showRoster = true, focusOnEntry = true }: Props) {
   const { records } = journal;
   const [activeId, setActiveId] = useState<string | null>(() => records.find((record) => record.state === null)?.id ?? null);
   const [sheet, setSheet] = useState(false);
@@ -22,8 +23,9 @@ export function AttendanceCards({ journal, busy, blocked, error, onMark }: Props
   const pending = useRef(false);
   const [retryPresent, setRetryPresent] = useState(false);
   const titleId = useId();
+  const entered = useRef(false);
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
-  useEffect(() => { heading.current?.focus(); heading.current?.scrollIntoView({ block: 'start' }); }, [activeId]);
+  useEffect(() => { if (entered.current || focusOnEntry) { heading.current?.focus(); heading.current?.scrollIntoView({ block: 'start' }); } entered.current = true; }, [activeId]);
   const index = records.findIndex((record) => record.id === activeId);
   const current = records[index];
   const writable = journal.session.status === 'open' && !blocked;
@@ -68,7 +70,7 @@ export function AttendanceCards({ journal, busy, blocked, error, onMark }: Props
         {writable && <button className="attendance-secondary" disabled={busy} onClick={() => select(record.id)} aria-label={`Открыть карточку ${position + 1}: ${record.fullName}`}>{record.state === null ? 'Отметить' : 'Исправить'}</button>}
       </li>)}</ul>}
     </>}
-    {current && writable && <aside className="attendance-roster" aria-label="Состав и отметки"><h4>Состав группы</h4><ol>{records.map((record, position) => <li key={record.id}><button className="attendance-roster-item" aria-current={record.id === activeId ? 'true' : undefined} disabled={busy} onClick={() => select(record.id)}><span>{position + 1}. {record.fullName}</span><small>{recordLabel(record)}</small></button></li>)}</ol></aside>}
+    {showRoster && current && writable && <aside className="attendance-roster" aria-label="Состав и отметки"><h4>Состав группы</h4><ol>{records.map((record, position) => <li key={record.id}><button className="attendance-roster-item" aria-current={record.id === activeId ? 'true' : undefined} disabled={busy} onClick={() => select(record.id)}><span>{position + 1}. {record.fullName}</span><small>{recordLabel(record)}</small></button></li>)}</ol></aside>}
     </div>
     {sheet && current && writable && <ActionSheet title={`Причина отсутствия · ${current.fullName}`} busy={busy}
       onCancel={() => { setSheet(false); setRetryReason(null); }}>

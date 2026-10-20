@@ -792,3 +792,25 @@ assertions; без retries/новых timeout и product frontend/src измен
 Область/patch заранее опубликованы в #202; перед правкой #200/#202 CLOSED,
 конкурирующих PR нет. Точная исправленная копия прошла22 groups Chromium151/
 WebKit26.5. Исходный FAIL сохранён; новые CI/SHA — live #203/PR209.
+
+## Недельное расписание и страница тренировки #216 — 20.10.2026
+
+По прямому поручению реализация после спецификации PR218. Регистрация очереди
+`bd916a3` в main, dependencies156/157/158/159/185 закрыты/в main; claim
+StarMadeGalaxy/request600c0809973c4455905712bb7f4f7373,
+[run39409663967](https://github.com/NikishGum/JudeOSLite/actions/runs/39409663967) acquired=true.
+[Контракт](../sessions-weekly-ux.md), [проверки](../sessions-weekly-validation.md).
+Неделя по умолчанию:7 колонок при content width≥980px, ниже вертикальные дни;
+спортсменов/attendance summaries в календаре нет. Постоянная страница
+`/clubs/:clubId/sessions/:sessionId`, legacy query совместим, контекст возврата
+только whitelisted IDs/dates/view/filters/scroll. Existing journal GET/command
+responses дополнены `roster` (preliminary на actual date либо frozen snapshot,
+включая пустой), summary=null до freeze. GET не фиксирует состав/версии/отметки.
+`previousTrainerName` из replace-trainer audit, manualOverride не означает замену.
+Прежние sequential cards/admin corrections, роли/конфликты/история сохранены;
+без миграций и новых write endpoints. #214 здесь не реализуется, общие правила
+расписания/исключений сохраняют один источник.
+Impeccable direct context fallback: launcher отсутствует; существующие DESIGN/
+sidecar/tokens сохранены. Browser Chromium151/WebKit26.5 и full Go race+PG18.6
+проверки выполнены; точные итоговые SHA/CI/delivery смотреть в протоколе/live issue.
+#188/физические устройства/приёмка сотрудников этим не закрываются.
