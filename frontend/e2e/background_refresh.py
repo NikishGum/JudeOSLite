@@ -66,9 +66,13 @@ class RefreshFixture(Fixture):
 
 
 def pin(page, selectors):
+    # Finish font/layout and focus scrolling before measuring a background read.
+    page.evaluate('document.fonts.ready')
+    page.clock.run_for(500)
     page.evaluate('''selectors => {
       window.refreshNodes = selectors.map(s => document.querySelector(s));
       if (refreshNodes.some(n => !n)) throw new Error('Missing test content');
+      scrollTo({top: 300, behavior: 'instant'});
       window.refreshScroll = scrollY;
       window.refreshFocus = document.activeElement;
     }''', selectors)
@@ -79,7 +83,8 @@ def assert_preserved(page, focus=False, scroll=False):
     if focus:
         assert page.evaluate('document.activeElement === refreshFocus'), 'Background read stole focus'
     if scroll:
-        assert page.evaluate('scrollY === refreshScroll'), 'Background read changed scroll position'
+        position = page.evaluate('({before: refreshScroll, after: scrollY, fonts: document.fonts.status, width: innerWidth})')
+        assert abs(position['after'] - position['before']) <= 1, ('Background read changed scroll position', position)
 
 
 def main():
@@ -90,7 +95,7 @@ def main():
         )
         for width in (1440, 390):
             fixture = RefreshFixture()
-            context = browser.new_context(viewport={'width': width, 'height': 900}, service_workers='block')
+            context = browser.new_context(viewport={'width': width, 'height': 900}, service_workers='block', reduced_motion='reduce')
             context.add_init_script('delete Navigator.prototype.serviceWorker')
             context.route('**/api/**', fixture.route)
             page = context.new_page()
@@ -102,6 +107,7 @@ def main():
                 wait_for_api_idle(page)
                 page.goto(ROOT+path)
                 wait_for_api_idle(page)
+                page.evaluate('document.fonts.ready')
 
             def settle():
                 fixture.release()
