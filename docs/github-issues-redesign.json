@@ -4,8 +4,8 @@
   "repository": "NikishGum/JudeOSLite",
   "source_main": "72460d8f7bf8fd58fd93eeb026099012033daabf",
   "prototype_commit": "8016b746072e9334567de7fdbba2dcaf2a72fb45",
-  "task_count": 17,
-  "dependency_count": 39,
+  "task_count": 18,
+  "dependency_count": 43,
   "issues": [
     {
       "id": "RD-01",
@@ -215,6 +215,20 @@
       ],
       "body_sha256": "5f34483e7ac8b25c7ab7240b4e8edb7cb8158a12c3274e5c195463bfc295a469",
       "title": "История: компактный журнал (вариант А), серверный поиск и фильтры"
+    },
+    {
+      "id": "UX-STATS",
+      "number": 221,
+      "github_id": 5944442606,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/221",
+      "dependencies": [
+        "RD-04",
+        "RD-08",
+        "RD-10",
+        "UX"
+      ],
+      "body_sha256": "a0c6e40a3655586cbefd78585533584531d840831aa461336582d5c64b57d961",
+      "title": "Статистика: точный перенос варианта А «Обзор сети» и необходимый backend"
     }
   ],
   "verification": {
