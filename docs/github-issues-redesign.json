@@ -4,8 +4,8 @@
   "repository": "NikishGum/JudeOSLite",
   "source_main": "72460d8f7bf8fd58fd93eeb026099012033daabf",
   "prototype_commit": "8016b746072e9334567de7fdbba2dcaf2a72fb45",
-  "task_count": 15,
-  "dependency_count": 31,
+  "task_count": 16,
+  "dependency_count": 37,
   "issues": [
     {
       "id": "RD-01",
@@ -187,6 +187,22 @@
       ],
       "body_sha256": "609ec8fcaafe2c8a5c7510d9e2613c9bdc42693761af08c56e53d561244b130a",
       "title": "Группы: состав, регулярное расписание и исключения"
+    },
+    {
+      "id": "UX-STAFF",
+      "number": 215,
+      "github_id": 5937991144,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/215",
+      "dependencies": [
+        "V1-03",
+        "V1-04",
+        "RD-02",
+        "RD-07",
+        "RD-08",
+        "RD-09"
+      ],
+      "body_sha256": "e9a4720b6aee51fe9b62841dcfeba2ab32287b500adf708e6b5c883b22c9b93b",
+      "title": "Сотрудники: карточка доступа (вариант Б) и необходимые доработки backend"
     }
   ],
   "verification": {
