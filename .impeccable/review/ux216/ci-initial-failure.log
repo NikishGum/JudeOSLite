@@ -1,0 +1,29 @@
+PR run https://github.com/NikishGum/JudeOSLite/actions/runs/39412755931
+Source 3e51998
+Traceback (most recent call last):
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6875278Z   File "/home/runner/work/JudeOSLite/JudeOSLite/frontend/e2e/pwa_v1.py", line 424, in <module>
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6877120Z     check_runtime(browser, page, signin, api, ROOT, club, ENGINE, open_section)
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6888466Z   File "/home/runner/work/JudeOSLite/JudeOSLite/frontend/e2e/shadcn_runtime.py", line 91, in check_runtime
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6889767Z     old_from=ui.get_by_label('С даты',exact=True).input_value()
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6890603Z              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6891595Z   File "/home/runner/.local/lib/python3.12/site-packages/playwright/sync_api/_generated.py", line 19486, in input_value
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6901524Z     self._sync(self._impl_obj.input_value(timeout=to_milliseconds(timeout)))
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6903169Z   File "/home/runner/.local/lib/python3.12/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6904189Z     return task.result()
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6904688Z            ^^^^^^^^^^^^^
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6905739Z   File "/home/runner/.local/lib/python3.12/site-packages/playwright/_impl/_locator.py", line 506, in input_value
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6907148Z     return await self._frame.input_value(
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6907934Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6909176Z   File "/home/runner/.local/lib/python3.12/site-packages/playwright/_impl/_frame.py", line 822, in input_value
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6910362Z     return await self._channel.send(
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6911088Z            ^^^^^^^^^^^^^^^^^^^^^^^^^
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6912294Z   File "/home/runner/.local/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 76, in send
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6913896Z     return await self._connection.wrap_api_call(
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6914400Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6915134Z   File "/home/runner/.local/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 632, in wrap_api_call
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6915970Z     raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6916997Z playwright._impl._errors.TimeoutError: Locator.input_value: Timeout 30000ms exceeded.
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6917491Z Call log:
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6917984Z   - waiting for get_by_label("С даты", exact=True)
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.6918237Z
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-20T11:16:23.7588915Z ##[error]Process completed with exit code 1.

@@ -327,6 +327,15 @@ try:
         tr.get_by_label('Поиск по составу', exact=True).fill('такого имени нет')
         expect(tr.locator('.session-roster')).to_contain_text('По этому имени никого нет')
         assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{stress}'") == '0'
+        # Cancellation before open is preliminary data, never an empty snapshot.
+        stress_journal = api(own, 'GET', base+'/journals/'+stress)
+        api(own, 'POST', base+'/sessions/'+stress+'/cancel', {'version': stress_journal['session']['version'], 'reason': 'Synthetic cancellation before freeze'})
+        tr.reload()
+        expect(tr.locator('.session-journal')).to_contain_text('Снимок состава не создавался')
+        expect(tr.locator('.session-roster')).to_contain_text('не история посещения')
+        expect(tr.locator('.session-roster-list > li')).to_have_count(45)
+        expect(tr.locator('.attendance-cards')).to_have_count(0)
+        assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{stress}'") == '0'
         # Calendar boundaries and the inclusive 366-day limit.
         admin.goto(ROOT+'/clubs/'+a['id']+'/sessions?from=2026-12-28&through=2027-01-03&view=week')
         expect(admin.locator('.session-day')).to_have_count(7)

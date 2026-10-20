@@ -83,9 +83,9 @@ export function SessionJournal({ clubId, initial, onChanged, initialJournal, onR
         {journal.session.date > localDate(journal.session.timezone) && <p>Открыть журнал можно в день занятия.</p>}
         <button disabled={busy || conflict || unavailable || journal.session.date > localDate(journal.session.timezone)} onClick={() => void command(() => apiPost<Journal>(`${base}/open`, { version: journal.session.version }))}>Подтвердить открытие журнала</button>
       </> : <>
-        {journal.session.status === 'cancelled' && <p>Занятие отменено. Отметки сохранены, автоматических отсутствий нет.</p>}
+        {journal.session.status === 'cancelled' && <p>{journal.session.rosterFrozen ? 'Занятие отменено. Отметки сохранены, автоматических отсутствий нет.' : 'Занятие отменено до открытия журнала. Снимок состава не создавался.'}</p>}
         {journal.session.status === 'closed' && <p>Журнал завершён. Для исправления обратитесь к администратору.</p>}
-        <AttendanceCards showRoster={!embedded} focusOnEntry={!embedded} key={attempt} journal={journal} busy={busy} blocked={!canWrite} error={error} onMark={mark} />
+        {journal.session.rosterFrozen && <AttendanceCards showRoster={!embedded} focusOnEntry={!embedded} key={attempt} journal={journal} busy={busy} blocked={!canWrite} error={error} onMark={mark} />}
       </>}
       {canWrite && <div className="journal-completion">
         <button disabled={busy} onClick={() => setConfirm(true)}>Завершить журнал</button>

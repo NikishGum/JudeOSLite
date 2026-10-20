@@ -1,2 +1,2 @@
-2026/10/20 11:05:24 migrations applied
+2026/10/20 11:16:36 migrations applied
 {"engine": "chromium", "version": "151.0.7922.34", "result": "PASS", "checks": "day/week/period, ID scope/two clubs, create/reschedule/replace/cancel, direct journal/back/reload, Escape/focus, double tap/network/reload, correction conflict/history, preview/snapshot/search/45 participants, no calendar N+1, canonical/legacy links, 320/390/768/1280/1440"}
