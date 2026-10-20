@@ -134,3 +134,13 @@ Main Build39445133862 на `af1aa91` упал на старом ожидании
 как superseded, не PASS. На совмещённом production-коде оба полных staff сценария
 прошли ещё раз: `merged-chromium.log`, `merged-webkit.log`, jsErrors=[].
 Новый полный CI проверяет также актуальные background-refresh regression.
+
+Branch Build39447286756 на `8734722`: Go/PG, frontend/image, оба новых staff
+сценария и backend браузерные suites прошли; общий browser шаг затем FAILED
+в старом `redesign_registry:282`: ожидался пустой локальный список после revoke A.
+Fixture admin управляет A **и B**, и trainer сохраняет B; единый реестр должен
+оставлять эту запись. Исправлены только expectations: та же личность в списке,
+нет revoke A, есть revoke B; прежний независимый API требует ровно `[B]`, прежний
+переход в журнал A проверяет отказ доступа. Без retries/новых timeout/правок API.
+Ошибка и её CI URL не названы PASS. Полные PWA/regression выполняются в обоих
+движках перед новым полным CI; окончательные run/SHA — в live issue.

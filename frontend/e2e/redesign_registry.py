@@ -279,7 +279,10 @@ def check_registry(browser, page, signin, api, owner, root, engine, open_section
     assert len(api(ui, 'GET', f"/api/clubs/{a['id']}/trainers")) == 1
     admin.get_by_role('button', name=revoke_name, exact=True).click()
     admin.get_by_role('button', name='Подтвердить снятие назначения', exact=True).click()
-    expect(admin.locator('.staff-access-list li')).to_have_count(0)
+    # This administrator manages both clubs: the unified roster retains B.
+    expect(admin.locator(f'[data-person-id="{trainer["id"]}"]')).to_have_count(1)
+    expect(admin.get_by_role('button', name=revoke_name, exact=True)).to_have_count(0)
+    expect(admin.get_by_role('button', name='Снять назначение: Тренер · '+b['name'], exact=True)).to_be_visible()
     live_trainer = next(v for v in api(ui, 'GET', '/api/trainer-accounts') if v['id'] == trainer['id'])
     assert live_trainer['trainerClubIds'] == [b['id']]
     t.goto(root+f"/clubs/{a['id']}/journals")

@@ -21,7 +21,7 @@
     "frontend/src/features/staff/staff-access.css",
     "frontend/src/features/staff/staff-types.ts"
   ],
-  "source_sha256": "f2fd85afb9aed65c23a2e96bb76a6094b9583e3c105fc4b383695362412cdec8",
+  "source_sha256": "2ab3078e66339561235199f22bd82f4c3145b4b928fc22773f4a53a35edb70be",
   "results": {
     "Go_vet_race_PostgreSQL": "PASS",
     "Frontend_TypeScript_production": "PASS",
@@ -39,7 +39,8 @@
     "Docker_history_final": "PASS",
     "Docker_merged_main": "PASS",
     "Chromium_merged_main_full": "PASS",
-    "WebKit_merged_main_full": "PASS"
+    "WebKit_merged_main_full": "PASS",
+    "CI_39447286756": "FAIL: obsolete RD-02 empty roster expectation; staff suites PASS"
   },
   "artifacts_sha256": {
     "candidate-before-copy/chromium-existing-1280.png": "5440c47241efc3fa2fad85f76eb6a865c02f3e282f781b9243edbb7713807771",
@@ -76,6 +77,8 @@
     "chromium-list-320.png": "1ec27318db97471d103939620975faf8e115a280ed358b6571025d0cf1666b2e",
     "chromium-list-390.png": "d89e7345b5285735addad32dc5a076cb806c50a8d69890c3bb92ef68fe271224",
     "chromium-screenshots.json": "2fd2012ad9d3ac343412009c1530f5c45b3953abf99a818d4801bece9f2be978",
+    "ci-registry-failure.log": "14dcf43f10f6fb6b61bad896e6b2e6f569eeb0cf19ea5c9c07880cd3511b5d29",
+    "ci-registry-failure.log.raw.gz": "5fb86388c98ada92113266660b14de2357a11b7a8190f2c68ce5780e675168f9",
     "confirmation-contact-review.png": "8351f589e9fa80c4ecaed7d70baae6c530d0873a68c98743f3f6304944257e5f",
     "confirmation-existing.py": "8735530f96d7888d29837ef55b8ac02f58108ee923ae4829b5fd03241f08e73c",
     "coordination.log": "63f265d4df2c5d40a7f1a9f4eb7138bb44efb1a3254dce633c851b3d32e0d0f9",
