@@ -21,7 +21,7 @@
     "frontend/src/features/staff/staff-access.css",
     "frontend/src/features/staff/staff-types.ts"
   ],
-  "source_sha256": "b4efb7be005209ba57260e328a85afe90d025acc5dafe300b86e4eb8e0626458",
+  "source_sha256": "f2fd85afb9aed65c23a2e96bb76a6094b9583e3c105fc4b383695362412cdec8",
   "results": {
     "Go_vet_race_PostgreSQL": "PASS",
     "Frontend_TypeScript_production": "PASS",
@@ -36,7 +36,8 @@
     "Physical_PWA_employee_acceptance": "NOT RUN; separate #188",
     "Staff_legacy_history_PostgreSQL_race": "PASS",
     "Docker_history_first_attempt": "RESOURCE EXHAUSTED; not PASS",
-    "Docker_history_final": "PASS"
+    "Docker_history_final": "PASS",
+    "Docker_merged_main": "PASS"
   },
   "artifacts_sha256": {
     "candidate-before-copy/chromium-existing-1280.png": "5440c47241efc3fa2fad85f76eb6a865c02f3e282f781b9243edbb7713807771",
@@ -85,6 +86,8 @@
     "docker-build-history-final.log.raw.gz": "4a7cf23a68ca4170098e86bf1d6675b739338b188f4d6bb4af94301e7f64bdeb",
     "docker-build-history.log": "122ca2c1523a9e9e3f84f1ab47b5ada24fe5209fa5e0df70943de1c2db07b4e2",
     "docker-build-history.log.raw.gz": "368447e14bb2eca07bc26dfa98314008eff11a5e138ae60aeaa79de1c05f2ab9",
+    "docker-build-merged.log": "aa2976bf8791346c505ea1c9a8e9230d0b7c8e8c1bfaf444d7952185cceda6a2",
+    "docker-build-merged.log.raw.gz": "2feaeaccb03afd8639f59df0f27c96d223a41b2f56dc1b87e2f91ef592d9a606",
     "docker-build-shipping.log": "8197ccebc808d3c558fe1058bf36ddd847bb4b7c7b4ee8705ebde67e3da06aaa",
     "docker-build-shipping.log.raw.gz": "53ee2fd74f9de83066e95c47b7c36f184a2332cfaec4ec1b8d4afd0288a86b11",
     "docker-build.log": "73b40be3c564c72fa9021ab1edaf38e0c5e6c8cae7ff0e54062b2251b315da74",
@@ -153,5 +156,6 @@
     "webkit-list-320.png": "7a8b6cd121ba9ceb4cbe506043d9a373e8ae42c0cf540666655c49ece794cae3",
     "webkit-list-390.png": "1f474d49c89c3a3ff0ec8dbe3d12f48378ca083ebb37ad774abecf8319b67c28",
     "webkit-screenshots.json": "49bb94303576bfc285ffb22e012c109b79b06c6caa3fd4d8056f2a24cab277f6"
-  }
+  },
+  "integrated_main": "af1aa9110e93d2c10310ef3172510265d56a650d"
 }
