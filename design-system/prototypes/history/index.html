@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>История — два UX-концепта PRIDE</title>
+  <link rel="stylesheet" href="history.css">
+  <script src="history.js" defer></script>
+</head>
+<body>
+<!-- THESIS: Два способа читать аудит: сравнивать компактные строки или просматривать сгруппированную ленту. Одна запись не занимает карточку.
+OWN-WORLD: Действующая PRIDE: локальный Rubik, белый, F5F7FA, DB0C0C, исходные радиусы и токены. Никакой оболочки приложения.
+STORY: Выбрать период, найти действие, раскрыть техническую запись без потери места. Все сведения синтетические.
+FIRST VIEWPORT: Небольшой переключатель концептов, заголовок, одна строка фильтров и сами события; дополнительные поля скрыты.
+FORM: Два заказанных code-led прототипа внутри существующей дизайн-системы; seed не применяется к заданной паре.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance -->
+  <a class="skip" href="#history">К истории событий</a>
+  <main>
+    <section class="concept-bar" aria-label="Сравнение концептов">
+      <div class="concept-switch" role="group" aria-label="Вариант раздела">
+        <button type="button" data-view="journal" aria-pressed="true">А · Компактный журнал</button>
+        <button type="button" data-view="feed" aria-pressed="false">Б · Лента по дням</button>
+      </div>
+      <span class="demo-label">UX-концепт · вымышленные данные</span>
+    </section>
+    <p id="concept-note" class="concept-note">Для поиска и сверки: все события в компактных строках, подробности — по нажатию.</p>
+
+    <header class="page-heading">
+      <div><h1>История</h1><p>Кто, когда и что изменил в рабочем пространстве</p></div>
+      <button class="button secondary" id="refresh" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2 6M20 4v7h-7"/></svg><span>Обновить</span></button>
+    </header>
+
+    <section class="history-panel" id="history" aria-label="История действий">
+      <form id="filters" aria-label="Фильтры истории">
+        <div class="toolbar">
+          <label class="search-field"><span class="sr-only">Поиск по сотруднику, действию или ID</span><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><input id="search" type="search" placeholder="Сотрудник, действие или ID" autocomplete="off"></label>
+          <label class="select-field"><span class="sr-only">Филиал</span><select id="club"><option value="">Все филиалы</option>Брест · Восток</option><option>Брест · Центр</option></select></label>
+          <label class="select-field period"><span class="sr-only">Период</span><select id="period"><option value="week">За 7 дней</option><option value="today">Сегодня</option><option value="yesterday">Вчера</option><option value="all">За всё время</option><option value="custom">Выбрать даты…</option></select></label>
+          <button class="button secondary filter-toggle" type="button" id="toggle-filters" aria-expanded="false" aria-controls="extra-filters"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="17" r="2"/></svg>Фильтры<span id="filter-count" hidden></span></button>
+        </div>
+        <div class="extra-filters" id="extra-filters" hidden>
+          <label>Действие<select id="action"><option value="">Все действия</option><option value="marked">Отметка посещаемости</option><option value="corrected">Исправление отметки</option><option value="journal_closed">Завершение журнала</option><option value="journal_opened">Открытие журнала</option><option value="created">Создание</option><option value="updated">Изменение</option><option value="added">Включение в группу</option><option value="archived">Архивирование</option><option value="other">Другое действие</option></select></label>
+          <label>Сотрудник<select id="actor"><option value="">Все сотрудники</option><option>Ольга Калиновская</option><option>Алексей Волков</option><option>Мария Соколова</option></select></label>
+          <div class="date-fields" id="date-fields" hidden><label>С даты<input type="date" id="from" value="2026-10-14"></label><label>По дату<input type="date" id="until" value="2026-10-20"></label></div>
+          <p id="date-error" role="alert" hidden>Дата начала должна быть не позже даты окончания.</p>
+        </div>
+      </form>
+      <div class="results-heading"><div><strong id="result-count"></strong><span class="results-context" id="results-context"></span></div><button class="text-button" id="reset" hidden type="button">Сбросить фильтры</button><span class="timezone">Новые сверху · Минск, UTC+3</span></div>
+      <div id="results" aria-busy="false"></div>
+      <div class="list-footer"><span id="shown-count"></span><button class="button secondary" id="more" type="button">Показать ещё</button></div>
+      <div class="panel-footnote">Имена сотрудников и названия филиалов показаны на сегодня.</div>
+    </section>
+    <div id="announcement" role="status" class="sr-only" aria-live="polite"></div>
+    <details class="demo-tools"><summary>Проверить состояния прототипа</summary><div><button class="button secondary" id="demo-empty" type="button">Пустой результат</button><button class="button secondary" id="demo-error" type="button">Ошибка загрузки</button><span>Обновление показывает состояние загрузки. Дата примера: 20 октября 2026.</span></div></details>
+  </main>
+</body>
+</html>
