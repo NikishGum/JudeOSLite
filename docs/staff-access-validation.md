@@ -144,3 +144,14 @@ Fixture admin управляет A **и B**, и trainer сохраняет B; е
 переход в журнал A проверяет отказ доступа. Без retries/новых timeout/правок API.
 Ошибка и её CI URL не названы PASS. Полные PWA/regression выполняются в обоих
 движках перед новым полным CI; окончательные run/SHA — в live issue.
+
+Финальная интеграция main `d2ff446`/`e9dd2fb`: background-refresh измеряет scroll
+после fonts/layout и явного положения (допуск только1px); preview запускается
+из frontend. Сохранены все проверки DOM/focus/draft/access. В workflow разрешён
+конфликт перестановки Playwright bootstrap: установка один раз в раннем шаге,
+обе staff suites остаются в полном browser блоке. Product-код215 не менялся.
+Полные локальные `pwa_v1` Chromium/WebKit и исправленный background_refresh
+Chromium/WebKit — PASS; логи `pwa-final-*`, `background-final-*`. Повторно14
+coordination tests — PASS (`coordination-final.log`). Окончательные main SHA/полный
+CI/Done фиксируются в live issue после действительного завершения, без нового
+коммита только ради статуса. До этого issue остаётся In progress.

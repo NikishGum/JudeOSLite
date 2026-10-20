@@ -1,0 +1,19 @@
+test_another_chat_of_same_user_does_not_confirm_this_request (test_claim_client.ClaimClientTests.test_another_chat_of_same_user_does_not_confirm_this_request) ... ok
+test_dry_run_reports_no_acquisition (test_claim_client.ClaimClientTests.test_dry_run_reports_no_acquisition) ... ok
+test_failure_or_cancellation_never_grants_the_claim (test_claim_client.ClaimClientTests.test_failure_or_cancellation_never_grants_the_claim) ... ok
+test_unknown_result_requires_inspecting_existing_request (test_claim_client.ClaimClientTests.test_unknown_result_requires_inspecting_existing_request) ... ok
+test_already_assigned_issue_is_never_reassigned (test_claim_issue.ClaimTests.test_already_assigned_issue_is_never_reassigned) ... ok
+test_blocked_or_mismatched_dependencies_prevent_assignment (test_claim_issue.ClaimTests.test_blocked_or_mismatched_dependencies_prevent_assignment) ... ok
+test_closed_non_v1_pull_request_and_bot_are_refused (test_claim_issue.ClaimTests.test_closed_non_v1_pull_request_and_bot_are_refused) ... ok
+test_dry_run_cannot_take_the_issue (test_claim_issue.ClaimTests.test_dry_run_cannot_take_the_issue) ... ok
+test_invalid_plan_merge_fails_closed (test_claim_issue.ClaimTests.test_invalid_plan_merge_fails_closed) ... ok
+test_manual_assignment_during_checks_is_preserved (test_claim_issue.ClaimTests.test_manual_assignment_during_checks_is_preserved) ... ok
+test_redesign_cross_plan_dependency_uses_same_claim_guard (test_claim_issue.ClaimTests.test_redesign_cross_plan_dependency_uses_same_claim_guard) ... ok
+test_repository_registries_load_together (test_claim_issue.ClaimTests.test_repository_registries_load_together) ... ok
+test_two_people_and_two_chats_of_one_person_have_one_winner (test_claim_issue.ClaimTests.test_two_people_and_two_chats_of_one_person_have_one_winner) ... ok
+test_unconfirmed_assignment_never_returns_acquired (test_claim_issue.ClaimTests.test_unconfirmed_assignment_never_returns_acquired) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.008s
+
+OK
