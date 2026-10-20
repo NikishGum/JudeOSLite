@@ -125,3 +125,12 @@ assertions, без retries/увеличения timeout/ослабления п�
 сохранены. Конфликт только в prepend памяти разрешён сохранением обеих записей.
 Совместный production image проверен отдельно в `docker-build-merged.log`;
 полный штатный CI проверяет совмещённый SHA, включая staff и background refresh.
+
+Main Build39445133862 на `af1aa91` упал на старом ожидании удаления отчёта
+после transport error. Отдельный main `d41d969` уже согласовал reports/dashboard
+и reports_v1 с сохранением последнего подтверждённого содержимого/DOM и явной
+ошибкой. Этот коммит интегрирован без собственных правок данных тестов; проверки
+401/403/смены scope не менялись. Branch Build39446274766 на `14dffda` отменён
+как superseded, не PASS. На совмещённом production-коде оба полных staff сценария
+прошли ещё раз: `merged-chromium.log`, `merged-webkit.log`, jsErrors=[].
+Новый полный CI проверяет также актуальные background-refresh regression.

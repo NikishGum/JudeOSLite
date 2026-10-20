@@ -37,7 +37,9 @@
     "Staff_legacy_history_PostgreSQL_race": "PASS",
     "Docker_history_first_attempt": "RESOURCE EXHAUSTED; not PASS",
     "Docker_history_final": "PASS",
-    "Docker_merged_main": "PASS"
+    "Docker_merged_main": "PASS",
+    "Chromium_merged_main_full": "PASS",
+    "WebKit_merged_main_full": "PASS"
   },
   "artifacts_sha256": {
     "candidate-before-copy/chromium-existing-1280.png": "5440c47241efc3fa2fad85f76eb6a865c02f3e282f781b9243edbb7713807771",
@@ -99,6 +101,8 @@
     "frontend-build.log.raw.gz": "f8089878731af8ec89ccc17fd458ce2d68b64190776273015c249690629c2a97",
     "go-checks-final.log": "61822db7915277e576b7f2e0944fba77580fb692b5f975db806d776bbd44912b",
     "go-checks.log": "99fb62e00cb9b408d6ea27d4b594ffc6b885736a719cd4140ddffe1a484f41e2",
+    "merged-chromium.log": "993b481551d355c624f229e6f99df6d1d4a0c3e01ac4fdaed6c4bd6d209d16dd",
+    "merged-webkit.log": "b2cfc4b3efb3860e657586ed38a84e95853115fa36c72eeacc76e091b0ec1733",
     "round1/chromium-card-1280.png": "c9872f442b7af0578ac2e8bc42a1e3fe7c76817b29d7c0fbd406c4c28a64ded1",
     "round1/chromium-card-1440.png": "040e8791f37545f6f248f9c185ec45af6a4e4b1913807ca80c35846286aa48e2",
     "round1/chromium-card-320.png": "8804facf74662880dd5d07eb00fc4b6737b82160bc1015f0dcefb5cf6a2aac59",
@@ -157,5 +161,5 @@
     "webkit-list-390.png": "1f474d49c89c3a3ff0ec8dbe3d12f48378ca083ebb37ad774abecf8319b67c28",
     "webkit-screenshots.json": "49bb94303576bfc285ffb22e012c109b79b06c6caa3fd4d8056f2a24cab277f6"
   },
-  "integrated_main": "af1aa9110e93d2c10310ef3172510265d56a650d"
+  "integrated_main": "d41d96987b686942fa2c758eb046331468f6ebe6"
 }
