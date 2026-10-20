@@ -53,8 +53,10 @@ const events = seeds.map(([day, time, action, actor, club], index) => ({
   action, actorName: actors[actor], clubName: clubs[club],
 }));
 const $ = (id) => document.getElementById(id);
-const state = { view: new URLSearchParams(location.search).get('view') === 'feed' ? 'feed' : 'journal', limit: 10, loading: false, error: false };
-const fields = ['search', 'club', 'period', 'action', 'actor', 'from', 'until'];
+const state = { query: '', limit: 10, loading: false, error: false };
+let searchTimer;
+let refreshTimer;
+const fields = ['club', 'period', 'action', 'actor', 'from', 'until'];
 const paths = {
   edit: '<path d="m14 5 5 5M4 20l5-1L20 8a2 2 0 0 0-5-5L4 14z"/>',
   check: '<path d="m5 12 4 4L19 6"/>',
@@ -66,8 +68,46 @@ const paths = {
 function icon(name) { return `<svg class="action-icon" aria-hidden="true" viewBox="0 0 24 24">${paths[name]}</svg>`; }
 function plural(n) { return `${n} ${n % 10 === 1 && n % 100 !== 11 ? 'событие' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'события' : 'событий'}`; }
 function shortId(e) { return e.entityId.slice(0, 6); }
+function normalize(text) { return text.toLocaleLowerCase('ru').replaceAll('ё', 'е'); }
+function queryWords() { return normalize(state.query).split(/\s+/).filter(Boolean).map(word => word.replace(/^#(?=[a-f0-9])/i, '')); }
+function escapeHtml(text) { return String(text).replace(/[&<>"']/g, char => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[char])); }
+function highlight(text) {
+  const normalized = normalize(text);
+  const ranges = [];
+  for (const word of queryWords()) {
+    let start = 0;
+    while ((start = normalized.indexOf(word, start)) >= 0) { ranges.push([start, start + word.length]); start += word.length; }
+  }
+  ranges.sort((a, b) => a[0] - b[0]);
+  const merged = [];
+  for (const range of ranges) {
+    const last = merged[merged.length - 1];
+    if (last && range[0] <= last[1]) last[1] = Math.max(last[1], range[1]); else merged.push([...range]);
+  }
+  let result = '', cursor = 0;
+  for (const [start, end] of merged) { result += escapeHtml(text.slice(cursor, start)) + '<mark>' + escapeHtml(text.slice(start, end)) + '</mark>'; cursor = end; }
+  return result + escapeHtml(text.slice(cursor));
+}
+function periodLabel() {
+  const period = $('period').value;
+  if (period === 'custom') {
+    const format = value => value ? value.split('-').reverse().join('.') : '…';
+    return `${format($('from').value)} — ${format($('until').value)}`;
+  }
+  return {week: '14–20 октября', today: '20 октября', yesterday: '19 октября', all: 'За всё время'}[period];
+}
+function activeFilters() {
+  const chips = [];
+  if (state.query) chips.push(['search', `Поиск: ${state.query}`]);
+  if ($('club').value) chips.push(['club', `Филиал: ${$('club').value}`]);
+  if ($('period').value !== 'week' && $('period').value !== 'all') chips.push(['period', `Период: ${periodLabel()}`]);
+  if ($('action').value) chips.push(['action', `Действие: ${$('action').selectedOptions[0].textContent}`]);
+  if ($('actor').value) chips.push(['actor', `Сотрудник: ${$('actor').value}`]);
+  $('active-filters').hidden = !chips.length;
+  $('active-filters').innerHTML = chips.map(([field, label]) => `<button type="button" class="filter-chip" data-clear="${field}" aria-label="Убрать условие: ${escapeHtml(label)}"><span>${escapeHtml(label)}</span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button>`).join('');
+}
 function filterEvents() {
-  const q = $('search').value.trim().toLocaleLowerCase('ru');
+  const words = queryWords();
   const period = $('period').value;
   return events.filter(e => {
     if ($('club').value && e.clubName !== $('club').value) return false;
@@ -77,37 +117,22 @@ function filterEvents() {
     if (period === 'yesterday' && e.day !== 19) return false;
     if (period === 'week' && e.day < 14) return false;
     if (period === 'custom' && (($('from').value && e.date < $('from').value) || ($('until').value && e.date > $('until').value))) return false;
-    return !q || [e.actorName, e.clubName, kinds[e.action][0], kinds[e.action][1], e.entityId, e.id].join(' ').toLocaleLowerCase('ru').includes(q);
+    const actionLabel = $('action').querySelector(`option[value="${e.action}"]`).textContent;
+    const haystack = normalize([e.actorName, e.clubName, kinds[e.action][0], kinds[e.action][1], actionLabel, e.action, e.entityId, e.id].join(' '));
+    return words.every(word => haystack.includes(word));
   });
 }
 function details(e) {
-  return `<div class="detail-content"><dl><div><dt>Дата и время · Минск</dt><dd>${e.day} октября 2026, ${e.time}</dd></div><div><dt>ID записи</dt><dd><code>${e.entityId}</code></dd></div><div><dt>ID события</dt><dd><code>${e.id}</code></dd></div></dl></div>`;
+  return `<div class="detail-content"><dl><div><dt>Дата и время · Минск</dt><dd>${e.day} октября 2026, ${e.time}</dd></div><div><dt>ID записи</dt><dd><code>${highlight(e.entityId)}</code></dd></div><div><dt>ID события</dt><dd><code>${highlight(e.id)}</code></dd></div></dl></div>`;
 }
 function journal(items) {
-  return `<table class="journal"><caption class="sr-only">История действий, новые события сверху. Подробности раскрываются в строке.</caption><thead><tr><th scope="col">Время</th><th scope="col">Действие</th><th scope="col">Запись</th><th scope="col">Сотрудник / филиал</th><th scope="col"><span class="sr-only">Подробности</span></th></tr></thead><tbody>${items.map(e => `<tr class="event-row"><td><time class="event-time" datetime="${e.createdAt}">${e.time.slice(0, 5)}<small>${e.day} окт.</small></time></td><td><span class="action-text">${icon(kinds[e.action][2])}${kinds[e.action][0]}</span></td><td><span class="entity">${kinds[e.action][1]}</span><span class="short-id">#${shortId(e)}</span></td><td><span class="actor">${e.actorName}</span><span class="club-name">${e.clubName}</span></td><td><button class="expand" type="button" data-detail="${e.id}" aria-label="Подробности события ${e.day} октября в ${e.time}" aria-expanded="false" aria-controls="detail-${e.id}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button></td></tr><tr class="detail-row" id="detail-${e.id}" hidden><td colspan="5">${details(e)}</td></tr>`).join('')}</tbody></table>`;
-}
-function feed(items) {
-  const days = [...new Set(items.map(e => e.day))];
-  return `<div class="feed">${days.map(day => {
-    const dayItems = items.filter(e => e.day === day);
-    const groups = [];
-    dayItems.forEach(e => {
-      const last = groups[groups.length - 1];
-      // Только последовательные отметки одного автора/филиала, не более 5 минут.
-      if (e.action === 'marked' && last && last[0].action === e.action && last[0].actorName === e.actorName && last[0].clubName === e.clubName && Math.abs(Date.parse(last[0].createdAt) - Date.parse(e.createdAt)) <= 300000) last.push(e);
-      else groups.push([e]);
-    });
-    return `<section class="day" aria-labelledby="day-${day}"><div class="day-title"><h2 id="day-${day}">${day === 20 ? 'Сегодня' : day === 19 ? 'Вчера' : `${day} октября`}</h2><span>${day === 20 || day === 19 ? `${day} октября · ` : ''}${plural(dayItems.length)}</span></div><ol class="day-events">${groups.map(group => {
-      const e = group[0];
-      const batch = group.length > 1;
-      return `<li class="feed-event"><div class="feed-top"><span class="action-text">${icon(kinds[e.action][2])}${batch ? `Отмечена посещаемость · ${group.length} записи` : kinds[e.action][0]}</span><div class="feed-time-controls"><time class="event-time" datetime="${e.createdAt}">${e.time.slice(0, 5)}</time>${!batch ? `<button class="expand" type="button" data-detail="${e.id}" aria-label="Подробности события ${e.day} октября в ${e.time}" aria-expanded="false" aria-controls="detail-${e.id}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>` : ''}</div></div><div class="feed-context"><span>${e.actorName}</span><span>${e.clubName}</span>${!batch ? `<span class="entity">${kinds[e.action][1]} <span class="short-id">#${shortId(e)}</span></span>` : ''}</div>${batch ? `<div class="feed-bottom"><button class="text-button" type="button" data-detail="${e.id}" aria-expanded="false" aria-controls="detail-${e.id}">Показать ${group.length} записи</button></div>` : ''}<div id="detail-${e.id}" hidden>${batch ? `<ul class="batch-list">${group.map(item => `<li><span>Отметка #${shortId(item)}<br><span class="short-id">ID: ${item.entityId}</span></span><time datetime="${item.createdAt}">${item.time}</time></li>`).join('')}</ul>` : details(e)}</div></li>`;
-    }).join('')}</ol></section>`;
-  }).join('')}</div>`;
+  return `<table class="journal"><caption class="sr-only">История действий, новые события сверху. Подробности раскрываются в строке.</caption><thead><tr><th scope="col">Время</th><th scope="col">Действие</th><th scope="col">Запись</th><th scope="col">Сотрудник / филиал</th><th scope="col"><span class="sr-only">Подробности</span></th></tr></thead><tbody>${items.map(e => `<tr class="event-row"><td><time class="event-time" datetime="${e.createdAt}">${e.time.slice(0, 5)}<small>${e.day} окт.</small></time></td><td><span class="action-text">${icon(kinds[e.action][2])}<span>${highlight(kinds[e.action][0])}</span></span></td><td><span class="entity">${highlight(kinds[e.action][1])}</span><span class="short-id">#${highlight(shortId(e))}</span></td><td><span class="actor">${highlight(e.actorName)}</span><span class="club-name">${highlight(e.clubName)}</span></td><td><button class="expand" type="button" data-detail="${e.id}" aria-label="Подробности события ${e.day} октября в ${e.time}" aria-expanded="false" aria-controls="detail-${e.id}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button></td></tr><tr class="detail-row" id="detail-${e.id}" hidden><td colspan="5">${details(e)}</td></tr>`).join('')}</tbody></table>`;
 }
 function reset() {
-  $('filters').reset(); state.limit = 10; state.error = false;
+  clearTimeout(searchTimer); clearTimeout(refreshTimer);
+  $('filters').reset(); state.query = ''; state.limit = 10; state.error = false; state.loading = false;
   $('extra-filters').hidden = true; $('toggle-filters').setAttribute('aria-expanded', 'false');
-  render();
+  render(); $('search').focus();
 }
 function render() {
   const custom = $('period').value === 'custom';
@@ -119,10 +144,12 @@ function render() {
   const extraCount = Number(Boolean($('action').value)) + Number(Boolean($('actor').value));
   $('filter-count').hidden = !extraCount;
   $('filter-count').textContent = extraCount;
-  $('reset').hidden = !$('search').value && !$('club').value && $('period').value === 'week' && !extraCount;
+  $('clear-search').hidden = !$('search').value;
+  activeFilters();
+  $('reset').hidden = !state.query && !$('club').value && $('period').value === 'week' && !extraCount;
   const filtered = invalid ? [] : filterEvents();
   $('result-count').textContent = state.error ? 'История недоступна' : state.loading ? 'Загружаем историю…' : invalid ? 'Проверьте период' : plural(filtered.length);
-  $('results-context').textContent = $('club').value || 'Все филиалы';
+  $('results-context').textContent = `${$('club').value || 'Все филиалы'} · ${periodLabel()}`;
   $('results').setAttribute('aria-busy', String(state.loading));
   $('refresh').disabled = state.loading;
   $('more').hidden = state.loading || state.error || filtered.length <= state.limit;
@@ -131,28 +158,42 @@ function render() {
   if (state.loading) content = `<div class="loading" aria-hidden="true">${Array.from({length: 6}, () => '<div class="skeleton"><span></span><span></span><span></span></div>').join('')}</div>`;
   else if (state.error) content = '<div class="empty-state" role="alert"><h2>Не удалось загрузить историю</h2><p>Попробуйте ещё раз. Выбранные фильтры сохранятся.</p><button class="button" type="button" data-retry>Повторить загрузку</button></div>';
   else if (invalid) content = '<div class="empty-state"><h2>Проверьте даты</h2><p>Дата начала периода должна быть не позже даты окончания.</p></div>';
-  else if (!filtered.length) content = '<div class="empty-state"><h2>Событий не найдено</h2><p>Попробуйте другой запрос, расширьте период или сбросьте фильтры.</p><button class="button" type="button" data-reset>Сбросить фильтры</button></div>';
-  else content = state.view === 'journal' ? journal(filtered.slice(0, state.limit)) : feed(filtered.slice(0, state.limit));
+  else if (!filtered.length) content = `<div class="empty-state"><h2>Событий не найдено</h2><p>Поиск ограничен выбранными фильтрами. ${state.query ? 'Очистите запрос или расширьте период.' : 'Расширьте период или уберите одно из условий.'}</p>${state.query ? '<button class="button" type="button" data-clear-query>Очистить запрос</button>' : '<button class="button" type="button" data-reset>Сбросить фильтры</button>'}</div>`;
+  else content = journal(filtered.slice(0, state.limit));
   $('results').innerHTML = content;
   $('announcement').textContent = $('result-count').textContent;
 }
-function setView(view) {
-  state.view = view; state.limit = view === 'feed' ? 16 : 10;
-  document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === view)));
-  $('concept-note').textContent = view === 'journal' ? 'Для поиска и сверки: все события в компактных строках, подробности — по нажатию.' : 'Для обзора дня: события читаются как лента, последовательные отметки собраны в группы.';
-  const url = new URL(location.href); url.searchParams.set('view', view); history.replaceState(null, '', url);
-  render();
+function applySearch() {
+  clearTimeout(searchTimer); state.query = $('search').value.trim(); state.limit = 10; render();
 }
+function clearSearch() { $('search').value = ''; applySearch(); $('search').focus(); }
 function refresh() {
+  clearTimeout(searchTimer); clearTimeout(refreshTimer); state.query = $('search').value.trim();
   state.loading = true; state.error = false; render();
-  setTimeout(() => { state.loading = false; render(); $('announcement').textContent = 'История обновлена. ' + $('result-count').textContent; }, 650);
+  refreshTimer = setTimeout(() => { state.loading = false; render(); $('announcement').textContent = 'История обновлена. ' + $('result-count').textContent; }, 650);
 }
-$('filters').addEventListener('submit', e => e.preventDefault());
-fields.forEach(id => $(id).addEventListener(id === 'search' ? 'input' : 'change', () => {
+$('filters').addEventListener('submit', e => { e.preventDefault(); applySearch(); });
+$('search').maxLength = 160;
+$('search').addEventListener('input', () => {
+  clearTimeout(searchTimer); $('clear-search').hidden = !$('search').value;
+  $('results').setAttribute('aria-busy', 'true'); $('result-count').textContent = 'Ищем…';
+  searchTimer = setTimeout(applySearch, 300);
+});
+$('search').addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); clearSearch(); } });
+$('clear-search').addEventListener('click', clearSearch);
+$('active-filters').addEventListener('click', e => {
+  const button = e.target.closest('[data-clear]'); if (!button) return;
+  const field = button.dataset.clear;
+  if (field === 'search') { clearSearch(); return; }
+  $(field).value = field === 'period' ? 'all' : '';
+  applySearch();
+  if (field === 'action' || field === 'actor') $('toggle-filters').focus(); else $(field).focus();
+});
+fields.forEach(id => $(id).addEventListener('change', () => {
   if (id === 'period' && $('period').value === 'custom') {
     $('extra-filters').hidden = false; $('toggle-filters').setAttribute('aria-expanded', 'true');
   }
-  state.limit = 10; render();
+  applySearch();
 }));
 $('toggle-filters').addEventListener('click', () => {
   const hidden = !$('extra-filters').hidden;
@@ -162,16 +203,16 @@ $('toggle-filters').addEventListener('click', () => {
 $('reset').addEventListener('click', reset);
 $('refresh').addEventListener('click', refresh);
 $('more').addEventListener('click', () => { state.limit += 10; render(); });
-document.querySelectorAll('[data-view]').forEach(button => button.addEventListener('click', () => setView(button.dataset.view)));
 $('results').addEventListener('click', e => {
   const button = e.target.closest('button'); if (!button) return;
   if (button.hasAttribute('data-reset')) { reset(); $('search').focus(); }
   if (button.hasAttribute('data-retry')) refresh();
+  if (button.hasAttribute('data-clear-query')) clearSearch();
   if (button.dataset.detail) {
     const detail = $(`detail-${button.dataset.detail}`);
     detail.hidden = !detail.hidden; button.setAttribute('aria-expanded', String(!detail.hidden));
   }
 });
-$('demo-empty').addEventListener('click', () => { $('search').value = 'Несуществующее событие'; state.error = false; render(); $('search').focus(); });
+$('demo-empty').addEventListener('click', () => { $('search').value = 'Несуществующее событие'; state.error = false; applySearch(); $('search').focus(); });
 $('demo-error').addEventListener('click', () => { state.error = true; render(); });
-setView(state.view);
+render();
