@@ -21,6 +21,10 @@ acquired=true, единственный исполнитель/In progress. Ве
   при20 конкурентных изменениях, live role/session после middleware: PASS.
   Owner candidate lookup/буквальные wildcard/лимит30, перевод существующего
   parent-only в staff без дубля и без потери family_access: PASS в Go/PG.
+  Дополнительная проверка legacy audit: parent-only после правки аккаунта с
+  пустыми/null `clubIds` не становится сотрудником; бывший administrator с
+  непустыми прежними `clubIds` остаётся доступен. `staff-history-final.log`: PASS
+  после фактического прогона; итоговый CI проверяет изменённый predicate.
 - Production Docker image: PASS с session CA secret mount, без изменения TLS trust
   и без включения session CA/секретов в слои.
 - 14 тестов очереди/клиента: PASS. Состав JSON/штатные Blocked by согласованы;
@@ -85,7 +89,8 @@ New-work/Operate/craft-floor и React best practices применены внут
 сохранение DESIGN.md/sidecar/токенов и соответствие контракта исходникам.
 
 Финальный набор логов: `go-checks-final.log`, `staff-api-final.log`,
-`frontend-build.log`, `docker-build-shipping.log`, `coordination.log`,
+`frontend-build.log`, `docker-build-shipping.log` + `docker-build-history-final.log`
+(после уточнения исторического predicate), `coordination.log`,
 `chromium-candidates.log` (полный сценарий с parent lookup) +
 `chromium-existing-verdict.log` (адресное подтверждение двух последних правок формы),
 `webkit-confirmation.log` (полный сценарий на финальной форме). Все PASS.
@@ -107,3 +112,10 @@ scrollY=0. Без retries/новых timeout. `chromium-confirmation2.log` PASS;
 assertions, без retries/увеличения timeout/ослабления прав и формул остальных разделов.
 Проверки физических устройств, HTTPS/PWA-установки и пользовательская приёмка #188
 в этой задаче не проводились и не объявляются PASS.
+
+Локальный `docker-build-history.log` завершился ResourceExhausted: диск среды был
+заполнен кэшем Docker. Это не PASS. Удалён только неиспользуемый build cache этой
+задачи через `docker builder prune -f`; тестовая PG и исходники сохранены.
+Повторная сборка зафиксирована отдельно в `docker-build-history-final.log`.
+Первый branch Build39444474780 на a41aac8 отменён как superseded для проверки
+уточнённого predicate; Coordination39444474765 завершён success.

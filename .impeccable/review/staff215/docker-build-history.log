@@ -1,0 +1,88 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.78kB done
+#1 DONE 0.0s
+
+#2 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#2 DONE 0.6s
+
+#3 docker-image://docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+#3 CACHED
+
+#4 [internal] load metadata for docker.io/library/node:24.19.0-bookworm-slim
+#4 ...
+
+#5 [internal] load metadata for docker.io/library/golang:1.27.2-bookworm
+#5 DONE 0.5s
+
+#4 [internal] load metadata for docker.io/library/node:24.19.0-bookworm-slim
+#4 DONE 0.5s
+
+#6 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#6 DONE 0.5s
+
+#7 [internal] load .dockerignore
+#7 transferring context: 150B done
+#7 DONE 0.0s
+
+#8 [frontend 1/7] FROM docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df
+#8 DONE 0.0s
+
+#9 [stage-2 1/6] FROM docker.io/library/debian:bookworm-slim@sha256:7c7b2c966bc9ee8cedfeef67e0e279108992c77681fa595db4a9d65c06ccc587
+#9 DONE 0.0s
+
+#10 [backend 1/6] FROM docker.io/library/golang:1.27.2-bookworm@sha256:5cf287a799e6b94384bad13d16b14904c531f51ba65792237e122ce42b392f61
+#10 DONE 0.0s
+
+#11 [internal] load build context
+#11 transferring context: 249.07kB 0.2s done
+#11 DONE 0.2s
+
+#12 [backend 2/6] WORKDIR /src/backend
+#12 CACHED
+
+#13 [backend 3/6] COPY backend/go.mod backend/go.sum ./
+#13 CACHED
+
+#14 [backend 4/6] RUN --mount=type=secret,id=proxy_ca     if [ -f /run/secrets/proxy_ca ]; then export SSL_CERT_FILE=/run/secrets/proxy_ca; fi;     go mod download
+#14 CACHED
+
+#15 [frontend 2/7] WORKDIR /src/frontend
+#15 CACHED
+
+#16 [frontend 3/7] COPY frontend/package.json frontend/package-lock.json ./
+#16 CACHED
+
+#17 [frontend 4/7] RUN --mount=type=secret,id=proxy_ca     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi;     npm ci --strict-ssl=true
+#17 CACHED
+
+#18 [frontend 5/7] COPY frontend/ ./
+#18 DONE 2.4s
+
+#19 [backend 5/6] COPY backend/ ./
+#19 ...
+
+#20 [frontend 6/7] COPY design-system/ /src/design-system/
+#20 DONE 3.0s
+
+#21 [frontend 7/7] RUN npm run build
+#21 ERROR: failed to prepare tq1gjnzigvpmgvv1rl255xl1b as pd26pcbcf6jbrxe59kq7uxdaf: no space left on device
+
+#19 [backend 5/6] COPY backend/ ./
+#19 ERROR: failed to prepare lw5y42n4lbv5qr0i98v5ef1es as vl6yo4fu3tv9l30fo83pjkqoy: no space left on device
+------
+ > [backend 5/6] COPY backend/ ./:
+------
+------
+ > [frontend 7/7] RUN npm run build:
+------
+Dockerfile:11
+--------------------
+   9 |     COPY frontend/ ./
+  10 |     COPY design-system/ /src/design-system/
+  11 | >>> RUN npm run build
+  12 |
+  13 |     FROM golang:1.27.2-bookworm AS backend
+--------------------
+ERROR: failed to build: failed to solve: ResourceExhausted: failed to prepare tq1gjnzigvpmgvv1rl255xl1b as pd26pcbcf6jbrxe59kq7uxdaf: no space left on device

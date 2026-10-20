@@ -21,7 +21,7 @@
     "frontend/src/features/staff/staff-access.css",
     "frontend/src/features/staff/staff-types.ts"
   ],
-  "source_sha256": "1db72f7bcf49196b97b154785910ef2410dd59e964bfe416de75e7089138caf7",
+  "source_sha256": "b4efb7be005209ba57260e328a85afe90d025acc5dafe300b86e4eb8e0626458",
   "results": {
     "Go_vet_race_PostgreSQL": "PASS",
     "Frontend_TypeScript_production": "PASS",
@@ -33,7 +33,10 @@
     "Impeccable_bounded_verdict": "ship",
     "Frontend_lint": "NOT CONFIGURED",
     "Detector": "UNAVAILABLE",
-    "Physical_PWA_employee_acceptance": "NOT RUN; separate #188"
+    "Physical_PWA_employee_acceptance": "NOT RUN; separate #188",
+    "Staff_legacy_history_PostgreSQL_race": "PASS",
+    "Docker_history_first_attempt": "RESOURCE EXHAUSTED; not PASS",
+    "Docker_history_final": "PASS"
   },
   "artifacts_sha256": {
     "candidate-before-copy/chromium-existing-1280.png": "5440c47241efc3fa2fad85f76eb6a865c02f3e282f781b9243edbb7713807771",
@@ -78,6 +81,10 @@
     "docker-build-candidates.log.raw.gz": "fa52f5cb26c65738853c19839c4769b4f5cb30930ff8831a32f81a6efe87918e",
     "docker-build-final.log": "a7e86f7fc6fecc885849ba37a8342a5c2884e4b762db72f0dfd838d7583742ef",
     "docker-build-final.log.raw.gz": "c1c12c03dfa1c0c9db6e24ae3c10a5419b014c16e6c195658a641ceb7ba1d490",
+    "docker-build-history-final.log": "874f7ea22ec06e9757512cd7143d649e5dd37caa4f1b993366fa15f851f3cb95",
+    "docker-build-history-final.log.raw.gz": "4a7cf23a68ca4170098e86bf1d6675b739338b188f4d6bb4af94301e7f64bdeb",
+    "docker-build-history.log": "122ca2c1523a9e9e3f84f1ab47b5ada24fe5209fa5e0df70943de1c2db07b4e2",
+    "docker-build-history.log.raw.gz": "368447e14bb2eca07bc26dfa98314008eff11a5e138ae60aeaa79de1c05f2ab9",
     "docker-build-shipping.log": "8197ccebc808d3c558fe1058bf36ddd847bb4b7c7b4ee8705ebde67e3da06aaa",
     "docker-build-shipping.log.raw.gz": "53ee2fd74f9de83066e95c47b7c36f184a2332cfaec4ec1b8d4afd0288a86b11",
     "docker-build.log": "73b40be3c564c72fa9021ab1edaf38e0c5e6c8cae7ff0e54062b2251b315da74",
@@ -121,6 +128,8 @@
     "round1/webkit-screenshots.json": "585a48a075cfb3af0170cc7907f67f6bf391bbeca840d95c8ad30b7e09392a07",
     "staff-api-final.log": "463e4645dd4411a92f89afc34c1e3971e0a3b943703066ee5838a533fa811189",
     "staff-api.log": "ebe5b3b3f2871629c7def4d35267548748e7f67aa8b057a3330c0eefb665cd9a",
+    "staff-history-final.log": "2898d46042ae2bfd3a4384ec2f387c0e48f2acd0a998606731aa342ebec2b633",
+    "staff-history.log": "9a80aa5e41621c18f8e537814c0983ee6cf27106294bdbb4ed819ce9d8d0de5f",
     "webkit-card-1280.png": "0c16c46480eb5c7f394c59b05e615e297729a70acb3695a3473855ec117aef51",
     "webkit-card-1440.png": "ba4b81d4353e799d374497e79c8c98d0ca2ae2cc8814a8b0f9f2f96b0ca3e043",
     "webkit-card-320.png": "99eaffbb16ceea451c8223a53f9c33f410752f2073ee4991ce60b1afb05eefc5",

@@ -33,6 +33,11 @@ func TestStaffDirectoryIntegration(t *testing.T) {
 	execSQL(t, pool, `INSERT INTO pride.staff_club_roles(staff_user_id,club_id,role) VALUES($1,$2,'administrator')`, admin, a)
 	family := queryID(t, pool, `INSERT INTO pride.families(club_id,name) VALUES($1,'Secret family name') RETURNING id::text`, a)
 	execSQL(t, pool, `INSERT INTO pride.family_access(family_id,user_id) VALUES($1,$2)`, family, parent)
+	// The legacy bulk account form once listed all non-owner logins. A pure
+	// identity edit with no roles is not evidence that a parent was an employee.
+	execSQL(t, pool, `INSERT INTO pride.audit_events(actor_id,entity_type,entity_id,action,before_state,after_state)
+ SELECT id,'staff_user',$1,'administration_updated','{"clubIds":[]}'::jsonb,'{"clubIds":null}'::jsonb
+ FROM pride.staff_users WHERE is_owner`, parent)
 	type actor struct {
 		cookies []*http.Cookie
 		csrf    string
@@ -273,6 +278,13 @@ func TestStaffDirectoryIntegration(t *testing.T) {
 		var links int
 		if err := pool.QueryRow(ctx, `SELECT count(*) FROM pride.family_access WHERE user_id=$1`, parent).Scan(&links); err != nil || links != 1 {
 			t.Fatal("parent access lost", err)
+		}
+		former := newUser("former-admin")
+		execSQL(t, pool, `INSERT INTO pride.audit_events(actor_id,entity_type,entity_id,action,before_state,after_state)
+ SELECT id,'staff_user',$1,'administration_updated',jsonb_build_object('clubIds',jsonb_build_array($2::text)),
+ '{"clubIds":[]}'::jsonb FROM pride.staff_users WHERE is_owner`, former, a)
+		if card := find(get(owner), former); len(card.Assignments) != 0 {
+			t.Fatal("former administrator role history", card)
 		}
 		for i := 0; i < 35; i++ {
 			newUser(fmt.Sprintf("candidate-bound-%02d", i))

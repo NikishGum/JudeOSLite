@@ -17,8 +17,11 @@ import (
 // Staffing events survive removal of the final role, keeping former staff visible.
 const StaffRegistryPredicate = `(EXISTS(SELECT 1 FROM pride.staff_club_roles sr WHERE sr.staff_user_id=u.id)
  OR EXISTS(SELECT 1 FROM pride.audit_events se WHERE se.entity_type='staff_user' AND se.entity_id=u.id
- AND se.action IN ('administrator_created','administration_updated','trainer_created',
- 'trainer_assignment_created','trainer_assignment_revoked','administrator_assignment_created','administrator_assignment_revoked')))`
+ AND (se.action IN ('administrator_created','trainer_created',
+ 'trainer_assignment_created','trainer_assignment_revoked','administrator_assignment_created','administrator_assignment_revoked')
+ OR (se.action='administration_updated' AND
+ (jsonb_array_length(coalesce(nullif(se.before_state->'clubIds','null'::jsonb),'[]'::jsonb))>0 OR
+ jsonb_array_length(coalesce(nullif(se.after_state->'clubIds','null'::jsonb),'[]'::jsonb))>0)))))`
 
 type StaffAssignment struct {
 	ClubID    string `json:"clubId"`

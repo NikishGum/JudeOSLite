@@ -46,7 +46,8 @@ assignments[]`. Назначение: `clubId, clubName, role, archived, canRevo
 `clubs[]`: `id, name, archived`. `canAssignExisting` только owner.
 
 Сотрудником считается non-owner с текущим `staff_club_roles` либо с сохранённым
-кадровым событием `staff_user`: `administrator_created`, `administration_updated`,
+кадровым событием `staff_user`: `administrator_created`, `administration_updated` (только с непустым
+`clubIds` до или после изменения),
 `trainer_created`, `trainer_assignment_created/revoked`,
 `administrator_assignment_created/revoked`. Аудит кадровых API сохраняет бывших
 сотрудников после последней роли. Тот же predicate применяется к legacy

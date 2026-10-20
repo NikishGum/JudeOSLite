@@ -14,6 +14,8 @@ acquired=true, единственный исполнитель/In progress. Др
 `GET /api/staff-directory`: один REPEATABLE READ snapshot аккаунта/version/всех
 разрешённых role+club/actions. Staff — текущая роль либо прежнее кадровое событие
 staff_user; parent-only не включается, бывший staff остаётся после последней роли.
+Legacy administration_updated без непустых clubIds до/после — только правка
+аккаунта, не кадровое событие (пустой/null список не превращает parent в staff).
 Тот же predicate в legacy staff/trainer-accounts; mixed staff+parent без семейных
 сведений. Admin видит только своих trainer, canManageAccount строго одиночный
 trainer/действующий филиал/без family_access; общие аккаунты и существующие
