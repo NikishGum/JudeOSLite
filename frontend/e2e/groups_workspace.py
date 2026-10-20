@@ -146,6 +146,25 @@ def run():
   row=admin.locator(f'.group-sessions > li[data-session-id="{planned["id"]}"]');row.locator('summary').click();row.get_by_role('button',name='Заменить тренера',exact=True).click();form=admin.locator('.group-session-editor');form.get_by_label('Фактический тренер',exact=True).select_option(trainer2['id']);form.get_by_role('button',name='Подтвердить изменение занятия',exact=True).click();expect(form).to_have_count(0);expect(admin.locator(f'.group-sessions > li[data-session-id="{planned["id"]}"]')).to_contain_text(trainer2['displayName'])
   print('PASS open cancellation preserves marks/snapshot, closed restriction, parity/date-list, trainer replacement',flush=True)
   go();admin.get_by_role('tab',name='Расписание',exact=True).click()
+  # A lost successful batch response is reconciled from the dated history.
+  probe=api(owner,'POST',base+'/participants',{'identity':{'fullName':'Проверка потерянного ответа','birthDate':'2014-01-01'},'joinedOn':'2020-01-01','contactKind':'phone','contactValue':'+375291234568'},201)
+  go(target);admin.get_by_role('button',name='Добавить участников',exact=True).click();admin.locator('.group-pick-list label').filter(has_text=probe['fullName']).get_by_role('checkbox').check()
+  pattern='**/participants/'+probe['id']+'/groups'
+  def lost_response(route):
+   if route.request.method=='POST':
+    response=route.fetch();assert response.status==201;route.abort()
+   else:route.continue_()
+  admin.route(pattern,lost_response);admin.get_by_role('button',name='Добавить выбранных (1)',exact=True).click();expect(admin.locator('.group-add')).to_contain_text('Добавление подтверждено по истории');admin.unroute(pattern)
+  assert sql(f"SELECT count(*) FROM pride.group_memberships WHERE club_membership_id='{probe['id']}'")=='1'
+  admin.get_by_role('button',name='Закрыть добавление',exact=True).click();leave()
+  # Stale session edits keep the reason and require an explicit server reload.
+  admin.get_by_role('tab',name='Расписание',exact=True).click();leave()
+  planned=next(s for s in api(owner,'GET',base+'/sessions?from='+date()+'&until='+date(28)+'&groupId='+target['id']) if s['status']=='planned')
+  row=admin.locator(f'.group-sessions > li[data-session-id="{planned["id"]}"]');row.locator('summary').click();row.get_by_role('button',name='Отменить занятие',exact=True).click();form=admin.locator('.group-session-editor');form.get_by_label('Причина отмены',exact=True).fill('Сохранённая причина')
+  api(owner,'POST',base+'/sessions/'+planned['id']+'/replace-trainer',{'version':planned['version'],'trainerId':trainer2['id'] if planned['trainerId']==trainer['id'] else trainer['id']})
+  form.get_by_role('button',name='Подтвердить изменение занятия',exact=True).click();expect(form.get_by_role('alert')).to_be_visible();expect(form.get_by_label('Причина отмены',exact=True)).to_have_value('Сохранённая причина');expect(form.get_by_role('button',name='Подтвердить изменение занятия',exact=True)).to_be_disabled();form.get_by_role('button',name='Загрузить актуальные занятия и сбросить форму',exact=True).click();leave();expect(form).to_have_count(0)
+  go();admin.get_by_role('tab',name='Расписание',exact=True).click()
+  print('PASS lost response reconciliation and stale version input',flush=True)
   # Addressed branch/role checks use current real API, not UI filtering.
   api(admin,'GET','/api/clubs/'+other['id']+'/groups',status=404)
   api(tr,'GET',base+'/groups',status=404)
@@ -154,12 +173,15 @@ def run():
   admin.get_by_label('Период с даты',exact=True).fill(date(180));expect(admin.locator('.group-exceptions')).to_contain_text('В этом периоде занятий нет')
   admin.get_by_label('Период с даты',exact=True).fill(date());expect(admin.locator('.group-sessions > li').first).to_be_visible()
   admin.get_by_role('tab',name='Расписание',exact=True).focus();admin.keyboard.press('ArrowLeft');expect(admin.get_by_role('tab',name='Состав',exact=True)).to_be_focused()
+  admin.route('**/schedule',lambda r:r.abort() if r.request.method=='GET' else r.continue_())
+  go();expect(admin.locator('.group-header')).to_contain_text('Не удалось загрузить расписание');admin.unroute('**/schedule');admin.locator('.group-header').get_by_role('button',name='Повторить загрузку расписания',exact=True).click();expect(admin.locator('.group-header')).to_contain_text('19:30');admin.get_by_role('tab',name='Состав',exact=True).focus()
   # One batched visual pass: roster/rules/setup on desktop and mobile.
   for tab in ['Состав','Расписание']:
    admin.get_by_role('tab',name=tab,exact=True).click();wait_for_api_idle(admin)
    for width in [1440,1280,390,320]:
     admin.set_viewport_size({'width':width,'height':1000 if width>767 else 844});assert_page_targets(admin,width)
     assert admin.evaluate('document.documentElement.scrollWidth<=innerWidth'),(tab,width)
+    admin.evaluate('window.scrollTo(0,0)')
     admin.screenshot(path=str(OUT/f'{tab}-{width}.png'),full_page=True,animations='disabled')
   admin.set_viewport_size({'width':390,'height':844});admin.get_by_role('button',name='К списку групп',exact=True).click();expect(admin.locator('.group-index')).to_be_visible();admin.locator('.group-choice').filter(has_text=target['name']).click();expect(admin.locator('.group-header')).to_contain_text(target['name']);admin.get_by_role('button',name='К списку групп',exact=True).click();admin.locator('.group-choice').filter(has_text=g['name']).click();expect(admin.get_by_role('tab',name='Расписание',exact=True)).to_have_attribute('aria-selected','true')
   assert not errors,errors

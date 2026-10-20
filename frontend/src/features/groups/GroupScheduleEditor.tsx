@@ -21,8 +21,13 @@ export function GroupScheduleEditor({ clubId, timezone, rule, group, trainers, o
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [stale, setStale] = useState(false);
-  const pending = useRef(false), mounted = useRef(true);
-  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
+  const pending = useRef(false), mounted = useRef(true), heading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    mounted.current = true;
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    heading.current?.focus(); heading.current?.scrollIntoView({ block: 'start' });
+    return () => { mounted.current = false; if (previous?.isConnected) previous.focus(); };
+  }, []);
   function change(patch: Partial<ScheduleInput>) { setInput((old) => ({ ...old, ...patch })); setPreview(null); setError(''); }
   function body(): ScheduleInput {
     return { groupId: input.groupId, trainerId: input.trainerId, mode: input.mode, startsTime: input.startsTime,
@@ -47,7 +52,7 @@ export function GroupScheduleEditor({ clubId, timezone, rule, group, trainers, o
     const dates = input.mode === 'once' ? [picked] : [...new Set([...(input.selectedDates ?? []), picked])].sort();
     change({ selectedDates: dates, ...(!rule ? { from: dates[0] } : {}) });
   }
-  return <div className="group-rule-editor"><h3>{rule ? 'Изменить расписание с даты' : 'Настроить расписание'}</h3>
+  return <div className="group-rule-editor"><h3 ref={heading} tabIndex={-1}>{rule ? 'Изменить расписание с даты' : 'Настроить расписание'}</h3>
     <p><strong>{group.name}</strong></p><p className="help">Даты и время филиала: {timezone}. Длительность в минутах. Конец регулярного периода не включается.</p>
     {error && <p className="error" role="alert">{error}</p>}{stale && <p>Ввод сохранён. <button type="button" className="secondary" onClick={onRefresh} disabled={busy}>Загрузить актуальные правила и сбросить форму</button></p>}
     <form onSubmit={(event) => void submit(event)} aria-busy={busy}><fieldset disabled={busy}>

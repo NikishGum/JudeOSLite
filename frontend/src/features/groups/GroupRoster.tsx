@@ -41,6 +41,18 @@ export function GroupRoster({ clubId, group, groups, today, date, onDate, before
     return () => c.abort();
   }, [clubId, adding, query, page, attempt]);
   function changed() { setMember(null); setAttempt((v) => v + 1); setNotice('Состав сохранён. История и снимки занятий сохранены.'); trainingChanged(); }
+  async function verify(card: Card) {
+    if (pending.current) return;
+    pending.current = true; setBusy(true);
+    try {
+      const history = await apiGet<Interval[]>(`/api/clubs/${clubId}/participants/${card.id}/groups`);
+      if (!mounted.current) return;
+      const saved = history.some((i) => i.groupId === group.id && i.from === from && i.until === null);
+      setResults((old) => old.map((r) => r.card.id === card.id ? { card, state: saved ? 'saved' : 'failed', detail: saved ? 'Добавление подтверждено по истории' : 'Изменение не найдено в истории. Можно повторить.' } : r));
+      if (saved) { setSelected((old) => old.filter((c) => c.id !== card.id)); setAttempt((v) => v + 1); trainingChanged(); }
+    } catch { /* Keep the explicit unknown result until the server can be read. */ }
+    finally { if (mounted.current) { pending.current = false; setBusy(false); } }
+  }
   async function add(event: FormEvent) {
     event.preventDefault(); if (pending.current || !selected.length) return;
     // Independent, dated commands: never present this as an atomic batch.
@@ -83,7 +95,7 @@ export function GroupRoster({ clubId, group, groups, today, date, onDate, before
     {adding && <div className="group-add"><div className="section-heading"><h4>Добавить в «{group.name}»</h4><button className="secondary" disabled={busy} onClick={() => beforeNavigate(() => { setAdding(false); setSelected([]); setResults([]); })}>Закрыть добавление</button></div>
       <form className="registry-search" onSubmit={(e) => { e.preventDefault(); setQuery(search.trim()); setPage(0); }}><label className="field">Найти участника в реестре<input type="search" maxLength={200} value={search} onChange={(e) => setSearch(e.target.value)} /></label><button type="submit" disabled={busy}>Найти</button></form>
       {cardsLoading && <p role="status">Загружаем реестр…</p>}{cardsError && <div role="alert"><p>{cardsError}</p><button disabled={busy} onClick={() => setAttempt((v) => v + 1)}>Повторить загрузку реестра</button></div>}
-      <form key={formKey} onSubmit={(e) => void add(e)} aria-busy={busy}><fieldset disabled={busy}>
+      <form key={formKey} onSubmit={(e) => void add(e)} aria-busy={busy}><fieldset disabled={busy || results.some((r) => r.state === 'unknown')}>
         <ul className="group-pick-list">{cards.items.map((card) => <li key={card.id}><label><input type="checkbox" checked={selected.some((c) => c.id === card.id)} onChange={(e) => { setSelected((old) => e.target.checked ? [...old, card] : old.filter((c) => c.id !== card.id)); setResults([]); }} /><span><strong>{card.fullName}</strong><small>{displayDate(card.birthDate)}</small></span></label></li>)}</ul>
         {!cardsLoading && !cardsError && cards.items.length === 0 && <p>Участников по запросу не найдено.</p>}
         <div className="actions"><button type="button" className="secondary" disabled={page === 0} onClick={() => setPage((v) => v - 1)}>Назад по реестру</button><span>Страница {page + 1}</span><button type="button" className="secondary" disabled={!cards.hasMore} onClick={() => setPage((v) => v + 1)}>Далее по реестру</button></div>
@@ -92,7 +104,7 @@ export function GroupRoster({ clubId, group, groups, today, date, onDate, before
         <p className="help">С {displayDate(from)} в группе «{group.name}». Каждый участник сохраняется отдельно. При частичной ошибке успешные добавления остаются, повтор отправляется только для оставшихся. Для уже состоящего в другой группе используйте перевод.</p>
         <button type="submit" disabled={!selected.length || results.some((r) => r.state === 'unknown')}>{busy ? 'Добавляем участников…' : `Добавить выбранных (${selected.length})`}</button>
       </fieldset></form>
-      {results.length > 0 && <div role="status"><h4>Результат добавления</h4><ul>{results.map((r) => <li key={r.card.id}><strong>{r.card.fullName}</strong> — {r.detail}</li>)}</ul></div>}
+      {results.length > 0 && <div role="status"><h4>Результат добавления</h4><ul>{results.map((r) => <li key={r.card.id}><strong>{r.card.fullName}</strong> — {r.detail}{r.state === 'unknown' && <button className="secondary" disabled={busy} onClick={() => void verify(r.card)}>Проверить результат</button>}</li>)}</ul></div>}
     </div>}
     {member && <GroupMemberDialog clubId={clubId} interval={member.interval} action={member.action} groups={groups} onClose={() => beforeNavigate(() => setMember(null))} onChanged={changed} />}
   </div>;

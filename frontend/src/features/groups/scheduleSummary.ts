@@ -6,7 +6,7 @@ export function ruleSummary(rule: Rule) {
   const end = `${String(Math.floor(minutes / 60) % 24).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
   const days = rule.mode === 'weekly' ? rule.weekdays?.map((day) => ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'][day - 1]).join(', ')
     : rule.mode === 'day_parity' ? `${rule.dayParity === 'even' ? 'Чётные' : 'Нечётные'} числа месяца`
-      : rule.mode === 'date_list' ? rule.selectedDates?.map(dateLabel).join(', ') : modeNames[rule.mode];
+      : rule.mode === 'date_list' ? `${rule.selectedDates?.slice(0, 3).map(dateLabel).join(', ')}${(rule.selectedDates?.length ?? 0) > 3 ? ` · ещё ${(rule.selectedDates?.length ?? 0) - 3} дат` : ''}` : modeNames[rule.mode];
   return `${days} · ${start}–${end}${minutes >= 1440 ? ' (+1 день)' : ''}`;
 }
 

@@ -60,9 +60,11 @@
 .group-workspace [hidden] { display: none; }
 @media (max-width: 1099px) {
   .group-workspace .group-columns { display: block; }
+  .group-workspace.has-selection > .section-heading { display: none; }
+  .group-workspace.has-selection .group-columns { margin-top: 0; }
   .group-workspace .group-index { border: 0; padding: 0; }
   .group-workspace.has-selection .group-index, .group-workspace:not(.has-selection) .group-workarea { display: none; }
-  .group-workspace .group-back { display: inline-flex; margin-bottom: 24px; }
+  .group-workspace .group-back { display: inline-flex; margin-bottom: 16px; }
 }
 @media (max-width: 600px) {
   .group-workspace .group-people > li, .group-workspace .group-rules > li, .group-workspace .group-sessions > li { display: block; }
