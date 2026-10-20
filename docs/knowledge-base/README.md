@@ -30,6 +30,9 @@ iPay остаётся будущим отдельным подключением
 
 Занятия/журналы RD-03: [контракт переходов](../redesign-training.md), [проверки](../redesign-training-validation.md).
 
+Новая постановка20.10: [#216 — недельные колонки и страница тренировки](../sessions-weekly-ux.md),
+исследование TutorCruncher/TeamUp/Gymdesk; последовательная отметка сохраняется.
+
 React-оболочка редизайна RD-01: [навигация/карта функций](../redesign-navigation.md), [проверки](../redesign-shell-validation.md).
 
 Статистика/история RD-04: [контракт и адаптеры RD-05](../redesign-reports.md), [проверка](../redesign-reports-validation.md).
