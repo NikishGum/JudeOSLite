@@ -13,4 +13,4 @@ Structure: one roster only; trainers and administrators are combinable roles. Us
 A: table with role/branch mapping, access state and focused account dialog.
 B: roster with selected account beside it; mobile detail replaces roster, back preserves filters. Access actions precede individual assignments.
 Constraints: synthetic data in memory, no API requests or backend changes. Native dialog, focus restoration, >=44px controls. Assignment form combining trainer/admin is an unapproved UX proposal; production permissions must be preserved in a separate implementation issue.
-Open: user composition choice and further feedback. This prototype is not product acceptance.
+Confirmed 20.10.2026: user chose B for the main application and requested necessary backend additions; tracked in #215. A remains a historical alternative. Open: production implementation/verification. Prototype review does not accept the unimplemented production surface.
