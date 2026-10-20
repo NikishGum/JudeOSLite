@@ -1,5 +1,7 @@
 # Филиалы и администраторы V1-03
 
+Актуальный UI и согласованный реестр сотрудников20.10.2026 — [карточка доступа Б](staff-access.md).
+
 12.10.2026, [#151](https://github.com/NikishGum/JudeOSLite/issues/151). После входа владелец видит «Филиалы и администраторы»: создание/редактирование залов, создание администратора, несколько назначений, отзыв и отключение общего аккаунта. Каждый зал имеет отдельный ID, одинаковые названия разрешены. Архив виден владельцу, но отсутствует в рабочем выборе.
 
 ## Данные, валидация и доступ
@@ -21,7 +23,7 @@
 | GET /api/clubs/{id} | Текущий доступ к филиалу, включая архивные метаданные; 200 |
 | PUT /api/clubs/{id} | Owner: {name,address?,timezone,version}; 200 с новой version |
 | POST /api/clubs/{id}/archive | Owner: {version}; сохраняет историю/назначения; 200 |
-| GET /api/staff | Owner: non-owner аккаунты, включая отключённые/без назначений; [{id,login,displayName,disabled,clubIds,version}]. clubIds — только administrator |
+| GET /api/staff | Owner: текущие/бывшие staff без owner и parent-only, включая отключённые/без назначений; [{id,login,displayName,disabled,clubIds,version}]. clubIds — только administrator |
 | POST /api/staff | Owner: {login,displayName,password,clubIds}; 201 с аккаунтом без пароля |
 | PUT /api/staff/{id} | Owner: {displayName,disabled,clubIds,version}; общие данные и назначения атомарно, 200 |
 

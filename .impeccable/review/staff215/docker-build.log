@@ -1,0 +1,323 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.78kB done
+#1 DONE 0.1s
+
+#2 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#2 DONE 2.4s
+
+#3 docker-image://docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+#3 resolve docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e 0.0s done
+#3 sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e 9.08kB / 9.08kB done
+#3 sha256:7b32114e84ca21aeb2d6f871a0b62b3a0762193f75d9afd048ee4cbe889f3148 1.13kB / 1.13kB done
+#3 sha256:528c92d70d7e39dbb3dd1c6681f6750c565c7e45b70527cda47c1a61495c1b6a 1.41kB / 1.41kB done
+#3 sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 0B / 14.28MB 0.1s
+#3 sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 1.05MB / 14.28MB 1.1s
+#3 sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 3.15MB / 14.28MB 1.3s
+#3 sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 4.19MB / 14.28MB 1.4s
+#3 sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 5.24MB / 14.28MB 1.5s
+#3 sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 7.34MB / 14.28MB 1.7s
+#3 sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 8.39MB / 14.28MB 1.8s
+#3 sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 10.49MB / 14.28MB 1.9s
+#3 sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 12.58MB / 14.28MB 2.1s
+#3 sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 13.63MB / 14.28MB 2.2s
+#3 extracting sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62
+#3 sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 14.28MB / 14.28MB 2.3s done
+#3 extracting sha256:9d2b4f57f9e20f33279375ce25c6ff14f30f64270ed5c7b613b2b30256754f62 0.6s done
+#3 DONE 3.1s
+
+#4 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#4 DONE 1.9s
+
+#5 [internal] load metadata for docker.io/library/golang:1.27.2-bookworm
+#5 DONE 2.6s
+
+#6 [internal] load metadata for docker.io/library/node:24.19.0-bookworm-slim
+#6 DONE 2.7s
+
+#7 [internal] load .dockerignore
+#7 transferring context: 150B done
+#7 DONE 0.0s
+
+#8 [frontend 1/7] FROM docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df
+#8 resolve docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df 0.0s done
+#8 sha256:622f209f6c16ba5af4d9a337cae6577d096f17174b904cfc6a5b0c81a2679c24 6.76kB / 6.76kB done
+#8 sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df 3.93kB / 3.93kB done
+#8 sha256:e5a8dee7bc1e6a215d224a7ef8206f7e77271bc3cabd5febf2beafac0674f174 1.93kB / 1.93kB done
+#8 ...
+
+#9 [stage-2 1/6] FROM docker.io/library/debian:bookworm-slim@sha256:7c7b2c966bc9ee8cedfeef67e0e279108992c77681fa595db4a9d65c06ccc587
+#9 resolve docker.io/library/debian:bookworm-slim@sha256:7c7b2c966bc9ee8cedfeef67e0e279108992c77681fa595db4a9d65c06ccc587 0.1s done
+#9 sha256:7c7b2c966bc9ee8cedfeef67e0e279108992c77681fa595db4a9d65c06ccc587 5.65kB / 5.65kB done
+#9 sha256:a4672c0cb26fbdde88e38fa2dfb6c681942306680e41e4378b28770b6e79ee91 1.02kB / 1.02kB done
+#9 sha256:d4c45f66efc59f89b0597d343a9bd72808493c0eacecde5285961743252cee23 453B / 453B done
+#9 DONE 0.3s
+
+#10 [backend 1/6] FROM docker.io/library/golang:1.27.2-bookworm@sha256:5cf287a799e6b94384bad13d16b14904c531f51ba65792237e122ce42b392f61
+#10 resolve docker.io/library/golang:1.27.2-bookworm@sha256:5cf287a799e6b94384bad13d16b14904c531f51ba65792237e122ce42b392f61 0.0s done
+#10 sha256:55395706e9703db746cc507abfc4eb2aea75918f8a8024e4848e2cb81004f5ad 2.32kB / 2.32kB done
+#10 sha256:8cb71386cfcfc55b27b559f73c6d5c0cdcb93b83be8281314116e271cc42cea6 0B / 48.52MB 0.4s
+#10 sha256:c6c71fff0869aa9bd48cf80d66e30b83adc9a3fe5e77dd9aaf266282c6ec64ff 0B / 66.72MB 0.4s
+#10 sha256:5cf287a799e6b94384bad13d16b14904c531f51ba65792237e122ce42b392f61 6.53kB / 6.53kB done
+#10 sha256:ee4851781507a617e5a5e527b3edeebc0f803385e9a47b380c1ed58fe88e60e6 3.06kB / 3.06kB done
+#10 sha256:a4edf9c328e814bd91b20c8e2211065489ebf15a16c7663d68a880660dfc897d 0B / 23.87MB 0.4s
+#10 ...
+
+#11 [internal] load build context
+#11 transferring context: 2.72MB 0.8s done
+#11 DONE 0.8s
+
+#10 [backend 1/6] FROM docker.io/library/golang:1.27.2-bookworm@sha256:5cf287a799e6b94384bad13d16b14904c531f51ba65792237e122ce42b392f61
+#10 sha256:8cb71386cfcfc55b27b559f73c6d5c0cdcb93b83be8281314116e271cc42cea6 4.19MB / 48.52MB 1.3s
+#10 sha256:c6c71fff0869aa9bd48cf80d66e30b83adc9a3fe5e77dd9aaf266282c6ec64ff 5.24MB / 66.72MB 1.3s
+#10 sha256:a4edf9c328e814bd91b20c8e2211065489ebf15a16c7663d68a880660dfc897d 2.10MB / 23.87MB 1.3s
+#10 sha256:a4edf9c328e814bd91b20c8e2211065489ebf15a16c7663d68a880660dfc897d 4.19MB / 23.87MB 1.5s
+#10 sha256:8cb71386cfcfc55b27b559f73c6d5c0cdcb93b83be8281314116e271cc42cea6 7.34MB / 48.52MB 1.6s
+#10 sha256:a4edf9c328e814bd91b20c8e2211065489ebf15a16c7663d68a880660dfc897d 6.29MB / 23.87MB 1.6s
+#10 sha256:8cb71386cfcfc55b27b559f73c6d5c0cdcb93b83be8281314116e271cc42cea6 10.49MB / 48.52MB 1.7s
+#10 sha256:c6c71fff0869aa9bd48cf80d66e30b83adc9a3fe5e77dd9aaf266282c6ec64ff 9.44MB / 66.72MB 1.7s
+#10 sha256:a4edf9c328e814bd91b20c8e2211065489ebf15a16c7663d68a880660dfc897d 10.49MB / 23.87MB 2.0s
+#10 sha256:8cb71386cfcfc55b27b559f73c6d5c0cdcb93b83be8281314116e271cc42cea6 15.73MB / 48.52MB 2.2s
+#10 sha256:c6c71fff0869aa9bd48cf80d66e30b83adc9a3fe5e77dd9aaf266282c6ec64ff 14.68MB / 66.72MB 2.2s
+#10 sha256:a4edf9c328e814bd91b20c8e2211065489ebf15a16c7663d68a880660dfc897d 12.58MB / 23.87MB 2.2s
+#10 sha256:8cb71386cfcfc55b27b559f73c6d5c0cdcb93b83be8281314116e271cc42cea6 18.87MB / 48.52MB 2.4s
+#10 sha256:a4edf9c328e814bd91b20c8e2211065489ebf15a16c7663d68a880660dfc897d 15.73MB / 23.87MB 2.4s
+#10 sha256:c6c71fff0869aa9bd48cf80d66e30b83adc9a3fe5e77dd9aaf266282c6ec64ff 18.87MB / 66.72MB 2.6s
+#10 sha256:a4edf9c328e814bd91b20c8e2211065489ebf15a16c7663d68a880660dfc897d 17.83MB / 23.87MB 2.6s
+#10 sha256:8cb71386cfcfc55b27b559f73c6d5c0cdcb93b83be8281314116e271cc42cea6 24.12MB / 48.52MB 2.8s
+#10 sha256:a4edf9c328e814bd91b20c8e2211065489ebf15a16c7663d68a880660dfc897d 19.92MB / 23.87MB 2.8s
+#10 sha256:c6c71fff0869aa9bd48cf80d66e30b83adc9a3fe5e77dd9aaf266282c6ec64ff 23.07MB / 66.72MB 3.0s
+#10 sha256:a4edf9c328e814bd91b20c8e2211065489ebf15a16c7663d68a880660dfc897d 22.02MB / 23.87MB 3.0s
+#10 sha256:a4edf9c328e814bd91b20c8e2211065489ebf15a16c7663d68a880660dfc897d 23.59MB / 23.87MB 3.2s
+#10 sha256:8cb71386cfcfc55b27b559f73c6d5c0cdcb93b83be8281314116e271cc42cea6 29.36MB / 48.52MB 3.3s
+#10 sha256:c6c71fff0869aa9bd48cf80d66e30b83adc9a3fe5e77dd9aaf266282c6ec64ff 28.31MB / 66.72MB 3.5s
+#10 sha256:a4edf9c328e814bd91b20c8e2211065489ebf15a16c7663d68a880660dfc897d 23.87MB / 23.87MB 3.3s done
+#10 sha256:e27d95d86248184505d1806dbe46f052fede7d3924bce88bd3bf570b77ae367c 0B / 92.58MB 3.5s
+#10 sha256:8cb71386cfcfc55b27b559f73c6d5c0cdcb93b83be8281314116e271cc42cea6 34.60MB / 48.52MB 3.7s
+#10 sha256:8cb71386cfcfc55b27b559f73c6d5c0cdcb93b83be8281314116e271cc42cea6 37.75MB / 48.52MB 3.9s
+#10 sha256:c6c71fff0869aa9bd48cf80d66e30b83adc9a3fe5e77dd9aaf266282c6ec64ff 33.55MB / 66.72MB 3.9s
+#10 sha256:8cb71386cfcfc55b27b559f73c6d5c0cdcb93b83be8281314116e271cc42cea6 41.94MB / 48.52MB 4.2s
+#10 sha256:c6c71fff0869aa9bd48cf80d66e30b83adc9a3fe5e77dd9aaf266282c6ec64ff 38.80MB / 66.72MB 4.4s
+#10 sha256:8cb71386cfcfc55b27b559f73c6d5c0cdcb93b83be8281314116e271cc42cea6 45.09MB / 48.52MB 4.5s
+#10 sha256:8cb71386cfcfc55b27b559f73c6d5c0cdcb93b83be8281314116e271cc42cea6 48.52MB / 48.52MB 4.8s
+#10 sha256:e27d95d86248184505d1806dbe46f052fede7d3924bce88bd3bf570b77ae367c 6.29MB / 92.58MB 4.8s
+#10 sha256:8cb71386cfcfc55b27b559f73c6d5c0cdcb93b83be8281314116e271cc42cea6 48.52MB / 48.52MB 4.8s done
+#10 sha256:c6c71fff0869aa9bd48cf80d66e30b83adc9a3fe5e77dd9aaf266282c6ec64ff 44.04MB / 66.72MB 5.0s
+#10 sha256:b2b6413ae8f393d11d32262c8dc6bd053dbaea3d074f95edd5605d3eb116e3c2 0B / 71.15MB 5.0s
+#10 sha256:c6c71fff0869aa9bd48cf80d66e30b83adc9a3fe5e77dd9aaf266282c6ec64ff 48.23MB / 66.72MB 5.4s
+#10 extracting sha256:8cb71386cfcfc55b27b559f73c6d5c0cdcb93b83be8281314116e271cc42cea6
+#10 sha256:c6c71fff0869aa9bd48cf80d66e30b83adc9a3fe5e77dd9aaf266282c6ec64ff 53.48MB / 66.72MB 6.0s
+#10 sha256:e27d95d86248184505d1806dbe46f052fede7d3924bce88bd3bf570b77ae367c 11.53MB / 92.58MB 6.0s
+#10 sha256:c6c71fff0869aa9bd48cf80d66e30b83adc9a3fe5e77dd9aaf266282c6ec64ff 58.72MB / 66.72MB 6.3s
+#10 sha256:b2b6413ae8f393d11d32262c8dc6bd053dbaea3d074f95edd5605d3eb116e3c2 4.19MB / 71.15MB 6.3s
+#10 sha256:e27d95d86248184505d1806dbe46f052fede7d3924bce88bd3bf570b77ae367c 16.78MB / 92.58MB 6.6s
+#10 sha256:c6c71fff0869aa9bd48cf80d66e30b83adc9a3fe5e77dd9aaf266282c6ec64ff 63.96MB / 66.72MB 6.8s
+#10 sha256:b2b6413ae8f393d11d32262c8dc6bd053dbaea3d074f95edd5605d3eb116e3c2 8.39MB / 71.15MB 6.9s
+#10 sha256:c6c71fff0869aa9bd48cf80d66e30b83adc9a3fe5e77dd9aaf266282c6ec64ff 66.72MB / 66.72MB 7.0s done
+#10 sha256:018c58ecdb70412cf84e606f54c9a6eb423539dec826df5793442c42cff872a4 0B / 127B 7.1s
+#10 sha256:e27d95d86248184505d1806dbe46f052fede7d3924bce88bd3bf570b77ae367c 22.02MB / 92.58MB 7.6s
+#10 sha256:b2b6413ae8f393d11d32262c8dc6bd053dbaea3d074f95edd5605d3eb116e3c2 12.58MB / 71.15MB 7.6s
+#10 sha256:018c58ecdb70412cf84e606f54c9a6eb423539dec826df5793442c42cff872a4 127B / 127B 7.6s done
+#10 sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 0B / 32B 7.7s
+#10 sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 32B / 32B 7.9s done
+#10 ...
+
+#8 [frontend 1/7] FROM docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df
+#8 sha256:a8ac7f6c67abc236e4c745052c404112b8fab6fe8ac3a329d1ef3b867ad67c71 0B / 28.23MB 8.0s
+#8 sha256:a8ac7f6c67abc236e4c745052c404112b8fab6fe8ac3a329d1ef3b867ad67c71 3.15MB / 28.23MB 8.5s
+#8 sha256:a8ac7f6c67abc236e4c745052c404112b8fab6fe8ac3a329d1ef3b867ad67c71 7.34MB / 28.23MB 8.8s
+#8 sha256:a8ac7f6c67abc236e4c745052c404112b8fab6fe8ac3a329d1ef3b867ad67c71 10.49MB / 28.23MB 8.9s
+#8 sha256:a8ac7f6c67abc236e4c745052c404112b8fab6fe8ac3a329d1ef3b867ad67c71 12.58MB / 28.23MB 9.0s
+#8 sha256:a8ac7f6c67abc236e4c745052c404112b8fab6fe8ac3a329d1ef3b867ad67c71 16.78MB / 28.23MB 9.2s
+#8 sha256:a8ac7f6c67abc236e4c745052c404112b8fab6fe8ac3a329d1ef3b867ad67c71 20.97MB / 28.23MB 9.3s
+#8 sha256:a8ac7f6c67abc236e4c745052c404112b8fab6fe8ac3a329d1ef3b867ad67c71 25.17MB / 28.23MB 9.4s
+#8 sha256:a8ac7f6c67abc236e4c745052c404112b8fab6fe8ac3a329d1ef3b867ad67c71 28.23MB / 28.23MB 9.6s done
+#8 sha256:990581063f5c8a03a57db7a0d116679ea6e6e335d4ac48ef457f26f82d917eba 0B / 3.32kB 9.8s
+#8 extracting sha256:a8ac7f6c67abc236e4c745052c404112b8fab6fe8ac3a329d1ef3b867ad67c71
+#8 sha256:990581063f5c8a03a57db7a0d116679ea6e6e335d4ac48ef457f26f82d917eba 3.32kB / 3.32kB 10.4s done
+#8 sha256:4996e33358abd29e5daf56cdda6681efb4db3bd55b5ab63a7d3d44f8400195a4 0B / 50.50MB 10.5s
+#8 sha256:4996e33358abd29e5daf56cdda6681efb4db3bd55b5ab63a7d3d44f8400195a4 4.19MB / 50.50MB 11.5s
+#8 sha256:4996e33358abd29e5daf56cdda6681efb4db3bd55b5ab63a7d3d44f8400195a4 8.39MB / 50.50MB 12.0s
+#8 sha256:4996e33358abd29e5daf56cdda6681efb4db3bd55b5ab63a7d3d44f8400195a4 12.58MB / 50.50MB 12.5s
+#8 sha256:4996e33358abd29e5daf56cdda6681efb4db3bd55b5ab63a7d3d44f8400195a4 15.73MB / 50.50MB 12.9s
+#8 sha256:4996e33358abd29e5daf56cdda6681efb4db3bd55b5ab63a7d3d44f8400195a4 18.87MB / 50.50MB 13.2s
+#8 sha256:4996e33358abd29e5daf56cdda6681efb4db3bd55b5ab63a7d3d44f8400195a4 22.02MB / 50.50MB 13.6s
+#8 sha256:4996e33358abd29e5daf56cdda6681efb4db3bd55b5ab63a7d3d44f8400195a4 25.17MB / 50.50MB 13.9s
+#8 sha256:4996e33358abd29e5daf56cdda6681efb4db3bd55b5ab63a7d3d44f8400195a4 29.36MB / 50.50MB 14.4s
+#8 sha256:4996e33358abd29e5daf56cdda6681efb4db3bd55b5ab63a7d3d44f8400195a4 32.51MB / 50.50MB 14.8s
+#8 extracting sha256:a8ac7f6c67abc236e4c745052c404112b8fab6fe8ac3a329d1ef3b867ad67c71 5.0s
+#8 sha256:4996e33358abd29e5daf56cdda6681efb4db3bd55b5ab63a7d3d44f8400195a4 35.65MB / 50.50MB 15.2s
+#8 sha256:4996e33358abd29e5daf56cdda6681efb4db3bd55b5ab63a7d3d44f8400195a4 38.80MB / 50.50MB 15.5s
+#8 sha256:4996e33358abd29e5daf56cdda6681efb4db3bd55b5ab63a7d3d44f8400195a4 41.94MB / 50.50MB 15.9s
+#8 ...
+
+#10 [backend 1/6] FROM docker.io/library/golang:1.27.2-bookworm@sha256:5cf287a799e6b94384bad13d16b14904c531f51ba65792237e122ce42b392f61
+#10 sha256:e27d95d86248184505d1806dbe46f052fede7d3924bce88bd3bf570b77ae367c 72.35MB / 92.58MB 16.0s
+#10 sha256:b2b6413ae8f393d11d32262c8dc6bd053dbaea3d074f95edd5605d3eb116e3c2 69.21MB / 71.15MB 16.0s
+#10 extracting sha256:8cb71386cfcfc55b27b559f73c6d5c0cdcb93b83be8281314116e271cc42cea6 10.7s
+#10 sha256:b2b6413ae8f393d11d32262c8dc6bd053dbaea3d074f95edd5605d3eb116e3c2 71.15MB / 71.15MB 16.3s done
+#10 sha256:e27d95d86248184505d1806dbe46f052fede7d3924bce88bd3bf570b77ae367c 77.59MB / 92.58MB 16.9s
+#10 extracting sha256:8cb71386cfcfc55b27b559f73c6d5c0cdcb93b83be8281314116e271cc42cea6 12.4s done
+#10 sha256:e27d95d86248184505d1806dbe46f052fede7d3924bce88bd3bf570b77ae367c 82.84MB / 92.58MB 17.8s
+#10 sha256:e27d95d86248184505d1806dbe46f052fede7d3924bce88bd3bf570b77ae367c 88.08MB / 92.58MB 18.6s
+#10 sha256:e27d95d86248184505d1806dbe46f052fede7d3924bce88bd3bf570b77ae367c 92.58MB / 92.58MB 19.4s done
+#10 extracting sha256:a4edf9c328e814bd91b20c8e2211065489ebf15a16c7663d68a880660dfc897d
+#10 extracting sha256:a4edf9c328e814bd91b20c8e2211065489ebf15a16c7663d68a880660dfc897d 4.5s done
+#10 ...
+
+#8 [frontend 1/7] FROM docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df
+#8 extracting sha256:a8ac7f6c67abc236e4c745052c404112b8fab6fe8ac3a329d1ef3b867ad67c71 6.3s done
+#8 sha256:4996e33358abd29e5daf56cdda6681efb4db3bd55b5ab63a7d3d44f8400195a4 50.50MB / 50.50MB 16.8s done
+#8 sha256:f95897c2a1fb7bce26b018dd74b2845f816f7b86d5adff2939c6482b1d5b474c 1.71MB / 1.71MB 17.3s done
+#8 extracting sha256:990581063f5c8a03a57db7a0d116679ea6e6e335d4ac48ef457f26f82d917eba done
+#8 sha256:c35748eaa5ecc949b0f7cc349a9f7c4a5417dc008e2d9bebd53678d87238fcbf 450B / 450B 17.5s done
+#8 extracting sha256:4996e33358abd29e5daf56cdda6681efb4db3bd55b5ab63a7d3d44f8400195a4 5.3s
+#8 ...
+
+#10 [backend 1/6] FROM docker.io/library/golang:1.27.2-bookworm@sha256:5cf287a799e6b94384bad13d16b14904c531f51ba65792237e122ce42b392f61
+#10 extracting sha256:c6c71fff0869aa9bd48cf80d66e30b83adc9a3fe5e77dd9aaf266282c6ec64ff
+#10 extracting sha256:c6c71fff0869aa9bd48cf80d66e30b83adc9a3fe5e77dd9aaf266282c6ec64ff 5.1s
+#10 ...
+
+#8 [frontend 1/7] FROM docker.io/library/node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df
+#8 extracting sha256:4996e33358abd29e5daf56cdda6681efb4db3bd55b5ab63a7d3d44f8400195a4 10.2s done
+#8 extracting sha256:f95897c2a1fb7bce26b018dd74b2845f816f7b86d5adff2939c6482b1d5b474c 2.9s done
+#8 extracting sha256:c35748eaa5ecc949b0f7cc349a9f7c4a5417dc008e2d9bebd53678d87238fcbf done
+#8 DONE 36.9s
+
+#12 [frontend 2/7] WORKDIR /src/frontend
+#12 DONE 2.2s
+
+#10 [backend 1/6] FROM docker.io/library/golang:1.27.2-bookworm@sha256:5cf287a799e6b94384bad13d16b14904c531f51ba65792237e122ce42b392f61
+#10 extracting sha256:c6c71fff0869aa9bd48cf80d66e30b83adc9a3fe5e77dd9aaf266282c6ec64ff 10.5s
+#10 ...
+
+#13 [frontend 3/7] COPY frontend/package.json frontend/package-lock.json ./
+#13 DONE 2.0s
+
+#14 [frontend 4/7] RUN --mount=type=secret,id=proxy_ca     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi;     npm ci --strict-ssl=true
+#14 ...
+
+#10 [backend 1/6] FROM docker.io/library/golang:1.27.2-bookworm@sha256:5cf287a799e6b94384bad13d16b14904c531f51ba65792237e122ce42b392f61
+#10 extracting sha256:c6c71fff0869aa9bd48cf80d66e30b83adc9a3fe5e77dd9aaf266282c6ec64ff 13.3s done
+#10 extracting sha256:e27d95d86248184505d1806dbe46f052fede7d3924bce88bd3bf570b77ae367c 0.6s
+#10 extracting sha256:e27d95d86248184505d1806dbe46f052fede7d3924bce88bd3bf570b77ae367c 5.6s
+#10 extracting sha256:e27d95d86248184505d1806dbe46f052fede7d3924bce88bd3bf570b77ae367c 9.8s done
+#10 extracting sha256:b2b6413ae8f393d11d32262c8dc6bd053dbaea3d074f95edd5605d3eb116e3c2
+#10 ...
+
+#14 [frontend 4/7] RUN --mount=type=secret,id=proxy_ca     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi;     npm ci --strict-ssl=true
+#14 19.22
+#14 19.22 added 130 packages, and audited 131 packages in 16s
+#14 19.22
+#14 19.22 18 packages are looking for funding
+#14 19.22   run `npm fund` for details
+#14 19.22
+#14 19.22 found 0 vulnerabilities
+#14 19.22 npm notice
+#14 19.22 npm notice New major version of npm available! 11.17.0 -> 12.2.0
+#14 19.22 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+#14 19.22 npm notice To update run: npm install -g npm@12.2.0
+#14 19.22 npm notice
+#14 DONE 19.3s
+
+#15 [frontend 5/7] COPY frontend/ ./
+#15 DONE 4.1s
+
+#10 [backend 1/6] FROM docker.io/library/golang:1.27.2-bookworm@sha256:5cf287a799e6b94384bad13d16b14904c531f51ba65792237e122ce42b392f61
+#10 extracting sha256:b2b6413ae8f393d11d32262c8dc6bd053dbaea3d074f95edd5605d3eb116e3c2 5.9s
+#10 ...
+
+#16 [frontend 6/7] COPY design-system/ /src/design-system/
+#16 DONE 2.4s
+
+#10 [backend 1/6] FROM docker.io/library/golang:1.27.2-bookworm@sha256:5cf287a799e6b94384bad13d16b14904c531f51ba65792237e122ce42b392f61
+#10 ...
+
+#17 [frontend 7/7] RUN npm run build
+#17 2.949
+#17 2.949 > judeoslite-frontend@0.1.0 build
+#17 2.949 > npm run typecheck && vite build
+#17 2.949
+#17 3.939
+#17 3.939 > judeoslite-frontend@0.1.0 typecheck
+#17 3.939 > tsc --noEmit
+#17 3.939
+#17 ...
+
+#10 [backend 1/6] FROM docker.io/library/golang:1.27.2-bookworm@sha256:5cf287a799e6b94384bad13d16b14904c531f51ba65792237e122ce42b392f61
+#10 extracting sha256:b2b6413ae8f393d11d32262c8dc6bd053dbaea3d074f95edd5605d3eb116e3c2 11.0s done
+#10 extracting sha256:018c58ecdb70412cf84e606f54c9a6eb423539dec826df5793442c42cff872a4 done
+#10 extracting sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1
+#10 extracting sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1 done
+#10 ...
+
+#17 [frontend 7/7] RUN npm run build
+#17 8.435 vite v8.3.4 building client environment for production...
+#17 8.541 transforming...
+#17 10.53 ✓ 2467 modules transformed.
+#17 10.75 rendering chunks...
+#17 10.95 computing gzip size...
+#17 11.00 dist/index.html                                  1.01 kB │ gzip:   0.50 kB
+#17 11.00 dist/assets/pwa-shell-bffadbc63d7d9c9d.html      1.01 kB │ gzip:   0.50 kB
+#17 11.00 dist/sw.js                                       2.42 kB
+#17 11.00 dist/assets/rubik-cyrillic-ext-BgEjOSi_.woff2   12.28 kB
+#17 11.00 dist/assets/rubik-cyrillic-6J3aU1sj.woff2       15.10 kB
+#17 11.00 dist/assets/logo-pride-BmLOUEvF.png             16.36 kB
+#17 11.00 dist/assets/rubik-latin-ext-xIGCplNB.woff2      19.28 kB
+#17 11.00 dist/assets/rubik-latin-0V_ixqQm.woff2          35.32 kB
+#17 11.00 dist/assets/index-WkZLfM8G.css                 165.20 kB │ gzip:  28.86 kB
+#17 11.00 dist/assets/rolldown-runtime-hePW80VL.js         0.71 kB │ gzip:   0.42 kB
+#17 11.00 dist/assets/calendar-DIu29l1B.js                70.33 kB │ gzip:  20.62 kB
+#17 11.00 dist/assets/ui-vendor-DDMGJ27V.js              159.50 kB │ gzip:  53.97 kB
+#17 11.00 dist/assets/index-CNleNmvj.js                  545.56 kB │ gzip: 145.56 kB
+#17 11.00
+#17 11.00 [plugin builtin:vite-reporter]
+#17 11.00 (!) Some chunks are larger than 500 kB after minification. Consider:
+#17 11.00 - Using dynamic import() to code-split the application
+#17 11.00 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+#17 11.00 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#17 11.00 ✓ built in 2.57s
+#17 DONE 11.1s
+
+#10 [backend 1/6] FROM docker.io/library/golang:1.27.2-bookworm@sha256:5cf287a799e6b94384bad13d16b14904c531f51ba65792237e122ce42b392f61
+#10 DONE 78.9s
+
+#18 [backend 2/6] WORKDIR /src/backend
+#18 DONE 2.6s
+
+#19 [backend 3/6] COPY backend/go.mod backend/go.sum ./
+#19 DONE 3.2s
+
+#20 [backend 4/6] RUN --mount=type=secret,id=proxy_ca     if [ -f /run/secrets/proxy_ca ]; then export SSL_CERT_FILE=/run/secrets/proxy_ca; fi;     go mod download
+#20 DONE 5.8s
+
+#21 [backend 5/6] COPY backend/ ./
+#21 DONE 3.0s
+
+#22 [backend 6/6] RUN CGO_ENABLED=0 go build -trimpath -o /out/server ./cmd/server &&     CGO_ENABLED=0 go build -trimpath -o /out/migrate ./cmd/migrate &&     CGO_ENABLED=0 go build -trimpath -o /out/create-owner ./cmd/create-owner &&     CGO_ENABLED=0 go build -trimpath -o /out/seed-demo ./cmd/seed-demo
+#22 DONE 49.7s
+
+#23 [stage-2 2/6] COPY --from=backend /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+#23 DONE 3.7s
+
+#24 [stage-2 3/6] COPY --from=frontend /src/frontend/dist /app/static
+#24 DONE 0.8s
+
+#25 [stage-2 4/6] COPY --from=backend /out/server /out/migrate /out/create-owner /out/seed-demo /app/
+#25 DONE 0.6s
+
+#26 [stage-2 5/6] RUN printf '{"sha":"%s"}\n' "development" > /app/static/release.json
+#26 DONE 0.9s
+
+#27 [stage-2 6/6] WORKDIR /app
+#27 DONE 0.9s
+
+#28 exporting to image
+#28 exporting layers
+#28 exporting layers 0.9s done
+#28 writing image sha256:d69f05c815849eeac647c27be7491b95b435c3e12cb982fd4c1b582a0985321a
+#28 writing image sha256:d69f05c815849eeac647c27be7491b95b435c3e12cb982fd4c1b582a0985321a done
+#28 naming to docker.io/library/judeoslite:ci done
+#28 DONE 1.0s

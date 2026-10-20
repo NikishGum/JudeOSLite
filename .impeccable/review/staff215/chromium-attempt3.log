@@ -1,0 +1,7 @@
+2026/10/20 14:34:13 migrations applied
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+Traceback (most recent call last):
+  File "/workspace/JudeOSLite/frontend/e2e/staff_access.py", line 347, in <module>
+    assert sql("SELECT count(*) FROM pride.audit_events WHERE after_state::text LIKE '%synthetic-browser-password%' OR after_state::text LIKE '%renamed-coach%' OR after_state::text LIKE '%Synthetic%'") == '0'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

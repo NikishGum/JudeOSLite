@@ -1,5 +1,40 @@
 # Краткая память PRIDE CRM
 
+## Сотрудники: карточка доступа Б #215 —20.10.2026
+
+Прямое поручение: вариант Б уже выбран, без повторного выбора. UX-STAFF,
+регистрацияa9f6a3b в main; зависимости151/152/184/198/200/201 CLOSED/в main/CI.
+StarMadeGalaxy/request60b404f1bc344c199ef14d4863369034,
+[claim39437660096](https://github.com/NikishGum/JudeOSLite/actions/runs/39437660096)
+acquired=true, единственный исполнитель/In progress. Других активных чатов/PR215
+нет; #214/#188 не зависимости. [Контракт/памятка](../staff-access.md),
+[проверки](../staff-access-validation.md). Один список и role+club фильтры в одном
+назначении; ПК список+карточка, телефон список→карточка с возвратом/фокусом/scroll.
+
+`GET /api/staff-directory`: один REPEATABLE READ snapshot аккаунта/version/всех
+разрешённых role+club/actions. Staff — текущая роль либо прежнее кадровое событие
+staff_user; parent-only не включается, бывший staff остаётся после последней роли.
+Тот же predicate в legacy staff/trainer-accounts; mixed staff+parent без семейных
+сведений. Admin видит только своих trainer, canManageAccount строго одиночный
+trainer/действующий филиал/без family_access; общие аккаунты и существующие
+назначения выдаёт owner. Owner-аккаунт не является обычной кадровой карточкой.
+Существующие create/account/password/disable/trainer endpoints переиспользованы;
+новые только согласованное чтение/owner candidate lookup и point administrator
+assignment/revoke. Явный /api/staff-candidates?query=... находит также parent-only
+по имени/логину (3–100символов, максимум30), без семейных сведений; поиск не делает
+его сотрудником. Только owner выбор+назначение добавляет staff, сохраняя family_access.
+Без миграций/нового auth/приглашений. Версии/живые права/CSRF/credential revoke/
+atomic audit сохранены. Последняя роль закрывает рабочие разделы, не вход;
+disable закрывает все сессии, включая parent, enable требует нового входа.
+
+Go vet/race/реальная PG18.6 и адресные Chromium151/WebKit26.5 прошли; двойной
+submit/network/lost response/SQL/версия/сессии/roles/mixed/late scope/mobile/44px/
+контраст проверены. UI12–128байт совпадает с server policy. Первичный409 login_taken
+не должен блокировать форму как version_conflict. Impeccable direct fallback:
+launcher/detector отсутствуют, существующие токены/мир PRIDE сохраняются.
+Точные финальные review/CI/SHA/main/Done — протокол/live issue, не эта запись.
+#188/физические устройства/пользовательская приёмка здесь не закрываются.
+
 ## Рабочее место группы #214 —20.10.2026
 
 Прямое поручение: регистрация d210a24 в main, UX-GROUPS,8 готовых зависимостей;

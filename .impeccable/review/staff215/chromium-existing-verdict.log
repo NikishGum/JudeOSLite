@@ -1,0 +1,3 @@
+2026/10/20 14:55:39 migrations applied
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+{"result": "PASS", "scope": "existing-account copy + full recipient identity", "engine": "chromium", "version": "151.0.7922.34", "jsErrors": []}

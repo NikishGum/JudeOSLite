@@ -1,5 +1,8 @@
 # Тренеры филиала V1-04
 
+Актуальный интерфейс20.10.2026: [единый список и карточка доступа Б](staff-access.md).
+Разделение сотрудников/тренеров заменено; права и операции ниже сохранены.
+
 12.10.2026, [#152](https://github.com/NikishGum/JudeOSLite/issues/152). Владелец или администратор выбирает филиал и открывает «Тренеры филиала». Создание ручное: имя, свободный логин, первоначальный пароль с подтверждением. Публичные имена с сайта не импортируются в аккаунты. Пароль передают лично или по защищённому каналу; API его не возвращает, браузер/аудит не сохраняют, поля очищаются после попытки отправки. Используются существующие Argon2id, Origin/CSRF и сессии из [auth-v1.md](auth-v1.md).
 
 ## Права и история
@@ -26,7 +29,7 @@ Disable отзывает все сессии триггером 0002; включ
 | PUT B/{staffID}/account | {login,displayName,disabled,version}; 200 с Trainer; общие данные по правилу выше |
 | POST B/{staffID}/password | {password,version}; 200 с Trainer, сессии отозваны |
 | POST B/{staffID}/revoke | {version}; 200 status=ok; отзыв только trainer этого филиала |
-| GET /api/trainer-accounts | Только owner: все non-owner сотрудники, включая отключённых/без ролей; Trainer + trainerClubIds |
+| GET /api/trainer-accounts | Только owner: текущие/бывшие сотрудники, включая отключённых/без ролей, без parent-only; Trainer + trainerClubIds |
 | POST /api/staff/{staffID}/trainer-assignments | Только owner: {clubId,version}; 200 status=ok; повтор назначения с актуальной версией безопасен |
 | PUT /api/staff/{staffID}/account | Только owner: {login,displayName,disabled,version}; 200 с Trainer |
 | POST /api/staff/{staffID}/password | Только owner: {password,version}; 200 с Trainer |

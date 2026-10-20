@@ -144,7 +144,7 @@ func (s *Service) listTrainers(w http.ResponseWriter, r *http.Request) {
 	jsonResponse(w, 200, result)
 }
 func (s *Service) trainerRoster(w http.ResponseWriter, r *http.Request) {
-	rows, err := s.pool.Query(r.Context(), `SELECT `+trainerColumns+`,ARRAY(SELECT club_id::text FROM pride.staff_club_roles r WHERE r.staff_user_id=u.id AND r.role='trainer' ORDER BY club_id) FROM pride.staff_users u WHERE NOT u.is_owner ORDER BY u.display_name,u.id`)
+	rows, err := s.pool.Query(r.Context(), `SELECT `+trainerColumns+`,ARRAY(SELECT club_id::text FROM pride.staff_club_roles r WHERE r.staff_user_id=u.id AND r.role='trainer' ORDER BY club_id) FROM pride.staff_users u WHERE NOT u.is_owner AND `+StaffRegistryPredicate+` ORDER BY u.display_name,u.id`)
 	if err != nil {
 		trainerFail(w, err)
 		return

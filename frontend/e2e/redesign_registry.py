@@ -1,6 +1,7 @@
 """RD-02: real UI/API/PG, isolated synthetic fixtures in the PWA harness."""
 from pathlib import Path
 from playwright.sync_api import expect
+from staff_ui import select_employee, add_assignment, discard_staff_form, toggle_access
 
 
 def check_registry(browser, page, signin, api, owner, root, engine, open_section, sql):
@@ -12,6 +13,8 @@ def check_registry(browser, page, signin, api, owner, root, engine, open_section
         ui.wait_for_load_state('networkidle')
         for width in (1280, 390, 320):
             ui.set_viewport_size({'width': width, 'height': 900})
+            if name == 'staff-list' and ui.get_by_role('button', name='К списку сотрудников', exact=True).is_visible():
+                ui.get_by_role('button', name='К списку сотрудников', exact=True).click()
             ui.evaluate('window.scrollTo(0,0)')
             if not ui.evaluate('document.documentElement.scrollWidth <= innerWidth'):
                 ui.screenshot(path=f'/tmp/rd08-registry-overflow-{name}-{width}.png')
@@ -49,25 +52,28 @@ def check_registry(browser, page, signin, api, owner, root, engine, open_section
     # Owner administrators and multiple assignments: UI create, stale version,
     # explicit recovery, cancel archive; API enforces actual IDs independently.
     open_section(ui, 'Сотрудники')
-    ui.get_by_role('button', name='Создать администратора', exact=True).click()
+    ui.get_by_role('button', name='Добавить сотрудника', exact=True).click()
     panel.get_by_label('Имя сотрудника', exact=True).fill('Synthetic RD Admin')
-    panel.get_by_label('Логин администратора', exact=True).fill('rdadmin')
+    panel.get_by_label('Логин сотрудника', exact=True).fill('rdadmin')
     panel.get_by_label('Первоначальный пароль', exact=True).fill('synthetic-browser-password')
-    panel.get_by_label(a['name'], exact=True).check(); panel.get_by_label(b['name'], exact=True).check()
+    panel.get_by_label('Повторите пароль', exact=True).fill('synthetic-browser-password')
+    panel.get_by_label('Роль', exact=True).select_option('administrator')
+    panel.get_by_label('Филиал назначения', exact=True).select_option(a['id'])
     shots('admin-form')
-    panel.get_by_role('button', name='Сохранить администратора', exact=True).click()
+    panel.get_by_role('button', name='Создать сотрудника', exact=True).click()
     expect(panel).to_have_count(0)
     employee = next(s for s in api(ui, 'GET', '/api/staff') if s['login'] == 'rdadmin')
+    add_assignment(ui, employee['id'], b['id'], 'administrator')
+    employee = next(s for s in api(ui, 'GET', '/api/staff') if s['login'] == 'rdadmin')
     assert set(employee['clubIds']) == {a['id'], b['id']}
-    if ui.get_by_role('radio', name='Сотрудники сети', exact=True).count():
-        ui.get_by_role('radio', name='Сотрудники сети', exact=True).click()
-    ui.get_by_role('button', name='Изменить назначения Synthetic RD Admin', exact=True).click()
+    select_employee(ui, employee['id'])
+    ui.get_by_role('button', name='Изменить данные', exact=True).click()
     panel.get_by_label('Имя сотрудника', exact=True).fill('Synthetic stale admin draft')
     api(ui, 'PUT', '/api/staff/'+employee['id'], {'displayName': employee['displayName'], 'clubIds': employee['clubIds'], 'disabled': False, 'version': employee['version']})
-    panel.get_by_role('button', name='Сохранить администратора', exact=True).click()
+    panel.get_by_role('button', name='Сохранить данные', exact=True).click()
     expect(panel.get_by_role('alert')).to_contain_text('уже изменена')
     expect(panel.get_by_label('Имя сотрудника', exact=True)).to_have_value('Synthetic stale admin draft')
-    panel.get_by_role('button', name='Отмена', exact=True).click()
+    discard_staff_form(ui)
     # Administrator works only in a concrete club, never mixed network registry.
     admin_ctx = browser.new_context(viewport={'width': 1280, 'height': 900})
     admin = page(admin_ctx); signin(admin, 'rdadmin')
@@ -85,27 +91,29 @@ def check_registry(browser, page, signin, api, owner, root, engine, open_section
     g1 = next(g for g in groups if g['name'] == 'Synthetic младшая'); g2 = next(g for g in groups if g['name'] == 'Synthetic старшая')
     # Trainer creation and password validation/cancel; multi assignment stays server driven.
     open_section(admin, 'Сотрудники')
-    admin.get_by_role('button', name='Добавить тренера', exact=True).click()
-    admin.get_by_label('Имя тренера', exact=True).fill('Synthetic RD Trainer')
-    admin.get_by_label('Логин тренера', exact=True).fill('rdtrainer')
+    admin.get_by_role('button', name='Добавить сотрудника', exact=True).click()
+    admin.get_by_label('Имя сотрудника', exact=True).fill('Synthetic RD Trainer')
+    admin.get_by_label('Логин сотрудника', exact=True).fill('rdtrainer')
     admin.get_by_label('Первоначальный пароль', exact=True).fill('synthetic-browser-password')
     admin.get_by_label('Повторите пароль', exact=True).fill('synthetic-other-password')
-    admin.get_by_role('button', name='Создать тренера', exact=True).click()
+    admin.get_by_label('Филиал назначения', exact=True).select_option(a['id'])
+    admin.get_by_role('button', name='Создать сотрудника', exact=True).click()
     expect(admin.get_by_role('alert')).to_contain_text('Пароли не совпадают')
     admin.get_by_label('Повторите пароль', exact=True).fill('synthetic-browser-password')
-    admin.get_by_role('button', name='Создать тренера', exact=True).click()
+    admin.get_by_role('button', name='Создать сотрудника', exact=True).click()
     expect(admin.get_by_role('dialog')).to_have_count(0)
     trainer = api(admin, 'GET', f"/api/clubs/{a['id']}/trainers")[0]
     ui.get_by_label('Филиал', exact=True).select_option(b['id'])
-    ui.get_by_role('radio', name='Тренеры филиала', exact=True).click()
-    expect(ui.locator('#trainers-title')).to_be_visible()
-    ui.get_by_label('Аккаунт сотрудника', exact=True).select_option(trainer['id'])
-    ui.get_by_role('button', name='Назначить тренером', exact=True).click()
-    expect(ui.locator('.staff-management')).to_contain_text('Назначение тренером добавлено')
+    add_assignment(ui, trainer['id'], b['id'])
+    expect(ui.locator('.staff-access')).to_contain_text('Назначение добавлено')
+    # Show the list, then the selected card at each responsive width.
+    back = ui.get_by_role('button', name='К списку сотрудников', exact=True)
+    if back.is_visible(): back.click()
     shots('staff-list')
-    ui.get_by_role('button', name='Изменить аккаунт', exact=True).click()
+    select_employee(ui, trainer['id'])
+    ui.get_by_role('button', name='Изменить данные', exact=True).click()
     shots('trainer-form')
-    panel.get_by_role('button', name='Отмена', exact=True).click()
+    discard_staff_form(ui)
     # Same-name participants sharing a family contact remain separate.
     open_section(admin, 'Участники')
     for _ in range(2):
@@ -264,12 +272,14 @@ def check_registry(browser, page, signin, api, owner, root, engine, open_section
     admin.get_by_role('button', name='Закрыть карточку', exact=True).click()
     # Revocation preserves the second assignment; disabling is a separate global operation.
     open_section(admin, 'Сотрудники')
-    admin.get_by_role('button', name='Отозвать назначение', exact=True).click()
+    select_employee(admin, trainer['id'])
+    revoke_name = 'Снять назначение: Тренер · '+a['name']
+    admin.get_by_role('button', name=revoke_name, exact=True).click()
     admin.get_by_role('button', name='Отмена', exact=True).click()
     assert len(api(ui, 'GET', f"/api/clubs/{a['id']}/trainers")) == 1
-    admin.get_by_role('button', name='Отозвать назначение', exact=True).click()
-    admin.get_by_role('button', name='Подтвердить отзыв', exact=True).click()
-    expect(admin.locator('.staff-list li')).to_have_count(0)
+    admin.get_by_role('button', name=revoke_name, exact=True).click()
+    admin.get_by_role('button', name='Подтвердить снятие назначения', exact=True).click()
+    expect(admin.locator('.staff-access-list li')).to_have_count(0)
     live_trainer = next(v for v in api(ui, 'GET', '/api/trainer-accounts') if v['id'] == trainer['id'])
     assert live_trainer['trainerClubIds'] == [b['id']]
     t.goto(root+f"/clubs/{a['id']}/journals")
@@ -277,20 +287,12 @@ def check_registry(browser, page, signin, api, owner, root, engine, open_section
     trainer_ctx.close()
     # Owner UI global disable/re-enable and admin revocation preserve remaining assignment.
     open_section(ui, 'Сотрудники')
-    if ui.get_by_role('radio', name='Сотрудники сети', exact=True).count():
-        ui.get_by_role('radio', name='Сотрудники сети', exact=True).click()
-    ui.get_by_role('button', name='Изменить назначения Synthetic RD Admin', exact=True).click()
-    panel.get_by_label('Отключить аккаунт во всех филиалах', exact=True).check()
-    panel.get_by_role('button', name='Сохранить администратора', exact=True).click()
-    expect(panel).to_have_count(0)
+    toggle_access(ui, employee['id'], False)
     admin.evaluate("window.dispatchEvent(new Event('focus'))")
     expect(admin.get_by_label('Логин', exact=True)).to_be_visible()
-    if ui.get_by_role('radio', name='Сотрудники сети', exact=True).count():
-        ui.get_by_role('radio', name='Сотрудники сети', exact=True).click()
-    ui.get_by_role('button', name='Изменить назначения Synthetic RD Admin', exact=True).click()
-    panel.get_by_label('Отключить аккаунт во всех филиалах', exact=True).uncheck()
-    panel.get_by_label(a['name'], exact=True).uncheck()
-    panel.get_by_role('button', name='Сохранить администратора', exact=True).click()
+    toggle_access(ui, employee['id'], True)
+    ui.get_by_role('button', name='Снять назначение: Администратор · '+a['name'], exact=True).click()
+    panel.get_by_role('button', name='Подтвердить снятие назначения', exact=True).click()
     expect(panel).to_have_count(0)
     live_employee = next(s for s in api(ui, 'GET', '/api/staff') if s['id'] == employee['id'])
     assert not live_employee['disabled'] and live_employee['clubIds'] == [b['id']]

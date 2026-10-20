@@ -3,7 +3,6 @@ import { flushSync } from "react-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { RuntimeProfile, RuntimeSidebar } from "./RuntimeShell";
 import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,7 +26,7 @@ import logo from "../../../design-system/assets/logo-pride.png";
 import { ApiError, apiGet, apiPost, setCsrfToken } from "../shared/api";
 import { OwnerManagement } from "../features/clubs/OwnerManagement";
 import { ParticipantRegistry } from "../features/participants/ParticipantRegistry";
-import { TrainerManagement } from "../features/staff/TrainerManagement";
+import { StaffAccess } from "../features/staff/StaffAccess";
 import { GroupManagement } from "../features/groups/GroupManagement";
 import { ScheduleManagement } from "../features/schedule/ScheduleManagement";
 import { AuditHistory } from "../features/audit/AuditHistory";
@@ -86,7 +85,6 @@ export function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [installContainer, setInstallContainer] =
     useState<HTMLDivElement | null>(null);
-  const [staffView, setStaffView] = useState<"network" | "trainers">("network");
   const mobile = useIsMobile();
   const [leave, setLeave] = useState<(() => void) | null>(null);
   const [navigationNotice, setNavigationNotice] = useState("");
@@ -811,9 +809,6 @@ export function App() {
                         "groups",
                         "journals",
                         ...(!parentOnly ? ["families", "payments"] : []),
-                        ...(session.user.isOwner && staffView === "network"
-                          ? []
-                          : ["staff"]),
                       ].includes(route.section) &&
                         !selectedId &&
                         !parentOnly && (
@@ -839,26 +834,6 @@ export function App() {
                             )}
                           </section>
                         )}
-                      {route.section === "staff" && session.user.isOwner && (
-                        <ToggleGroup
-                          type="single"
-                          className="staff-scopes"
-                          aria-label="Область сотрудников"
-                          orientation={mobile ? "vertical" : "horizontal"}
-                          value={staffView}
-                          onValueChange={(view) => {
-                            if (view === "network" || view === "trainers")
-                              requestLeave(() => setStaffView(view));
-                          }}
-                        >
-                          <ToggleGroupItem value="network">
-                            Сотрудники сети
-                          </ToggleGroupItem>
-                          <ToggleGroupItem value="trainers">
-                            Тренеры филиала
-                          </ToggleGroupItem>
-                        </ToggleGroup>
-                      )}
                       {currentClub && (
                         <>
                           {route.section === "participants" && canManage && (
@@ -928,30 +903,15 @@ export function App() {
                               )}
                             </>
                           )}
-                          {route.section === "staff" &&
-                            canManage &&
-                            (!session.user.isOwner ||
-                              staffView === "trainers") && (
-                              <TrainerManagement
-                                beforeNavigate={requestLeave}
-                                clubName={currentClub.name}
-                                clubId={currentClub.id}
-                                isOwner={session.user.isOwner}
-                                onSessionRefresh={() => loadSession()}
-                              />
-                            )}
                         </>
                       )}
 
-                      {route.section === "staff" &&
-                        session.user.isOwner &&
-                        staffView === "network" && (
-                          <OwnerManagement
-                            beforeNavigate={requestLeave}
-                            mode="staff"
-                            onChanged={() => loadSession()}
-                          />
-                        )}
+                      {route.section === "staff" && (
+                        <StaffAccess
+                          beforeNavigate={requestLeave}
+                          onSessionRefresh={() => loadSession()}
+                        />
+                      )}
                     </NavigationBoundary>
                   </>
                 )}

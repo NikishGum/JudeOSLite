@@ -1,0 +1,7 @@
+2026/10/20 14:32:53 migrations applied
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+Traceback (most recent call last):
+  File "/workspace/JudeOSLite/frontend/e2e/staff_access.py", line 190, in <module>
+    assert next(v for v in api(ui, 'GET', '/api/staff-directory')['staff'] if v['id'] == coach['id'])['displayName'] == long_name
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

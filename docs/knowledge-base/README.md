@@ -2,6 +2,9 @@
 
 [Словарь людей, ролей и сущностей системы](../system-glossary.md).
 
+20.10.2026: [сотрудники — единый список и карточка доступа Б #215](../staff-access.md),
+согласованный реестр staff/parent, несколько role+club назначений и прежние права.
+
 Актуальное расширение19.10.2026: [макеты PRIDE и frontend #200](../screenshot-redesign.md),
 [контракты backend #201–#204](../backend-contracts/README.md),
 [проверки и ограничения](../screenshot-redesign-validation.md). Семьи/оплаты/документы/

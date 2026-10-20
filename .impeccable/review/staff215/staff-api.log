@@ -1,0 +1,20 @@
+=== RUN   TestStaffDirectoryIntegration
+=== RUN   TestStaffDirectoryIntegration/one_snapshot_owner_admin_scope_and_parent_exclusion
+=== RUN   TestStaffDirectoryIntegration/point_assignment_preserves_every_other_role_and_versions
+=== RUN   TestStaffDirectoryIntegration/mixed_parent_is_staff_but_account_remains_owner_only
+=== RUN   TestStaffDirectoryIntegration/former_employees_survive_last_role_and_can_return
+=== RUN   TestStaffDirectoryIntegration/archive_owner_protection_atomic_audit_rollback_and_races
+=== RUN   TestStaffDirectoryIntegration/directory_never_combines_versions_and_roles_from_different_snapshots
+=== RUN   TestStaffDirectoryIntegration/live_read_role_check_after_middleware
+=== RUN   TestStaffDirectoryIntegration/live_read_and_write_actor/session_checks_after_middleware
+--- PASS: TestStaffDirectoryIntegration (5.78s)
+    --- PASS: TestStaffDirectoryIntegration/one_snapshot_owner_admin_scope_and_parent_exclusion (0.02s)
+    --- PASS: TestStaffDirectoryIntegration/point_assignment_preserves_every_other_role_and_versions (0.03s)
+    --- PASS: TestStaffDirectoryIntegration/mixed_parent_is_staff_but_account_remains_owner_only (0.35s)
+    --- PASS: TestStaffDirectoryIntegration/former_employees_survive_last_role_and_can_return (0.04s)
+    --- PASS: TestStaffDirectoryIntegration/archive_owner_protection_atomic_audit_rollback_and_races (0.11s)
+    --- PASS: TestStaffDirectoryIntegration/directory_never_combines_versions_and_roles_from_different_snapshots (1.15s)
+    --- PASS: TestStaffDirectoryIntegration/live_read_role_check_after_middleware (0.00s)
+    --- PASS: TestStaffDirectoryIntegration/live_read_and_write_actor/session_checks_after_middleware (0.88s)
+PASS
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/auth	6.846s

@@ -315,7 +315,7 @@ func staffState(u Staff) any {
 	return map[string]any{"disabled": u.Disabled, "clubIds": u.ClubIDs, "version": u.Version}
 }
 func (s *Service) listStaff(w http.ResponseWriter, r *http.Request) {
-	rows, err := s.pool.Query(r.Context(), `SELECT `+staffColumns+` FROM pride.staff_users u WHERE NOT u.is_owner ORDER BY u.display_name,u.id`)
+	rows, err := s.pool.Query(r.Context(), `SELECT `+staffColumns+` FROM pride.staff_users u WHERE NOT u.is_owner AND `+auth.StaffRegistryPredicate+` ORDER BY u.display_name,u.id`)
 	if err != nil {
 		fail(w, err)
 		return

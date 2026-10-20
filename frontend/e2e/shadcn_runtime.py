@@ -34,7 +34,7 @@ def check_runtime(browser, page, signin, api, root, club, engine, open_section):
                 modal.evaluate('n=>{n.scrollTop=0}')
             assert_page_targets(ui, width)
             if name == 'staff':
-                row = ui.locator('.management-list > li').first
+                row = ui.locator('.staff-access-person').first
                 assert row.evaluate('n=>[getComputedStyle(n).paddingTop,getComputedStyle(n).paddingRight,getComputedStyle(n).paddingBottom,getComputedStyle(n).paddingLeft]') == ['16px','12px','16px','12px']
                 avatar = row.locator('[data-slot="avatar"]').bounding_box()
                 assert avatar['width'] == 44 and avatar['height'] == 44

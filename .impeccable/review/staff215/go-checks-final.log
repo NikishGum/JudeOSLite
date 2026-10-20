@@ -1,0 +1,24 @@
+?   	github.com/NikishGum/JudeOSLite/backend/cmd/create-owner	[no test files]
+?   	github.com/NikishGum/JudeOSLite/backend/cmd/migrate	[no test files]
+?   	github.com/NikishGum/JudeOSLite/backend/cmd/seed-demo	[no test files]
+?   	github.com/NikishGum/JudeOSLite/backend/cmd/server	[no test files]
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/audit	14.207s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/auth	(cached)
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/billing	48.726s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/clubs	(cached)
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/dashboard	14.785s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/demodata	105.959s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/documents	96.183s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/families	47.771s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/notifications	42.442s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/participants	8.877s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/platform	(cached)
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/reports	12.262s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/attendance	33.705s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/corrections	34.088s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/groups	5.507s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/schedule	7.151s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/sessions	7.265s
+ok  	github.com/NikishGum/JudeOSLite/backend/migrations	(cached)
+ok  	github.com/NikishGum/JudeOSLite/backend/tests/integration/access	51.234s
+ok  	github.com/NikishGum/JudeOSLite/backend/tests/integration/training	39.021s

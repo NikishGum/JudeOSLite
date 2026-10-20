@@ -1,0 +1,3 @@
+2026/10/20 14:36:33 migrations applied
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+{"result": "PASS", "engine": "chromium", "version": "151.0.7922.34", "roles": "owner/admin/trainer/parent/mixed", "staff": 9, "jsErrors": [], "captures": ["chromium-list-1440.png", "chromium-card-1440.png", "chromium-form-1440.png", "chromium-list-1280.png", "chromium-card-1280.png", "chromium-form-1280.png", "chromium-list-390.png", "chromium-card-390.png", "chromium-form-390.png", "chromium-list-320.png", "chromium-card-320.png", "chromium-form-320.png"]}

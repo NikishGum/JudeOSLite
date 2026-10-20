@@ -362,6 +362,16 @@ func (s *Service) club(w http.ResponseWriter, r *http.Request) {
 }
 func (s *Service) Handler(fallback http.Handler) http.Handler {
 	mux := http.NewServeMux()
+	mux.Handle("GET /api/staff-directory", s.Require(http.HandlerFunc(s.staffDirectory)))
+	mux.Handle("GET /api/staff-candidates", s.trainerScope(s.staffCandidates, true))
+	mux.Handle("POST /api/staff/{staffID}/administrator-assignments", s.trainerScope(s.administratorAssignment, true))
+	mux.Handle("POST /api/staff/{staffID}/administrator-assignments/{operation}", s.trainerScope(func(w http.ResponseWriter, r *http.Request) {
+		if r.PathValue("operation") != "revoke" {
+			platform.WriteError(w, 404, "not_found", "Адрес не найден.")
+			return
+		}
+		s.administratorAssignment(w, r)
+	}, true))
 	mux.Handle("GET /api/clubs/{clubID}/trainers", s.trainerScope(s.listTrainers, false))
 	mux.Handle("POST /api/clubs/{clubID}/trainers", s.trainerScope(s.createTrainer, false))
 	mux.Handle("PUT /api/clubs/{clubID}/trainers/{staffID}/account", s.trainerScope(s.changeTrainer, false))
@@ -383,7 +393,7 @@ func (s *Service) Handler(fallback http.Handler) http.Handler {
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("Referrer-Policy", "same-origin")
 		// Keep all auth responses (including method/path errors) out of caches.
-		if strings.HasPrefix(r.URL.Path, "/api/auth/") || strings.HasPrefix(r.URL.Path, "/api/clubs/") || strings.HasPrefix(r.URL.Path, "/api/staff/") || r.URL.Path == "/api/trainer-accounts" {
+		if strings.HasPrefix(r.URL.Path, "/api/auth/") || strings.HasPrefix(r.URL.Path, "/api/clubs/") || strings.HasPrefix(r.URL.Path, "/api/staff/") || r.URL.Path == "/api/trainer-accounts" || r.URL.Path == "/api/staff-directory" || r.URL.Path == "/api/staff-candidates" {
 			w.Header().Set("Cache-Control", "no-store")
 		}
 		mux.ServeHTTP(w, r)

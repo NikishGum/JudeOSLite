@@ -1,0 +1,25 @@
+go: downloading golang.org/x/term v0.47.0
+?   	github.com/NikishGum/JudeOSLite/backend/cmd/create-owner	[no test files]
+?   	github.com/NikishGum/JudeOSLite/backend/cmd/migrate	[no test files]
+?   	github.com/NikishGum/JudeOSLite/backend/cmd/seed-demo	[no test files]
+?   	github.com/NikishGum/JudeOSLite/backend/cmd/server	[no test files]
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/audit	8.977s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/auth	(cached)
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/billing	27.344s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/clubs	(cached)
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/dashboard	8.836s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/demodata	67.648s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/documents	66.541s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/families	38.830s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/notifications	30.497s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/participants	6.290s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/platform	1.099s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/reports	7.884s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/attendance	26.545s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/corrections	28.529s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/groups	6.095s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/schedule	7.169s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/sessions	5.758s
+ok  	github.com/NikishGum/JudeOSLite/backend/migrations	4.449s
+ok  	github.com/NikishGum/JudeOSLite/backend/tests/integration/access	50.126s
+ok  	github.com/NikishGum/JudeOSLite/backend/tests/integration/training	38.356s
