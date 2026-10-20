@@ -34,8 +34,9 @@ jobs:
         working-directory: frontend
         run: npm ci && npm run build
       - name: Background refresh preserves mounted content, drafts and access checks
+        working-directory: frontend
         run: |
-          node frontend/node_modules/vite/bin/vite.js preview --host 127.0.0.1 --port 4174 >/tmp/refresh-preview.log 2>&1 &
+          node node_modules/vite/bin/vite.js preview --host 127.0.0.1 --port 4174 >/tmp/refresh-preview.log 2>&1 &
           refresh_preview_pid=$!
           trap 'kill "$refresh_preview_pid" 2>/dev/null || true; wait "$refresh_preview_pid" 2>/dev/null || true' EXIT
           python3 -m pip install playwright==1.62.0
@@ -49,10 +50,11 @@ jobs:
               except OSError:
                   time.sleep(1)
           else:
-              raise SystemExit('Background refresh preview did not start')
+              from pathlib import Path
+              raise SystemExit(Path('/tmp/refresh-preview.log').read_text())
           PY
-          RD08_ROOT=http://127.0.0.1:4174 python3 frontend/e2e/background_refresh.py
-          RD08_ROOT=http://127.0.0.1:4174 PWA_BROWSER=webkit python3 frontend/e2e/background_refresh.py
+          RD08_ROOT=http://127.0.0.1:4174 python3 e2e/background_refresh.py
+          RD08_ROOT=http://127.0.0.1:4174 PWA_BROWSER=webkit python3 e2e/background_refresh.py
       - name: Go formatting, vet, race and PostgreSQL migration tests
         working-directory: backend
         env:
