@@ -170,7 +170,7 @@ try:
         admin.get_by_label('Статус занятия', exact=True).select_option('cancelled')
         expect(admin.locator('.session-list > li')).to_have_count(0)
         expect(admin.locator('.session-list-heading')).to_contain_text('Занятий за период: 0')
-        assert sum(int(x.rsplit(': ',1)[1]) for x in admin.locator('.session-day-heading small').all_text_contents()) == 0
+        expect(admin.locator('.session-day-heading small')).to_have_count(0)
         admin.get_by_label('Статус занятия', exact=True).select_option('')
         admin.get_by_label('Фактический тренер', exact=True).select_option(trainer['id'])
         expect(admin.locator('.session-list > li')).to_have_count(1)
@@ -214,7 +214,9 @@ try:
         session_action('Перенести занятие')
         form.get_by_label('Дата занятия', exact=True).fill(str(tomorrow+timedelta(days=1)))
         form.get_by_role('button', name='Подтвердить изменение занятия', exact=True).click()
-        expect(form).to_have_count(0); expect(row).to_contain_text('Перенесено с')
+        expect(form).to_have_count(0)
+        moved = api(admin, 'GET', base+'/journals/'+row.get_attribute('data-session-id'))['session']
+        assert moved['sourceDate'] == str(tomorrow) and moved['date'] == str(tomorrow+timedelta(days=1)), moved
         session_action('Заменить тренера')
         form.get_by_label('Фактический тренер', exact=True).select_option(replacement['id'])
         form.get_by_role('button', name='Подтвердить изменение занятия', exact=True).click()
@@ -222,13 +224,14 @@ try:
         session_action('Отменить занятие')
         form.get_by_label('Причина отмены', exact=True).fill('Контроль отмены')
         form.get_by_role('button', name='Подтвердить изменение занятия', exact=True).click()
-        expect(form).to_have_count(0); expect(row).to_contain_text('Отменено')
+        expect(form).to_have_count(0); expect(row).to_have_attribute('data-state', 'cancelled')
+        expect(row.locator('.session-card-link')).to_have_attribute('title', 'Отменено')
         admin.get_by_label('С даты', exact=True).fill(str(today))
         expect(admin.locator('.session-list > li')).to_have_count(2)
         shots(admin, 'calendar')
         tr = page('trainer'); tr.goto(calendar)
-        # Clicking the status area of the card must open the same permanent page as its time.
-        tr.locator(f'[data-session-id="{sid}"] .training-status').click()
+        # The compact time is the permanent session link; there is no redundant CTA.
+        tr.locator(f'[data-session-id="{sid}"] .session-clock strong').click()
         expect(tr).to_have_url(__import__('re').compile('/sessions/'+sid))
         expect(tr.get_by_role('button', name='Подтвердить открытие журнала', exact=True)).to_be_visible()
         expect(tr.locator('.session-roster')).to_contain_text('Предварительный состав')
@@ -410,8 +413,81 @@ try:
         admin.goto(ROOT+'/clubs/'+a['id']+'/sessions/'+str(uuid.uuid4()))
         expect(admin.locator('.session-detail [role="alert"]')).to_be_visible()
         expect(admin.locator('.admin-records > li')).to_have_count(0)
+        # Dense, real-API calendar: common rows must survive uneven names and statuses.
+        compact_club = api(own, 'POST', '/api/clubs', {'name': 'Сетка календаря · контроль', 'timezone': 'Europe/Minsk'})
+        compact_base = '/api/clubs/'+compact_club['id']
+        compact_trainer = api(own, 'POST', compact_base+'/trainers', {'login': 'compact-trainer', 'displayName': 'Соколов Андрей Игоревич', 'password': PASSWORD})
+        compact_groups = [api(own, 'POST', compact_base+'/groups', {'name': name}) for name in (
+            'Первые шаги · 6–9 лет · Соколов',
+            'Основы дзюдо и подготовка к соревнованиям · 10–13 лет · Соколов',
+            'Старшая группа · Спортивная подготовка',
+        )]
+        fixtures = [(0,0,'open'), (0,1,'cancelled'), (1,1,'planned'), (1,0,'open'), (2,0,'planned'), (2,1,'cancelled'), (4,1,'planned'), (4,0,'planned'), (6,2,'closed')]
+        compact_ids = []
+        compact_start = start+timedelta(days=7)
+        for index, (offset, group_index, state) in enumerate(fixtures):
+            at = compact_start+timedelta(days=offset)
+            clock = '16:00' if index % 2 == 0 else '17:30'
+            frozen = 'now()' if state in ('open','closed') else 'NULL'
+            closed_at = 'now()' if state == 'closed' else 'NULL'
+            cancelled_at = 'now()' if state == 'cancelled' else 'NULL'
+            reason = "'Контрольная причина отмены'" if state == 'cancelled' else 'NULL'
+            compact_ids.append(sql(f"INSERT INTO pride.training_sessions(club_id,group_id,trainer_id,starts_on,timezone,starts_at,ends_at,status,roster_frozen_at,closed_at,cancelled_at,cancellation_reason) VALUES('{compact_club['id']}','{compact_groups[group_index]['id']}','{compact_trainer['id']}','{at}','Europe/Minsk','{at} {clock}+03',timestamptz '{at} {clock}+03'+interval '75 minutes','{state}',{frozen},{closed_at},{cancelled_at},{reason}) RETURNING id").splitlines()[0])
+        compact = page('compact-trainer')
+        compact.goto(ROOT+'/clubs/'+compact_club['id']+'/sessions?from='+str(compact_start)+'&through='+str(compact_start+timedelta(days=6))+'&view=week')
+        expect(compact.locator('.session-list > li')).to_have_count(len(fixtures))
+        for width in (320,390,768,1280,1440):
+            compact.set_viewport_size({'width':width,'height':900});settle_shell(compact,width)
+            assert compact.evaluate('document.documentElement.scrollWidth <= innerWidth'), width
+            assert_page_targets(compact,width,extra_selector=',.session-card-link:visible')
+            expect(compact.locator('.session-day-heading small')).to_have_count(0)
+            expect(compact.locator('.session-card-cta,.session-list .training-status')).to_have_count(0)
+            expect(compact.locator('.session-days')).not_to_contain_text('Соколов')
+            expect(compact.locator('.session-days')).not_to_contain_text('Причина отмены')
+            expect(compact.locator('.session-days')).not_to_contain_text('Открыть тренировку')
+            if width <= 390:
+                for link in compact.locator('.session-card-link').all():
+                    assert __import__('re').fullmatch(r'\d{2}:\d{2}\s+75 мин',link.inner_text()),link.inner_text()
+                    box=link.bounding_box();assert box['height'] >= 44,box
+            if width >= 1280:
+                geometry=compact.locator('.session-days').evaluate("""e=>[...e.children].map(day=>({
+                    header:(()=>{const r=day.querySelector('h3').getBoundingClientRect();return {y:r.y,height:r.height};})(),
+                    cards:[...day.querySelectorAll('li')].map(card=>{const r=card.getBoundingClientRect();return {y:r.y,height:r.height,timeY:card.querySelector('.session-clock').getBoundingClientRect().y};}),
+                }))""")
+                assert len({round(d['header']['y']) for d in geometry})==1,geometry
+                assert all(d['header']['height']==44 for d in geometry),geometry
+                for index in (0,1):
+                    rows=[d['cards'][index] for d in geometry if len(d['cards'])>index]
+                    assert max(r['y'] for r in rows)-min(r['y'] for r in rows)<1,geometry
+                    assert max(r['height'] for r in rows)-min(r['height'] for r in rows)<1,geometry
+                    assert max(r['timeY'] for r in rows)-min(r['timeY'] for r in rows)<1,geometry
+                # The unrelated suffix is retained, while the known trainer's name is removed.
+                expect(compact.locator('.session-card-group').filter(has_text='Спортивная подготовка')).to_be_visible()
+            colors={}
+            for state in ('open','cancelled','planned','closed'):
+                card=compact.locator(f'.session-list > li[data-state="{state}"]').first
+                colors[state]=card.evaluate('(e)=>getComputedStyle(e).backgroundColor')
+                expect(card.locator('a')).to_have_attribute('title',{'open':'Журнал открыт','cancelled':'Отменено','planned':'Плановое','closed':'Завершено'}[state])
+            assert colors['open']!=colors['planned'] and colors['cancelled']!=colors['planned'] and colors['open']!=colors['cancelled'],colors
+            compact.screenshot(path=f'/tmp/rd216-{ENGINE}-compact-calendar-{width}.png',full_page=True)
+        # A past planned session is shaded as missed; past open remains yellow.
+        past = today-timedelta(days=8)
+        missed=sql(f"INSERT INTO pride.training_sessions(club_id,group_id,trainer_id,starts_on,timezone,starts_at,ends_at) VALUES('{compact_club['id']}','{compact_groups[0]['id']}','{compact_trainer['id']}','{past}','Europe/Minsk','{past} 16:00+03','{past} 17:15+03') RETURNING id").splitlines()[0]
+        past_open=sql(f"INSERT INTO pride.training_sessions(club_id,group_id,trainer_id,starts_on,timezone,starts_at,ends_at,status,roster_frozen_at) VALUES('{compact_club['id']}','{compact_groups[0]['id']}','{compact_trainer['id']}','{past}','Europe/Minsk','{past} 17:30+03','{past} 18:45+03','open',now()) RETURNING id").splitlines()[0]
+        compact.goto(ROOT+'/clubs/'+compact_club['id']+'/sessions?from='+str(past)+'&through='+str(past)+'&view=day')
+        past_open_card=compact.locator(f'[data-session-id="{past_open}"]')
+        expect(past_open_card).to_have_attribute('data-state','open')
+        assert past_open_card.evaluate('(e)=>getComputedStyle(e).backgroundColor')==colors['open']
+        missed_card=compact.locator(f'[data-session-id="{missed}"]')
+        expect(missed_card).to_have_attribute('data-state','missed')
+        expect(missed_card.locator('a')).to_have_attribute('title','Занятие пропущено')
+        assert missed_card.evaluate('(e)=>getComputedStyle(e).backgroundColor')==colors['cancelled']
+        missed_card.locator('a').focus();compact.keyboard.press('Enter')
+        expect(compact).to_have_url(__import__('re').compile('/sessions/'+missed))
+        assert sql(f"SELECT (roster_frozen_at IS NULL)::text || '|' || version FROM pride.training_sessions WHERE id='{missed}'")=='true|1'
+        assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{missed}'")=='0'
         assert not errors, errors
-        print(json.dumps({'engine': ENGINE, 'version': browser.version, 'result': 'PASS', 'checks': 'day/week/period, ID scope/two clubs, create/reschedule/replace/cancel, direct journal/back/reload, Escape/focus, double tap/network/reload, correction conflict/history, preview/snapshot/search/45 participants, no calendar N+1, canonical/legacy links, 320/390/768/1280/1440'}, ensure_ascii=False))
+        print(json.dumps({'engine': ENGINE, 'version': browser.version, 'result': 'PASS', 'checks': 'compact desktop/mobile, shared header/rows, trainer suffix, status shading/missed, keyboard link without write, day/week/period, ID scope/two clubs, create/reschedule/replace/cancel, direct journal/back/reload, Escape/focus, double tap/network/reload, correction conflict/history, preview/snapshot/search/45 participants, no calendar N+1, canonical/legacy links, 320/390/768/1280/1440'}, ensure_ascii=False))
         browser.close()
 finally:
     STATIC_TEMP.cleanup()
