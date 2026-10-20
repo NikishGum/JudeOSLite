@@ -4,8 +4,8 @@
   "repository": "NikishGum/JudeOSLite",
   "source_main": "72460d8f7bf8fd58fd93eeb026099012033daabf",
   "prototype_commit": "8016b746072e9334567de7fdbba2dcaf2a72fb45",
-  "task_count": 14,
-  "dependency_count": 23,
+  "task_count": 15,
+  "dependency_count": 31,
   "issues": [
     {
       "id": "RD-01",
@@ -169,6 +169,24 @@
       ],
       "body_sha256": "13cd9b9971291206dd9b1f9be0d06605af6fe5cf346e4694d92cff9bd7bacaec",
       "title": "Занятия: недельное расписание и отдельная страница тренировки"
+    },
+    {
+      "id": "UX-GROUPS",
+      "number": 214,
+      "github_id": 5937621951,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/214",
+      "dependencies": [
+        "V1-06",
+        "V1-07",
+        "V1-08",
+        "V1-09",
+        "V1-11",
+        "RD-02",
+        "RD-03",
+        "RD-08"
+      ],
+      "body_sha256": "609ec8fcaafe2c8a5c7510d9e2613c9bdc42693761af08c56e53d561244b130a",
+      "title": "Группы: состав, регулярное расписание и исключения"
     }
   ],
   "verification": {
