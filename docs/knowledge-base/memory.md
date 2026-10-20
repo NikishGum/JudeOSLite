@@ -921,3 +921,15 @@ Admin/owner на desktop сохраняют actual trainer. [Актуальны�
 ветвь codex/issue-216-compact-calendar от main7e99de5, штатный claim
 StarMadeGalaxy/request37fc36ac33024627a597dc86a5c025e9,
 [run39467688570](https://github.com/NikishGum/JudeOSLite/actions/runs/39467688570).
+
+## #216: отдельные карточки, mobile-названия и легенда —20.10.2026
+
+Новое прямое уточнение после #223 отменяет mobile без названия: группа снова
+видна под началом/длительностью. События — отдельные ограниченные карточки с
+рамкой/радиусом/отступами; единственная воскресная не выглядит занятием на весь
+день. Общие ряды сохранены, название до3 строк с полным aria/title. Closed зелёный;
+над расписанием легенда red cancelled/missed, yellow open, green closed.
+[Актуальный контракт](../sessions-weekly-ux.md). Реестр/права/журнал не меняются.
+Продолжение в исходном чате, ветвь codex/issue-216-session-cards от maina54d18e,
+claim StarMadeGalaxy/request5c11d5d3b715424badb7fdfaa28040a5,
+[run39475857123](https://github.com/NikishGum/JudeOSLite/actions/runs/39475857123).
