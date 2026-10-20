@@ -4,8 +4,8 @@
   "repository": "NikishGum/JudeOSLite",
   "source_main": "72460d8f7bf8fd58fd93eeb026099012033daabf",
   "prototype_commit": "8016b746072e9334567de7fdbba2dcaf2a72fb45",
-  "task_count": 12,
-  "dependency_count": 16,
+  "task_count": 14,
+  "dependency_count": 23,
   "issues": [
     {
       "id": "RD-01",
@@ -154,6 +154,21 @@
       ],
       "body_sha256": "66a0ef2b127ec60f446d79d210eafc562ffda6eaa0586a4f985c60a85268b87b",
       "title": "Реалистичное демо-наполнение CRM для Беларуси"
+    },
+    {
+      "id": "UX",
+      "number": 216,
+      "github_id": 5938056601,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/216",
+      "dependencies": [
+        "V1-08",
+        "V1-09",
+        "V1-10",
+        "V1-11",
+        "RD-03"
+      ],
+      "body_sha256": "13cd9b9971291206dd9b1f9be0d06605af6fe5cf346e4694d92cff9bd7bacaec",
+      "title": "Занятия: недельное расписание и отдельная страница тренировки"
     }
   ],
   "verification": {
