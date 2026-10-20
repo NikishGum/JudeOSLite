@@ -30,46 +30,47 @@
 .session-calendar .session-form { border: 0; border-radius: 0; padding: 24px 0; border-block: 1px solid var(--panel-line); }
 
 /* Measure the actual workspace beside the sidebar, including on zoomed laptops. */
-.session-calendar { container: session-calendar / inline-size; }
+.session-calendar { container: session-calendar / inline-size; --session-card-size: 156px; }
+.session-calendar[data-managed="true"] { --session-card-size: 208px; }
 .session-week-navigation { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
 .session-range { margin: 12px 0 20px; font-size: 18px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .session-calendar .date-picker-group { grid-template-columns: 44px minmax(0, auto) 44px; }
 .session-calendar .date-picker-group .date-step { width: 44px; height: 44px; min-width: 44px; min-height: 44px; }
 .session-calendar .date-select-trigger { height: 44px; min-height: 44px; }
-.session-days { display: grid; gap: 16px; margin-top: 24px; align-items: start; }
-.session-days .session-day { min-width: 0; margin: 0; padding: 0; border: 1px solid var(--panel-line); border-radius: 12px; background: var(--card); scroll-margin-top: 20px; }
-.session-day-heading { display: flex; align-items: center; min-height: 44px; margin: 0; padding: 12px; background: var(--muted); border-radius: 12px 12px 0 0; font-size: 14px; font-weight: 500; text-transform: capitalize; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.session-calendar .session-legend { display: flex; flex-wrap: wrap; gap: 8px 16px; list-style: none; padding: 0; margin: 20px 0 12px; color: var(--pride-text-secondary); font-size: 13px; }
+.session-legend li { display: inline-flex; align-items: center; gap: 8px; }
+.session-legend-swatch { display: inline-block; flex: 0 0 16px; width: 16px; height: 16px; border: 1px solid var(--pride-border); border-radius: 4px; }
+.session-days { display: grid; gap: 16px; margin-top: 12px; align-items: start; }
+.session-days .session-day { min-width: 0; margin: 0; padding: 8px; border: 1px solid var(--panel-line); border-radius: 12px; background: var(--muted); scroll-margin-top: 20px; }
+.session-day-heading { display: flex; align-items: center; min-height: 44px; margin: 0; padding: 4px 12px 12px; background: transparent; border-radius: 0; font-size: 14px; font-weight: 500; text-transform: capitalize; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .session-today .session-day-heading { color: var(--pride-brand); }
-.session-calendar .session-empty-day { color: var(--pride-text-secondary); margin: 0; padding: 12px; font-size: 13px; border-top: 1px solid var(--panel-line); }
-.session-calendar .session-list { display: grid; margin: 0; padding: 0; gap: 0; }
-.session-calendar .session-list > li { display: grid; grid-template-rows: 1fr auto; align-items: stretch; justify-content: normal; min-width: 0; padding: 0; border: 0; border-top: 1px solid var(--panel-line); border-radius: 0; background: var(--card); }
-.session-calendar .session-list > li:last-child { border-radius: 0 0 12px 12px; }
-.session-calendar .session-list > li[data-state="open"] { background: var(--panel-warning-bg); }
-.session-calendar .session-list > li:is([data-state="cancelled"], [data-state="missed"]) { background: color-mix(in srgb, var(--destructive) 8%, var(--card)); }
-.session-card-link { display: flex; flex-direction: column; align-items: start; gap: 8px; min-height: 44px; padding: 12px; color: var(--pride-text); text-decoration: none; transition: box-shadow 160ms ease-out; }
+.session-calendar .session-empty-day { color: var(--pride-text-secondary); margin: 0; padding: 12px; font-size: 13px; }
+.session-calendar .session-list { display: grid; margin: 0; padding: 0; gap: 12px; }
+.session-calendar .session-list > li { display: grid; grid-template-rows: 1fr auto; gap: 0; align-items: stretch; align-self: start; justify-content: normal; width: 100%; min-width: 0; padding: 0; border: 1px solid var(--pride-border); border-radius: 12px; background: var(--card); }
+.session-calendar .session-list > li[data-state="open"], .session-legend-swatch[data-state="open"] { background: var(--panel-warning-bg); }
+.session-calendar .session-list > li:is([data-state="cancelled"], [data-state="missed"]), .session-legend-swatch[data-state="cancelled"] { background: color-mix(in srgb, var(--destructive) 8%, var(--card)); }
+.session-calendar .session-list > li[data-state="closed"], .session-legend-swatch[data-state="closed"] { background: var(--panel-success-bg); }
+.session-card-link { height: calc(var(--session-card-size) - 2px); border-radius: 12px; display: flex; flex-direction: column; align-items: start; gap: 8px; min-height: 44px; padding: 12px; color: var(--pride-text); text-decoration: none; transition: box-shadow 160ms ease-out; }
 .session-card-link:hover { box-shadow: inset 0 0 0 1px var(--pride-text-secondary); }
 .session-card-link:focus-visible { outline-offset: -3px; }
-.session-calendar .session-card-group { margin: 0; font-size: 14px; font-weight: 400; line-height: 1.5; }
-.session-clock { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; font-variant-numeric: tabular-nums; }
+.session-calendar .session-card-group { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; flex-shrink: 0; max-height: 4.5em; margin: 0; font-size: 14px; font-weight: 400; line-height: 1.5; }
+.session-clock { flex-shrink: 0; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; font-variant-numeric: tabular-nums; }
 .session-clock strong { font-size: 16px; font-weight: 500; white-space: nowrap; }
 .session-clock > span, .session-card-trainer { color: var(--pride-text-secondary); font-size: 13px; white-space: nowrap; }
-.session-card-trainer { white-space: normal; }
+.session-card-trainer { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; flex-shrink: 0; max-height: 3em; white-space: normal; }
 .session-list > li[data-state="open"] :is(.session-clock > span, .session-card-trainer) { color: var(--panel-warning); }
 .session-list > li:is([data-state="cancelled"], [data-state="missed"]) :is(.session-clock > span, .session-card-trainer) { color: var(--pride-text); }
+.session-list > li[data-state="closed"] :is(.session-clock > span, .session-card-trainer) { color: var(--panel-success); }
 .session-now { display: inline-block; color: var(--panel-success); font-size: 13px; font-weight: 500; padding: 4px 8px; }
 .session-row-actions { padding: 0 8px 4px; }
 .session-row-actions details summary { min-height: 44px; padding: 12px 4px; cursor: pointer; font-size: 13px; }
 .session-row-actions .actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0; }
 .session-loading { padding: 32px 16px; background: var(--pride-surface-subtle); border-radius: var(--pride-radius-field); margin-top: 16px; min-height: 120px; }
 @container session-calendar (min-width: 840px) {
-  .session-week { grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: 44px repeat(var(--session-row-count), minmax(92px, auto)); gap: 0; align-items: stretch; border: 1px solid var(--panel-line); border-radius: 12px; }
-  .session-week .session-day { display: grid; grid-template-rows: subgrid; grid-row: 1 / span calc(var(--session-row-count) + 1); border: 0; border-radius: 0; }
-  .session-week .session-day + .session-day { border-left: 1px solid var(--panel-line); }
-  .session-week .session-day-heading { min-height: 0; padding: 8px; border-radius: 0; font-size: 13px; }
-  .session-week .session-day:first-child .session-day-heading { border-top-left-radius: 12px; }
-  .session-week .session-day:last-child .session-day-heading { border-top-right-radius: 12px; }
+  .session-week { grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: auto repeat(var(--session-row-count), max-content); gap: 12px 8px; align-items: stretch; }
+  .session-week .session-day { display: grid; grid-template-rows: subgrid; grid-row: 1 / span calc(var(--session-row-count) + 1); padding: 0 8px 8px; }
+  .session-week .session-day-heading { padding: 8px; font-size: 13px; }
   .session-week .session-list { display: contents; }
-  .session-week .session-list > li:last-child { border-radius: 0; }
   .session-week .session-card-link { padding: 12px 8px; }
   .session-week .session-clock { display: grid; gap: 0; }
   .session-week .session-clock strong { font-size: 14px; }
@@ -122,7 +123,8 @@
   .session-week-navigation { width: 100%; justify-content: space-between; gap: 4px; }
   .session-range, .session-detail-time { font-size: 16px; }
   .session-card-link { padding: 12px; }
-  .session-calendar :is(.session-card-group, .session-card-trainer) { display: none; }
+  .session-calendar, .session-calendar[data-managed="true"] { --session-card-size: 128px; }
+  .session-calendar .session-card-trainer { display: none; }
   .session-clock { flex-wrap: nowrap; gap: 12px; }
   .session-clock strong { font-size: 17px; }
   .session-clock > span { font-size: 14px; }

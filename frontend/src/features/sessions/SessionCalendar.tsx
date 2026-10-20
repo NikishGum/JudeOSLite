@@ -98,7 +98,7 @@ function CalendarView({ clubId, timezone, canManage }: { clubId: string; timezon
   const days = view === 'week' ? Array.from({ length: 7 }, (_, i) => nextDate(from, i)) : view === 'day' ? [from] : [...new Set(visible.map((s) => s.date))].sort();
   const dayItems = days.map((day) => visible.filter((s) => s.date === day).sort((a, b) => a.startsAt.localeCompare(b.startsAt) || a.id.localeCompare(b.id)));
   const calendarStyle = { '--session-row-count': Math.max(1, ...dayItems.map((items) => items.length)) } as CSSProperties;
-  return <section className="connection registry session-calendar" aria-labelledby="sessions-title">
+  return <section className="connection registry session-calendar" data-managed={canManage} aria-labelledby="sessions-title">
     <div className="section-heading"><div><h2 id="sessions-title">Календарь занятий</h2><p className="help">{canManage ? 'Занятия филиала' : 'Мои назначенные занятия'} · {timezone}</p></div>
       {canManage && <button disabled={!ready || !!editor} onClick={() => { setNotice(''); setEditor('new'); }}>Добавить разовое занятие</button>}
     </div>
@@ -119,7 +119,11 @@ function CalendarView({ clubId, timezone, canManage }: { clubId: string; timezon
     {notice && <p role="status">{notice}</p>}{(loading || optionsLoading) && <div className="session-loading" role="status">Загружаем занятия…</div>}
     {(error || optionsError) && <div role="alert"><p className="error">{error || optionsError}</p><button onClick={refresh}>Повторить загрузку занятий</button><a className="session-link" href={sessionHref(clubId)}>Сбросить параметры</a></div>}
     {editor && <SessionForm key={editor === 'new' ? 'new' : `${editor.session.id}:${editor.action}`} clubId={clubId} timezone={timezone} groups={groups} trainers={trainers} selectedGroup={groupId} session={editor === 'new' ? null : editor.session} action={editor === 'new' ? undefined : editor.action} onSaved={changed} onCancel={() => setEditor(null)} onRefresh={refresh} />}
-    {ready && <><div className={`session-days ${view === 'week' ? 'session-week' : ''}`} style={calendarStyle}>{days.map((day, dayIndex) => {
+    {ready && <><ul className="session-legend" role="list" aria-label="Обозначения в расписании">
+      <li><span className="session-legend-swatch" data-state="cancelled" aria-hidden="true" />Отменено или пропущено</li>
+      <li><span className="session-legend-swatch" data-state="open" aria-hidden="true" />Журнал не закрыт</li>
+      <li><span className="session-legend-swatch" data-state="closed" aria-hidden="true" />Завершено</li>
+    </ul><div className={`session-days ${view === 'week' ? 'session-week' : ''}`} style={calendarStyle}>{days.map((day, dayIndex) => {
       const items = dayItems[dayIndex];
       return <section className={`session-day ${day === today ? 'session-today' : ''}`} id={`day-${day}`} key={day} aria-label={`Занятия ${dateLabel(day)}`}>
         <h3 className="session-day-heading"><time dateTime={day} aria-label={`${dateLabel(day)}${day === today ? ', сегодня' : ''}`}>{new Intl.DateTimeFormat('ru', { weekday: 'short', day: '2-digit', month: '2-digit', timeZone: 'UTC' }).format(new Date(`${day}T12:00:00Z`))}</time></h3>
@@ -129,7 +133,7 @@ function CalendarView({ clubId, timezone, canManage }: { clubId: string; timezon
           const stateLabel = state === 'missed' ? 'Занятие пропущено' : statusNames[state];
           const groupName = canManage ? v.groupName : coachGroupName(v);
           return <li key={v.id} data-session-id={v.id} data-state={state}>
-          <a className="session-card-link" title={stateLabel} aria-label={`${dateLabel(v.date)}, ${timeLabel(v.startsAt, v.timezone)}, ${durationLabel(v)}, ${groupName}, ${stateLabel}${canManage ? `, тренер ${v.trainerName}` : ''}`} href={sessionHref(clubId, { ...location, sessionId: v.id, journal: canManage ? 'admin' : 'trainer' })} onClick={(event) => { event.currentTarget.href = sessionHref(clubId, { ...location, sessionId: v.id, journal: canManage ? 'admin' : 'trainer', scrollY: window.scrollY }); }}>
+          <a className="session-card-link" title={`${groupName} · ${stateLabel}`} aria-label={`${dateLabel(v.date)}, ${timeLabel(v.startsAt, v.timezone)}, ${durationLabel(v)}, ${groupName}, ${stateLabel}${canManage ? `, тренер ${v.trainerName}` : ''}`} href={sessionHref(clubId, { ...location, sessionId: v.id, journal: canManage ? 'admin' : 'trainer' })} onClick={(event) => { event.currentTarget.href = sessionHref(clubId, { ...location, sessionId: v.id, journal: canManage ? 'admin' : 'trainer', scrollY: window.scrollY }); }}>
             <span className="session-clock"><strong>{timeLabel(v.startsAt, v.timezone)}</strong><span>{durationLabel(v)}</span></span>
             <h4 className="session-card-group">{groupName}</h4>
             {canManage && <span className="session-card-trainer">{v.trainerName}</span>}

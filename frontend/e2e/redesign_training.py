@@ -1,6 +1,7 @@
 from runtime_ui import observe_api, wait_for_api_idle, assert_page_targets, settle_shell
 """RD-03: real browser -> Go -> disposable PostgreSQL. No external club data."""
 import json
+import re
 import os
 from pathlib import Path
 import pty
@@ -225,7 +226,7 @@ try:
         form.get_by_label('Причина отмены', exact=True).fill('Контроль отмены')
         form.get_by_role('button', name='Подтвердить изменение занятия', exact=True).click()
         expect(form).to_have_count(0); expect(row).to_have_attribute('data-state', 'cancelled')
-        expect(row.locator('.session-card-link')).to_have_attribute('title', 'Отменено')
+        expect(row.locator('.session-card-link')).to_have_attribute('title', re.compile(r' · Отменено$'))
         admin.get_by_label('С даты', exact=True).fill(str(today))
         expect(admin.locator('.session-list > li')).to_have_count(2)
         shots(admin, 'calendar')
@@ -447,8 +448,10 @@ try:
             expect(compact.locator('.session-days')).not_to_contain_text('Открыть тренировку')
             if width <= 390:
                 for link in compact.locator('.session-card-link').all():
-                    assert __import__('re').fullmatch(r'\d{2}:\d{2}\s+75 мин',link.inner_text()),link.inner_text()
-                    box=link.bounding_box();assert box['height'] >= 44,box
+                    assert re.fullmatch(r'\d{2}:\d{2}\s+75 мин',link.locator('.session-clock').inner_text()),link.inner_text()
+                    expect(link.locator('.session-card-group')).to_be_visible()
+                    box=link.bounding_box();assert box['height'] == 126,box
+                    assert link.locator('..').bounding_box()['height']==128
             if width >= 1280:
                 geometry=compact.locator('.session-days').evaluate("""e=>[...e.children].map(day=>({
                     header:(()=>{const r=day.querySelector('h3').getBoundingClientRect();return {y:r.y,height:r.height};})(),
@@ -461,15 +464,35 @@ try:
                     assert max(r['y'] for r in rows)-min(r['y'] for r in rows)<1,geometry
                     assert max(r['height'] for r in rows)-min(r['height'] for r in rows)<1,geometry
                     assert max(r['timeY'] for r in rows)-min(r['timeY'] for r in rows)<1,geometry
+                assert all(c['height']==156 for d in geometry for c in d['cards']),geometry
+                sunday=compact.locator('.session-day').last
+                assert sunday.locator('li').first.bounding_box()['height'] < sunday.bounding_box()['height']-60
+                for card in compact.locator('.session-list > li').all():
+                    shape=card.evaluate('(e)=>({border:getComputedStyle(e).borderTopWidth,radius:getComputedStyle(e).borderTopLeftRadius,inset:e.getBoundingClientRect().left-e.closest(".session-day").getBoundingClientRect().left})')
+                    assert shape['border']=='1px' and shape['radius']=='12px' and shape['inset']>=8,shape
                 # The unrelated suffix is retained, while the known trainer's name is removed.
                 expect(compact.locator('.session-card-group').filter(has_text='Спортивная подготовка')).to_be_visible()
             colors={}
             for state in ('open','cancelled','planned','closed'):
                 card=compact.locator(f'.session-list > li[data-state="{state}"]').first
                 colors[state]=card.evaluate('(e)=>getComputedStyle(e).backgroundColor')
-                expect(card.locator('a')).to_have_attribute('title',{'open':'Журнал открыт','cancelled':'Отменено','planned':'Плановое','closed':'Завершено'}[state])
-            assert colors['open']!=colors['planned'] and colors['cancelled']!=colors['planned'] and colors['open']!=colors['cancelled'],colors
-            compact.screenshot(path=f'/tmp/rd216-{ENGINE}-compact-calendar-{width}.png',full_page=True)
+                expect(card.locator('a')).to_have_attribute('title',re.compile(' · '+re.escape({'open':'Журнал открыт','cancelled':'Отменено','planned':'Плановое','closed':'Завершено'}[state])+'$'))
+            assert len(set(colors.values()))==4,colors
+            legend=compact.get_by_role('list',name='Обозначения в расписании',exact=True)
+            expect(legend).to_contain_text('Отменено или пропущено')
+            expect(legend).to_contain_text('Журнал не закрыт')
+            expect(legend).to_contain_text('Завершено')
+            assert legend.bounding_box()['y']+legend.bounding_box()['height'] <= compact.locator('.session-days').bounding_box()['y']
+            for state in ('open','cancelled','closed'):
+                assert legend.locator(f'[data-state="{state}"]').evaluate('(e)=>getComputedStyle(e).backgroundColor')==colors[state]
+            compact.screenshot(path=f'/tmp/rd216-{ENGINE}-session-cards-{width}.png',full_page=True)
+        # Mobile group names remain the same complete session link, without a write.
+        compact.set_viewport_size({'width':390,'height':900});settle_shell(compact,390)
+        planned=compact.locator('.session-list > li[data-state="planned"]').first
+        planned_id=planned.get_attribute('data-session-id')
+        planned.locator('.session-card-group').click()
+        expect(compact).to_have_url(re.compile('/sessions/'+planned_id))
+        assert sql(f"SELECT (roster_frozen_at IS NULL)::text || '|' || version FROM pride.training_sessions WHERE id='{planned_id}'")=='true|1'
         # A past planned session is shaded as missed; past open remains yellow.
         past = today-timedelta(days=8)
         missed=sql(f"INSERT INTO pride.training_sessions(club_id,group_id,trainer_id,starts_on,timezone,starts_at,ends_at) VALUES('{compact_club['id']}','{compact_groups[0]['id']}','{compact_trainer['id']}','{past}','Europe/Minsk','{past} 16:00+03','{past} 17:15+03') RETURNING id").splitlines()[0]
@@ -480,14 +503,14 @@ try:
         assert past_open_card.evaluate('(e)=>getComputedStyle(e).backgroundColor')==colors['open']
         missed_card=compact.locator(f'[data-session-id="{missed}"]')
         expect(missed_card).to_have_attribute('data-state','missed')
-        expect(missed_card.locator('a')).to_have_attribute('title','Занятие пропущено')
+        expect(missed_card.locator('a')).to_have_attribute('title',re.compile(r' · Занятие пропущено$'))
         assert missed_card.evaluate('(e)=>getComputedStyle(e).backgroundColor')==colors['cancelled']
         missed_card.locator('a').focus();compact.keyboard.press('Enter')
         expect(compact).to_have_url(__import__('re').compile('/sessions/'+missed))
         assert sql(f"SELECT (roster_frozen_at IS NULL)::text || '|' || version FROM pride.training_sessions WHERE id='{missed}'")=='true|1'
         assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{missed}'")=='0'
         assert not errors, errors
-        print(json.dumps({'engine': ENGINE, 'version': browser.version, 'result': 'PASS', 'checks': 'compact desktop/mobile, shared header/rows, trainer suffix, status shading/missed, keyboard link without write, day/week/period, ID scope/two clubs, create/reschedule/replace/cancel, direct journal/back/reload, Escape/focus, double tap/network/reload, correction conflict/history, preview/snapshot/search/45 participants, no calendar N+1, canonical/legacy links, 320/390/768/1280/1440'}, ensure_ascii=False))
+        print(json.dumps({'engine': ENGINE, 'version': browser.version, 'result': 'PASS', 'checks': 'separate bounded cards/mobile names, closed green and matching legend, compact desktop/mobile, shared header/rows, trainer suffix, status shading/missed, keyboard link without write, day/week/period, ID scope/two clubs, create/reschedule/replace/cancel, direct journal/back/reload, Escape/focus, double tap/network/reload, correction conflict/history, preview/snapshot/search/45 participants, no calendar N+1, canonical/legacy links, 320/390/768/1280/1440'}, ensure_ascii=False))
         browser.close()
 finally:
     STATIC_TEMP.cleanup()
