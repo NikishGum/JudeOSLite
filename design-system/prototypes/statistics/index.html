@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Статистика · PRIDE — UX-концепции</title>
+  <link rel="stylesheet" href="../../fonts/fonts.css">
+  <link rel="stylesheet" href="../../tokens.css">
+  <link rel="stylesheet" href="statistics.css">
+  <script src="statistics.js" defer></script>
+</head>
+<body>
+<!-- THESIS: Assess the network, then investigate exceptions; two working compositions replace a long form and repeated fact labels.
+OWN-WORLD: Existing PRIDE Rubik, #DB0C0C active controls, #212529 ink, #F5F7FA ground, white 20px panels; Working Panel success/warning tokens.
+STORY: Choose context, understand weighted attendance, spot incomplete journals and low-attendance branches, inspect groups without losing context.
+FIRST VIEWPORT: Compact concept switch and page title, one filter band, a unified metric strip, then prioritized findings and ranked branch rows. Table variant moves sortable comparison immediately below totals.
+FORM: Network brief (candidate 5) and expandable comparative rows (candidate 3), surface seed 94a08f24. Two implemented options explicitly requested; no preliminary lock gate. Code-led.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance -->
+<a class="skip-link" href="#report">К статистике</a>
+<div class="concept-bar">
+  <div class="concept-inner">
+    <nav class="concept-switch" aria-label="Варианты редизайна">
+      <a href="?idea=overview" data-idea="overview" aria-current="page">А · Обзор сети</a>
+      <a href="?idea=table" data-idea="table">Б · Рабочая таблица</a>
+    </nav>
+    <span class="demo-label">Прототип · вымышленные данные</span>
+  </div>
+</div>
+<main>
+  <header class="page-heading">
+    <div><h1>Статистика</h1><p id="concept-description">Вся сеть на одном экране. Детали — по запросу.</p></div>
+    <button class="button secondary refresh" id="refresh" type="button" aria-label="Обновить статистику"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M5.5 8a7 7 0 0 1 11.6-2L20 9M4 15l2.9 3A7 7 0 0 0 18.5 16"/></svg><span>Обновить</span></button>
+  </header>
+  <section class="filter-band" aria-label="Фильтры отчёта">
+    <div class="filter-main">
+      <div class="periods" role="group" aria-label="Быстрый период">
+        <button type="button" data-period="today" aria-pressed="false">Сегодня</button>
+        <button type="button" data-period="week" aria-pressed="false">Неделя</button>
+        <button type="button" data-period="month" aria-pressed="true">Месяц</button>
+        <button type="button" data-period="custom" aria-pressed="false" aria-expanded="false" aria-controls="custom-range">Период<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 10 4 4 4-4"/></svg></button>
+      </div>
+      <div class="scope-fields">
+        <label>Филиал<select id="branch"><option value="all">Вся сеть</option></select></label>
+        <label>Группа<select id="group"><option value="all">Все группы</option></select></label>
+      </div>
+    </div>
+    <form id="custom-range" class="custom-range" hidden>
+      <label>Дата с<input id="from" type="date" value="2026-10-01" required></label>
+      <label>Дата по<input id="until" type="date" value="2026-10-20" required></label>
+      <button class="button primary" type="submit">Применить</button>
+      <p class="form-error" id="date-error" role="alert" hidden></p>
+    </form>
+  </section>
+  <div id="report" tabindex="-1"></div>
+  <footer class="report-footer">
+    <details><summary>Как считается посещаемость</summary><p>Присутствия ÷ (присутствия + пропуски) × 100, только по закрытым занятиям. Отменённые исключены. Открытые и запланированные показаны отдельно. При отсутствии отметок — «—». Общий процент взвешен по отметкам, а не усреднён по филиалам. «Присутствия» — посещения занятий, а не уникальные спортсмены.</p><p>Обе даты включены. Быстрые периоды — по Минску; в прототипе «сегодня» зафиксировано: 20 октября 2026. Дата занятия в приложении определяется его сохранённым часовым поясом.</p></details>
+    <details><summary>Почему здесь нет вкладки «Финансы»</summary><p>Сейчас раздел отвечает на один вопрос: как посещают занятия и где неполные данные. Финансовая часть отложена. Пустая вкладка добавляет выбор без пользы.</p><p>Когда появятся оплаты, посещаемость и финансы логично разделить внутри «Статистики»: у них разные показатели и действия. Период и филиал можно сделать общими. Общий обзор нужен только при наличии содержательных связей между данными.</p></details>
+    <details class="demo-states"><summary>Проверить состояния прототипа</summary><p>Демонстрация без подключения к серверу.</p><button class="button secondary" type="button" data-demo-error>Ошибка загрузки</button> <button class="button secondary" type="button" data-demo-empty>Пустой период</button></details>
+    <p class="prototype-caption">Идеи для обсуждения · PRIDE · <a href="preview.html">Посмотреть на телефоне</a> · <a href="README.md">Описание решений</a></p>
+  </footer>
+</main>
+<div class="live-message" id="live-message" role="status" aria-live="polite"></div>
+<noscript><p class="no-script">Для интерактивного прототипа включите JavaScript.</p></noscript>
+</body>
+</html>
