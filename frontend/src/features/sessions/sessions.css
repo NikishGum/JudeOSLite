@@ -37,46 +37,43 @@
 .session-calendar .date-picker-group .date-step { width: 44px; height: 44px; min-width: 44px; min-height: 44px; }
 .session-calendar .date-select-trigger { height: 44px; min-height: 44px; }
 .session-days { display: grid; gap: 16px; margin-top: 24px; align-items: start; }
-.session-days .session-day { min-width: 0; margin: 0; padding: 12px; border: 1px solid var(--panel-line); border-radius: 12px; background: var(--muted); scroll-margin-top: 20px; }
-.session-day-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; min-height: 44px; margin: 0 0 12px; padding: 4px 0 12px; border-bottom: 1px solid var(--pride-border); font-size: 14px; text-transform: capitalize; }
-.session-day-heading strong { font-size: 17px; font-weight: 500; }
-.session-day-heading small { color: var(--pride-text-secondary); font-size: 13px; font-weight: 400; margin-left: auto; }
-.session-days .session-today { border-color: var(--pride-brand); }
+.session-days .session-day { min-width: 0; margin: 0; padding: 0; border: 1px solid var(--panel-line); border-radius: 12px; background: var(--card); scroll-margin-top: 20px; }
+.session-day-heading { display: flex; align-items: center; min-height: 44px; margin: 0; padding: 12px; background: var(--muted); border-radius: 12px 12px 0 0; font-size: 14px; font-weight: 500; text-transform: capitalize; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .session-today .session-day-heading { color: var(--pride-brand); }
-.session-calendar .session-empty-day { color: var(--pride-text-secondary); margin: 0; padding: 8px 0; font-size: 14px; }
-.session-calendar .session-list { display: grid; margin: 0; padding: 0; gap: 12px; }
-.session-calendar .session-list > li { display: block; min-width: 0; padding: 0; border: 1px solid var(--pride-border); border-radius: 12px; background: var(--card); }
-.session-card-link { display: grid; gap: 12px; min-height: 44px; padding: 16px; border-radius: 12px; color: var(--pride-text); text-decoration: none; transition: background-color 160ms ease-out; }
-.session-card-link:hover { background: var(--secondary); }
+.session-calendar .session-empty-day { color: var(--pride-text-secondary); margin: 0; padding: 12px; font-size: 13px; border-top: 1px solid var(--panel-line); }
+.session-calendar .session-list { display: grid; margin: 0; padding: 0; gap: 0; }
+.session-calendar .session-list > li { display: grid; grid-template-rows: 1fr auto; align-items: stretch; justify-content: normal; min-width: 0; padding: 0; border: 0; border-top: 1px solid var(--panel-line); border-radius: 0; background: var(--card); }
+.session-calendar .session-list > li:last-child { border-radius: 0 0 12px 12px; }
+.session-calendar .session-list > li[data-state="open"] { background: var(--panel-warning-bg); }
+.session-calendar .session-list > li:is([data-state="cancelled"], [data-state="missed"]) { background: color-mix(in srgb, var(--destructive) 8%, var(--card)); }
+.session-card-link { display: flex; flex-direction: column; align-items: start; gap: 8px; min-height: 44px; padding: 12px; color: var(--pride-text); text-decoration: none; transition: box-shadow 160ms ease-out; }
+.session-card-link:hover { box-shadow: inset 0 0 0 1px var(--pride-text-secondary); }
 .session-card-link:focus-visible { outline-offset: -3px; }
-.session-card-link:hover .session-card-cta { text-decoration: underline; text-underline-offset: 4px; }
-.session-card-heading { display: flex; flex-wrap: wrap; align-items: start; gap: 12px 20px; }
-.session-card-heading h4 { flex: 1 1 220px; margin: 0; font-size: 16px; font-weight: 500; }
-.session-clock { display: grid; gap: 2px; font-variant-numeric: tabular-nums; }
-.session-clock strong { font-size: 17px; font-weight: 500; white-space: nowrap; }
-.session-clock > span { color: var(--pride-text-secondary); font-size: 13px; }
-.session-card-cta { color: var(--pride-brand); font-size: 14px; font-weight: 500; }
-.session-calendar .session-information p { margin: 0; font-size: 14px; }
-.session-information { display: grid; gap: 8px; }
+.session-calendar .session-card-group { margin: 0; font-size: 14px; font-weight: 400; line-height: 1.5; }
+.session-clock { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; font-variant-numeric: tabular-nums; }
+.session-clock strong { font-size: 16px; font-weight: 500; white-space: nowrap; }
+.session-clock > span, .session-card-trainer { color: var(--pride-text-secondary); font-size: 13px; white-space: nowrap; }
+.session-card-trainer { white-space: normal; }
+.session-list > li[data-state="open"] :is(.session-clock > span, .session-card-trainer) { color: var(--panel-warning); }
+.session-list > li:is([data-state="cancelled"], [data-state="missed"]) :is(.session-clock > span, .session-card-trainer) { color: var(--pride-text); }
 .session-now { display: inline-block; color: var(--panel-success); font-size: 13px; font-weight: 500; padding: 4px 8px; }
-.session-row-actions { padding: 0 12px 8px; }
-.session-row-actions details summary { min-height: 44px; padding: 12px 4px; cursor: pointer; font-size: 14px; }
+.session-row-actions { padding: 0 8px 4px; }
+.session-row-actions details summary { min-height: 44px; padding: 12px 4px; cursor: pointer; font-size: 13px; }
 .session-row-actions .actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0; }
 .session-loading { padding: 32px 16px; background: var(--pride-surface-subtle); border-radius: var(--pride-radius-field); margin-top: 16px; min-height: 120px; }
 @container session-calendar (min-width: 840px) {
-  .session-week { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
-  .session-week .session-day { padding: 8px; }
-  .session-week .session-day-heading { display: grid; gap: 4px; min-height: 92px; align-content: start; }
-  .session-week .session-day-heading small { margin-left: 0; }
+  .session-week { grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: 44px repeat(var(--session-row-count), minmax(92px, auto)); gap: 0; align-items: stretch; border: 1px solid var(--panel-line); border-radius: 12px; }
+  .session-week .session-day { display: grid; grid-template-rows: subgrid; grid-row: 1 / span calc(var(--session-row-count) + 1); border: 0; border-radius: 0; }
+  .session-week .session-day + .session-day { border-left: 1px solid var(--panel-line); }
+  .session-week .session-day-heading { min-height: 0; padding: 8px; border-radius: 0; font-size: 13px; }
+  .session-week .session-day:first-child .session-day-heading { border-top-left-radius: 12px; }
+  .session-week .session-day:last-child .session-day-heading { border-top-right-radius: 12px; }
+  .session-week .session-list { display: contents; }
+  .session-week .session-list > li:last-child { border-radius: 0; }
   .session-week .session-card-link { padding: 12px 8px; }
-  .session-week .session-card-heading { display: grid; gap: 12px; }
-  .session-week .session-card-heading h4 { font-size: 14px; }
-  .session-week .session-clock strong { font-size: 13px; }
-  .session-week .session-card-cta { font-size: 13px; }
-  .session-week .session-information p { font-size: 13px; }
-  .session-week .training-status { padding-inline: 5px; font-size: 12px; }
+  .session-week .session-clock { display: grid; gap: 0; }
+  .session-week .session-clock strong { font-size: 14px; }
   .session-week .session-row-actions { padding-inline: 4px; }
-  .session-week .session-row-actions summary { font-size: 13px; }
   .session-week .session-row-actions .actions { display: grid; }
   .session-week .session-row-actions button { padding-inline: 4px; font-size: 13px; }
 }
@@ -124,9 +121,11 @@
   .session-view button { padding-inline: 2px; white-space: nowrap; }
   .session-week-navigation { width: 100%; justify-content: space-between; gap: 4px; }
   .session-range, .session-detail-time { font-size: 16px; }
-  .session-card-heading { display: grid; gap: 8px; }
-  .session-card-link { padding: 14px 12px; }
-  .session-clock strong { font-size: 18px; }
+  .session-card-link { padding: 12px; }
+  .session-calendar :is(.session-card-group, .session-card-trainer) { display: none; }
+  .session-clock { flex-wrap: nowrap; gap: 12px; }
+  .session-clock strong { font-size: 17px; }
+  .session-clock > span { font-size: 14px; }
   .session-row-actions .actions { display: grid; }
   .session-link { font-size: 16px; }
   .session-detail-actions { max-width: none; width: 100%; }
