@@ -711,7 +711,7 @@ with tempfile.TemporaryDirectory(prefix='pwa161-') as temp:
             groups.get_by_label('Название группы', exact=True).fill('Synthetic update group')
             groups.get_by_role('button', name='Сохранить группу', exact=True).click()
             wait_for_response(admin)
-            expect(admin.get_by_role('dialog').get_by_role('button', name='Закрыть форму', exact=True)).to_be_disabled()
+            expect(admin.get_by_role('dialog').get_by_role('button', name='Закрыть форму группы', exact=True)).to_be_disabled()
             admin.get_by_role('navigation', name='Разделы филиала').get_by_role('link', name='Занятия', exact=True).evaluate('(el)=>el.click()')
             expect(admin.locator('main h1')).to_have_text('Группы')
             expect(admin.locator('main')).to_contain_text('Дождитесь окончания сохранения')
