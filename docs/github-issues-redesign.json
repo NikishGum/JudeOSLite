@@ -4,8 +4,8 @@
   "repository": "NikishGum/JudeOSLite",
   "source_main": "72460d8f7bf8fd58fd93eeb026099012033daabf",
   "prototype_commit": "8016b746072e9334567de7fdbba2dcaf2a72fb45",
-  "task_count": 16,
-  "dependency_count": 37,
+  "task_count": 17,
+  "dependency_count": 41,
   "issues": [
     {
       "id": "RD-01",
@@ -203,6 +203,20 @@
       ],
       "body_sha256": "e9a4720b6aee51fe9b62841dcfeba2ab32287b500adf708e6b5c883b22c9b93b",
       "title": "Сотрудники: карточка доступа (вариант Б) и необходимые доработки backend"
+    },
+    {
+      "id": "UX-STATS",
+      "number": 221,
+      "github_id": 5944442606,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/221",
+      "dependencies": [
+        "RD-04",
+        "RD-08",
+        "RD-10",
+        "UX"
+      ],
+      "body_sha256": "a0c6e40a3655586cbefd78585533584531d840831aa461336582d5c64b57d961",
+      "title": "Статистика: точный перенос варианта А «Обзор сети» и необходимый backend"
     }
   ],
   "verification": {
