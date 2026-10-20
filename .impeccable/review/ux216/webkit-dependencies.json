@@ -1,0 +1,50 @@
+[
+  {
+    "Package": "libcolord2",
+    "Version": "1.4.7-3",
+    "Filename": "pool/main/c/colord/libcolord2_1.4.7-3_amd64.deb",
+    "SHA256": "f11fd3b492781122edf0790f1e1fe24c51a41c67d4bb76cff84a9426c5654fa7"
+  },
+  {
+    "Package": "libgraphene-1.0-0",
+    "Version": "1.10.8-5",
+    "Filename": "pool/main/g/graphene/libgraphene-1.0-0_1.10.8-5_amd64.deb",
+    "SHA256": "ddcf98f17f6c0a7c76974d7238be1468e59c186034c1b806638d32d9f446ea6e"
+  },
+  {
+    "Package": "libgtk-4-1",
+    "Version": "4.18.6+ds-2",
+    "Filename": "pool/main/g/gtk4/libgtk-4-1_4.18.6+ds-2_amd64.deb",
+    "SHA256": "51ab1114a57702e703cce745c24caf5bd31ec1d2a900c72fd15fe47c6c030e68"
+  },
+  {
+    "Package": "libharfbuzz-icu0",
+    "Version": "10.2.0-1+deb13u1",
+    "Filename": "pool/main/h/harfbuzz/libharfbuzz-icu0_10.2.0-1+deb13u1_amd64.deb",
+    "SHA256": "0b45d951629e98673c0da73b2bcd0886a467d833bb3b7499892a168f247165d2"
+  },
+  {
+    "Package": "libhyphen0",
+    "Version": "2.8.8-7+b2",
+    "Filename": "pool/main/h/hyphen/libhyphen0_2.8.8-7+b2_amd64.deb",
+    "SHA256": "fa9dca7b8cf1381fd52800c44a385c5725a78a88bd705f7c39b1046a5293435e"
+  },
+  {
+    "Package": "libcloudproviders0",
+    "Version": "0.3.6-2",
+    "Filename": "pool/main/libc/libcloudproviders/libcloudproviders0_0.3.6-2_amd64.deb",
+    "SHA256": "a626bb23ed9ebc4bc3ce446b552048de63d76768bf0fb492754965c5ee28a7e4"
+  },
+  {
+    "Package": "libgles2",
+    "Version": "1.7.0-1+b2",
+    "Filename": "pool/main/libg/libglvnd/libgles2_1.7.0-1+b2_amd64.deb",
+    "SHA256": "e12c18aa77939d122ee1dea520ba0440b97dc19200b7396e03dff03a3ece74c1"
+  },
+  {
+    "Package": "libmanette-0.2-0",
+    "Version": "0.2.12-1",
+    "Filename": "pool/main/libm/libmanette/libmanette-0.2-0_0.2.12-1_amd64.deb",
+    "SHA256": "98841a467692c46fd1870275113235691ebbfe71a3524f6b2a0fa7e9c33c6e56"
+  }
+]

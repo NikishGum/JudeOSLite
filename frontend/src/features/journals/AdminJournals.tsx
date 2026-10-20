@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { apiGet, ApiError } from '../../shared/api';
 import type { Group } from '../groups/types';
 import type { Session } from '../sessions/types';
+import { sessionHref } from '../sessions/navigation';
+import '../sessions/sessions.css';
 import { localDate, timeLabel } from '../schedule/types';
 import { stateNames } from '../trainer-sessions/types';
 import { AdminJournal } from './AdminJournal';
@@ -29,6 +31,7 @@ export function AdminJournals({ clubId, timezone }: { clubId: string; timezone: 
     {loading && <p role="status">Загружаем журналы…</p>}{error && <div role="alert"><p className="error">{error}</p><button onClick={() => setAttempt((n) => n + 1)}>Повторить загрузку журналов</button></div>}
     {!loading && !error && <><p role="status">Занятий на дату: {items.length}</p><ul className="admin-session-list">{items.map((v) => <li key={v.id} data-session-id={v.id}>
       <div><h3>{v.groupName} · {timeLabel(v.startsAt, v.timezone)}</h3><p>{stateNames[v.status]} · Тренер: {v.trainerName}</p></div>
+      <a className="session-link" href={sessionHref(clubId, { sessionId: v.id, journal: 'admin', from: date, through: date, view: 'day', groupId })}>Страница тренировки</a>
       <button disabled={selected?.id === v.id} onClick={() => setSelected(v)}>Посмотреть журнал филиала</button>
     </li>)}</ul>{items.length === 0 && <p>На выбранную дату занятий нет.</p>}</>}
     {selected && <AdminJournal key={`${selected.id}:${date}:${groupId}`} clubId={clubId} initial={selected} onUnavailable={() => setAttempt((n) => n + 1)} />}

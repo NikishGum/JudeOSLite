@@ -106,12 +106,15 @@ try:
             assert result['status'] == status if status else result['status'] in (200, 201), result
             return result['body']
         def shots(value, name):
-            for width in (320, 390, 1280):
+            for width in (320, 390, 768, 1280, 1440):
                 value.set_viewport_size({'width': width, 'height': 900})
                 settle_shell(value, width)
                 value.wait_for_load_state('networkidle')
                 assert value.evaluate('document.documentElement.scrollWidth <= innerWidth'), (name, width)
-                assert_page_targets(value, width, extra_selector=',.session-link:visible')
+                assert_page_targets(value, width, extra_selector=',.session-link:visible,.session-card-link:visible')
+                for target in value.locator('.session-calendar .date-step:visible,.session-calendar .date-select-trigger:visible').all():
+                    box = target.bounding_box()
+                    assert box['width'] >= 44 and box['height'] >= 44, box
                 value.evaluate('window.scrollTo(0,0)')
                 value.screenshot(path=f'/tmp/rd185-{ENGINE}-{name}-{width}.png', full_page=True)
         own = page('owner')
@@ -135,13 +138,32 @@ try:
         expect(admin).to_have_url(calendar)
         expect(admin.get_by_label('Группа календаря', exact=True)).to_have_value(group['id'])
         expect(admin.locator('.session-list > li')).to_have_count(1)
-        admin.get_by_role('radio', name='Неделя', exact=True).click()
+        expect(admin.get_by_role('radio', name='Неделя', exact=True)).to_be_checked()
+        expect(admin.locator('.session-day')).to_have_count(7)
+        # Week step and counters share the same filtered dataset; no athlete API.
+        calendar_reads = []
+        admin.on('request', lambda r: calendar_reads.append(r.url) if '/api/clubs/' in r.url else None)
+        admin.locator('.session-calendar').get_by_role('button', name='Вперёд', exact=True).click()
+        expect(admin.locator('.session-list > li')).to_have_count(0)
+        admin.locator('.session-calendar').get_by_role('button', name='Назад', exact=True).click()
+        expect(admin.locator('.session-list > li')).to_have_count(1)
+        assert not any('/journal' in u or '/participants' in u for u in calendar_reads), calendar_reads
+        expect(admin.locator('.session-calendar')).not_to_contain_text('Алексей · контроль')
+        admin.get_by_label('Статус занятия', exact=True).select_option('cancelled')
+        expect(admin.locator('.session-list > li')).to_have_count(0)
+        expect(admin.locator('.session-list-heading')).to_contain_text('Занятий за период: 0')
+        assert sum(int(x.rsplit(': ',1)[1]) for x in admin.locator('.session-day-heading small').all_text_contents()) == 0
+        admin.get_by_label('Статус занятия', exact=True).select_option('')
+        admin.get_by_label('Фактический тренер', exact=True).select_option(trainer['id'])
+        expect(admin.locator('.session-list > li')).to_have_count(1)
+        admin.get_by_label('Фактический тренер', exact=True).select_option('')
         start = today-timedelta(days=today.weekday())
-        expect(admin.get_by_label('С даты', exact=True)).to_have_value(str(start))
-        expect(admin.get_by_label('По дату включительно', exact=True)).to_have_value(str(start+timedelta(days=6)))
+        assert 'from='+str(start) in admin.url
+        assert 'through='+str(start+timedelta(days=6)) in admin.url
+        shots(admin, 'weekly-calendar')
         admin.get_by_role('radio', name='День', exact=True).click()
         admin.get_by_role('button', name='Сегодня', exact=True).click()
-        admin.get_by_role('button', name='Все группы · сбросить фильтр', exact=True).click()
+        admin.get_by_role('button', name='Сбросить фильтры · Все группы', exact=True).click()
         expect(admin.get_by_label('Группа календаря', exact=True)).to_have_value('')
         admin.get_by_label('Группа календаря', exact=True).select_option(group['id'])
         admin.reload(); expect(admin.get_by_label('Группа календаря', exact=True)).to_have_value(group['id'])
@@ -158,6 +180,7 @@ try:
         form.get_by_label('Дата занятия', exact=True).fill(str(tomorrow))
         form.get_by_role('button', name='Создать разовое занятие', exact=True).click()
         expect(form).to_have_count(0)
+        admin.get_by_role('radio', name='Период', exact=True).click()
         admin.get_by_label('По дату включительно', exact=True).fill(str(tomorrow+timedelta(days=3)))
         admin.get_by_label('С даты', exact=True).fill(str(tomorrow))
         expect(admin.locator('.session-list > li')).to_have_count(1)
@@ -186,11 +209,24 @@ try:
         expect(admin.locator('.session-list > li')).to_have_count(2)
         shots(admin, 'calendar')
         tr = page('trainer'); tr.goto(calendar)
-        tr.locator(f'[data-session-id="{sid}"]').get_by_role('link', name='Открыть журнал', exact=True).click()
+        tr.locator(f'[data-session-id="{sid}"]').get_by_role('link').first.click()
+        expect(tr).to_have_url(__import__('re').compile('/sessions/'+sid))
         expect(tr.get_by_role('button', name='Подтвердить открытие журнала', exact=True)).to_be_visible()
+        expect(tr.locator('.session-roster')).to_contain_text('Предварительный состав')
+        expect(tr.locator('.session-roster-list > li')).to_have_count(3)
+        expect(tr.locator('.session-detail-heading')).not_to_contain_text('Тренер:')
+        tr.get_by_label('Поиск по составу', exact=True).fill('Борис')
+        expect(tr.locator('.session-roster-list > li')).to_have_count(1)
+        tr.get_by_label('Поиск по составу', exact=True).fill('')
+        tr.reload()
+        expect(tr.locator('.session-roster-list > li')).to_have_count(3)
+        assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{sid}'") == '0'
+        assert sql(f"SELECT (roster_frozen_at IS NULL)::text || '|' || version FROM pride.training_sessions WHERE id='{sid}'") == 'true|1'
+        shots(tr, 'planned-session')
         assert sql(f"SELECT status FROM pride.training_sessions WHERE id='{sid}'") == 'planned'
         tr.get_by_role('button', name='Подтвердить открытие журнала', exact=True).click()
         expect(tr.locator('.attendance-card')).to_contain_text('Алексей')
+        expect(tr.locator('.session-roster')).to_contain_text('Зафиксированный состав')
         shots(tr, 'attendance')
         tr.set_viewport_size({'width': 320, 'height': 480})
         tr.locator('.attendance-card h4').evaluate("e=>e.scrollIntoView({block:'start'})")
@@ -240,11 +276,13 @@ try:
         tr.reload(); expect(tr.locator('.attendance-card')).to_have_count(0)
         api(tr, 'GET', base+'/journals/'+sid, status=404)
         # Return/back/forward and direct deep link restore the exact session.
-        tr.get_by_role('link', name='К списку занятий', exact=True).click()
+        tr.get_by_role('link', name='К расписанию', exact=True).click()
         expect(tr.get_by_label('Группа календаря', exact=True)).to_have_value(group['id'])
         tr.go_back(); expect(tr.locator('.session-journal')).to_contain_text('Журнал завершён')
         tr.go_forward(); expect(tr.locator('.session-calendar')).to_be_visible()
+        # Legacy query link normalizes to the canonical page without selecting a fallback.
         admin.goto(calendar+'&session='+sid)
+        expect(admin).to_have_url(__import__('re').compile('/sessions/'+sid))
         expect(admin.locator('.admin-records > li')).to_have_count(3)
         record = admin.locator('.admin-records > li').first
         record.get_by_role('button', name='Исправить отметку', exact=True).click()
@@ -266,8 +304,52 @@ try:
         expect(record.locator('.record-history')).to_contain_text('Конкурентная проверка владельца')
         admin.reload(); expect(admin.locator('.admin-records > li').first).to_contain_text('Присутствует')
         assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{sid}'") == '3'
+        # Direct entry without a calendar uses the actual session week on return.
+        direct = ROOT+'/clubs/'+a['id']+'/sessions/'+sid
+        admin.goto(direct)
+        expect(admin.locator('.admin-records > li')).to_have_count(3)
+        admin.reload(); expect(admin.locator('.admin-records > li')).to_have_count(3)
+        admin.get_by_role('link', name='К расписанию', exact=True).click()
+        expect(admin.get_by_role('radio', name='Неделя', exact=True)).to_be_checked()
+        admin.go_back(); expect(admin.locator('.admin-records > li')).to_have_count(3)
+        admin.goto(ROOT+'/clubs/'+b['id']+'/sessions/'+sid)
+        expect(admin.get_by_role('alert')).to_be_visible()
+        expect(admin.locator('.admin-records > li')).to_have_count(0)
+        # Forty-five participants are a stress case, not a product limit.
+        for i in range(42):
+            api(own, 'POST', base+'/participants', {'identity': {'fullName': f'Стресс участник {i:02} с длинным именем', 'birthDate': '2010-01-01'}, 'joinedOn': '2020-01-01', 'contactKind': 'phone', 'contactValue': '+375291234567', 'initialGroup': {'groupId': group['id'], 'from': '2020-01-01'}})
+        stress = sql(f"INSERT INTO pride.training_sessions(club_id,group_id,trainer_id,starts_on,timezone,starts_at,ends_at) VALUES('{a['id']}','{group['id']}','{trainer['id']}','{tomorrow}','Europe/Minsk','{tomorrow} 20:00+03','{tomorrow} 21:30+03') RETURNING id").splitlines()[0]
+        tr.goto(ROOT+'/clubs/'+a['id']+'/sessions/'+stress)
+        expect(tr.locator('.session-roster-list > li')).to_have_count(45)
+        expect(tr.get_by_role('button', name='Подтвердить открытие журнала', exact=True)).to_be_disabled()
+        tr.get_by_label('Поиск по составу', exact=True).fill('участник 41')
+        expect(tr.locator('.session-roster-list > li')).to_have_count(1)
+        tr.get_by_label('Поиск по составу', exact=True).fill('такого имени нет')
+        expect(tr.locator('.session-roster')).to_contain_text('По этому имени никого нет')
+        assert sql(f"SELECT count(*) FROM pride.attendance_records WHERE training_session_id='{stress}'") == '0'
+        # Calendar boundaries and the inclusive 366-day limit.
+        admin.goto(ROOT+'/clubs/'+a['id']+'/sessions?from=2026-12-28&through=2027-01-03&view=week')
+        expect(admin.locator('.session-day')).to_have_count(7)
+        admin.locator('.session-calendar').get_by_role('button', name='Вперёд', exact=True).click()
+        assert 'from=2027-01-04' in admin.url
+        admin.locator('.session-calendar').get_by_role('button', name='Назад', exact=True).click()
+        assert 'through=2027-01-03' in admin.url
+        admin.goto(ROOT+'/clubs/'+a['id']+'/sessions?from=2025-01-01&through=2026-01-01&view=period')
+        expect(admin.locator('.session-calendar [role="alert"]')).to_have_count(0)
+        expect(admin.get_by_role('button', name='Добавить разовое занятие', exact=True)).to_be_enabled()
+        admin.get_by_label('По дату включительно', exact=True).fill('2026-01-02')
+        expect(admin.locator('.session-calendar [role="alert"]')).to_be_visible()
+        admin.goto(ROOT+'/clubs/'+a['id']+'/sessions?status=invalid')
+        expect(admin.locator('.session-calendar [role="alert"]')).to_be_visible()
+        admin.get_by_role('button', name='Сбросить фильтры · Все группы', exact=True).click()
+        expect(admin.locator('.session-calendar [role="alert"]')).to_have_count(0)
+        expect(admin.get_by_role('button', name='Добавить разовое занятие', exact=True)).to_be_enabled()
+        # Unknown IDs cannot fall back to an available session.
+        admin.goto(ROOT+'/clubs/'+a['id']+'/sessions/'+str(uuid.uuid4()))
+        expect(admin.locator('.session-detail [role="alert"]')).to_be_visible()
+        expect(admin.locator('.admin-records > li')).to_have_count(0)
         assert not errors, errors
-        print(json.dumps({'engine': ENGINE, 'version': browser.version, 'result': 'PASS', 'checks': 'day/week/period, ID scope/two clubs, create/reschedule/replace/cancel, direct journal/back/reload, Escape/focus, double tap/network/reload, correction conflict/history, 320/390/1280'}, ensure_ascii=False))
+        print(json.dumps({'engine': ENGINE, 'version': browser.version, 'result': 'PASS', 'checks': 'day/week/period, ID scope/two clubs, create/reschedule/replace/cancel, direct journal/back/reload, Escape/focus, double tap/network/reload, correction conflict/history, preview/snapshot/search/45 participants, no calendar N+1, canonical/legacy links, 320/390/768/1280/1440'}, ensure_ascii=False))
         browser.close()
 finally:
     STATIC_TEMP.cleanup()

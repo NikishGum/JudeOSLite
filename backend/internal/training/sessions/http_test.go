@@ -243,6 +243,9 @@ func TestSessionsIntegration(t *testing.T) {
 		command(v, "cancel", commandInput{Reason: "synthetic"}, 409)
 		command(v, "reschedule", commandInput{Date: "2028-01-20", Time: "19:00", Duration: 60}, 409)
 		out := parse[Session](t, command(v, "replace-trainer", commandInput{TrainerID: replacement}, 200), 200)
+		if out.PreviousTrainerName == nil || *out.PreviousTrainerName != "trainer-a" {
+			t.Fatal("replacement must come from committed audit history")
+		}
 		if out.Status != "open" || !out.Frozen || !out.Manual || out.TrainerID != replacement || out.SourceDate != v.SourceDate {
 			t.Fatal("replace damaged journal")
 		}

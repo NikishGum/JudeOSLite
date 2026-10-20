@@ -1,0 +1,15 @@
+2026/10/20 11:01:05 migrations applied
+Error response from daemon: failed to set up container networking: driver failed programming external connectivity on endpoint rd185-e44407c8-app (672fe4abc51323d5fca7d19e21dd249fbf21e516788bd9012f56c94830a4c321): Bind for 127.0.0.1:18085 failed: port is already allocated
+Error: failed to start containers: rd185-e44407c8-app
+Traceback (most recent call last):
+  File "/workspace/JudeOSLite/frontend/e2e/redesign_training.py", line 68, in <module>
+    cmd('docker', 'start', APP)
+  File "/workspace/JudeOSLite/frontend/e2e/redesign_training.py", line 33, in cmd
+    return subprocess.check_output(args, text=True).strip()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '('docker', 'start', 'rd185-e44407c8-app')' returned non-zero exit status 1.

@@ -6,16 +6,19 @@ import { type Journal, type Record, markLabel, originLabel } from './types';
 import { trainingChanged } from '../sessions/navigation';
 import { RecordHistory } from './RecordHistory';
 
-export function AdminJournal({ clubId, initial, onUnavailable }: { clubId: string; initial: Session; onUnavailable: () => void }) {
+export function AdminJournal({ clubId, initial, onUnavailable, initialJournal, onRead }: { clubId: string; initial: Session; onUnavailable: () => void; initialJournal?: Journal; onRead?: (value: Journal) => void }) {
   const base = `/api/clubs/${clubId}/journals/${initial.id}` as const;
-  const [journal, setJournal] = useState<Journal | null>(null), [loading, setLoading] = useState(true), [busy, setBusy] = useState(false);
+  const [journal, setJournal] = useState<Journal | null>(initialJournal ?? null), [loading, setLoading] = useState(!initialJournal), [busy, setBusy] = useState(false);
   const [error, setError] = useState(''), [conflict, setConflict] = useState(false), [attempt, setAttempt] = useState(0), [notice, setNotice] = useState('');
   const [draft, setDraft] = useState<{ record: Record; value: string; reason: string } | null>(null), [historyId, setHistoryId] = useState('');
+  const [search, setSearch] = useState('');
+  const firstRead = useRef(!!initialJournal), read = useRef(onRead); read.current = onRead;
   const mounted = useRef(true), pending = useRef(false), unavailable = useRef(onUnavailable); unavailable.current = onUnavailable;
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   useEffect(() => {
+    if (attempt === 0 && firstRead.current) return;
     const c = new AbortController(); setLoading(true); setError(''); setJournal(null); setDraft(null); setHistoryId(''); setConflict(false); setNotice('');
-    apiGet<Journal>(base, c.signal).then((v) => { if (!c.signal.aborted) setJournal(v); })
+    apiGet<Journal>(base, c.signal).then((v) => { if (!c.signal.aborted) { setJournal(v); read.current?.(v); } })
       .catch((e: unknown) => { if (!c.signal.aborted) {
         setError(e instanceof ApiError ? e.message : 'Нет соединения. Повторите загрузку журнала.');
         if (e instanceof ApiError && (e.status === 401 || e.status === 404)) unavailable.current();
@@ -28,7 +31,7 @@ export function AdminJournal({ clubId, initial, onUnavailable }: { clubId: strin
     try {
       const result = await apiPut<Journal>(`${base}/records/${draft.record.id}`, { version: draft.record.version, state: draft.value === 'present' ? 'present' : 'absent', absenceReason: draft.value === 'present' ? null : draft.value, changeReason: draft.reason });
       if (!mounted.current) return;
-      setJournal(result); setDraft(null); setHistoryId(draft.record.id); setNotice('Отметка подтверждена сервером.');
+      setJournal(result); read.current?.(result); setDraft(null); setHistoryId(draft.record.id); setNotice('Отметка подтверждена сервером.');
       trainingChanged();
     } catch (e) {
       if (!mounted.current) return;
@@ -43,11 +46,13 @@ export function AdminJournal({ clubId, initial, onUnavailable }: { clubId: strin
     <button className="secondary" disabled={busy} onClick={() => setAttempt((n) => n + 1)}>{conflict ? 'Перечитать журнал и сбросить ввод' : 'Обновить журнал'}</button>
     {error && <p className="error" role="alert">{error}</p>}{notice && <p role="status">{notice}</p>}{loading && <p role="status">Загружаем снимок состава…</p>}
     {journal && <>
-      <p><strong>{stateNames[journal.session.status]}</strong> · Участников в снимке: {journal.records.length}</p>
-      <p>Состав сохранён на дату занятия. Архив и переводы участников не меняют снимок.</p>
+      <p><strong>{stateNames[journal.session.status]}</strong>{journal.session.rosterFrozen ? ` · Участников в снимке: ${journal.records.length}` : " · Журнал ещё не открыт"}</p>
+      {journal.session.rosterFrozen && <p>Состав сохранён на дату занятия. Архив и переводы участников не меняют снимок.</p>}
       {journal.session.status === 'closed' ? <p>Исправляйте по одной отметке с объяснением причины. Давность занятия не ограничена.</p> : <p>Здесь журнал доступен для чтения. Исправление администратора доступно после закрытия.</p>}
       {journal.records.length === 0 && <p>{journal.session.rosterFrozen ? 'Снимок состава пуст.' : 'Снимок состава ещё не создан.'}</p>}
-      <ul className="admin-records">{journal.records.map((record) => <li key={record.id} data-record-id={record.id}>
+      {journal.session.rosterFrozen && <label className="field">Поиск по составу<input type="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Имя участника" /></label>}
+      {search && <p role="status">Показано: {journal.records.filter((r) => r.fullName.toLocaleLowerCase('ru').includes(search.trim().toLocaleLowerCase('ru'))).length} из {journal.records.length}</p>}
+      <ul className="admin-records">{journal.records.filter((r) => !search || r.fullName.toLocaleLowerCase('ru').includes(search.trim().toLocaleLowerCase('ru')) || draft?.record.id === r.id).map((record) => <li key={record.id} data-record-id={record.id}>
         <h4>{record.fullName}{record.archived && ' · Карточка в архиве'}</h4>
         <p><span className={`training-status status-${record.state ?? 'unmarked'}`}>{markLabel(record)}</span></p>{record.origin && <p>{originLabel(record.origin)} · Версия {record.version}</p>}
         {record.changeReason && <p className="change-reason">Причина последнего исправления: {record.changeReason}</p>}

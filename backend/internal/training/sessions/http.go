@@ -34,34 +34,39 @@ type Service struct {
 func New(pool *pgxpool.Pool, access *auth.Service) *Service { return &Service{pool, access, time.Now} }
 
 type Session struct {
-	ID           string     `json:"id"`
-	ClubID       string     `json:"clubId"`
-	GroupID      string     `json:"groupId"`
-	GroupName    string     `json:"groupName"`
-	RuleID       *string    `json:"ruleId"`
-	TrainerID    string     `json:"trainerId"`
-	TrainerName  string     `json:"trainerName"`
-	Date         string     `json:"date"`       // Actual local calendar date, including a manual move.
-	SourceDate   string     `json:"sourceDate"` // Immutable starts_on of the original occurrence.
-	Timezone     string     `json:"timezone"`
-	StartsAt     time.Time  `json:"startsAt"`
-	EndsAt       time.Time  `json:"endsAt"`
-	Status       string     `json:"status"`
-	Manual       bool       `json:"manualOverride"`
-	Frozen       bool       `json:"rosterFrozen"`
-	ClosedAt     *time.Time `json:"closedAt"`
-	CancelledAt  *time.Time `json:"cancelledAt"`
-	Reason       *string    `json:"cancellationReason"`
-	SupersededAt *time.Time `json:"supersededAt"`
-	Version      int        `json:"version"`
+	ID                  string     `json:"id"`
+	ClubID              string     `json:"clubId"`
+	GroupID             string     `json:"groupId"`
+	GroupName           string     `json:"groupName"`
+	RuleID              *string    `json:"ruleId"`
+	TrainerID           string     `json:"trainerId"`
+	TrainerName         string     `json:"trainerName"`
+	PreviousTrainerName *string    `json:"previousTrainerName"`
+	Date                string     `json:"date"`       // Actual local calendar date, including a manual move.
+	SourceDate          string     `json:"sourceDate"` // Immutable starts_on of the original occurrence.
+	Timezone            string     `json:"timezone"`
+	StartsAt            time.Time  `json:"startsAt"`
+	EndsAt              time.Time  `json:"endsAt"`
+	Status              string     `json:"status"`
+	Manual              bool       `json:"manualOverride"`
+	Frozen              bool       `json:"rosterFrozen"`
+	ClosedAt            *time.Time `json:"closedAt"`
+	CancelledAt         *time.Time `json:"cancelledAt"`
+	Reason              *string    `json:"cancellationReason"`
+	SupersededAt        *time.Time `json:"supersededAt"`
+	Version             int        `json:"version"`
 }
 
-const columns = `s.id::text,s.club_id::text,s.group_id::text,g.name,s.schedule_rule_id::text,s.trainer_id::text,u.display_name,to_char(s.starts_at AT TIME ZONE s.timezone,'YYYY-MM-DD'),to_char(s.starts_on,'YYYY-MM-DD'),s.timezone,s.starts_at,s.ends_at,s.status,s.is_manual_override,s.roster_frozen_at IS NOT NULL,s.closed_at,s.cancelled_at,s.cancellation_reason,s.superseded_at,s.version`
+const columns = `s.id::text,s.club_id::text,s.group_id::text,g.name,s.schedule_rule_id::text,s.trainer_id::text,u.display_name,
+(SELECT previous.display_name FROM pride.audit_events a JOIN pride.staff_users previous ON previous.id::text=a.before_state->>'trainerId'
+ WHERE a.entity_type='training_session' AND a.entity_id=s.id AND a.club_id=s.club_id AND a.action='replace-trainer'
+ AND a.after_state->>'trainerId'=s.trainer_id::text ORDER BY a.created_at DESC,a.id DESC LIMIT 1),
+to_char(s.starts_at AT TIME ZONE s.timezone,'YYYY-MM-DD'),to_char(s.starts_on,'YYYY-MM-DD'),s.timezone,s.starts_at,s.ends_at,s.status,s.is_manual_override,s.roster_frozen_at IS NOT NULL,s.closed_at,s.cancelled_at,s.cancellation_reason,s.superseded_at,s.version`
 const joins = ` FROM pride.training_sessions s JOIN pride.training_groups g ON g.id=s.group_id JOIN pride.staff_users u ON u.id=s.trainer_id `
 
 func scan(row pgx.Row) (Session, error) {
 	var v Session
-	e := row.Scan(&v.ID, &v.ClubID, &v.GroupID, &v.GroupName, &v.RuleID, &v.TrainerID, &v.TrainerName, &v.Date, &v.SourceDate, &v.Timezone, &v.StartsAt, &v.EndsAt, &v.Status, &v.Manual, &v.Frozen, &v.ClosedAt, &v.CancelledAt, &v.Reason, &v.SupersededAt, &v.Version)
+	e := row.Scan(&v.ID, &v.ClubID, &v.GroupID, &v.GroupName, &v.RuleID, &v.TrainerID, &v.TrainerName, &v.PreviousTrainerName, &v.Date, &v.SourceDate, &v.Timezone, &v.StartsAt, &v.EndsAt, &v.Status, &v.Manual, &v.Frozen, &v.ClosedAt, &v.CancelledAt, &v.Reason, &v.SupersededAt, &v.Version)
 	return v, e
 }
 
@@ -298,7 +303,11 @@ func (s *Service) command(action string) http.HandlerFunc {
 			if e != nil {
 				return e
 			}
-			return groups.Audit(ctx, tx, auth.CurrentUser(ctx).ID, club, id, "training_session", action, state(old), state(out))
+			if e = groups.Audit(ctx, tx, auth.CurrentUser(ctx).ID, club, id, "training_session", action, state(old), state(out)); e != nil {
+				return e
+			}
+			out, e = Read(ctx, tx, club, id, false)
+			return e
 		})
 		if e != nil {
 			fail(w, e)

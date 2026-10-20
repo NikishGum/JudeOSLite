@@ -40,8 +40,9 @@ type Record struct {
 	ChangeReason *string `json:"changeReason"`
 }
 type Journal struct {
-	Session sessions.Session `json:"session"`
-	Records []Record         `json:"records"`
+	Session sessions.Session  `json:"session"`
+	Records []Record          `json:"records"`
+	Roster  attendance.Roster `json:"roster"`
 }
 
 // Whitelisted audit fields only; never return arbitrary before/after JSON.
@@ -129,6 +130,10 @@ func readSession(r *http.Request, tx pgx.Tx) (sessions.Session, error) {
 func readJournal(ctx context.Context, tx pgx.Tx, v sessions.Session) (Journal, error) {
 	out := Journal{Session: v, Records: []Record{}}
 	records, e := attendance.ReadRecords(ctx, tx, v.ID)
+	if e != nil {
+		return out, e
+	}
+	out.Roster, e = attendance.ReadRoster(ctx, tx, v, records)
 	if e != nil {
 		return out, e
 	}
