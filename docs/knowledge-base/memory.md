@@ -18,7 +18,8 @@ Items/total один SQL snapshot до cursor; total может меняться
 React: компактные строки/мобильный список, inline details,48px native select,
 реальные семь дней Europe/Minsk, мгновенные условия, debounce300/Enter/Escape,
 снятие chips с фокусом, дозагрузка, Abort/epoch и privacy/navigation boundary.
-Background сохраняет DOM/детали/ввод при transport error; новая область/отказ
+Background сохраняет DOM/детали/ввод и геометрию без polling loading-строки
+при transport error/чтении; новая область/отказ
 доступа очищает данные. Без индекса/миграции без измеренной необходимости.
 
 Go vet/race/реальная PG18.6, production build/typecheck и background Chromium/

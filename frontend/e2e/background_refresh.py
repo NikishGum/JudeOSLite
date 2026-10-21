@@ -201,6 +201,7 @@ def main():
             fixture.hold = True
             page.clock.run_for(30_100)
             page.wait_for_timeout(100)
+            expect(page.locator('.audit-updating')).to_have_count(0)
             assert_preserved(page, focus=True, scroll=True)
             settle()
             assert_preserved(page, focus=True, scroll=True)

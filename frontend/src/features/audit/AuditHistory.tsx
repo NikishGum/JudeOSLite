@@ -53,7 +53,7 @@ export function AuditHistory({ selectedClubId }: { selectedClubId: string }) {
   const controller = new AbortController(); active.current?.abort(); active.current = controller;
   const generation = ++epoch.current;
   let previous = data.current;
-  setLoading(true);
+  setLoading(!request.background || previous === null);
   async function load() {
    try {
     const allowed = await apiGet<Filters>('/api/audit/filters', controller.signal);
@@ -61,7 +61,7 @@ export function AuditHistory({ selectedClubId }: { selectedClubId: string }) {
     const scope = `${allowed.isOwner}:${allowed.clubs.map((club) => club.id).sort().join(',')}`;
     const scopeChanged = Boolean(allowedScope.current && allowedScope.current !== scope);
     allowedScope.current = scope;
-    if (scopeChanged) { previous = null; pages.current = 1; setPage(null); setExpanded(new Set()); }
+    if (scopeChanged) { previous = null; pages.current = 1; setPage(null); setExpanded(new Set()); setLoading(true); }
     setFilters(allowed);
     const cursor = scopeChanged ? '' : request.cursor;
     const read = (cursor: string) => {

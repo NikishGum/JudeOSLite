@@ -114,3 +114,13 @@ responsive shell mount до ввода, проверяет Synthetic также 
 2/4/2/1 расписания,40% ledger, роли/revoke, browser history, static-only cache,
 expiry/logout/account swap/network/two-build update. PhysicalInstallation NOT TESTED.
 Оба исходных CI FAIL и локальные результаты сохранены в evidence.
+
+
+При финальной проверке фонового кода устранена собственная регрессия: loading
+для каждого polling/focus чтения добавлял над таблицей строку обновления.
+Теперь loading виден при первом/явном чтении и дозагрузке; повторное background
+чтение с показанными данными оставляет прежнюю геометрию и состояние кнопок.
+Изменение live scope по-прежнему сразу очищает строки и включает loading.
+Background regression дополнен строгим отсутствием .audit-updating при удержанном
+ответе таймера; Chromium151/WebKit26.5, desktop/mobile и transport/revoke — PASS.
+Новых глобальных стилей, исключений прав или задержек проверки не добавлено.

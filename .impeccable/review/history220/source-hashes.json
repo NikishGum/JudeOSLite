@@ -1,9 +1,9 @@
 {
-  "date": "2026-10-21T13:22:33.186625+03:00",
+  "date": "2026-10-21T13:50:28.047738+03:00",
   "files": {
     "backend/internal/audit/http.go": "6c5f92b2cb218f82a233c0f0875dd175a3952bedf3791fd3c99fe59d4e501ee1",
     "backend/internal/audit/catalog.go": "038a74010a720b8e8f1db14289f5a63dcac23056608c7e6d3a5bfab550445933",
-    "frontend/src/features/audit/AuditHistory.tsx": "b9f6f054607209832549354a26df6ac8510247875152bc3ac887ca0de114813a",
+    "frontend/src/features/audit/AuditHistory.tsx": "499959de45f12146fd51ed7e12a06c6389a7e1e1985925aa75e2900b63cef6e1",
     "frontend/src/features/audit/audit.css": "02adcd9e257fca1e50d0cd6657c726d34e6cfbfc1b8126bc4445d10eef30c9b4",
     "frontend/src/features/audit/history.ts": "ca60ad2e970a19a90dbd5094248065179f2bab2b49860463739375ab352c1b47",
     "frontend/e2e/history_search.py": "5dfa4a2d9fe68e776e49e749b7cdc7ac6e318588b81059252ad961f528fb3577"
