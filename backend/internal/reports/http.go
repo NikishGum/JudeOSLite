@@ -187,18 +187,29 @@ type Row struct {
 	Totals
 }
 type Report struct {
-	From   string `json:"from"`
-	Until  string `json:"until"`
-	Total  Totals `json:"total"`
-	Clubs  []Row  `json:"clubs"`
-	Groups []Row  `json:"groups"`
+	From         string        `json:"from"`
+	Until        string        `json:"until"`
+	Total        Totals        `json:"total"`
+	Clubs        []Row         `json:"clubs"`
+	Groups       []Row         `json:"groups"`
+	OpenSessions []OpenSession `json:"openSessions"`
+}
+
+// Navigation metadata only; no roster, trainer identity or personal marks.
+type OpenSession struct {
+	ID       string    `json:"id"`
+	ClubID   string    `json:"clubId"`
+	GroupID  string    `json:"groupId"`
+	Date     string    `json:"date"`
+	StartsAt time.Time `json:"startsAt"`
+	Timezone string    `json:"timezone"`
 }
 
 // A single statement gives every level the same MVCC snapshot. Aggregate each
 // session BEFORE comparison levels so closed empty rosters count once, and marks
 // never multiply session counts. No join to current membership or audit history.
 const attendanceSQL = `WITH per_session AS (
- SELECT s.id,s.club_id,s.group_id,s.status,
+ SELECT s.id,s.club_id,s.group_id,s.status,s.starts_at,s.timezone,
  count(r.id) FILTER (WHERE s.status='closed' AND r.state='present') AS present,
  count(r.id) FILTER (WHERE s.status='closed' AND r.state='absent') AS absent,
  count(r.id) FILTER (WHERE s.status='closed' AND r.absence_reason='unknown') AS unknown,
@@ -224,7 +235,11 @@ const attendanceSQL = `WITH per_session AS (
  GROUP BY GROUPING SETS ((c.id,c.name,c.archived_at,g.id,g.name,g.archived_at),(c.id,c.name,c.archived_at),())
  HAVING GROUPING(g.id)=1 OR g.id IS NOT NULL
 )
-SELECT *,present::double precision*100/nullif(present+absent,0) AS percentage
+SELECT *,present::double precision*100/nullif(present+absent,0) AS percentage,
+ CASE WHEN level='network' THEN coalesce((SELECT jsonb_agg(jsonb_build_object(
+ 'id',id,'clubId',club_id,'groupId',group_id,
+ 'date',to_char(starts_at AT TIME ZONE timezone,'YYYY-MM-DD'),'startsAt',starts_at,'timezone',timezone)
+ ORDER BY starts_at,id) FROM per_session WHERE status='open'),'[]'::jsonb) ELSE '[]'::jsonb END AS open_sessions
 FROM levels ORDER BY level,club_name,club_id,group_name,group_id`
 
 func (s *Service) attendance(w http.ResponseWriter, r *http.Request) {
@@ -250,7 +265,7 @@ func (s *Service) attendance(w http.ResponseWriter, r *http.Request) {
 		fail(w, err)
 		return
 	}
-	result := Report{From: q.from, Until: q.until, Clubs: []Row{}, Groups: []Row{}}
+	result := Report{From: q.from, Until: q.until, Clubs: []Row{}, Groups: []Row{}, OpenSessions: []OpenSession{}}
 	rows, err := tx.Query(r.Context(), attendanceSQL, q.from, q.until, q.club, q.group)
 	if err != nil {
 		fail(w, err)
@@ -259,13 +274,15 @@ func (s *Service) attendance(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var level string
 		var v Row
-		err = rows.Scan(&level, &v.ClubID, &v.ClubName, &v.ClubArchived, &v.GroupID, &v.GroupName, &v.GroupArchived, &v.Closed, &v.Planned, &v.Open, &v.Present, &v.Absent, &v.Unknown, &v.Illness, &v.Excused, &v.Percentage)
+		var opened []OpenSession
+		err = rows.Scan(&level, &v.ClubID, &v.ClubName, &v.ClubArchived, &v.GroupID, &v.GroupName, &v.GroupArchived, &v.Closed, &v.Planned, &v.Open, &v.Present, &v.Absent, &v.Unknown, &v.Illness, &v.Excused, &v.Percentage, &opened)
 		if err != nil {
 			break
 		}
 		switch level {
 		case "network":
 			result.Total = v.Totals
+			result.OpenSessions = opened
 		case "club":
 			result.Clubs = append(result.Clubs, v)
 		case "group":

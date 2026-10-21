@@ -1,0 +1,30 @@
+{
+  "issue": 221,
+  "reference_commit": "dfb9549d2be9d04a977ee7529cea93dd9147cdd9",
+  "reference_source": "design-system/prototypes/statistics/index.html?idea=overview",
+  "fixture": "frontend/e2e/statistics_overview.py; all displayed people and aggregates synthetic",
+  "pairs": {
+    "desktop": {
+      "report_width": 1216,
+      "reference_window_width": 1280
+    },
+    "mobile": {
+      "report_width": 358,
+      "reference_window_width": 390,
+      "capture_style": ".bottom-navigation { visibility:hidden !important; } only for component comparison"
+    }
+  },
+  "shell_content_widths": [
+    319,
+    320,
+    390,
+    768,
+    1280
+  ],
+  "shell_window_width": 1440,
+  "engines": [
+    "Chromium 151.0.7922.34",
+    "WebKit 26.5"
+  ],
+  "shipping_assets": "No generated or sourced rasters added to application; these PNG files are validation evidence."
+}

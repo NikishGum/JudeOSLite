@@ -152,8 +152,11 @@ try:
         def metric(name, value):
             expect(screen.locator('[data-metric="'+name+'"]')).to_have_text(value)
         def period(start='2000-02-01', end='2000-02-01'):
+            if not screen.get_by_label('Период с', exact=True).is_visible():
+                screen.get_by_role('button', name='Период', exact=True).click()
             screen.get_by_label('Период с', exact=True).fill(start)
             screen.get_by_label('Период по', exact=True).fill(end)
+            screen.get_by_role('button', name='Применить', exact=True).click()
         def shots(value, name):
             for width in (1280, 390, 320):
                 value.set_viewport_size({'width': width, 'height': 900})
@@ -164,31 +167,41 @@ try:
                     rect = control.bounding_box()
                     assert rect['height'] >= 44 and rect['width'] >= 44, (name, width, rect, control.text_content())
                     if width <= 390 and control.evaluate('el=>["BUTTON","INPUT","SELECT"].includes(el.tagName)'):
-                        assert float(control.evaluate('el=>parseFloat(getComputedStyle(el).fontSize)')) >= 16, control.text_content()
+                        # #221 pinned prototype uses 14px quick periods and a 12px journal counter.
+                        minimum = 12 if control.evaluate('el=>!!el.closest(".summary-meta")') else 14 if control.evaluate('el=>el.tagName==="BUTTON" && !!el.closest(".statistics-overview")') else 16
+                        assert float(control.evaluate('el=>parseFloat(getComputedStyle(el).fontSize)')) >= minimum, control.text_content()
                 value.screenshot(path=f'/tmp/rd186-{ENGINE}-{name}-{width}.png', full_page=True)
             value.set_viewport_size({'width': 1280, 'height': 900})
         period()
         for key, value in [('closed','3'),('present','3'),('absent','4'),('planned','1'),('open','1'),('percentage','42,9%')]: metric(key, value)
         expect(screen.locator('[data-metric="reasons"]')).to_contain_text('неизвестна — 1; болезнь — 2; уважительная — 1')
         shots(owner, 'report')
+        assert len(r['openSessions']) == r['total']['open'] == 1
+        screen.get_by_role('button', name='Показать эти филиалы', exact=True).click()
+        expect(screen.locator('.open-journal')).to_have_count(1)
+        screen.get_by_role('link', name='Открыть журнал', exact=False).click()
+        expect(owner.locator('.session-detail')).to_be_visible()
+        expect(owner.get_by_role('link', name='К обзору статистики', exact=True)).to_be_visible()
+        owner.get_by_role('link', name='К обзору статистики', exact=True).click()
+        expect(screen.locator('.open-journal')).to_have_count(1)
+        assert 'reportFrom=2000-02-01' in owner.url
+        screen.get_by_role('button', name='К обзору сети', exact=True).click()
         # Explicit quick calendar across a Sunday/year boundary, independent of browser Honolulu.
         owner.clock.set_fixed_time(datetime(2027, 1, 3, 0, 30, tzinfo=ZoneInfo('Europe/Minsk')))
         for label, start in [('Сегодня','2027-01-03'),('Неделя','2026-12-28'),('Месяц','2027-01-01')]:
             screen.get_by_role('button', name=label, exact=True).click()
-            expect(screen.get_by_label('Период с', exact=True)).to_have_value(start)
-            expect(screen.get_by_label('Период по', exact=True)).to_have_value('2027-01-03')
-        screen.get_by_role('button', name='Свой период', exact=True).click(); metric('percentage', '42,9%')
-        expect(screen.get_by_label('Период с', exact=True)).to_have_value('2000-02-01')
+            assert 'reportFrom='+start in owner.url
+            assert 'reportUntil=2027-01-03' in owner.url
+        screen.get_by_role('button', name='Период', exact=True).click()
+        screen.get_by_role('button', name='Применить', exact=True).click(); metric('percentage', '42,9%')
+        assert 'reportFrom=2000-02-01' in owner.url
         # Same group names are distinguished by club and UUID. Drilldown does not change workspace.
-        screen.locator(f'tr[data-group-id="{gb["id"]}"] button').click()
+        screen.get_by_role('button', name='Группы: '+b['name'], exact=True).click()
+        screen.locator(f'[data-group-id="{gb["id"]}"] button').click()
         expect(screen.get_by_label('Филиал отчёта', exact=True)).to_have_value(b['id'])
         expect(screen.get_by_label('Группа отчёта', exact=True)).to_have_value(gb['id']); metric('percentage','33,3%')
         expect(owner.get_by_label('Филиал', exact=True)).to_have_value('')
-        screen.get_by_role('link', name='Занятия выбранного контекста').click()
-        expect(owner.get_by_label('Филиал', exact=True)).to_have_value(b['id'])
-        expect(owner.get_by_label('Группа календаря', exact=True)).to_have_value(gb['id'])
-        expect(owner.get_by_label('С даты', exact=True)).to_have_value('2000-02-01')
-        expect(owner.get_by_label('По дату включительно', exact=True)).to_have_value('2000-02-01')
+        # Group drilldown keeps the workspace selection independent.
         owner.goto(ROOT+'/statistics'); period()
         screen.get_by_label('Филиал отчёта', exact=True).select_option(a['id'])
         screen.get_by_label('Группа отчёта', exact=True).select_option(empty['id']); metric('closed','1'); metric('percentage','—')
@@ -217,7 +230,7 @@ try:
         metric('present','4'); metric('absent','3'); metric('percentage','57,1%')
         assert sql(f"SELECT count(*) FROM pride.audit_events WHERE entity_id='{ja['records'][2]['id']}' AND action='corrected'") == '1'
         # A transport error preserves the last report; only a new scope clears it.
-        totals_before = screen.locator('.report-totals').element_handle()
+        totals_before = screen.locator('.summary-panel').element_handle()
         owner.route('**/api/reports/attendance?*', lambda route: route.abort())
         screen.get_by_role('button', name='Обновить статистику', exact=True).click()
         expect(screen.get_by_role('alert')).to_contain_text('Нет соединения')
@@ -238,7 +251,7 @@ try:
         release(owner); metric('percentage','33,3%')
         screen.get_by_label('Филиал отчёта', exact=True).select_option(''); metric('percentage','57,1%')
         period('2000-02-02','2000-02-01'); expect(screen.get_by_role('alert')).to_contain_text('начало периода')
-        expect(screen.locator('[data-metric="closed"]')).to_have_count(0)
+        metric('closed','3')
         period('2000-02-02','2000-02-02'); metric('percentage','—'); metric('closed','1')
         # Archive retains historical sums and never offers an active-club action.
         sql(f"UPDATE pride.clubs SET archived_at=now() WHERE id='{b['id']}'")
@@ -247,7 +260,8 @@ try:
         expect(screen.locator('.report-context')).to_contain_text('Филиал в архиве')
         screen.get_by_label('Филиал отчёта', exact=True).select_option(''); metric('percentage','57,1%')
         owner.set_viewport_size({'width':390,'height':900})
-        screen.locator(f'.report-mobile-list [data-group-id="{ga["id"]}"] button').click()
+        screen.get_by_role('button', name='Группы: '+a['name'], exact=True).click()
+        screen.locator(f'[data-group-id="{ga["id"]}"] button').click()
         expect(screen.get_by_label('Группа отчёта', exact=True)).to_have_value(ga['id'])
         screen.get_by_label('Филиал отчёта', exact=True).select_option(''); metric('percentage','57,1%')
         owner.set_viewport_size({'width':1280,'height':900})

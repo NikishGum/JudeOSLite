@@ -1,0 +1,3 @@
+2026/10/21 10:47:09 migrations applied
+Skipping host requirements validation logic because `PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS` env variable is set.
+{"engine": "webkit", "version": "26.5", "result": "PASS", "ledger": "2/5=40%; correction3/5=60%; close5/8=62.5%; empty closed null", "checks": "two 24-hour-separated local dates; role scopes/counters/frozen roster; exact group/journal/create links; real mark/close/correction/archive; independent failures+retry; multi-role actual trainer; revoke/late replies/logout; 1440/1280/768/390/320; touch targets/main action"}

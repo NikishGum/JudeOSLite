@@ -151,6 +151,10 @@ func TestAttendanceReportIntegration(t *testing.T) {
 	empty := id(`INSERT INTO pride.training_groups(club_id,name) VALUES($1,'Empty') RETURNING id::text`, a)
 	ta, tb := staff("trainer-a", a, "trainer"), staff("trainer-b", b, "trainer")
 	admin := staff("admin", a, "administrator")
+	parentID := id(`INSERT INTO pride.staff_users(login,display_name,password_hash) SELECT 'parent','Synthetic Parent',password_hash FROM pride.staff_users WHERE is_owner RETURNING id::text`)
+	familyID := id(`INSERT INTO pride.families(club_id,name) VALUES($1,'Synthetic family') RETURNING id::text`, a)
+	exec(`INSERT INTO pride.family_access(family_id,user_id) SELECT $1,id FROM pride.staff_users WHERE id=$2 OR login IN ('owner','admin','trainer-a')`, familyID, parentID)
+	parent := login(t, h, "parent")
 	// Multiple administrator/trainer roles do not grant owner statistics.
 	exec(`INSERT INTO pride.staff_club_roles(staff_user_id,club_id,role) SELECT id,$1,'administrator' FROM pride.staff_users WHERE login='admin'`, b)
 	member := func(club, group string, n int) {
@@ -215,6 +219,9 @@ func TestAttendanceReportIntegration(t *testing.T) {
 	}
 	r := get("")
 	assertTotals(r.Total, 3, 1, 1, 3, 4, 1, 2, 1)
+	if len(r.OpenSessions) != int(r.Total.Open) || r.OpenSessions[0].ID != so || r.OpenSessions[0].ClubID != a || r.OpenSessions[0].GroupID != ga || r.OpenSessions[0].Date != "2000-02-01" || r.OpenSessions[0].Timezone != "Europe/Minsk" {
+		t.Fatalf("open list differs from same-snapshot counter: %+v", r.OpenSessions)
+	}
 	if r.Total.Percentage == nil || math.Abs(*r.Total.Percentage-300.0/7) > 1e-9 {
 		t.Fatalf("weighted percentage %+v", r.Total)
 	}
@@ -223,8 +230,14 @@ func TestAttendanceReportIntegration(t *testing.T) {
 	}
 	filtered := get("&clubId=" + a)
 	assertTotals(filtered.Total, 2, 0, 1, 2, 2, 1, 1, 0)
+	if len(filtered.OpenSessions) != 1 || filtered.OpenSessions[0].ID != so {
+		t.Fatal("open list club scope")
+	}
 	filtered = get("&groupId=" + gb)
 	assertTotals(filtered.Total, 1, 1, 0, 1, 2, 0, 1, 1)
+	if len(filtered.OpenSessions) != 0 {
+		t.Fatal("open list leaked another group")
+	}
 	if len(filtered.Clubs) != 1 || *filtered.Clubs[0].ClubID != b || len(filtered.Groups) != 1 {
 		t.Fatal("group ID scope")
 	}
@@ -250,6 +263,9 @@ func TestAttendanceReportIntegration(t *testing.T) {
 	}
 	exec(`UPDATE pride.clubs SET archived_at=now() WHERE id=$1`, a)
 	assertTotals(get("").Total, 3, 1, 1, 4, 3, 1, 1, 1)
+	if len(get("").OpenSessions) != 1 {
+		t.Fatal("archive lost historical open session")
+	}
 	f := decode[Filters](t, owner.call("GET", "/api/reports/filters", nil), 200)
 	if len(f.Clubs) != 2 || len(f.Groups) != 3 {
 		t.Fatal("historical filters")
@@ -260,7 +276,7 @@ func TestAttendanceReportIntegration(t *testing.T) {
 			t.Fatalf("privacy: %s", private)
 		}
 	}
-	for _, c := range []client{admin, ta, tb} {
+	for _, c := range []client{parent, admin, ta, tb} {
 		status(t, c.call("GET", reportPath, nil), 403)
 		status(t, c.call("GET", "/api/reports/filters", nil), 403)
 	}
@@ -275,6 +291,9 @@ func TestAttendanceReportIntegration(t *testing.T) {
 	status(t, owner.call("GET", reportPath+"&clubId=00000000-0000-0000-0000-000000000000", nil), 404)
 	zero := decode[Report](t, owner.call("GET", "/api/reports/attendance?from=9999-12-31&until=9999-12-31", nil), 200)
 	assertTotals(zero.Total, 0, 0, 0, 0, 0, 0, 0, 0)
+	if len(zero.OpenSessions) != 0 {
+		t.Fatal("open list outside period")
+	}
 	if zero.Total.Percentage != nil {
 		t.Fatal("empty period percentage")
 	}
@@ -300,6 +319,9 @@ func TestAttendanceReportIntegration(t *testing.T) {
 	}()
 	for i := 0; i < 20; i++ {
 		v := get("")
+		if len(v.OpenSessions) != int(v.Total.Open) {
+			t.Fatal("mixed open-session snapshot")
+		}
 		var p, a int64
 		for _, row := range v.Groups {
 			p += row.Present
@@ -311,7 +333,7 @@ func TestAttendanceReportIntegration(t *testing.T) {
 	}
 	<-done
 	// Revoke permissions/session after authentication middleware, before SQL read.
-	for _, mutation := range []string{`UPDATE pride.staff_users SET is_owner=false WHERE login='owner'`, `UPDATE pride.staff_users SET disabled_at=now() WHERE login='owner'`, `UPDATE pride.staff_sessions SET revoked_at=now()`} {
+	for _, mutation := range []string{`UPDATE pride.staff_users SET is_owner=false WHERE login='owner'`, `UPDATE pride.staff_users SET disabled_at=now() WHERE login='owner'`, `UPDATE pride.staff_sessions SET revoked_at=now()`, `UPDATE pride.staff_sessions SET created_at=now()-interval '2 hours',expires_at=now()-interval '1 second'`} {
 		live := login(t, h, "owner")
 		paused := access.Require(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { exec(mutation); service.attendance(w, r) }))
 		live.h = paused
