@@ -1,0 +1,29 @@
+{
+  "engine": "chromium",
+  "version": "151.0.7922.34",
+  "result": "PASS",
+  "geometry": [
+    {
+      "content": 319,
+      "actual": 319
+    },
+    {
+      "content": 320,
+      "actual": 320
+    },
+    {
+      "content": 390,
+      "actual": 390
+    },
+    {
+      "content": 768,
+      "actual": 768
+    },
+    {
+      "content": 1280,
+      "actual": 1280
+    }
+  ],
+  "api": "synthetic fixtures; real API verified by redesign_reports and reports Go integration"
+}
+

@@ -1,0 +1,10 @@
+----------------------------------------------------------------------
+Ran 43 tests in 0.182s
+
+OK
+Deployment ready; SHA, schema history and backup recorded.
+SSH Match rule already correct; validated and reloaded.
+Restricted Actions public key installed; other owner keys retained for review.
+Restricted SSH controller configured; root policy unchanged. Backup: /tmp/tmp8fc6bbun/60-judeos-deploy.conf.before-json-95a610bc
+New DB password generated locally; old secret files untouched.
+Existing V1-19 secret files retained.

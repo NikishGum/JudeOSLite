@@ -1,0 +1,33 @@
+go: downloading github.com/jackc/pgx/v5 v5.11.0
+go: downloading golang.org/x/term v0.47.0
+go: downloading golang.org/x/crypto v0.58.0
+go: downloading golang.org/x/sys v0.49.0
+go: downloading github.com/jackc/pgpassfile v1.0.0
+go: downloading github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761
+go: downloading golang.org/x/text v0.43.0
+go: downloading github.com/jackc/puddle/v2 v2.2.2
+go: downloading golang.org/x/sync v0.24.0
+?   	github.com/NikishGum/JudeOSLite/backend/cmd/create-owner	[no test files]
+?   	github.com/NikishGum/JudeOSLite/backend/cmd/migrate	[no test files]
+?   	github.com/NikishGum/JudeOSLite/backend/cmd/seed-demo	[no test files]
+?   	github.com/NikishGum/JudeOSLite/backend/cmd/server	[no test files]
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/audit	10.295s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/auth	48.618s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/billing	30.552s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/clubs	9.473s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/dashboard	10.624s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/demodata	49.949s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/documents	59.038s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/families	26.578s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/notifications	28.279s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/participants	6.232s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/platform	1.080s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/reports	7.324s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/attendance	24.682s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/corrections	34.790s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/groups	8.000s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/schedule	9.270s
+ok  	github.com/NikishGum/JudeOSLite/backend/internal/training/sessions	8.486s
+ok  	github.com/NikishGum/JudeOSLite/backend/migrations	5.770s
+ok  	github.com/NikishGum/JudeOSLite/backend/tests/integration/access	42.241s
+ok  	github.com/NikishGum/JudeOSLite/backend/tests/integration/training	32.104s

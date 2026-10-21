@@ -9,6 +9,7 @@ import { durationLabel, isHappening, localDateOf, nextDate } from './types';
 import { SessionRoster } from './SessionRoster';
 import { SessionMemberPanel } from './SessionMemberPanel';
 import { CurrentTrainingLink, type TrainingContext } from './CurrentTrainingLink';
+import { reportReturnHref } from '../owner-dashboard/navigation';
 import '../trainer-sessions/trainer-sessions.css';
 import '../journals/journals.css';
 
@@ -18,6 +19,7 @@ export function SessionDetail({ clubId, timezone, location, canManage }: { clubI
   const [selectedMembershipId, setSelectedMembershipId] = useState<string | null>(null);
   const [trainingContext, setTrainingContext] = useState<TrainingContext | null>(null);
   const trainer = !canManage || location.journal === 'trainer';
+  const reportReturn = reportReturnHref();
   useEffect(() => { const timer = window.setInterval(() => setNow(Date.now()), 30_000); return () => clearInterval(timer); }, []);
   useEffect(() => {
     const controller = new AbortController(); setJournal(null); setError(''); setCanTrain(false); setSelectedMembershipId(null); setTrainingContext(null);
@@ -37,7 +39,7 @@ export function SessionDetail({ clubId, timezone, location, canManage }: { clubI
   const selectedMember = journal?.roster.members.find((member) => member.membershipId === selectedMembershipId);
   const back = location.hasCalendar || !session ? { ...location, sessionId: '' } : { sessionId: '', from: weekStart(session.date), through: nextDate(weekStart(session.date), 6), view: 'week' as const };
   return <section className="connection session-detail" aria-label="Выбранное занятие">
-    <div className="session-detail-toolbar"><a className="session-link" href={sessionHref(clubId, back)}>К расписанию</a>{journal && trainingContext && trainingContext.clubs.length > 0 && <CurrentTrainingLink context={trainingContext} sessionId={location.sessionId} now={now} />}</div>
+    <div className="session-detail-toolbar">{reportReturn && <a className="session-link" href={reportReturn}>К обзору статистики</a>}<a className="session-link" href={sessionHref(clubId, back)}>К расписанию</a>{journal && trainingContext && trainingContext.clubs.length > 0 && <CurrentTrainingLink context={trainingContext} sessionId={location.sessionId} now={now} />}</div>
     {!journal && !error && <div className="session-loading" role="status">Загружаем выбранное занятие…</div>}
     {error && <div role="alert"><p>{error}</p><button onClick={() => setAttempt((n) => n + 1)}>Повторить загрузку занятия</button></div>}
     {journal && session && <>
@@ -51,7 +53,7 @@ export function SessionDetail({ clubId, timezone, location, canManage }: { clubI
       </div><div className="session-detail-actions">
         {trainer && session.status === 'planned' && session.date > localDate(session.timezone) && <p className="help">Открыть журнал можно с {dateLabel(session.date)}. Пока доступен предварительный состав.</p>}
         {trainer && (session.status === 'planned' || session.status === 'open') && <a className="session-link session-primary" href="#session-workspace" onClick={() => setSelectedMembershipId(null)}>{session.status === 'planned' ? session.date > localDate(session.timezone) ? 'Посмотреть журнал' : 'Открыть журнал' : 'Продолжить отметку'}</a>}
-        {!trainer && canTrain && <a className="session-link session-primary" href={sessionHref(clubId, { ...location, journal: 'trainer' })}>{session.status === 'open' ? 'Продолжить отметку' : 'Мой журнал тренера'}</a>}
+        {!trainer && canTrain && <a className="session-link session-primary" href={sessionHref(clubId, { ...location, journal: 'trainer' }) + (reportReturn ? '&' + reportReturn.split('?')[1] : '')}>{session.status === 'open' ? 'Продолжить отметку' : 'Мой журнал тренера'}</a>}
         {!trainer && !canTrain && <p className="help">{session.status === 'closed' ? 'Коррекция одной отметки с причиной и историей доступна в журнале ниже.' : 'Отмечает фактический тренер. Коррекции доступны после завершения.'}</p>}
       </div></header>
       {journal.roster.summary ? <p className="session-attendance-summary" role="status">Присутствуют: {journal.roster.summary.present} · Отсутствуют: {journal.roster.summary.absent} · Не отмечено: {journal.roster.summary.unmarked}</p> : <p className="session-attendance-summary">Журнал ещё не открыт · фактической сводки нет</p>}
