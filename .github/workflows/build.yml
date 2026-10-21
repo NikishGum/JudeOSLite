@@ -89,6 +89,8 @@ jobs:
           PWA_BROWSER=webkit python3 frontend/e2e/redesign_training.py
           python3 frontend/e2e/redesign_reports.py
           PWA_BROWSER=webkit python3 frontend/e2e/redesign_reports.py
+          python3 frontend/e2e/history_search.py
+          PWA_BROWSER=webkit python3 frontend/e2e/history_search.py
           python3 frontend/e2e/redesign_dashboard.py
           PWA_BROWSER=webkit python3 frontend/e2e/redesign_dashboard.py
       - name: Frontend contracts for new modules (synthetic API responses)

@@ -11,9 +11,12 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
 	_ "time/tzdata"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/NikishGum/JudeOSLite/backend/internal/auth"
 	"github.com/NikishGum/JudeOSLite/backend/internal/platform"
@@ -96,9 +99,12 @@ type Club struct {
 	Archived bool   `json:"archived"`
 }
 type Filters struct {
-	Owner   bool     `json:"isOwner"`
-	Clubs   []Club   `json:"clubs"`
-	Actions []string `json:"actions"`
+	Owner        bool              `json:"isOwner"`
+	Clubs        []Club            `json:"clubs"`
+	Actions      []string          `json:"actions"`
+	Actors       []Actor           `json:"actors"`
+	ActionLabels map[string]string `json:"actionLabels"`
+	EntityLabels map[string]string `json:"entityLabels"`
 }
 
 func (s *Service) filters(w http.ResponseWriter, r *http.Request) {
@@ -108,7 +114,7 @@ func (s *Service) filters(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer tx.Rollback(context.Background())
-	result := Filters{Owner: owner, Clubs: []Club{}, Actions: []string{}}
+	result := Filters{Owner: owner, Clubs: []Club{}, Actions: []string{}, Actors: []Actor{}, ActionLabels: labels(actionCatalog), EntityLabels: labels(entityCatalog)}
 	rows, err := tx.Query(r.Context(), `SELECT c.id::text,c.name,c.archived_at IS NOT NULL FROM pride.clubs c WHERE $2 OR EXISTS(SELECT 1 FROM pride.staff_club_roles r WHERE r.staff_user_id=$1 AND r.club_id=c.id AND r.role='administrator') ORDER BY c.name,c.id`, actor, owner)
 	if err != nil {
 		fail(w, err)
@@ -147,6 +153,26 @@ func (s *Service) filters(w http.ResponseWriter, r *http.Request) {
 		err = rows.Err()
 	}
 	rows.Close()
+	if err != nil {
+		fail(w, err)
+		return
+	}
+	rows, err = tx.Query(r.Context(), `SELECT DISTINCT u.id::text,u.display_name,u.disabled_at IS NOT NULL FROM pride.audit_events e JOIN pride.staff_users u ON u.id=e.actor_id WHERE `+scope+` ORDER BY u.display_name,u.id::text`, actor, owner)
+	if err != nil {
+		fail(w, err)
+		return
+	}
+	for rows.Next() {
+		var a Actor
+		if err = rows.Scan(&a.ID, &a.Name, &a.Disabled); err != nil {
+			break
+		}
+		result.Actors = append(result.Actors, a)
+	}
+	if err == nil {
+		err = rows.Err()
+	}
+	rows.Close()
 	if err == nil {
 		err = tx.Commit(r.Context())
 	}
@@ -163,15 +189,16 @@ type cursor struct {
 	Filter string    `json:"filter"`
 }
 type query struct {
-	club, action, fingerprint string
-	from, until               *time.Time
-	cursor                    *cursor
+	club, action, actor, search, fingerprint string
+	terms                                    []string
+	from, until                              *time.Time
+	cursor                                   *cursor
 }
 
 func parseQuery(values url.Values) (query, error) {
-	q := query{club: values.Get("clubId"), action: values.Get("action")}
+	q := query{club: values.Get("clubId"), action: values.Get("action"), actor: strings.ToLower(values.Get("actorId"))}
 	for k, v := range values {
-		if len(v) != 1 || (k != "clubId" && k != "action" && k != "from" && k != "until" && k != "cursor") {
+		if len(v) != 1 || (k != "clubId" && k != "action" && k != "from" && k != "until" && k != "cursor" && k != "q" && k != "actorId") {
 			return q, errInput
 		}
 	}
@@ -182,6 +209,26 @@ func parseQuery(values url.Values) (query, error) {
 	if q.action != "" && !actionPattern.MatchString(q.action) {
 		return q, errInput
 	}
+	if q.actor != "" && !uuid.MatchString(q.actor) {
+		return q, errInput
+	}
+	rawSearch := values.Get("q")
+	if !utf8.ValidString(rawSearch) || utf8.RuneCountInString(rawSearch) > 160 {
+		return q, errInput
+	}
+	for _, ch := range rawSearch {
+		if unicode.IsControl(ch) && !unicode.IsSpace(ch) {
+			return q, errInput
+		}
+	}
+	for _, term := range strings.Fields(strings.ReplaceAll(strings.ToLower(rawSearch), "ё", "е")) {
+		term = strings.TrimPrefix(term, "#")
+		if term != "" {
+			q.terms = append(q.terms, term)
+		}
+	}
+	sort.Strings(q.terms)
+	q.search = strings.Join(q.terms, " ")
 	loc, _ := time.LoadLocation("Europe/Minsk")
 	for _, field := range []string{"from", "until"} {
 		raw := values.Get(field)
@@ -202,7 +249,13 @@ func parseQuery(values url.Values) (query, error) {
 	if q.from != nil && q.until != nil && !q.from.Before(*q.until) {
 		return q, errInput
 	}
-	sum := sha256.Sum256([]byte(q.club + "|" + q.action + "|" + values.Get("from") + "|" + values.Get("until")))
+	fingerprint := q.club + "|" + q.action + "|" + values.Get("from") + "|" + values.Get("until")
+	// Keep legacy cursors valid for unchanged legacy queries.
+	if q.search != "" || q.actor != "" {
+		encoded, _ := json.Marshal([]string{q.club, q.action, values.Get("from"), values.Get("until"), q.actor, q.search})
+		fingerprint = string(encoded)
+	}
+	sum := sha256.Sum256([]byte(fingerprint))
 	q.fingerprint = hex.EncodeToString(sum[:])
 	if raw := values.Get("cursor"); raw != "" {
 		if len(raw) > 600 {
@@ -233,10 +286,13 @@ type Event struct {
 	EntityType    string    `json:"entityType"`
 	EntityID      string    `json:"entityId"`
 	Action        string    `json:"action"`
+	ActionLabel   string    `json:"actionLabel"`
+	EntityLabel   string    `json:"entityLabel"`
 }
 type Page struct {
 	Items      []Event `json:"items"`
 	NextCursor string  `json:"nextCursor"`
+	Total      int64   `json:"total"`
 }
 
 func (s *Service) events(w http.ResponseWriter, r *http.Request) {
@@ -269,15 +325,42 @@ func (s *Service) events(w http.ResponseWriter, r *http.Request) {
 		at = &q.cursor.At
 		id = q.cursor.ID
 	}
-	rows, err := tx.Query(r.Context(), `SELECT e.id::text,e.created_at,e.actor_id::text,u.display_name,u.disabled_at IS NOT NULL,e.club_id::text,c.name,coalesce(c.archived_at IS NOT NULL,false),e.entity_type,e.entity_id::text,e.action FROM pride.audit_events e JOIN pride.staff_users u ON u.id=e.actor_id LEFT JOIN pride.clubs c ON c.id=e.club_id WHERE `+scope+` AND ($3='' OR ($3='network' AND e.club_id IS NULL) OR e.club_id::text=$3) AND ($4='' OR e.action=$4) AND ($5::timestamptz IS NULL OR e.created_at>=$5) AND ($6::timestamptz IS NULL OR e.created_at<$6) AND ($7::timestamptz IS NULL OR (e.created_at,e.id)<($7,$8::uuid)) ORDER BY e.created_at DESC,e.id DESC LIMIT 51`, actor, owner, q.club, q.action, q.from, q.until, at, nullableID(id))
+	// One statement gives items and total the same MVCC snapshot. The count is
+	// before the keyset condition, including when that page has become empty.
+	actionJSON, _ := json.Marshal(actionCatalog)
+	entityJSON, _ := json.Marshal(entityCatalog)
+	rows, err := tx.Query(r.Context(), `WITH matched AS MATERIALIZED (
+ SELECT e.id, e.created_at AS "createdAt",e.actor_id AS "actorId",u.display_name AS "actorName",u.disabled_at IS NOT NULL AS "actorDisabled",
+ e.club_id AS "clubId",c.name AS "clubName",coalesce(c.archived_at IS NOT NULL,false) AS "clubArchived",
+ e.entity_type AS "entityType",e.entity_id AS "entityId",e.action,
+ coalesce($9::jsonb->e.action->>'label',e.action) AS "actionLabel",
+ coalesce($10::jsonb->e.entity_type->>'label',e.entity_type) AS "entityLabel"
+ FROM pride.audit_events e JOIN pride.staff_users u ON u.id=e.actor_id LEFT JOIN pride.clubs c ON c.id=e.club_id
+ WHERE `+scope+` AND ($3='' OR ($3='network' AND e.club_id IS NULL) OR e.club_id::text=$3)
+ AND ($4='' OR e.action=$4) AND ($5::timestamptz IS NULL OR e.created_at>=$5) AND ($6::timestamptz IS NULL OR e.created_at<$6)
+ AND ($12='' OR e.actor_id::text=$12)
+ AND NOT EXISTS (SELECT 1 FROM unnest($11::text[]) term WHERE strpos(
+ translate(lower(concat_ws(' ',u.display_name,coalesce(c.name,'Сеть без филиала'),e.action,
+ $9::jsonb->e.action->>'label',$9::jsonb->e.action->>'aliases',e.entity_type,
+ $10::jsonb->e.entity_type->>'label',$10::jsonb->e.entity_type->>'aliases',e.entity_id::text,e.id::text)),'ё','е'),term)=0)
+ ) SELECT totals.total,row_to_json(p) FROM (SELECT count(*) total FROM matched) totals LEFT JOIN LATERAL (
+ SELECT * FROM matched WHERE ($7::timestamptz IS NULL OR ("createdAt",id)<($7,$8::uuid))
+ ORDER BY "createdAt" DESC,id DESC LIMIT 51) p ON true ORDER BY p."createdAt" DESC,p.id DESC`, actor, owner, q.club, q.action, q.from, q.until, at, nullableID(id), string(actionJSON), string(entityJSON), q.terms, q.actor)
 	if err != nil {
 		fail(w, err)
 		return
 	}
 	result := Page{Items: []Event{}}
 	for rows.Next() {
+		var raw []byte
+		if err = rows.Scan(&result.Total, &raw); err != nil {
+			break
+		}
+		if len(raw) == 0 {
+			continue
+		}
 		var e Event
-		if err = rows.Scan(&e.ID, &e.CreatedAt, &e.ActorID, &e.ActorName, &e.ActorDisabled, &e.ClubID, &e.ClubName, &e.ClubArchived, &e.EntityType, &e.EntityID, &e.Action); err != nil {
+		if err = json.Unmarshal(raw, &e); err != nil {
 			break
 		}
 		result.Items = append(result.Items, e)

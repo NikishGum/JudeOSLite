@@ -30,19 +30,19 @@ PostgreSQL/API tests: два филиала, owner/admin/trainer, несколь
 TEST_DATABASE_URL='postgres://test:test-only@127.0.0.1:55432/test?sslmode=disable' go -C backend test -race ./internal/audit
 ```
 
-Браузерная регрессия — frontend/e2e/audit_v1.py; синтетическая fixture — backend/internal/audit/testdata/browser_fixture.go (отказывает любой БД кроме loopback audit_browser с user=test). запуск только на disposable loopback app с синтетическим owner, не на реальном реестре. Итоговые SHA/CI/браузерные результаты — в live issue #170. Реальные устройства/PWA и полная предметная приёмка остаются своими задачами.
+Актуальные UI/API-контракт и проверки21.10.2026: [UX-HISTORY/#220](history-search.md),
+[протокол](history-search-validation.md). Поиск/actor/total дополняют исходный API;
+прежние scope, публичный envelope и keyset сохраняются.
 
-Для браузерного прогона создать отдельную `audit_browser` на тестовой PostgreSQL, затем из корня:
+`frontend/e2e/audit_v1.py` — совместимый вход в текущий
+`frontend/e2e/history_search.py`. Он сам создаёт disposable loopback Go/PostgreSQL
+на production image `judeoslite:ci`; запускать после frontend build и сборки image:
 
-```bash
-export DATABASE_URL='postgres://test:test-only@127.0.0.1:55432/audit_browser?sslmode=disable'
-go -C backend run ./cmd/migrate
-go -C backend run ./internal/audit/testdata/browser_fixture.go
-npm --prefix frontend ci
-npm --prefix frontend run build
-HTTP_ADDR=127.0.0.1:8082 APP_ORIGIN=http://127.0.0.1:8082 AUTH_INSECURE_LOCAL=true go -C backend run ./cmd/server
-# В другом терминале, после установки Playwright/Chromium:
-python3 frontend/e2e/audit_v1.py
+```sh
+python3 frontend/e2e/history_search.py
+PWA_BROWSER=webkit python3 frontend/e2e/history_search.py
 ```
 
-Fixture одноразовая, отказывает повторному созданию владельца; после теста удалять только эту disposable БД. Персональные/реальные записи не использовать.
+Прежняя фиксированная `testdata/browser_fixture.go` остаётся историческим
+синтетическим набором, не обязательной подготовкой текущего прогона.
+Реальные устройства/PWA/приёмка сотрудников остаются отдельной #188.

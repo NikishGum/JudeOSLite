@@ -1,0 +1,723 @@
+{
+  "browser": "26.5",
+  "metrics": [
+    {
+      "width": 1280,
+      "controls": [
+        {
+          "tag": "INPUT",
+          "h": 46,
+          "w": 278.1875,
+          "appearance": "none"
+        },
+        {
+          "tag": "SELECT",
+          "h": 48,
+          "w": 220,
+          "appearance": "none"
+        },
+        {
+          "tag": "SELECT",
+          "h": 48,
+          "w": 180,
+          "appearance": "none"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 48,
+          "w": 149.8125,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 479.390625,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 169.625,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 275.375,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 95.828125,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 124.828125,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 44,
+          "appearance": "button"
+        }
+      ],
+      "contrast": {
+        "pairs": [
+          {
+            "foreground": "rgb(255, 255, 255)",
+            "background": [
+              200,
+              16,
+              46
+            ],
+            "minimum": 4.5,
+            "ratio": 5.88
+          },
+          {
+            "foreground": "rgb(33, 37, 41)",
+            "background": [
+              255,
+              255,
+              255
+            ],
+            "minimum": 4.5,
+            "ratio": 15.43
+          },
+          {
+            "foreground": "rgb(98, 107, 114)",
+            "background": [
+              245,
+              247,
+              250
+            ],
+            "minimum": 4.5,
+            "ratio": 5.06
+          },
+          {
+            "foreground": "rgb(98, 107, 114)",
+            "background": [
+              255,
+              255,
+              255
+            ],
+            "minimum": 4.5,
+            "ratio": 5.43
+          },
+          {
+            "foreground": "rgb(68, 72, 98)",
+            "background": [
+              255,
+              255,
+              255
+            ],
+            "minimum": 4.5,
+            "ratio": 8.94
+          },
+          {
+            "foreground": "rgb(33, 37, 41)",
+            "background": [
+              242,
+              246,
+              249
+            ],
+            "minimum": 4.5,
+            "ratio": 14.2
+          },
+          {
+            "foreground": "rgb(33, 37, 41)",
+            "background": [
+              242,
+              246,
+              249
+            ],
+            "minimum": 3,
+            "ratio": 14.2
+          },
+          {
+            "foreground": "rgb(98, 107, 114)",
+            "background": [
+              242,
+              246,
+              249
+            ],
+            "minimum": 4.5,
+            "ratio": 5
+          },
+          {
+            "foreground": "rgb(33, 37, 41)",
+            "background": [
+              245,
+              247,
+              250
+            ],
+            "minimum": 4.5,
+            "ratio": 14.37
+          },
+          {
+            "foreground": "rgb(200, 16, 46)",
+            "background": [
+              255,
+              255,
+              255
+            ],
+            "minimum": 4.5,
+            "ratio": 5.88
+          }
+        ],
+        "failures": [],
+        "unmeasured": [
+          {
+            "tag": "SELECT",
+            "image": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%23212529' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 8 4 4 4-4'/%3E%3C/svg%3E\")",
+            "size": "20px auto",
+            "position": "calc(100% - 12px) 50%"
+          },
+          {
+            "tag": "SELECT",
+            "image": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%23212529' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 8 4 4 4-4'/%3E%3C/svg%3E\")",
+            "size": "20px auto",
+            "position": "calc(100% - 12px) 50%"
+          }
+        ]
+      }
+    },
+    {
+      "width": 980,
+      "controls": [
+        {
+          "tag": "INPUT",
+          "h": 46,
+          "w": 576,
+          "appearance": "none"
+        },
+        {
+          "tag": "SELECT",
+          "h": 48,
+          "w": 219.09375,
+          "appearance": "none"
+        },
+        {
+          "tag": "SELECT",
+          "h": 48,
+          "w": 219.09375,
+          "appearance": "none"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 48,
+          "w": 149.8125,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 479.390625,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 169.625,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 275.375,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 95.828125,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 124.828125,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 44,
+          "appearance": "button"
+        }
+      ],
+      "contrast": {
+        "pairs": [
+          {
+            "foreground": "rgb(255, 255, 255)",
+            "background": [
+              200,
+              16,
+              46
+            ],
+            "minimum": 4.5,
+            "ratio": 5.88
+          },
+          {
+            "foreground": "rgb(33, 37, 41)",
+            "background": [
+              255,
+              255,
+              255
+            ],
+            "minimum": 4.5,
+            "ratio": 15.43
+          },
+          {
+            "foreground": "rgb(98, 107, 114)",
+            "background": [
+              245,
+              247,
+              250
+            ],
+            "minimum": 4.5,
+            "ratio": 5.06
+          },
+          {
+            "foreground": "rgb(98, 107, 114)",
+            "background": [
+              255,
+              255,
+              255
+            ],
+            "minimum": 4.5,
+            "ratio": 5.43
+          },
+          {
+            "foreground": "rgb(68, 72, 98)",
+            "background": [
+              255,
+              255,
+              255
+            ],
+            "minimum": 4.5,
+            "ratio": 8.94
+          },
+          {
+            "foreground": "rgb(33, 37, 41)",
+            "background": [
+              242,
+              246,
+              249
+            ],
+            "minimum": 4.5,
+            "ratio": 14.2
+          },
+          {
+            "foreground": "rgb(33, 37, 41)",
+            "background": [
+              242,
+              246,
+              249
+            ],
+            "minimum": 3,
+            "ratio": 14.2
+          },
+          {
+            "foreground": "rgb(98, 107, 114)",
+            "background": [
+              242,
+              246,
+              249
+            ],
+            "minimum": 4.5,
+            "ratio": 5
+          },
+          {
+            "foreground": "rgb(33, 37, 41)",
+            "background": [
+              245,
+              247,
+              250
+            ],
+            "minimum": 4.5,
+            "ratio": 14.37
+          },
+          {
+            "foreground": "rgb(200, 16, 46)",
+            "background": [
+              255,
+              255,
+              255
+            ],
+            "minimum": 4.5,
+            "ratio": 5.88
+          }
+        ],
+        "failures": [],
+        "unmeasured": [
+          {
+            "tag": "SELECT",
+            "image": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%23212529' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 8 4 4 4-4'/%3E%3C/svg%3E\")",
+            "size": "20px auto",
+            "position": "calc(100% - 12px) 50%"
+          },
+          {
+            "tag": "SELECT",
+            "image": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%23212529' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 8 4 4 4-4'/%3E%3C/svg%3E\")",
+            "size": "20px auto",
+            "position": "calc(100% - 12px) 50%"
+          }
+        ]
+      }
+    },
+    {
+      "width": 390,
+      "controls": [
+        {
+          "tag": "INPUT",
+          "h": 46,
+          "w": 282,
+          "appearance": "none"
+        },
+        {
+          "tag": "SELECT",
+          "h": 48,
+          "w": 254,
+          "appearance": "none"
+        },
+        {
+          "tag": "SELECT",
+          "h": 48,
+          "w": 254,
+          "appearance": "none"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 48,
+          "w": 158.921875,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 62.78125,
+          "w": 326,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 186.71875,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 307.578125,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 109.21875,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 134.375,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 44,
+          "appearance": "button"
+        }
+      ],
+      "contrast": {
+        "pairs": [
+          {
+            "foreground": "rgb(255, 255, 255)",
+            "background": [
+              200,
+              16,
+              46
+            ],
+            "minimum": 4.5,
+            "ratio": 5.88
+          },
+          {
+            "foreground": "rgb(33, 37, 41)",
+            "background": [
+              255,
+              255,
+              255
+            ],
+            "minimum": 4.5,
+            "ratio": 15.43
+          },
+          {
+            "foreground": "rgb(98, 107, 114)",
+            "background": [
+              245,
+              247,
+              250
+            ],
+            "minimum": 4.5,
+            "ratio": 5.06
+          },
+          {
+            "foreground": "rgb(98, 107, 114)",
+            "background": [
+              255,
+              255,
+              255
+            ],
+            "minimum": 4.5,
+            "ratio": 5.43
+          },
+          {
+            "foreground": "rgb(33, 37, 41)",
+            "background": [
+              242,
+              246,
+              249
+            ],
+            "minimum": 4.5,
+            "ratio": 14.2
+          },
+          {
+            "foreground": "rgb(33, 37, 41)",
+            "background": [
+              242,
+              246,
+              249
+            ],
+            "minimum": 3,
+            "ratio": 14.2
+          },
+          {
+            "foreground": "rgb(98, 107, 114)",
+            "background": [
+              242,
+              246,
+              249
+            ],
+            "minimum": 4.5,
+            "ratio": 5
+          },
+          {
+            "foreground": "rgb(33, 37, 41)",
+            "background": [
+              245,
+              247,
+              250
+            ],
+            "minimum": 4.5,
+            "ratio": 14.37
+          },
+          {
+            "foreground": "rgb(200, 16, 46)",
+            "background": [
+              255,
+              255,
+              255
+            ],
+            "minimum": 4.5,
+            "ratio": 5.88
+          }
+        ],
+        "failures": [],
+        "unmeasured": [
+          {
+            "tag": "SELECT",
+            "image": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%23212529' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 8 4 4 4-4'/%3E%3C/svg%3E\")",
+            "size": "20px auto",
+            "position": "calc(100% - 12px) 50%"
+          },
+          {
+            "tag": "SELECT",
+            "image": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%23212529' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 8 4 4 4-4'/%3E%3C/svg%3E\")",
+            "size": "20px auto",
+            "position": "calc(100% - 12px) 50%"
+          }
+        ]
+      }
+    },
+    {
+      "width": 320,
+      "controls": [
+        {
+          "tag": "INPUT",
+          "h": 46,
+          "w": 212,
+          "appearance": "none"
+        },
+        {
+          "tag": "SELECT",
+          "h": 48,
+          "w": 184,
+          "appearance": "none"
+        },
+        {
+          "tag": "SELECT",
+          "h": 48,
+          "w": 184,
+          "appearance": "none"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 48,
+          "w": 158.921875,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 85.171875,
+          "w": 256,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 186.71875,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 62.78125,
+          "w": 256,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 109.21875,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 134.375,
+          "appearance": "button"
+        },
+        {
+          "tag": "BUTTON",
+          "h": 44,
+          "w": 44,
+          "appearance": "button"
+        }
+      ],
+      "contrast": {
+        "pairs": [
+          {
+            "foreground": "rgb(255, 255, 255)",
+            "background": [
+              200,
+              16,
+              46
+            ],
+            "minimum": 4.5,
+            "ratio": 5.88
+          },
+          {
+            "foreground": "rgb(33, 37, 41)",
+            "background": [
+              255,
+              255,
+              255
+            ],
+            "minimum": 4.5,
+            "ratio": 15.43
+          },
+          {
+            "foreground": "rgb(98, 107, 114)",
+            "background": [
+              245,
+              247,
+              250
+            ],
+            "minimum": 4.5,
+            "ratio": 5.06
+          },
+          {
+            "foreground": "rgb(98, 107, 114)",
+            "background": [
+              255,
+              255,
+              255
+            ],
+            "minimum": 4.5,
+            "ratio": 5.43
+          },
+          {
+            "foreground": "rgb(33, 37, 41)",
+            "background": [
+              242,
+              246,
+              249
+            ],
+            "minimum": 4.5,
+            "ratio": 14.2
+          },
+          {
+            "foreground": "rgb(33, 37, 41)",
+            "background": [
+              242,
+              246,
+              249
+            ],
+            "minimum": 3,
+            "ratio": 14.2
+          },
+          {
+            "foreground": "rgb(98, 107, 114)",
+            "background": [
+              242,
+              246,
+              249
+            ],
+            "minimum": 4.5,
+            "ratio": 5
+          },
+          {
+            "foreground": "rgb(33, 37, 41)",
+            "background": [
+              245,
+              247,
+              250
+            ],
+            "minimum": 4.5,
+            "ratio": 14.37
+          },
+          {
+            "foreground": "rgb(200, 16, 46)",
+            "background": [
+              255,
+              255,
+              255
+            ],
+            "minimum": 4.5,
+            "ratio": 5.88
+          }
+        ],
+        "failures": [],
+        "unmeasured": [
+          {
+            "tag": "SELECT",
+            "image": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%23212529' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 8 4 4 4-4'/%3E%3C/svg%3E\")",
+            "size": "20px auto",
+            "position": "calc(100% - 12px) 50%"
+          },
+          {
+            "tag": "SELECT",
+            "image": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%23212529' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 8 4 4 4-4'/%3E%3C/svg%3E\")",
+            "size": "20px auto",
+            "position": "calc(100% - 12px) 50%"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "checks": "search beyond page, AND/order/case/ё/#ID, exact UUID filters, namesakes/disabled, live Minsk/custom dates, total/keyset, empty/clear, focus/late/background/error/revoke, 1280/980/390/320 and reduced motion"
+}

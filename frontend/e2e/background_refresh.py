@@ -37,13 +37,13 @@ class RefreshFixture(Fixture):
                 'message': 'Нет доступа.' if status == 403 else 'Временно недоступно.',
             }})
         elif path == '/api/audit/filters':
-            route.fulfill(json={'isOwner': True, 'clubs': [], 'actions': ['created']})
+            route.fulfill(json={'isOwner': True, 'clubs': [], 'actions': ['created'], 'actors': [], 'actionLabels': {'created': 'Создание'}, 'entityLabels': {'club': 'Филиал'}})
         elif path == '/api/audit/events':
             route.fulfill(json={'items': [dict(
-                id=uid(999), createdAt=TODAY+'T09:00:00+03:00', actorName='Synthetic Owner',
+                id=uid(999), createdAt=TODAY+'T09:00:00+03:00', actorName='Synthetic Owner', actorId=uid(1),
                 actorDisabled=False, clubName=None, clubArchived=False,
                 entityType='club', entityId=CLUB, action='created',
-            )], 'nextCursor': ''})
+            )], 'nextCursor': '', 'total': 1})
         elif path == '/api/dashboard':
             # Keep the real fixture shape while allowing a changed server value.
             original = route.fulfill
@@ -191,19 +191,21 @@ def main():
                        for path, body in fixture.mutations), 'Draft was not saved with its CSRF token'
 
             go('/history')
-            expect(page.locator('.audit-events li')).to_have_count(1)
-            page.locator('.audit-record-id summary').click()
-            page.get_by_label('С даты', exact=True).fill('2026-10-01')
+            expect(page.locator('.audit-event')).to_have_count(1)
+            page.get_by_role('button', name='Фильтры', exact=True).click()
+            page.get_by_label('Период', exact=True).select_option('custom')
+            page.get_by_role('button', name='Подробнее о событии #'+uid(999), exact=True).click()
+            page.get_by_label('С даты', exact=True).fill('')
             page.get_by_label('С даты', exact=True).focus()
-            pin(page, ['.audit-events', '.audit-record-id', '.audit-filters'])
+            pin(page, ['.audit-events', '.audit-detail-row', '.audit-filters'])
             fixture.hold = True
             page.clock.run_for(30_100)
             page.wait_for_timeout(100)
             assert_preserved(page, focus=True, scroll=True)
             settle()
             assert_preserved(page, focus=True, scroll=True)
-            expect(page.get_by_label('С даты', exact=True)).to_have_value('2026-10-01')
-            assert page.locator('.audit-record-id').evaluate('n => n.open')
+            expect(page.get_by_label('С даты', exact=True)).to_have_value('')
+            expect(page.locator('.audit-detail-row')).to_be_visible()
 
             fixture.failures['/api/audit/events'] = 503
             page.clock.run_for(30_100)

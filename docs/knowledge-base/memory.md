@@ -1,5 +1,31 @@
 # Краткая память PRIDE CRM
 
+## История UX-HISTORY/#220 —21.10.2026
+
+Вариант А ddee243 уже утверждён заказчиком. Регистрация2654202 в main,
+прямые RD-04/#186 и RD-08/#200 CLOSED/результаты/CI в main. Claim
+StarMadeGalaxy/request640bf1fdd546437aac81022b88495c65,
+[run39578429446](https://github.com/NikishGum/JudeOSLite/actions/runs/39578429446)
+acquired=true/единственный исполнитель/In progress. Отдельный codex/issue-220-history.
+#215 завершена, активных коллизий нет; staff/auth/shared API/миграции не меняются.
+
+[Контракт/памятка](../history-search.md), [проверки](../history-search-validation.md).
+Существующие audit endpoints расширены q/actorId/actors/total; AND/подстроки/е-ё/
+регистр/#ID по всей разрешённой истории, серверный единый словарь labels/aliases.
+Авторы только из scoped audit, disabled/бывшие/одноимённые сохраняются по UUID.
+Items/total один SQL snapshot до cursor; total может меняться между запросами.
+Прежние роли/no-store/public envelope/keyset и legacy cursors сохранены.
+React: компактные строки/мобильный список, inline details,48px native select,
+реальные семь дней Europe/Minsk, мгновенные условия, debounce300/Enter/Escape,
+снятие chips с фокусом, дозагрузка, Abort/epoch и privacy/navigation boundary.
+Background сохраняет DOM/детали/ввод при transport error; новая область/отказ
+доступа очищает данные. Без индекса/миграции без измеренной необходимости.
+
+Go vet/race/реальная PG18.6, production build/typecheck и background Chromium/
+WebKit выполнены; точные итоговые browser/CI/main/Done — в протоколе/live issue.
+Impeccable context fallback (launcher отсутствует), distill/craft-floor,
+текущий PRIDE/shadcn без новых глобальных токенов. #188/devices/signoff отдельно.
+
 ## Повторная приёмка расписания #216 —20.10.2026
 
 После #219 заказчик сообщил: desktop без колонок, мобильные дни/занятия

@@ -1,0 +1,56 @@
+PREPARE
+                                                                                                                                                                                                                   QUERY PLAN                                                                                                                                                                                                                   
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=64.52..64.65 rows=51 width=64) (actual time=3.212..3.220 rows=51.00 loops=1)
+   Sort Key: p."createdAt" DESC, p.id DESC
+   Sort Method: quicksort  Memory: 53kB
+   Buffers: shared hit=49
+   CTE matched
+     ->  Nested Loop Anti Join  (cost=0.32..43.96 rows=235 width=225) (actual time=0.051..0.330 rows=236.00 loops=1)
+           Join Filter: (strpos(translate(lower(concat_ws(' '::text, u.display_name, COALESCE(c.name, 'Сеть без филиала'::text), e.action, (('{}'::jsonb -> e.action) ->> 'label'::text), (('{}'::jsonb -> e.action) ->> 'aliases'::text), e.entity_type, (('{}'::jsonb -> e.entity_type) ->> 'label'::text), (('{}'::jsonb -> e.entity_type) ->> 'aliases'::text), (e.entity_id)::text, (e.id)::text)), 'ё'::text, 'е'::text), term.term) = 0)
+           Buffers: shared hit=43
+           ->  Nested Loop Left Join  (cost=0.32..26.86 rows=236 width=175) (actual time=0.041..0.264 rows=236.00 loops=1)
+                 Buffers: shared hit=43
+                 ->  Nested Loop  (cost=0.16..17.29 rows=236 width=135) (actual time=0.027..0.169 rows=236.00 loops=1)
+                       Buffers: shared hit=25
+                       ->  Seq Scan on audit_events e  (cost=0.00..7.36 rows=236 width=95) (actual time=0.010..0.044 rows=236.00 loops=1)
+                             Buffers: shared hit=5
+                       ->  Memoize  (cost=0.16..0.38 rows=1 width=56) (actual time=0.000..0.000 rows=1.00 loops=236)
+                             Cache Key: e.actor_id
+                             Cache Mode: logical
+                             Hits: 226  Misses: 10  Evictions: 0  Overflows: 0  Memory Usage: 2kB
+                             Buffers: shared hit=20
+                             ->  Index Scan using staff_users_pkey on staff_users u  (cost=0.15..0.37 rows=1 width=56) (actual time=0.001..0.002 rows=1.00 loops=10)
+                                   Index Cond: (id = e.actor_id)
+                                   Index Searches: 10
+                                   Buffers: shared hit=20
+                 ->  Memoize  (cost=0.16..0.38 rows=1 width=56) (actual time=0.000..0.000 rows=1.00 loops=236)
+                       Cache Key: e.club_id
+                       Cache Mode: logical
+                       Hits: 226  Misses: 10  Evictions: 0  Overflows: 0  Memory Usage: 2kB
+                       Buffers: shared hit=18
+                       ->  Index Scan using clubs_pkey on clubs c  (cost=0.15..0.37 rows=1 width=56) (actual time=0.002..0.002 rows=0.90 loops=10)
+                             Index Cond: (id = e.club_id)
+                             Index Searches: 9
+                             Buffers: shared hit=18
+           ->  Function Scan on unnest term  (cost=0.00..0.01 rows=1 width=32) (actual time=0.000..0.000 rows=0.00 loops=236)
+   ->  Nested Loop Left Join  (cost=17.83..19.11 rows=51 width=64) (actual time=2.389..3.135 rows=51.00 loops=1)
+         Buffers: shared hit=43
+         ->  Aggregate  (cost=5.29..5.30 rows=1 width=8) (actual time=0.535..0.536 rows=1.00 loops=1)
+               Buffers: shared hit=43
+               ->  CTE Scan on matched  (cost=0.00..4.70 rows=235 width=0) (actual time=0.054..0.517 rows=236.00 loops=1)
+                     Storage: Memory  Maximum Storage: 70kB
+                     Buffers: shared hit=43
+         ->  Subquery Scan on p  (cost=12.54..13.18 rows=51 width=314) (actual time=0.840..0.916 rows=51.00 loops=1)
+               ->  Limit  (cost=12.54..12.67 rows=51 width=266) (actual time=0.823..0.833 rows=51.00 loops=1)
+                     ->  Sort  (cost=12.54..13.13 rows=235 width=266) (actual time=0.822..0.828 rows=51.00 loops=1)
+                           Sort Key: matched_1."createdAt" DESC, matched_1.id DESC
+                           Sort Method: top-N heapsort  Memory: 51kB
+                           ->  CTE Scan on matched matched_1  (cost=0.00..4.70 rows=235 width=266) (actual time=0.000..0.048 rows=236.00 loops=1)
+                                 Storage: Memory  Maximum Storage: 70kB
+ Planning:
+   Buffers: shared hit=323 dirtied=5
+ Planning Time: 5.958 ms
+ Execution Time: 4.504 ms
+(51 rows)
+
