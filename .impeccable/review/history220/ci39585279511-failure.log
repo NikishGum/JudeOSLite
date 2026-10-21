@@ -1,0 +1,53 @@
+check	Chromium and WebKit UI, four schedules, PWA and network regression	﻿2026-10-21T10:37:09.0337788Z ##[group]Run python3 frontend/e2e/staff_access.py
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0338304Z [36;1mpython3 frontend/e2e/staff_access.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0338791Z [36;1mPWA_BROWSER=webkit python3 frontend/e2e/staff_access.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0339299Z [36;1mpython3 backend/tests/browser/notifications.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0339828Z [36;1mPWA_BROWSER=webkit python3 backend/tests/browser/notifications.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0340366Z [36;1mpython3 backend/tests/browser/billing.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0340861Z [36;1mPWA_BROWSER=webkit python3 backend/tests/browser/billing.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0341376Z [36;1mpython3 backend/tests/browser/documents.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0342113Z [36;1mPWA_BROWSER=webkit python3 backend/tests/browser/documents.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0342622Z [36;1mpython3 backend/tests/browser/families.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0343098Z [36;1mPWA_BROWSER=webkit python3 backend/tests/browser/families.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0343570Z [36;1mpython3 frontend/e2e/pwa_v1.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0344062Z [36;1mPWA_BROWSER=webkit python3 frontend/e2e/pwa_v1.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0344508Z [36;1mpython3 frontend/e2e/redesign_training.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0344973Z [36;1mPWA_BROWSER=webkit python3 frontend/e2e/redesign_training.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0345468Z [36;1mpython3 frontend/e2e/redesign_reports.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0345972Z [36;1mPWA_BROWSER=webkit python3 frontend/e2e/redesign_reports.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0346439Z [36;1mpython3 frontend/e2e/history_search.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0346889Z [36;1mPWA_BROWSER=webkit python3 frontend/e2e/history_search.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0347363Z [36;1mpython3 frontend/e2e/redesign_dashboard.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0347831Z [36;1mPWA_BROWSER=webkit python3 frontend/e2e/redesign_dashboard.py[0m
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0408069Z shell: /usr/bin/bash -e {0}
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0408303Z env:
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0408480Z   GOTOOLCHAIN: local
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:09.0408675Z ##[endgroup]
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:10.6605612Z 2026/10/21 10:37:10 migrations applied
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:31.3083738Z {"result": "PASS", "engine": "chromium", "version": "151.0.7922.34", "roles": "owner/admin/trainer/parent/mixed", "staff": 10, "jsErrors": [], "captures": []}
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:37:33.9639875Z 2026/10/21 10:37:33 migrations applied
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9263444Z Traceback (most recent call last):
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9264393Z   File "/home/runner/work/JudeOSLite/JudeOSLite/frontend/e2e/staff_access.py", line 301, in <module>
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9265735Z     expect(ui.get_by_label('Поиск по имени или логину', exact=True)).to_have_value('Synthetic')
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9266801Z   File "/home/runner/.local/lib/python3.12/site-packages/playwright/sync_api/_generated.py", line 22638, in to_have_value
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9284709Z     self._sync(
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9285437Z   File "/home/runner/.local/lib/python3.12/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9286107Z     return task.result()
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9286478Z            ^^^^^^^^^^^^^
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9287269Z   File "/home/runner/.local/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 568, in to_have_value
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9287967Z     await self._expect_impl(
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9289106Z   File "/home/runner/.local/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 128, in _expect_impl
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9289796Z     _record_soft_or_raise(
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9290614Z   File "/home/runner/.local/lib/python3.12/site-packages/playwright/_impl/_assertions.py", line 60, in _record_soft_or_raise
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9291294Z     raise error
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9291943Z AssertionError: Locator expected to have Value 'Synthetic'
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9292227Z Actual value:  
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9292400Z Call log:
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9292641Z   - Expect "to_have_value" with timeout 5000ms
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9293109Z   - waiting for get_by_label("Поиск по имени или логину", exact=True)
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9293888Z     14 × locator resolved to <input value="" type="search" placeholder="Имя или логин"/>
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9294290Z        - unexpected value ""
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9294433Z 
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9294519Z Aria snapshot:
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9294792Z - searchbox "Поиск по имени или логину"
+check	Chromium and WebKit UI, four schedules, PWA and network regression	2026-10-21T10:38:02.9569213Z ##[error]Process completed with exit code 1.

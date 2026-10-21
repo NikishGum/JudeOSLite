@@ -289,7 +289,12 @@ try:
         ui.set_viewport_size(dict(width=390, height=844)); settle_shell(ui, 390)
         back = ui.get_by_role('button', name='К списку сотрудников', exact=True)
         if back.is_visible(): back.click()
+        # The responsive shell can still remount after its sidebar disappears.
+        # Wait for that directory read before editing the preserved list context.
+        wait_for_api_idle(ui)
+        expect(ui.locator('.staff-access-person')).to_have_count(9)
         ui.get_by_label('Поиск по имени или логину', exact=True).fill('Synthetic')
+        expect(ui.get_by_label('Поиск по имени или логину', exact=True)).to_have_value('Synthetic')
         last = ui.locator('.staff-access-person').last
         last.scroll_into_view_if_needed(); assert ui.evaluate('scrollY') > 400
         last.click()

@@ -99,3 +99,18 @@ Chromium/WebKit снова PASS, включая border0 внутреннего �
 сохранены. До этого шага frontend/background, полный Go/PG/race, image, обе
 staff/notifications/billing/documents/families suites прошли. Исходный FAIL
 сохранён; новые полный PWA/CI проверяют исправленную версию, без retries.
+
+
+CI [39585279511](https://github.com/NikishGum/JudeOSLite/actions/runs/39585279511)
+наbed887c — FAIL раньше history, staff_access.py:301/WebKit: после смены
+desktop→mobile и возврата из карточки query оказался пустым. Runtime staff/auth
+не изменён, в предыдущем CI та же suite PASS; точная причина первого сбоя
+не доказана. Harness теперь ждёт directory/API idle и девять строк после
+responsive shell mount до ввода, проверяет Synthetic также до навигации.
+Прежние post-back query/scroll/focus assertions и timeout сохранены, retries нет.
+Область заранее опубликована в #220; #215 CLOSED/чат idle, коллизий нет.
+Адресный полный staff WebKit26.5 с этими ожиданиями локально PASS.
+Полные PWA Chromium151/WebKit26.5 после исправления shell selectors также PASS:
+2/4/2/1 расписания,40% ledger, роли/revoke, browser history, static-only cache,
+expiry/logout/account swap/network/two-build update. PhysicalInstallation NOT TESTED.
+Оба исходных CI FAIL и локальные результаты сохранены в evidence.

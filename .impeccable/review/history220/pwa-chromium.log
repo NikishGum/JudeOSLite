@@ -1,0 +1,11 @@
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+2026/10/21 10:32:11 migrations applied
+RD-02 PASS: full fields/identity owner; separate same-name records/family contact; UI cancel/conflicts/archive/restore; dated transfer/exclude/add/history/roster; multi assignments/revoke/foreign API; group ID URL; keyboard/panels/list/card/forms1280/390/overflow320
+RD-07 PASS: real profile/logout/live settings; Sidebar248/76/mobile absent; all9 screens1280/900/390/320; participant name/detail/editor; civil date+URL/calendar; keyboard focus return/More; complete existing features
+RD-01: separate roles/multi-role; real detail/reload/legacy/history; draft/club/back guard; revoke/foreign API; 320/390/768/1280/1440; keyboard/safe-area/reduced motion passed
+{"check": "rendered-text-contrast", "normalMinimum": 4.88, "largeMinimum": 5.43}
+{"engine": "chromium", "version": "151.0.7922.34", "scheduleCounts": {"weekly": 2, "day_parity": 4, "date_list": 2, "once": 1}, "report": {"conducted": 1, "present": 2, "absent": 3, "unknown": 2, "illness": 0, "excused": 1, "percentage": 40}, "nativeHistoryReturn": "fresh session and role verified; BFCache not measured", "checks": "manifest/icons; admin UI/five participants/four schedules; cards/three reasons/defaults/correction/report; 320/390/768/900/1280/1440; rendered text contrast 4.5/3; double tap/delay/offline; mark/close/correct precommit error/lost response/SQL/reload; mark idempotent retry/correction stale retry; closed/cancelled/role revoke; static-only cache/logout/account swap/expiry/pagehide/native history return/fresh me; two builds/waiting/save guard/other-tab save", "physicalInstallation": "NOT TESTED"}
