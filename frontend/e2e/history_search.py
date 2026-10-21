@@ -137,6 +137,8 @@ try:
         audit.get_by_role('button',name='Подробнее о событии #'+target,exact=True).click()
         expect(audit.locator('.audit-detail-row')).to_contain_text(target)
         assert 'PRIVATE' not in audit.inner_text()
+        assert search.evaluate('n=>getComputedStyle(n).borderTopWidth')=='0px'
+        assert search.locator('..').evaluate('n=>n.getBoundingClientRect().height')==48
         assert audit.locator('.audit-details-toggle svg').first.evaluate('n=>getComputedStyle(n).transitionDuration')=='0s'
         # One batched visual/a11y pass, open/closed filters at all required widths.
         metrics=[]

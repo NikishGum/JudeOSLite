@@ -80,4 +80,13 @@ jsErrors=[]. [Снимки и измерения](../.impeccable/review/history2
 late responses/live revoke. В первой WebKit попытке новый harness установил hold
 до завершения предыдущего date request, заблокировав refresh; теперь ожидает
 строки/готовую кнопку до установки hold. Assertion/timeouts/retries не ослаблены.
-Финальные WebKit RD-04 и CI/main фиксируются при доставке; issue пока открыта.
+Адаптированный RD-04 WebKit26.5 также PASS; исходные неуспешные попытки сохранены.
+После retry harness ожидает исчезновение alert (завершённый успешный ответ),
+а не уже показанный пустой результат. Итоговые CI/main фиксируются при доставке.
+
+Точная доставка/CI и live завершение публикуются в [#220](https://github.com/NikishGum/JudeOSLite/issues/220).
+[Хеши production-исходников/метаданные](../.impeccable/review/history220/source-hashes.json)
+и [хеши доказательств](../.impeccable/review/history220/checksums.json) связывают
+последний пакет с кодом. После последней CSS-поправки отдельные shipping прогоны
+Chromium/WebKit снова PASS, включая border0 внутреннего поиска/outer48, все
+четыре ширины и те же функциональные assertions. Дальнейшей полировки нет.

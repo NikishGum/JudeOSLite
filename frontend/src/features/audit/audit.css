@@ -9,7 +9,7 @@
 .audit-history input::placeholder { color: var(--pride-text-secondary); opacity: 1; }
 .audit-search-field { display: flex; align-items: center; height: 48px; min-width: 0; gap: 8px; padding: 0 4px 0 12px; border: 1px solid var(--pride-border); border-radius: 7px; background: var(--pride-surface-search, var(--pride-surface-subtle)); color: var(--pride-text-secondary); }
 .audit-search-field > svg { width: 18px; height: 18px; flex-shrink: 0; }
-.audit-history .audit-search-field input { appearance: none; -webkit-appearance: none; height: 46px; min-height: 46px; padding: 10px 0; width: 0; flex: 1; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.audit-history .audit-search-field input[type='search'] { appearance: none; -webkit-appearance: none; height: 46px; min-height: 46px; padding: 10px 0; width: 0; flex: 1; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .audit-history .audit-search-field input:focus-visible { outline: none; box-shadow: none; }
 .audit-search-field:focus-within { outline: 2px solid var(--pride-brand); outline-offset: 3px; }
 .audit-search-field input::-webkit-search-cancel-button { appearance: none; -webkit-appearance: none; }
