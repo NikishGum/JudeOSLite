@@ -16,9 +16,14 @@ build побайтно совпали с выдачей стенда. Прове
 [Датированный протокол и машинные доказательства](redesign-evidence/rd06/20261021/README.md).
 TypeScript/Vite build выполнен также локально на Node24.19.0.
 
-Новый authenticated HTTPS role smoke текущего release пока NOT RUN: в этом
-окружении нет QA188_PASSWORD/тестовой сессии или подключения локального браузера.
-Успешный authenticated проход20.10 остаётся датированным результатом того release.
+Новый authenticated HTTPS role smoke21.10,18:50 — PASS на текущем release36c35b2:
+26 API и35 browser requests/no-store, API/UI40%, ручной период/детализация,
+новая история/#ID+action/actor/total/details, права трёх ролей, canonical journal/
+reload, static-only cache. Контрольный журнал до/после совпал по SHA256; все три
+сессии завершены с me401. Пароль предоставлен пользователем, в evidence его нет.
+[Результат](redesign-evidence/rd06/20261021/https-readonly.json) и новый opt-in
+`frontend/e2e/redesign_https_readonly.py` не изменяют предметные записи.
+Пользователь21.10 подтвердил: сотрудники приёмку **ещё не проводили**.
 Самостоятельная приёмка сотрудников, текущее визуальное решение и физический
 Chrome/Edge PWA smoke после изменений не подтверждены. Короткий оставшийся
 проход — [актуальная приёмка](acceptance-redesign.md#остаток-приёмки--21102026).

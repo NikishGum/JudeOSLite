@@ -35,7 +35,8 @@ main**, не новые локальные browser runs и не перенос �
 | Прочие интеграции | staff/notifications/billing/documents/families обоих движков PASS;22 synthetic frontend screen/state groups отдельно от backend-приёмки |
 | Operations/Compose/TLS/restore | PASS; штатный VPS deploy подтвердил HTTPS readiness и release SHA |
 
-Никаких новых runtime/e2e изменений и ослабления assertions здесь не было.
+Production runtime и существующие e2e assertions здесь не менялись; добавлен
+отдельный opt-in HTTPS smoke существующего QA188 без предметных записей.
 Полные suites не запускаются повторно без изменения/сбоя. Исходные неудачные
 попытки #220/#221 сохранены в их [протоколах истории](../../../history-search-validation.md)
 и [статистики](../../../statistics-overview-validation.md); текущий зелёный CI
@@ -87,19 +88,58 @@ desktop/mobile снимков #220/#221 выполнен; новыми сним�
 или новый полный WCAG-аудит. Новых продуктовых блокеров из прочитанных результатов
 и просмотренных снимков не установлено.
 
-## Что пока не выполнено
+## Authenticated HTTPS —18:50 Europe/Minsk
 
-Новый authenticated HTTPS role smoke этого SHA — NOT RUN: нет защищённой
-QA188_PASSWORD/тестовой сессии и callable Browser app `js`/подключённого локального
-браузера. Наличие skill не означает подключения. Привязка запрошена у заказчика;
-пароли не извлекались из файлов/логов и не публикуются. Проход20.10 — отдельный
-датированный PASS старого release, не новый authenticated smoke21.10.
+Первоначально не было тестового входа; пользователь предоставил пароль в этом
+чате. Он введён через скрытый TTY prompt, не записан в файлы/evidence/аргументы
+команды. Callable локального Browser app `js` нет; используется headless Linux
+Chromium151.0.7922.34 с проверкой TLS. Это технический HTTPS-проход, не управление
+физическим браузером заказчика. [https-readonly.json](https-readonly.json) —
+**PASS с первой попытки**,18:50:17–18:50:39, release36c35b2 проверен до/после:
+
+- 26 API и35 browser requests, все API no-store; существующие QA188/admin/trainer,
+  чужой филиал и owner-only APIs403/404 согласно матрице;
+- исходный журнал A–E и независимый отчёт API/UI дают1closed/2present/3absent,
+  unknown2/illness0/excused1/**40%**; ручные даты/«Применить»/сохранение диапазона
+  после быстрого месяца, детализация проблемы и обратный переход, вкладка финансов;
+- новая история находит единственную corrected15.10 по action+actor UUID+
+  `#короткийID corrected`, total1 и точному ID записи; API owner/admin и UI
+  администратора/подробности/reload подтверждены;
+- тренер открывает закрытый контрольный журнал по canonical URL и после reload;
+  admin/trainer прямой UI статистики не показывает отчёт владельца;
+- actual worker Cache Storage содержит только versioned static `/assets/`;
+  1280/390 у истории/статистики и390 у тренера без overflow, jsErrors=[];
+- digest полного контрольного журнала до/после идентичен. Предметных POST/PUT/
+  DELETE нет; только три login/logout. Все сессии завершены, me401 проверен.
+
+[Desktop40%](https-summary-1280.png), [mobile40%](https-summary-390.png),
+[панель поиска desktop](https-history-toolbar-1280.png),
+[панель поиска mobile](https-history-toolbar-390.png) — новые реальные HTTPS
+снимки синтетического QA188. Профили/имена сотрудников не включены в захват.
+Новых фикстур/аккаунтов/занятий этот runner не создаёт.
+
+Воспроизведение после проверки текущего release и `playwright install chromium`:
+
+```sh
+python3 frontend/e2e/redesign_https_readonly.py \
+  --expected-sha 36c35b2e961279133cd5cc354d7770fc6fe42fea \
+  --out /tmp/rd06-https
+```
+
+Runner требует скрытый пароль или защищённую QA188_PASSWORD, не запускается
+автоматически в CI и не повторяет неудачный вход. Не ослабляет limiter/права.
+Source SHA256 runner записан в JSON. Доставка документов/e2e не меняет
+production inputs; [равенство исходному36c35b2](production-inputs.json) проверено
+перед отправкой. [SHA256 evidence и runner](checksums.json) сохранены отдельно.
+
+## Что пока не выполнено
 
 Самостоятельные проходы трёх ролей, текущая визуальная оценка и новый физический
 Chrome/Edge installed-PWA smoke не подтверждены. Сценарии и памятки обновлены:
 [точный остаток](../../../acceptance-redesign.md#остаток-приёмки--21102026),
 [памятки](../../../staff-guide-redesign.md), [отличия](../../../redesign-changes-v1.md).
-Контрольный QA188-журнал15.10/40% сохранён; в этом чате публичный стенд не изменялся.
+Пользователь21.10 ответил о самостоятельной приёмке сотрудников: **«Ещё не проводили»**.
+Контрольный QA188-журнал15.10/40% сохранён; предметные записи стенда не менялись.
 Android и оставшиеся ручные iPhone сохраняют согласованный DEFERRED/NOT RUN,
 нового согласия не запрашивается. #188 OPEN/In progress до оставшейся приёмки.
 

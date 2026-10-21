@@ -18,9 +18,15 @@ production build побайтно совпали; Node24.19.0/TypeScript/Vite л
 Impeccable audit/direct context: launcher/detector отсутствуют; существующие
 синтетические desktop/mobile снимки #220/#221 просмотрены, новыми не названы.
 
-Новый authenticated HTTPS role smoke NOT RUN: нет QA188_PASSWORD/браузерной
-сессии в текущем окружении, защищённая привязка запрошена. Предыдущий20.10 PASS
-сохраняет свой SHA. Реальные самостоятельные проходы трёх ролей/оценка нынешнего
+После предоставленного пользователем тестового пароля authenticated HTTPS
+smoke21.10,18:50 на36c35b2 PASS с первой попытки:26 API/35 browser requests,
+новые статистика40%/ручной период/детализация и история/#ID+action/actor/total,
+права трёх ролей, canonical journal/reload, static-only cache. Контрольный журнал
+до/после совпал по SHA256, три сессии logout/me401. Новый opt-in
+frontend/e2e/redesign_https_readonly.py не пишет предметные записи; пароль/cookies/
+CSRF в Git не попали. [Факт](../redesign-evidence/rd06/20261021/https-readonly.json).
+Пользователь21.10 подтвердил: сотрудники «Ещё не проводили» приёмку.
+Реальные самостоятельные проходы трёх ролей/оценка нынешнего
 оформления и Chrome/Edge installed-PWA smoke текущего release не подтверждены;
 короткий остаток и форма ответа — [acceptance](../acceptance-redesign.md).
 Направления #220/#221 уже утверждены; повторного выбора нет. Android/оставшиеся

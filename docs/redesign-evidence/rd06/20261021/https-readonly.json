@@ -1,0 +1,565 @@
+{
+  "at": "2026-10-21T18:50:17.831982+03:00",
+  "origin": "https://test.judopride.tech",
+  "releaseSha": "36c35b2e961279133cd5cc354d7770fc6fe42fea",
+  "result": "PASS",
+  "checks": [
+    "QA188 control/API 2/5=40%; owner/admin/trainer and foreign-club denials",
+    "HTTPS statistics UI 40%; manual apply/range retention, problem detail, finance tab;1280/390",
+    "real HTTPS worker Cache Storage contains only versioned static assets",
+    "HTTPS history API/UI exact corrected event, #ID+action AND search, actor UUID, total/details/reload;1280/390",
+    "trainer canonical control URL/reload and closed journal; admin/trainer statistics UI denial"
+  ],
+  "requests": [
+    {
+      "role": "owner",
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "POST",
+      "path": "/api/auth/login",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/journals/7846284c-7823-47a6-adf9-4c65b53aae38",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/reports/attendance?from=2026-10-15&until=2026-10-15&clubId=867a31f5-7d4d-4f35-9916-65119041beb4&groupId=697f2685-64d1-4993-bcc7-c3c238a059a7",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/reports/filters",
+      "status": 403,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/reports/attendance?from=2026-10-15&until=2026-10-15&clubId=867a31f5-7d4d-4f35-9916-65119041beb4&groupId=697f2685-64d1-4993-bcc7-c3c238a059a7",
+      "status": 403,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/reports/filters",
+      "status": 403,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/reports/attendance?from=2026-10-15&until=2026-10-15&clubId=867a31f5-7d4d-4f35-9916-65119041beb4&groupId=697f2685-64d1-4993-bcc7-c3c238a059a7",
+      "status": 403,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/audit/filters",
+      "status": 403,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/journals/7846284c-7823-47a6-adf9-4c65b53aae38",
+      "status": 404,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/trainer-sessions/7846284c-7823-47a6-adf9-4c65b53aae38/journal",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/clubs/1e8d6955-7af7-4cbb-a761-a647bdba1ab1/trainer-sessions?from=2026-10-15&until=2026-10-15",
+      "status": 404,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/audit/events?clubId=867a31f5-7d4d-4f35-9916-65119041beb4&from=2026-10-15&until=2026-10-15&action=corrected",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/audit/events?clubId=867a31f5-7d4d-4f35-9916-65119041beb4&from=2026-10-15&until=2026-10-15&action=corrected&q=%23bb1e9c92+corrected&actorId=8a4fbc1e-a073-4305-9592-cbdac7752a9c",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/audit/events?clubId=867a31f5-7d4d-4f35-9916-65119041beb4&from=2026-10-15&until=2026-10-15&action=corrected&q=%23bb1e9c92+corrected&actorId=8a4fbc1e-a073-4305-9592-cbdac7752a9c",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/journals/7846284c-7823-47a6-adf9-4c65b53aae38",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "POST",
+      "path": "/api/auth/logout",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 401,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "POST",
+      "path": "/api/auth/logout",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 401,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "POST",
+      "path": "/api/auth/logout",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 401,
+      "cache": "no-store"
+    }
+  ],
+  "browserRequests": [
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/reports/filters",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/reports/attendance",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/reports/attendance",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/reports/filters",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/reports/filters",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "owner",
+      "method": "GET",
+      "path": "/api/reports/attendance",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/audit/filters",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/audit/events",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/audit/filters",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/audit/events",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/audit/filters",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/audit/events",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/auth/clubs/867a31f5-7d4d-4f35-9916-65119041beb4",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/trainer-sessions/7846284c-7823-47a6-adf9-4c65b53aae38/journal",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/sessions",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/auth/clubs/867a31f5-7d4d-4f35-9916-65119041beb4",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/trainer-sessions/7846284c-7823-47a6-adf9-4c65b53aae38/journal",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/clubs/867a31f5-7d4d-4f35-9916-65119041beb4/sessions",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "trainer",
+      "method": "GET",
+      "path": "/api/auth/clubs/867a31f5-7d4d-4f35-9916-65119041beb4",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/auth/me",
+      "status": 200,
+      "cache": "no-store"
+    },
+    {
+      "role": "administrator",
+      "method": "GET",
+      "path": "/api/notifications",
+      "status": 200,
+      "cache": "no-store"
+    }
+  ],
+  "layouts": [
+    {
+      "screen": "statistics1280",
+      "viewport": 1280,
+      "pageWidth": 1280
+    },
+    {
+      "screen": "statistics390",
+      "viewport": 390,
+      "pageWidth": 390
+    },
+    {
+      "screen": "history1280",
+      "viewport": 1280,
+      "pageWidth": 1280
+    },
+    {
+      "screen": "history390",
+      "viewport": 390,
+      "pageWidth": 390
+    },
+    {
+      "screen": "trainer390",
+      "viewport": 390,
+      "pageWidth": 390
+    }
+  ],
+  "jsErrors": [],
+  "tlsVerification": true,
+  "secretsPersisted": false,
+  "runnerSha256": "a1f0b271d282b096874f869b0e6c29d3c74e6147029f0f64041c1d56fa53fbac",
+  "limits": [
+    "headless Linux Chromium, no physical PWA installation",
+    "no employee or visual acceptance",
+    "no new revoke/expiry/mutation/update injection on HTTPS"
+  ],
+  "browser": "151.0.7922.34",
+  "controlBeforeSha256": "d4dcba05889ec6f3c3e2f42e6e99beccf99ec14a638c8ba41ca0e1bdeb9a819e",
+  "controlTotals": {
+    "closed": 1,
+    "present": 2,
+    "absent": 3,
+    "unknown": 2,
+    "illness": 0,
+    "excused": 1,
+    "percentage": 40
+  },
+  "cache": [
+    {
+      "name": "pride-shell-7b31c170b0197ff5",
+      "path": "/assets/index-DiU2v1sa.js"
+    },
+    {
+      "name": "pride-shell-7b31c170b0197ff5",
+      "path": "/assets/calendar-BOe3gk7n.js"
+    },
+    {
+      "name": "pride-shell-7b31c170b0197ff5",
+      "path": "/assets/rolldown-runtime-hePW80VL.js"
+    },
+    {
+      "name": "pride-shell-7b31c170b0197ff5",
+      "path": "/assets/ui-vendor-Ccj4sf49.js"
+    },
+    {
+      "name": "pride-shell-7b31c170b0197ff5",
+      "path": "/assets/index-CoD3RrPv.css"
+    },
+    {
+      "name": "pride-shell-7b31c170b0197ff5",
+      "path": "/assets/logo-pride-BmLOUEvF.png"
+    },
+    {
+      "name": "pride-shell-7b31c170b0197ff5",
+      "path": "/assets/rubik-cyrillic-6J3aU1sj.woff2"
+    },
+    {
+      "name": "pride-shell-7b31c170b0197ff5",
+      "path": "/assets/rubik-cyrillic-ext-BgEjOSi_.woff2"
+    },
+    {
+      "name": "pride-shell-7b31c170b0197ff5",
+      "path": "/assets/rubik-latin-0V_ixqQm.woff2"
+    },
+    {
+      "name": "pride-shell-7b31c170b0197ff5",
+      "path": "/assets/rubik-latin-ext-xIGCplNB.woff2"
+    },
+    {
+      "name": "pride-shell-7b31c170b0197ff5",
+      "path": "/assets/pride-any-192-b0e310ba1bea.png"
+    },
+    {
+      "name": "pride-shell-7b31c170b0197ff5",
+      "path": "/assets/pride-any-512-042391ab33a4.png"
+    },
+    {
+      "name": "pride-shell-7b31c170b0197ff5",
+      "path": "/assets/pride-maskable-512-8dd07e24421e.png"
+    },
+    {
+      "name": "pride-shell-7b31c170b0197ff5",
+      "path": "/assets/pwa-shell-7b31c170b0197ff5.html"
+    }
+  ],
+  "controlAfterSha256": "d4dcba05889ec6f3c3e2f42e6e99beccf99ec14a638c8ba41ca0e1bdeb9a819e",
+  "cleanup": [
+    {
+      "role": "owner",
+      "session": "logged out; me401"
+    },
+    {
+      "role": "administrator",
+      "session": "logged out; me401"
+    },
+    {
+      "role": "trainer",
+      "session": "logged out; me401"
+    }
+  ],
+  "finishedAt": "2026-10-21T18:50:39.724669+03:00"
+}

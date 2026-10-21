@@ -1,0 +1,12 @@
+{
+  "docs/redesign-evidence/rd06/20261021/README.md": "21a0972dfa76dea6fb37b6501870b694234c6040f5324df97090737b3f9b86c1",
+  "docs/redesign-evidence/rd06/20261021/ci-and-claim.json": "dd532d2115d286ee72bc88e5aa8f4a4458fabfaa32cbb1890937a4d799a722ed",
+  "docs/redesign-evidence/rd06/20261021/https-history-toolbar-1280.png": "6e9dbf3cf9b966916b582554f8c4388063790f7e6f23f2300adb15bfc199723c",
+  "docs/redesign-evidence/rd06/20261021/https-history-toolbar-390.png": "d64f2cbf284ef4598d9e732208901c9a49481463546493c24cda07811cb55cc4",
+  "docs/redesign-evidence/rd06/20261021/https-readonly.json": "861a1e35e17093902eebc570858b63ddaf8193948ca07a6dca26ae79c04d17a3",
+  "docs/redesign-evidence/rd06/20261021/https-summary-1280.png": "9e232ce921b65d7d23621243132fc31979254138c402a468bd6bb199d717f1c0",
+  "docs/redesign-evidence/rd06/20261021/https-summary-390.png": "a1757da244ee3740a9ee9a239cd3c11e81778604a1c8fd0b860cf0eb83192df7",
+  "docs/redesign-evidence/rd06/20261021/production-inputs.json": "af058efdc73032982ae3fcaf14c39453e2c527e951013f42fe3dc6cff480f09d",
+  "docs/redesign-evidence/rd06/20261021/public-https.json": "1b7cc0bf90dd50547a8dcc69b7717f4adddfa7aec52ccac833e3983bac659e5d",
+  "frontend/e2e/redesign_https_readonly.py": "a1f0b271d282b096874f869b0e6c29d3c74e6147029f0f64041c1d56fa53fbac"
+}

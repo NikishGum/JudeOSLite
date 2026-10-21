@@ -1,0 +1,26 @@
+{
+  "recordedAt": "2026-10-21T15:53:19.163400+00:00",
+  "testedRelease": "36c35b2e961279133cd5cc354d7770fc6fe42fea",
+  "productionInputsUnchanged": true,
+  "paths": [
+    "backend",
+    "frontend/src",
+    "frontend/public",
+    "frontend/index.html",
+    "frontend/package.json",
+    "frontend/package-lock.json",
+    "frontend/vite.config.ts",
+    "frontend/tsconfig.json",
+    "design-system",
+    "deploy",
+    ".dockerignore"
+  ],
+  "sourceTrees": {
+    "backend": "39bad1ba8305ac44ca045748e47dc2a9d4303590",
+    "frontend/src": "15eb46e5e150d76a15064d02283f8b85935594fc",
+    "frontend/public": "73bcc7dcb51178a39a4c824118a32ad522d5e11f",
+    "design-system": "814c045cbc91f26380e1044458a051b271f22293",
+    "deploy": "8e798861a7799573e93584d418e50668cffd11bc"
+  },
+  "limits": "Documentation and opt-in e2e updates do not change these production inputs; public release must still be verified after deployment."
+}
