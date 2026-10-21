@@ -1,0 +1,317 @@
+{
+  "observedAt": "2026-10-21T15:37:51.939800+00:00",
+  "origin": "https://test.judopride.tech",
+  "expectedSha": "36c35b2e961279133cd5cc354d7770fc6fe42fea",
+  "tlsVerification": true,
+  "requests": [
+    {
+      "path": "/release.json",
+      "status": 200,
+      "contentType": "application/json",
+      "cacheControl": "no-cache",
+      "bytes": 51,
+      "sha256": "ff1d8a61484c4a128ead162dd7e71aba77532d52e26b151921b62d54d0cf6355",
+      "release": {
+        "sha": "36c35b2e961279133cd5cc354d7770fc6fe42fea"
+      }
+    },
+    {
+      "path": "/api/healthz",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "no-store",
+      "bytes": 16,
+      "sha256": "6489d6d7a33c5d40e18fc61eeb6c34c341279ee61816394dde5189aa4ad8fae5"
+    },
+    {
+      "path": "/api/readyz",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "no-store",
+      "bytes": 16,
+      "sha256": "6489d6d7a33c5d40e18fc61eeb6c34c341279ee61816394dde5189aa4ad8fae5"
+    },
+    {
+      "path": "/api/auth/me",
+      "status": 401,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "no-store",
+      "bytes": 80,
+      "sha256": "4a0e3e677a0285bd99d5b29de1dd1bf47d85aed6144ce59e666a48a3ce377a11"
+    },
+    {
+      "path": "/api/dashboard",
+      "status": 401,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "no-store",
+      "bytes": 80,
+      "sha256": "4a0e3e677a0285bd99d5b29de1dd1bf47d85aed6144ce59e666a48a3ce377a11"
+    },
+    {
+      "path": "/api/reports/filters",
+      "status": 401,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "no-store",
+      "bytes": 80,
+      "sha256": "4a0e3e677a0285bd99d5b29de1dd1bf47d85aed6144ce59e666a48a3ce377a11"
+    },
+    {
+      "path": "/api/reports/attendance",
+      "status": 401,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "no-store",
+      "bytes": 80,
+      "sha256": "4a0e3e677a0285bd99d5b29de1dd1bf47d85aed6144ce59e666a48a3ce377a11"
+    },
+    {
+      "path": "/api/audit/filters",
+      "status": 401,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "no-store",
+      "bytes": 80,
+      "sha256": "4a0e3e677a0285bd99d5b29de1dd1bf47d85aed6144ce59e666a48a3ce377a11"
+    },
+    {
+      "path": "/api/audit/events",
+      "status": 401,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "no-store",
+      "bytes": 80,
+      "sha256": "4a0e3e677a0285bd99d5b29de1dd1bf47d85aed6144ce59e666a48a3ce377a11"
+    },
+    {
+      "path": "/api/notifications",
+      "status": 401,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "no-store",
+      "bytes": 80,
+      "sha256": "4a0e3e677a0285bd99d5b29de1dd1bf47d85aed6144ce59e666a48a3ce377a11"
+    },
+    {
+      "path": "/api/portal/families",
+      "status": 401,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "no-store",
+      "bytes": 80,
+      "sha256": "4a0e3e677a0285bd99d5b29de1dd1bf47d85aed6144ce59e666a48a3ce377a11"
+    },
+    {
+      "path": "/history",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "cacheControl": "no-cache",
+      "bytes": 1012,
+      "sha256": "47663b065f5b9a7447ba9f76d27cee494acf3b4a60c24e4c4f30da8aed1e0ef0"
+    },
+    {
+      "path": "/statistics",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "cacheControl": "no-cache",
+      "bytes": 1012,
+      "sha256": "47663b065f5b9a7447ba9f76d27cee494acf3b4a60c24e4c4f30da8aed1e0ef0"
+    }
+  ],
+  "assets": [
+    {
+      "path": "/assets/calendar-BOe3gk7n.js",
+      "status": 200,
+      "contentType": "text/javascript; charset=utf-8",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 70330,
+      "sha256": "7e8e74c411e590f01b723d5f694e0de8603242b7b1958d3f06f4639215182e66",
+      "matchesLocalBuild": true
+    },
+    {
+      "path": "/assets/index-CoD3RrPv.css",
+      "status": 200,
+      "contentType": "text/css; charset=utf-8",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 201450,
+      "sha256": "169cf067b557b239d7d4f60f23d62abf6c405bb8ebd4157ea058ef9968a380a8",
+      "matchesLocalBuild": true
+    },
+    {
+      "path": "/assets/index-DiU2v1sa.js",
+      "status": 200,
+      "contentType": "text/javascript; charset=utf-8",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 580754,
+      "sha256": "1ad91746e82c8e25c711c5fcfca4cff83243cbd80ca95813b17e22e62cb84ae9",
+      "matchesLocalBuild": true
+    },
+    {
+      "path": "/assets/logo-pride-BmLOUEvF.png",
+      "status": 200,
+      "contentType": "image/png",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 16367,
+      "sha256": "349b48bb8312034f5b2ca9ef44995b8ae9a7a5d0f12dcabdb0d44b1c8aa9fef3",
+      "matchesLocalBuild": true,
+      "pngSize": [
+        256,
+        256
+      ]
+    },
+    {
+      "path": "/assets/pride-any-192-b0e310ba1bea.png",
+      "status": 200,
+      "contentType": "image/png",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 41079,
+      "sha256": "b0e310ba1bea8e8903b1c1cf4639c8542c6cac1b71ee22efe9dba9e86292df1d",
+      "matchesLocalBuild": true,
+      "pngSize": [
+        192,
+        192
+      ]
+    },
+    {
+      "path": "/assets/pride-any-512-042391ab33a4.png",
+      "status": 200,
+      "contentType": "image/png",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 207689,
+      "sha256": "042391ab33a4a5fa313c1bb5d9b82ae230ca0684fcd9d9f9ddbd93aa94f7323a",
+      "matchesLocalBuild": true,
+      "pngSize": [
+        512,
+        512
+      ]
+    },
+    {
+      "path": "/assets/pride-maskable-512-8dd07e24421e.png",
+      "status": 200,
+      "contentType": "image/png",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 137963,
+      "sha256": "8dd07e24421edf0e2ad08a3cf7a9575fe6bae03a938782f6e409d2405c484631",
+      "matchesLocalBuild": true,
+      "pngSize": [
+        512,
+        512
+      ]
+    },
+    {
+      "path": "/assets/pwa-shell-7b31c170b0197ff5.html",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 1012,
+      "sha256": "47663b065f5b9a7447ba9f76d27cee494acf3b4a60c24e4c4f30da8aed1e0ef0",
+      "matchesLocalBuild": true
+    },
+    {
+      "path": "/assets/rolldown-runtime-hePW80VL.js",
+      "status": 200,
+      "contentType": "text/javascript; charset=utf-8",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 716,
+      "sha256": "580ad8c58061a4dde99bde0a56905e382f0568516ee2f5b84dbfb52085709021",
+      "matchesLocalBuild": true
+    },
+    {
+      "path": "/assets/rubik-cyrillic-6J3aU1sj.woff2",
+      "status": 200,
+      "contentType": "font/woff2",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 15108,
+      "sha256": "963fc62d2cf3e59e6f338db71b85b5ea86dd009fff859116d51a31a9b98d1d30",
+      "matchesLocalBuild": true
+    },
+    {
+      "path": "/assets/rubik-cyrillic-ext-BgEjOSi_.woff2",
+      "status": 200,
+      "contentType": "font/woff2",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 12288,
+      "sha256": "79891522e6f702d4f365da6048b12acb0b453dd7b0705a431f2b10f4400896a4",
+      "matchesLocalBuild": true
+    },
+    {
+      "path": "/assets/rubik-latin-0V_ixqQm.woff2",
+      "status": 200,
+      "contentType": "font/woff2",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 35324,
+      "sha256": "99ec7ccb40cf143f977c893649deece6cc2dcc7c0ff82ebf84b6584090f207ea",
+      "matchesLocalBuild": true
+    },
+    {
+      "path": "/assets/rubik-latin-ext-xIGCplNB.woff2",
+      "status": 200,
+      "contentType": "font/woff2",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 19288,
+      "sha256": "b11446f4d0b897435488492cdc6cd612f33748e2b010ac79eff74ea861cf8970",
+      "matchesLocalBuild": true
+    },
+    {
+      "path": "/assets/ui-vendor-Ccj4sf49.js",
+      "status": 200,
+      "contentType": "text/javascript; charset=utf-8",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "bytes": 160033,
+      "sha256": "e232923d13a95ae0615beb948b92a1b87ae7eb54ccccd7cd449fdc8ee9841b8e",
+      "matchesLocalBuild": true
+    },
+    {
+      "path": "/index.html",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "cacheControl": "no-cache",
+      "bytes": 1012,
+      "sha256": "47663b065f5b9a7447ba9f76d27cee494acf3b4a60c24e4c4f30da8aed1e0ef0",
+      "matchesLocalBuild": true
+    },
+    {
+      "path": "/manifest.webmanifest",
+      "status": 200,
+      "contentType": "text/plain; charset=utf-8",
+      "cacheControl": "no-cache",
+      "bytes": 803,
+      "sha256": "4167c3110339ca0af25b1d8d706bd90f87b3d13381f670c4945157ebe3aeb8ed",
+      "matchesLocalBuild": true,
+      "manifest": {
+        "start_url": "/",
+        "scope": "/",
+        "display": "standalone",
+        "icons": [
+          {
+            "src": "/assets/pride-any-192-b0e310ba1bea.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+          },
+          {
+            "src": "/assets/pride-any-512-042391ab33a4.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+          },
+          {
+            "src": "/assets/pride-maskable-512-8dd07e24421e.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+          }
+        ]
+      }
+    },
+    {
+      "path": "/sw.js",
+      "status": 200,
+      "contentType": "text/javascript; charset=utf-8",
+      "cacheControl": "no-cache",
+      "bytes": 2428,
+      "sha256": "5381d4591336963b58636fc1fb5cedcaeef82ccecf2f070b9e6b08cf8a0647b4",
+      "matchesLocalBuild": true
+    }
+  ],
+  "result": "PASS",
+  "limits": [
+    "Public HTTPS reads, no authenticated role session",
+    "No physical installation or employee acceptance",
+    "Browser execution covered separately by exact-main CI"
+  ]
+}

@@ -1,5 +1,34 @@
 # Краткая память PRIDE CRM
 
+## Продолжение приёмки RD-06/#188 —21.10.2026
+
+Явная передача в чат01a15f17-5674-70c3-bc86-e664ee05a048. Четыре прежних чата
+idle/notLoaded, последние turns completed; конкурирующих PR нет. Исходный
+StarMadeGalaxy/requestfc02eb61696d4543b4e75cc757b604e3/run38699613597 сохранён:
+лог job116304342880 acquired=true, gh/connector StarMadeGalaxy, один исполнитель,
+live OPEN/In progress. Повторного claim/прямого назначения нет.
+
+Отдельный codex/rd-06-acceptance-current от main36c35b2; #220/#221 CLOSED/в main.
+[Протокол21.10](../redesign-evidence/rd06/20261021/README.md): прочитаны точные
+логи успешных Build39620402525/Deploy39623354372 attempt1. Текущие CI PWA,
+training/reports/history/dashboard Chromium151/WebKit26.5, SQL-ledgers/роли/
+lifecycle PASS; это новый CI текущего SHA, не повтор локально и не PASS20.10.
+Независимый публичный HTTPS18:37 Minsk: точный release,13 checks и17 файлов
+production build побайтно совпали; Node24.19.0/TypeScript/Vite локально PASS.
+Impeccable audit/direct context: launcher/detector отсутствуют; существующие
+синтетические desktop/mobile снимки #220/#221 просмотрены, новыми не названы.
+
+Новый authenticated HTTPS role smoke NOT RUN: нет QA188_PASSWORD/браузерной
+сессии в текущем окружении, защищённая привязка запрошена. Предыдущий20.10 PASS
+сохраняет свой SHA. Реальные самостоятельные проходы трёх ролей/оценка нынешнего
+оформления и Chrome/Edge installed-PWA smoke текущего release не подтверждены;
+короткий остаток и форма ответа — [acceptance](../acceptance-redesign.md).
+Направления #220/#221 уже утверждены; повторного выбора нет. Android/оставшиеся
+ручные iPhone сохраняют согласованный DEFERRED, без нового согласования.
+Контрольный QA188-журнал15.10/40% не менять; новые записи только в отдельном
+синтетическом занятии. Документы/CI не заменяют ответы сотрудников; #188 открыта.
+Точная доставка этих документов/финальный SHA — протокол и live issue.
+
 ## История UX-HISTORY/#220 —21.10.2026
 
 Вариант А ddee243 уже утверждён заказчиком. Регистрация2654202 в main,

@@ -1,0 +1,352 @@
+{
+  "sourceSha": "36c35b2e961279133cd5cc354d7770fc6fe42fea",
+  "claim": {
+    "requestId": "fc02eb61696d4543b4e75cc757b604e3",
+    "runId": 38699613597,
+    "jobId": 116304342880,
+    "acquired": true,
+    "actor": "StarMadeGalaxy",
+    "logLine": "2026-10-15T07:34:11.8000321Z {\"acquired\": true, \"issue\": 188, \"actor\": \"StarMadeGalaxy\", \"request_id\": \"fc02eb61696d4543b4e75cc757b604e3\"}"
+  },
+  "build": {
+    "runId": 39620402525,
+    "attempt": 1,
+    "url": "https://github.com/NikishGum/JudeOSLite/actions/runs/39620402525",
+    "jobs": [
+      {
+        "id": 119292013685,
+        "name": "check",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 39620402525,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Initialize containers",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Run actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Frontend checks and production build",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6
+          },
+          {
+            "name": "Background refresh preserves mounted content, drafts and access checks",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7
+          },
+          {
+            "name": "Go formatting, vet, race and PostgreSQL migration tests",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8
+          },
+          {
+            "name": "Missing mandatory configuration fails safely",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9
+          },
+          {
+            "name": "Build production image",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10
+          },
+          {
+            "name": "Chromium and WebKit UI, four schedules, PWA and network regression",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11
+          },
+          {
+            "name": "Frontend contracts for new modules (synthetic API responses)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12
+          },
+          {
+            "name": "Deployment policy, controller and server operation tests",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 13
+          },
+          {
+            "name": "Compose clean startup, migration rerun and restart",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 14
+          },
+          {
+            "name": "Disposable Caddy TLS, deploy persistence and backup restore",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 15
+          },
+          {
+            "name": "Post Run actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 27
+          },
+          {
+            "name": "Post Run actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 28
+          },
+          {
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 29
+          },
+          {
+            "name": "Stop containers",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 30
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 31
+          }
+        ]
+      }
+    ],
+    "logExtract": [
+      "2026-10-21T14:53:56.3480318Z ok  \tgithub.com/NikishGum/JudeOSLite/backend/internal/audit\t13.230s",
+      "2026-10-21T14:55:07.8576628Z ok  \tgithub.com/NikishGum/JudeOSLite/backend/internal/reports\t9.435s",
+      "2026-10-21T14:57:23.8057523Z {\"result\": \"PASS\", \"engine\": \"chromium\", \"version\": \"151.0.7922.34\", \"roles\": \"owner/admin/trainer/parent/mixed\", \"staff\": 10, \"jsErrors\": [], \"captures\": []}",
+      "2026-10-21T14:58:02.3302886Z {\"result\": \"PASS\", \"engine\": \"webkit\", \"version\": \"26.5\", \"roles\": \"owner/admin/trainer/parent/mixed\", \"staff\": 10, \"jsErrors\": [], \"captures\": []}",
+      "2026-10-21T14:58:16.8036279Z {\"engine\": \"chromium\", \"browser\": \"151.0.7922.34\", \"result\": \"PASS\", \"transport\": \"real frontend -> Go -> PostgreSQL18.6\", \"checks\": [\"personal counts and IDOR\", \"UI read/read-all/reload + independent SQL\", \"payment/document/family events\", \"mobile pagination and desktop inbox\", \"trainer route/replacement/cancellation/revocation\", \"parent unlink/revoke/logout\", \"CSRF/no-store/privacy\"]}",
+      "2026-10-21T14:58:33.9018847Z {\"engine\": \"webkit\", \"browser\": \"26.5\", \"result\": \"PASS\", \"transport\": \"real frontend -> Go -> PostgreSQL18.6\", \"checks\": [\"personal counts and IDOR\", \"UI read/read-all/reload + independent SQL\", \"payment/document/family events\", \"mobile pagination and desktop inbox\", \"trainer route/replacement/cancellation/revocation\", \"parent unlink/revoke/logout\", \"CSRF/no-store/privacy\"]}",
+      "2026-10-21T14:59:24.2842083Z {\"engine\": \"chromium\", \"browser\": \"155.0.8059.0\", \"result\": \"PASS\", \"transport\": \"real UI/browser -> Go -> PostgreSQL18.6\", \"checks\": [\"UI tariff/invoice/confirm/void\", \"integer BYN and SQL audit\", \"eight concurrent UUID retries\", \"version conflict\", \"snapshot\", \"exclusive interval/closed-only usage/HTTP correction\", \"family A/B and club isolation\", \"unlink/revoke/disabled session\", \"CSRF/no-store\", \"migration rerun\"]}",
+      "2026-10-21T14:59:37.5761048Z {\"engine\": \"webkit\", \"browser\": \"26.5\", \"result\": \"PASS\", \"transport\": \"real UI/browser -> Go -> PostgreSQL18.6\", \"checks\": [\"UI tariff/invoice/confirm/void\", \"integer BYN and SQL audit\", \"eight concurrent UUID retries\", \"version conflict\", \"snapshot\", \"exclusive interval/closed-only usage/HTTP correction\", \"family A/B and club isolation\", \"unlink/revoke/disabled session\", \"CSRF/no-store\", \"migration rerun\"]}",
+      "2026-10-21T14:59:47.1601000Z {\"engine\": \"chromium\", \"browser\": \"151.0.7922.34\", \"result\": \"PASS\", \"transport\": \"real frontend -> Go -> PostgreSQL18.6\", \"sampleDocument\": {\"id\": \"b4a759da-c566-4864-bd10-be1f33f8d87b\", \"membershipId\": \"c87a1a8b-ca87-4994-83c1-92c49a9cfc63\", \"name\": \"Synthetic Document 0\", \"kind\": \"medical\", \"filename\": \"proof.pdf\", \"mediaType\": \"application/pdf\", \"size\": 42, \"expiresOn\": null, \"createdAt\": \"2026-10-21T14:59:43.270622Z\", \"version\": 1}, \"checks\": [\"PDF/PNG/JPEG UI upload\", \"binary byte-for-byte browser download + SQL\", \"reload\", \"parent read-only mobile UI\", \"CSRF/foreign UUID/magic/filename/version denial\", \"UI deletion + SQL audit privacy\", \"live unlink on saved URL\"]}",
+      "2026-10-21T15:00:01.6428204Z {\"engine\": \"webkit\", \"browser\": \"26.5\", \"result\": \"PASS\", \"transport\": \"real frontend -> Go -> PostgreSQL18.6\", \"sampleDocument\": {\"id\": \"39f1b701-943c-4b09-8e07-a2519fe7f5a1\", \"membershipId\": \"825f8345-fd8b-4baf-b9d1-37d05daed0c8\", \"name\": \"Synthetic Document 0\", \"kind\": \"medical\", \"filename\": \"proof.pdf\", \"mediaType\": \"application/pdf\", \"size\": 42, \"expiresOn\": null, \"createdAt\": \"2026-10-21T14:59:54.529654Z\", \"version\": 1}, \"checks\": [\"PDF/PNG/JPEG UI upload\", \"binary byte-for-byte browser download + SQL\", \"reload\", \"parent read-only mobile UI\", \"CSRF/foreign UUID/magic/filename/version denial\", \"UI deletion + SQL audit privacy\", \"live unlink on saved URL\"]}",
+      "2026-10-21T15:00:08.6897491Z {\"engine\": \"chromium\", \"result\": \"PASS\", \"transport\": \"real browser -> Go -> PostgreSQL18.6\", \"checks\": [\"owner UI login\", \"explicit two-child family\", \"parent login and isolated list\", \"foreign UUID/staff denial\", \"CSRF\", \"unlink live denial\", \"Argon2id storage\", \"reset session revocation\", \"revoke SQL\"]}",
+      "2026-10-21T15:00:15.5251395Z {\"engine\": \"webkit\", \"result\": \"PASS\", \"transport\": \"real browser -> Go -> PostgreSQL18.6\", \"checks\": [\"owner UI login\", \"explicit two-child family\", \"parent login and isolated list\", \"foreign UUID/staff denial\", \"CSRF\", \"unlink live denial\", \"Argon2id storage\", \"reset session revocation\", \"revoke SQL\"]}",
+      "2026-10-21T15:00:54.7432629Z RD-02 PASS: full fields/identity owner; separate same-name records/family contact; UI cancel/conflicts/archive/restore; dated transfer/exclude/add/history/roster; multi assignments/revoke/foreign API; group ID URL; keyboard/panels/list/card/forms1280/390/overflow320",
+      "2026-10-21T15:01:04.2862660Z RD-07 PASS: real profile/logout/live settings; Sidebar248/76/mobile absent; all9 screens1280/900/390/320; participant name/detail/editor; civil date+URL/calendar; keyboard focus return/More; complete existing features",
+      "2026-10-21T15:01:15.3435290Z RD-01: separate roles/multi-role; real detail/reload/legacy/history; draft/club/back guard; revoke/foreign API; 320/390/768/1280/1440; keyboard/safe-area/reduced motion passed",
+      "2026-10-21T15:01:33.4922003Z {\"engine\": \"chromium\", \"version\": \"151.0.7922.34\", \"scheduleCounts\": {\"weekly\": 2, \"day_parity\": 4, \"date_list\": 2, \"once\": 1}, \"report\": {\"conducted\": 1, \"present\": 2, \"absent\": 3, \"unknown\": 2, \"illness\": 0, \"excused\": 1, \"percentage\": 40}, \"nativeHistoryReturn\": \"fresh session and role verified; BFCache not measured\", \"checks\": \"manifest/icons; admin UI/five participants/four schedules; cards/three reasons/defaults/correction/report; 320/390/768/900/1280/1440; rendered text contrast 4.5/3; double tap/delay/offline; mark/close/correct precommit error/lost response/SQL/reload; mark idempotent retry/correction stale retry; closed/cancelled/role revoke; static-only cache/logout/account swap/expiry/pagehide/native history return/fresh me; two builds/waiting/save guard/other-tab save\", \"physicalInstallation\": \"NOT TESTED\"}",
+      "2026-10-21T15:02:35.8373123Z RD-02 PASS: full fields/identity owner; separate same-name records/family contact; UI cancel/conflicts/archive/restore; dated transfer/exclude/add/history/roster; multi assignments/revoke/foreign API; group ID URL; keyboard/panels/list/card/forms1280/390/overflow320",
+      "2026-10-21T15:02:58.5224236Z RD-07 PASS: real profile/logout/live settings; Sidebar248/76/mobile absent; all9 screens1280/900/390/320; participant name/detail/editor; civil date+URL/calendar; keyboard focus return/More; complete existing features",
+      "2026-10-21T15:03:18.8788897Z RD-01: separate roles/multi-role; real detail/reload/legacy/history; draft/club/back guard; revoke/foreign API; 320/390/768/1280/1440; keyboard/safe-area/reduced motion passed",
+      "2026-10-21T15:03:46.1303301Z {\"engine\": \"webkit\", \"version\": \"26.5\", \"scheduleCounts\": {\"weekly\": 2, \"day_parity\": 4, \"date_list\": 2, \"once\": 1}, \"report\": {\"conducted\": 1, \"present\": 2, \"absent\": 3, \"unknown\": 2, \"illness\": 0, \"excused\": 1, \"percentage\": 40}, \"nativeHistoryReturn\": \"fresh session and role verified; BFCache not measured\", \"checks\": \"manifest/icons; admin UI/five participants/four schedules; cards/three reasons/defaults/correction/report; 320/390/768/900/1280/1440; rendered text contrast 4.5/3; double tap/delay/offline; mark/close/correct precommit error/lost response/SQL/reload; mark idempotent retry/correction stale retry; closed/cancelled/role revoke; static-only cache/logout/account swap/expiry/pagehide/native history return/fresh me; two builds/waiting/save guard/other-tab save\", \"physicalInstallation\": \"NOT TESTED\"}",
+      "2026-10-21T15:04:15.9296080Z {\"engine\": \"chromium\", \"version\": \"151.0.7922.34\", \"result\": \"PASS\", \"checks\": \"separate bounded cards/mobile names, closed green and matching legend, compact desktop/mobile, shared header/rows, trainer suffix, status shading/missed, keyboard link without write, day/week/period, ID scope/two clubs, create/reschedule/replace/cancel, direct journal/back/reload, Escape/focus, double tap/network/reload, correction conflict/history, preview/snapshot/search/45 participants, no calendar N+1, canonical/legacy links, 320/390/768/1280/1440\"}",
+      "2026-10-21T15:04:59.6632281Z {\"engine\": \"webkit\", \"version\": \"26.5\", \"result\": \"PASS\", \"checks\": \"separate bounded cards/mobile names, closed green and matching legend, compact desktop/mobile, shared header/rows, trainer suffix, status shading/missed, keyboard link without write, day/week/period, ID scope/two clubs, create/reschedule/replace/cancel, direct journal/back/reload, Escape/focus, double tap/network/reload, correction conflict/history, preview/snapshot/search/45 participants, no calendar N+1, canonical/legacy links, 320/390/768/1280/1440\"}",
+      "2026-10-21T15:05:21.0809711Z {\"engine\": \"chromium\", \"version\": \"151.0.7922.34\", \"result\": \"PASS\", \"ledger\": \"3/7=42.9%; corrected 4/7=57.1%; empty closed; planned/open/cancelled; archived/transfer; saved session timezone\", \"checks\": \"quick Sunday/year/Minsk vs browser date; custom restore; same names/ID drilldown/session period; error/retry/stale responses; audit 50+8 paging/scope/public envelope; live admin+owner revoke; keyboard; 320/390/1280\"}",
+      "2026-10-21T15:05:47.3431435Z {\"engine\": \"webkit\", \"version\": \"26.5\", \"result\": \"PASS\", \"ledger\": \"3/7=42.9%; corrected 4/7=57.1%; empty closed; planned/open/cancelled; archived/transfer; saved session timezone\", \"checks\": \"quick Sunday/year/Minsk vs browser date; custom restore; same names/ID drilldown/session period; error/retry/stale responses; audit 50+8 paging/scope/public envelope; live admin+owner revoke; keyboard; 320/390/1280\"}",
+      "2026-10-21T15:06:02.0919308Z UX-HISTORY PASS chromium 151.0.7922.34 jsErrors= []",
+      "2026-10-21T15:06:18.9870249Z UX-HISTORY PASS webkit 26.5 jsErrors= []",
+      "2026-10-21T15:06:41.7298191Z {\"engine\": \"chromium\", \"version\": \"151.0.7922.34\", \"result\": \"PASS\", \"ledger\": \"2/5=40%; correction3/5=60%; close5/8=62.5%; empty closed null\", \"checks\": \"two 24-hour-separated local dates; role scopes/counters/frozen roster; exact group/journal/create links; real mark/close/correction/archive; independent failures+retry; multi-role actual trainer; revoke/late replies/logout; 1440/1280/768/390/320; touch targets/main action\"}",
+      "2026-10-21T15:07:14.0346362Z {\"engine\": \"webkit\", \"version\": \"26.5\", \"result\": \"PASS\", \"ledger\": \"2/5=40%; correction3/5=60%; close5/8=62.5%; empty closed null\", \"checks\": \"two 24-hour-separated local dates; role scopes/counters/frozen roster; exact group/journal/create links; real mark/close/correction/archive; independent failures+retry; multi-role actual trainer; revoke/late replies/logout; 1440/1280/768/390/320; touch targets/main action\"}",
+      "2026-10-21T15:07:44.4916182Z RD-08 frontend contract PASS: chromium 22 screen/state groups; synthetic responses; NOT backend acceptance",
+      "2026-10-21T15:08:22.5405415Z RD-08 frontend contract PASS: webkit 22 screen/state groups; synthetic responses; NOT backend acceptance"
+    ]
+  },
+  "deploy": {
+    "runId": 39623354372,
+    "attempt": 1,
+    "url": "https://github.com/NikishGum/JudeOSLite/actions/runs/39623354372",
+    "jobs": [
+      {
+        "id": 119302228046,
+        "name": "select",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 39623354372,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run python3 .github/scripts/select_deploy.py",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7
+          }
+        ]
+      },
+      {
+        "id": 119302314041,
+        "name": "publish",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 39623354372,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Build or reuse the SHA image, smoke it, and record its digest",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7
+          }
+        ]
+      },
+      {
+        "id": 119303073272,
+        "name": "deploy",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 39623354372,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Recheck that CI still represents current main",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Send the restricted deployment request",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9
+          }
+        ]
+      }
+    ],
+    "logExtract": [
+      "2026-10-21T15:12:53.8869573Z   RELEASE_IMAGE: ghcr.io/nikishgum/judeoslite-test@sha256:be67604b9c3617e73e5bdb0802a0083b09afd7d5d7ab1122d0051d6d7221324a",
+      "2026-10-21T15:12:53.8870168Z   RELEASE_GENERATION: 259",
+      "2026-10-21T15:13:13.6699373Z Deployment completed; HTTPS readiness and release SHA verified."
+    ]
+  },
+  "previousChats": [
+    {
+      "id": "01a154dd-1dcb-7138-bf05-94efcb89d059",
+      "hostId": "durable",
+      "status": "idle",
+      "lastTurn": "completed"
+    },
+    {
+      "id": "01a13e78-5df7-7411-8951-9b7512126061",
+      "hostId": "durable",
+      "status": "idle",
+      "lastTurn": "completed"
+    },
+    {
+      "id": "01a13ffe-2616-79d0-a31d-d7001368d54a",
+      "hostId": "local",
+      "status": "notLoaded",
+      "lastTurn": "completed"
+    },
+    {
+      "id": "01a134c2-4f98-7a51-b19b-5e9debb7405c",
+      "hostId": "local",
+      "status": "notLoaded",
+      "lastTurn": "completed"
+    }
+  ],
+  "limits": [
+    "Exact-main CI evidence inspected; not a new local browser run",
+    "No connected local Browser app js tool or physical devices in this chat",
+    "No QA188 credential binding or authenticated HTTPS session in the current environment",
+    "Employee and current visual acceptance remain unconfirmed",
+    "Android and remaining manual iPhone checks retain agreed DEFERRED / NOT RUN"
+  ],
+  "recordedAt": "2026-10-21T15:44:26.794962+00:00"
+}
