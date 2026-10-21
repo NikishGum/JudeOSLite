@@ -4,8 +4,8 @@
   "repository": "NikishGum/JudeOSLite",
   "source_main": "72460d8f7bf8fd58fd93eeb026099012033daabf",
   "prototype_commit": "8016b746072e9334567de7fdbba2dcaf2a72fb45",
-  "task_count": 16,
-  "dependency_count": 37,
+  "task_count": 17,
+  "dependency_count": 39,
   "issues": [
     {
       "id": "RD-01",
@@ -203,6 +203,18 @@
       ],
       "body_sha256": "e9a4720b6aee51fe9b62841dcfeba2ab32287b500adf708e6b5c883b22c9b93b",
       "title": "Сотрудники: карточка доступа (вариант Б) и необходимые доработки backend"
+    },
+    {
+      "id": "UX-HISTORY",
+      "number": 220,
+      "github_id": 5944414833,
+      "url": "https://github.com/NikishGum/JudeOSLite/issues/220",
+      "dependencies": [
+        "RD-04",
+        "RD-08"
+      ],
+      "body_sha256": "5f34483e7ac8b25c7ab7240b4e8edb7cb8158a12c3274e5c195463bfc295a469",
+      "title": "История: компактный журнал (вариант А), серверный поиск и фильтры"
     }
   ],
   "verification": {
