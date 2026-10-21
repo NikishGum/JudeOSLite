@@ -55,8 +55,12 @@ try:
         cmd('docker','network','create',NET)
         cmd('docker','run','-d','--name',DB,'--network',NET,'-e','POSTGRES_USER=test','-e','POSTGRES_PASSWORD=test-only','-e','POSTGRES_DB='+DATABASE,'postgres:18.6-bookworm')
         for _ in range(30):
-            if subprocess.run(['docker','exec',DB,'pg_isready','-U','test'],stdout=subprocess.DEVNULL).returncode==0: break
+            # initdb temporarily accepts Unix sockets before the final server
+            # enables TCP. Migrations run in another container and require TCP.
+            if subprocess.run(['docker','exec',DB,'pg_isready','-h','127.0.0.1','-U','test','-d',DATABASE],stdout=subprocess.DEVNULL).returncode==0: break
             time.sleep(1)
+        else:
+            raise AssertionError('PostgreSQL TCP endpoint did not become ready')
         env=['-e',f'DATABASE_URL=postgres://test:test-only@{DB}:5432/{DATABASE}?sslmode=disable']
         cmd('docker','run','--rm','--network',NET,*env,IMAGE,'/app/migrate'); bootstrap(env)
         cmd('docker','create','--name',APP,'--network',NET,*env,'-e','APP_ORIGIN='+ROOT,'-e','AUTH_INSECURE_LOCAL=true','-p','127.0.0.1:18082:8080',IMAGE)

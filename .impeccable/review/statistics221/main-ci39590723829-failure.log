@@ -1,0 +1,24 @@
+2026-10-21T11:28:46.1858050Z 2026/10/21 11:28:46 migrations applied
+2026-10-21T11:29:11.7139463Z {"engine": "chromium", "version": "151.0.7922.34", "result": "PASS", "checks": "separate bounded cards/mobile names, closed green and matching legend, compact desktop/mobile, shared header/rows, trainer suffix, status shading/missed, keyboard link without write, day/week/period, ID scope/two clubs, create/reschedule/replace/cancel, direct journal/back/reload, Escape/focus, double tap/network/reload, correction conflict/history, preview/snapshot/search/45 participants, no calendar N+1, canonical/legacy links, 320/390/768/1280/1440"}
+2026-10-21T11:29:14.5814441Z 2026/10/21 11:29:14 migrations applied
+2026-10-21T11:29:48.1274151Z {"engine": "webkit", "version": "26.5", "result": "PASS", "checks": "separate bounded cards/mobile names, closed green and matching legend, compact desktop/mobile, shared header/rows, trainer suffix, status shading/missed, keyboard link without write, day/week/period, ID scope/two clubs, create/reschedule/replace/cancel, direct journal/back/reload, Escape/focus, double tap/network/reload, correction conflict/history, preview/snapshot/search/45 participants, no calendar N+1, canonical/legacy links, 320/390/768/1280/1440"}
+2026-10-21T11:29:51.1377001Z 2026/10/21 11:29:51 migrations applied
+2026-10-21T11:30:09.8863251Z {"engine": "chromium", "version": "151.0.7922.34", "result": "PASS", "ledger": "3/7=42.9%; corrected 4/7=57.1%; empty closed; planned/open/cancelled; archived/transfer; saved session timezone", "checks": "quick Sunday/year/Minsk vs browser date; custom restore; same names/ID drilldown/session period; error/retry/stale responses; audit 50+8 paging/scope/public envelope; live admin+owner revoke; keyboard; 320/390/1280"}
+2026-10-21T11:30:12.7949666Z 2026/10/21 11:30:12 migrations applied
+2026-10-21T11:30:34.3173417Z {"engine": "webkit", "version": "26.5", "result": "PASS", "ledger": "3/7=42.9%; corrected 4/7=57.1%; empty closed; planned/open/cancelled; archived/transfer; saved session timezone", "checks": "quick Sunday/year/Minsk vs browser date; custom restore; same names/ID drilldown/session period; error/retry/stale responses; audit 50+8 paging/scope/public envelope; live admin+owner revoke; keyboard; 320/390/1280"}
+2026-10-21T11:30:36.0399944Z 2026/10/21 11:30:36 migration failed: verify DATABASE_URL, database availability and migration history
+2026-10-21T11:30:36.5958893Z Traceback (most recent call last):
+2026-10-21T11:30:36.5959826Z   File "/home/runner/work/JudeOSLite/JudeOSLite/frontend/e2e/history_search.py", line 61, in <module>
+2026-10-21T11:30:36.5961161Z     cmd('docker','run','--rm','--network',NET,*env,IMAGE,'/app/migrate'); bootstrap(env)
+2026-10-21T11:30:36.5961905Z     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-10-21T11:30:36.5962668Z   File "/home/runner/work/JudeOSLite/JudeOSLite/frontend/e2e/history_search.py", line 24, in cmd
+2026-10-21T11:30:36.5963575Z     def cmd(*args): return subprocess.check_output(args, text=True).strip()
+2026-10-21T11:30:36.5964478Z                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-10-21T11:30:36.5965039Z   File "/usr/lib/python3.12/subprocess.py", line 466, in check_output
+2026-10-21T11:30:36.5965736Z     return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+2026-10-21T11:30:36.5966428Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-10-21T11:30:36.5966928Z   File "/usr/lib/python3.12/subprocess.py", line 571, in run
+2026-10-21T11:30:36.5967480Z     raise CalledProcessError(retcode, process.args,
+2026-10-21T11:30:36.5971345Z subprocess.CalledProcessError: Command '('docker', 'run', '--rm', '--network', 'history220-0d07272f-net', '-e', 'DATABASE_URL=***history220-0d07272f-db:5432/history220?sslmode=disable', 'judeoslite:ci', '/app/migrate')' returned non-zero exit status 1.
+2026-10-21T11:30:36.6163985Z ##[error]Process completed with exit code 1.
+2026-10-21T11:30:36.6269932Z Post job cleanup.
