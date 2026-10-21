@@ -344,7 +344,7 @@
   "limits": [
     "Exact-main CI evidence inspected; not a new local browser run",
     "No connected local Browser app js tool or physical devices in this chat",
-    "Employee and current visual acceptance remain unconfirmed",
+    "Employee acceptance remains unconfirmed; current visual design accepted separately on2026-10-21",
     "Android and remaining manual iPhone checks retain agreed DEFERRED / NOT RUN"
   ],
   "recordedAt": "2026-10-21T15:44:26.794962+00:00",
@@ -352,6 +352,8 @@
     "result": "PASS",
     "evidence": "https-readonly.json",
     "employeeAnswer": "Ещё не проводили",
-    "employeeAnswerDate": "2026-10-21"
+    "employeeAnswerDate": "2026-10-21",
+    "visualAnswer": "Принимаю текущее оформление",
+    "visualAnswerDate": "2026-10-21"
   }
 }
