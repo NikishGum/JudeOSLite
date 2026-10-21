@@ -90,3 +90,12 @@ late responses/live revoke. В первой WebKit попытке новый har
 последний пакет с кодом. После последней CSS-поправки отдельные shipping прогоны
 Chromium/WebKit снова PASS, включая border0 внутреннего поиска/outer48, все
 четыре ширины и те же функциональные assertions. Дальнейшей полировки нет.
+
+
+Первый полный branch CI [39584133445](https://github.com/NikishGum/JudeOSLite/actions/runs/39584133445)
+наfb6e9e0 — FAIL в существующем PWA/redesign_shell.py:101: старый label
+«Филиал истории» после принятого сокращения стал «Филиал». Исправлены только
+три селектора в области .audit-history; проверки multi-role/отзыва/UUID options
+сохранены. До этого шага frontend/background, полный Go/PG/race, image, обе
+staff/notifications/billing/documents/families suites прошли. Исходный FAIL
+сохранён; новые полный PWA/CI проверяют исправленную версию, без retries.
